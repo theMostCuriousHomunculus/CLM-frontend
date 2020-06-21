@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.avatar {
+  height: 100%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, 0);
+}
+
+.circle-avatar-container {
+  border: solid 3px black;
+  border-radius: 50%;
+  height: 10rem;
+  overflow: hidden;
+  position: relative;
+  width: 10rem;
+}
