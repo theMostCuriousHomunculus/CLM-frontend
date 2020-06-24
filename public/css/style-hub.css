@@ -4,11 +4,19 @@
   padding: 0;
 }
 
+main {
+  margin: 1rem auto;
+}
+
 .avatar {
   height: 100%;
   left: 50%;
   position: absolute;
   transform: translate(-50%, 0);
+}
+
+.card-container {
+  border: solid 1px black;
 }
 
 .circle-avatar-container {
@@ -18,4 +26,19 @@
   overflow: hidden;
   position: relative;
   width: 10rem;
+}
+
+.hover-preview-container {
+  position: absolute;
+}
+
+.hover-preview-image {
+  height: 300px;
+  z-index: 1;
+}
+
+.site-footer {
+  background-color: blueviolet;
+  color: white;
+  height: 300px;
 }

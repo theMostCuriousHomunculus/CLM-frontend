@@ -85,8 +85,8 @@ const Authenticate = () => {
                 method='PATCH'
                 onSubmit={login}
             >
-                <input type="email" id="email" name="email" placeholder="Email Address"></input>
-                <input type="password" id="password" name="password" placeholder="Password"></input>
+                <input type="email" id="email" name="email" placeholder="Email Address" required></input>
+                <input type="password" id="password" name="password" placeholder="Password" required></input>
                 <button>Login!</button>
             </form>
         );
@@ -97,9 +97,9 @@ const Authenticate = () => {
                 method='POST'
                 onSubmit={register}
             >
-                <input type="text" id="name" name="name" placeholder="Account Name"></input>
-                <input type="email" id="email" name="email" placeholder="Email Address"></input>
-                <input type="password" id="password" name="password" placeholder="Password"></input>
+                <input type="text" id="name" name="name" placeholder="Account Name" required></input>
+                <input type="email" id="email" name="email" placeholder="Email Address" required></input>
+                <input type="password" id="password" name="password" placeholder="Password" required></input>
                 <button>Register!</button>
             </form>
         );

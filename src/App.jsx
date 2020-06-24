@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import Account from './pages/Account';
 import Authenticate from './pages/Authenticate';
 import Cube from './pages/Cube';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import MainNav from './components/MainNav';
 import { AuthenticationContext } from './contexts/authentication-context';
@@ -45,7 +46,9 @@ function App() {
       }}
     >
       <BrowserRouter>
-        <MainNav />
+        <header>
+          <MainNav />
+        </header>
         <main>
           <Switch>
             <Route path='/' exact>
@@ -62,6 +65,9 @@ function App() {
             </Route>
           </Switch>
         </main>
+        <footer className="site-footer">
+          <Footer />
+        </footer>
       </BrowserRouter>
     </AuthenticationContext.Provider>
   );
