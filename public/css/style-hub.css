@@ -15,10 +15,6 @@ main {
   transform: translate(-50%, 0);
 }
 
-.card-container {
-  border: solid 1px black;
-}
-
 .circle-avatar-container {
   border: solid 3px black;
   border-radius: 50%;
@@ -26,6 +22,16 @@ main {
   overflow: hidden;
   position: relative;
   width: 10rem;
+}
+
+.curve-view-color-container,
+.table-view-color-container {
+  border: solid 1px black;
+}
+
+.curve-view-type-container {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
 }
 
 .hover-preview-container {
@@ -41,4 +47,9 @@ main {
   background-color: blueviolet;
   color: white;
   height: 300px;
+}
+
+.table-view-main-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
 }
