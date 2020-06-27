@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 
+import PrintSelector from './PrintSelector';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
@@ -55,6 +56,43 @@ const ListView = (props) => {
     props.updateCubeHandler(updatedCube);
   }
 
+  async function submitColorIdentityChange (event) {
+    const action = 'edit_card';
+    const card_id = event.target.getAttribute('data-card_id');
+    const color_checkboxes = document.getElementsByClassName(event.target.getAttribute('class'));
+    let color_identity = [];
+
+    for (let checkbox of color_checkboxes) {
+      if (checkbox.checked) {
+        color_identity.push(checkbox.value);
+      }
+    }
+
+    try {
+
+      const cardChanges = JSON.stringify({
+        action,
+        card_id,
+        color_identity: color_identity.sort(),
+        component: props.componentState.active_component_id,
+        cube_id: props.componentState.cube._id
+      });
+      const updatedCube = await sendRequest(
+        'http://localhost:5000/api/cube/',
+        'PATCH',
+        cardChanges,
+        {
+          Authorization: 'Bearer ' + authentication.token,
+          'Content-Type': 'application/json'
+        }
+      );
+      props.updateCubeHandler(updatedCube);
+
+    } catch (error) {
+      console.log({ 'Error': error.message });
+    }
+  }
+
   return (
     <div className="list-view-main-container">
       <table>
@@ -82,7 +120,31 @@ const ListView = (props) => {
                 >
                   {card.name}
                 </td>
-                <td>{card.color}</td>
+                <td>
+                  {props.componentState.cube.creator === authentication.userId ?
+                    <React.Fragment>
+                      {["W", "U", "B", "R", "G"].map(function (color) {
+                        return (
+                          <React.Fragment key={color}>
+                            <input
+                              checked={card.color_identity.includes(color) ? true : false}
+                              className={`color-indicator-${card._id}`}
+                              data-card_id={card._id}
+                              name="color_identity[]"
+                              onChange={submitColorIdentityChange}
+                              type="checkbox"
+                              value={color}
+                            />
+                            <label> : {color} </label>
+                          </React.Fragment>
+                        );
+                      })}
+                    </React.Fragment> :
+                    <React.Fragment>
+                      {card.color}
+                    </React.Fragment>
+                  }
+                </td>
                 <td>
                   {props.componentState.cube.creator === authentication.userId ?
                     <input
@@ -136,7 +198,18 @@ const ListView = (props) => {
                     </React.Fragment>
                   }
                 </td>
-                <td>{card.printing}</td>
+                <td>
+                  {props.componentState.cube.creator === authentication.userId ?
+                    <PrintSelector
+                      card={card}
+                      componentState={props.componentState}
+                      updateCubeHandler={props.updateCubeHandler}
+                    /> :
+                    <React.Fragment>
+                      {card.printing}
+                    </React.Fragment>
+                  }
+                </td>
                 <td><a href={card.purchase_link}>Buy It Now!</a></td>
               </tr>
             );

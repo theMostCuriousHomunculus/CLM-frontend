@@ -12,13 +12,15 @@ const Account = () => {
   const history = useHistory();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
-  const [avatar, setAvatar] = useState('');
-  const [buds, setBuds] = useState([]);
+  const [user, setUser] = useState({});
+
+  // const [avatar, setAvatar] = useState('');
+  // const [buds, setBuds] = useState([]);
   const [cubes, setCubes] = useState([]);
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [receivedBudRequests, setReceivedBudRequests] = useState([]);
-  const [sentBudRequests, setSentBudRequests] = useState([]);
+  // const [email, setEmail] = useState('');
+  // const [name, setName] = useState('');
+  // const [receivedBudRequests, setReceivedBudRequests] = useState([]);
+  // const [sentBudRequests, setSentBudRequests] = useState([]);
   const [showCubeForm, setShowCubeForm] = useState(false);
 
   useEffect(() => {
@@ -26,12 +28,13 @@ const Account = () => {
       try {
         const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
         const accountData = await sendRequest('http://localhost:5000/api/account/' + accountId, 'GET', null, headers);
-        setAvatar(accountData.avatar);
-        setBuds(accountData.buds);
-        setEmail(accountData.email);
-        setName(accountData.name);
-        setReceivedBudRequests(accountData.received_bud_requests);
-        setSentBudRequests(accountData.sent_bud_requests);
+        // setAvatar(accountData.avatar);
+        // setBuds(accountData.buds);
+        // setEmail(accountData.email);
+        // setName(accountData.name);
+        // setReceivedBudRequests(accountData.received_bud_requests);
+        // setSentBudRequests(accountData.sent_bud_requests);
+        setUser(accountData);
         const cubeData = await sendRequest(`http://localhost:5000/api/cube?creator=${accountId}`, 'GET', null, {});
         setCubes(cubeData.cubes);
       } catch (error) {
@@ -106,12 +109,14 @@ const Account = () => {
       </Modal>
       <h2>Basic Info</h2>
       <ul>
-        <li>{name}</li>
-        {email && <li>{email}</li>}
-        {avatar &&
+        <li>{user.name}</li>
+        {accountId === authentication.userId &&
+          <li>{user.email}</li>
+        }
+        {user.avatar &&
           <li>
             <div className="circle-avatar-container">
-              <img alt="avatar" className="avatar" src={avatar} />
+              <img alt="avatar" className="avatar" src={user.avatar} />
             </div>
           </li>
         }
@@ -124,22 +129,68 @@ const Account = () => {
           })}
         </ul>
       }
-      {email && <button onClick={openCubeForm}>Create a Cube</button>}
+      {accountId === authentication.userId &&
+        <button onClick={openCubeForm}>Create a Cube</button>
+      }
       <h2>Buds</h2>
       <ul>
-        {buds && buds.map(function (bud, index) {
-          return (
-            <li key={`bud${index}`}>
-              {bud.avatar &&
-                <div className="circle-avatar-container">
-                  <img alt="avatar" className="avatar" src={bud.avatar} />
-                </div>
-              }
-              <Link to={`/account/${bud._id}`}>{bud.name}</Link>
-            </li>
-          );
-        })}
+        {user.buds &&
+          user.buds.map(function (bud) {
+            return (
+              <li key={bud}>
+                {bud.avatar &&
+                  <div className="circle-avatar-container">
+                    <img alt="avatar" className="avatar" src={bud.avatar} />
+                  </div>
+                }
+                <Link to={`/account/${bud._id}`}>{bud.name}</Link>
+              </li>
+            );
+          })
+        }
       </ul>
+      {accountId === authentication.userId &&
+        <React.Fragment>
+          <h2>Aspiring Buds</h2>
+          <ul>
+            {user.received_bud_requests &&
+              user.received_bud_requests.map(function (request) {
+                return (
+                  <li key={request._id}>
+                    {request.avatar &&
+                      <div className="circle-avatar-container">
+                        <img alt="avatar" className="avatar" src={request.avatar} />
+                      </div>
+                    }
+                    <Link to={`/account/${request._id}`}>{request.name}</Link>
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </React.Fragment>
+      }
+      {accountId === authentication.userId &&
+        <React.Fragment>
+          <h2>Pending Buds</h2>
+          <ul>
+            {user.sent_bud_requests &&
+              user.sent_bud_requests.map(function (request) {
+                return (
+                  <li key={request._id}>
+                    {request.avatar &&
+                      <div className="circle-avatar-container">
+                        <img alt="avatar" className="avatar" src={request.avatar} />
+                      </div>
+                    }
+                    <Link to={`/account/${request._id}`}>{request.name}</Link>
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </React.Fragment>
+      }
     </React.Fragment>
   );
 }
