@@ -1,26 +1,48 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import CubeView from '../components/CubeView';
+import ComponentInfo from '../components/ComponentInfo';
+import CubeInfo from '../components/CubeInfo';
+import CurveView from '../components/CurveView';
 import HoverPreview from '../components/HoverPreview';
+import ListView from '../components/ListView';
 import Modal from '../components/Modal';
 import ScryfallRequest from '../components/ScryfallRequest';
+import TableView from '../components/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { useCardSort } from '../hooks/card-sort-hook';
+import { useCube } from '../hooks/cube-hook';
 import { useRequest } from '../hooks/request-hook';
 
 const Cube = () => {
 
   const cubeId = useParams().cubeId;
   const authentication = useContext(AuthenticationContext);
-  const { appendPropertiesAndSort } = useCardSort();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
-  const [activeComponent, setActiveComponent] = useState(null);
+  const [componentState, dispatch] = useReducer(useCube, {
+    active_component_cards: [],
+    active_component_id: 'mainboard',
+    active_component_name: 'Mainboard',
+    active_rotation_size: undefined,
+    active_component_type: 'mainboard',
+    cube: null,
+    displayed_cards: [],
+    filter: ''
+  });
+
+  function filterCardsHandler (event) {
+    dispatch({ type: 'FILTER_CARDS', value: event.target.value });
+  }
+
+  function updateCubeHandler (cube) {
+    dispatch({ type: 'UPDATE_CUBE', value: cube });
+  }
+
+  function switchComponentHandler (component_id) {
+    dispatch({ type: 'SWITCH_COMPONENT', value: component_id })
+  }
+
   const [creator, setCreator] = useState(null);
-  const [cube, setCube] = useState(null);
-  const [displayedCards, setDisplayedCards] = useState(null);
-  const [filter, setFilter] = useState('');
   const [preview, setPreview] = useState({
     back_image: null,
     container_display: "none",
@@ -35,14 +57,8 @@ const Cube = () => {
   useEffect(() => {
     const fetchCube = async function () {
       try {
-        const cubeData = await sendRequest('http://localhost:5000/api/cube/' + cubeId, 'GET', null, {});                
-        setActiveComponent({
-          cards: cubeData.mainboard,
-          _id: 'mainboard',
-          name: 'Mainboard'
-        });
-        setCube(cubeData);
-        changeDisplayedCards(cubeData.mainboard, filter);
+        const cubeData = await sendRequest('http://localhost:5000/api/cube/' + cubeId, 'GET', null, {});
+        updateCubeHandler(cubeData);
         const creatorData = await sendRequest('http://localhost:5000/api/account/' + cubeData.creator, 'GET', null, {});
         setCreator(creatorData);
       } catch (error) {
@@ -65,7 +81,7 @@ const Cube = () => {
         action: 'add_card',
         back_image: chosenPrinting.getAttribute('data-back_image'),
         color_identity: JSON.parse(chosenCard.getAttribute('data-color_identity')),
-        component: activeComponent._id,
+        component: componentState.active_component_id,
         cmc: chosenCard.getAttribute('data-cmc'),
         cube_id: cubeId,
         image: chosenPrinting.getAttribute('data-image'),
@@ -90,34 +106,7 @@ const Cube = () => {
           'Content-Type': 'application/json'
         }
       );
-      setCube(updatedCube);
-
-      if (activeComponent._id === 'mainboard') {
-        setActiveComponent({
-          cards: updatedCube.mainboard,
-          _id: 'mainboard',
-          name: 'Mainboard'
-        });
-        changeDisplayedCards(updatedCube.mainboard, filter);
-      } else if (activeComponent._id === 'sideboard') {
-        setActiveComponent({
-          cards: updatedCube.sideboard,
-          _id: 'sideboard',
-          name: 'Sideboard'
-        });
-        changeDisplayedCards(updatedCube.sideboard, filter);
-      } else {
-        let modulesAndRotations = [...updatedCube.modules, ...updatedCube.rotations];
-        const component = modulesAndRotations.find(function (cmpnt) {
-          return cmpnt._id === activeComponent._id;
-        });
-        setActiveComponent({
-          cards: component.cards,
-          _id: component._id,
-          name: component.name
-        });
-        changeDisplayedCards(component.cards, filter);
-      }
+      updateCubeHandler(updatedCube);
 
     } catch (error) {
       console.log({ 'Error': error.message });
@@ -145,21 +134,16 @@ const Cube = () => {
           'Content-Type': 'application/json'
         }
       );
-      setCube(updatedCube);
+      updateCubeHandler(updatedCube);
 
-      let component;
+      let component_id;
       if (action === 'add_module') {
-        component = updatedCube.modules[updatedCube.modules.length - 1];
+        component_id = updatedCube.modules[updatedCube.modules.length - 1]._id;
       } else {
-        component = updatedCube.rotations[updatedCube.rotations.length - 1];
+        component_id = updatedCube.rotations[updatedCube.rotations.length - 1]._id;
       }
 
-      setActiveComponent({
-        cards: component.cards,
-        _id: component._id,
-        name: component.name
-      });
-      changeDisplayedCards(component.cards, filter);
+      switchComponentHandler(component_id);
       closeComponentForm();
 
     } catch (error) {
@@ -168,51 +152,15 @@ const Cube = () => {
   }
 
   function changeComponent (event) {
-    if (event.target.value === 'mainboard') {
-      setActiveComponent({
-        cards: cube.mainboard,
-        _id: 'mainboard',
-        name: 'Mainboard'
-      });
-      changeDisplayedCards(cube.mainboard, filter);
-    } else if (event.target.value === 'sideboard') {
-      setActiveComponent({
-        cards: cube.sideboard,
-        _id: 'sideboard',
-        name: 'Sideboard'
-      });
-      changeDisplayedCards(cube.sideboard, filter);
-    } else {
-      let modulesAndRotations = [...cube.modules, ...cube.rotations];
-      const component = modulesAndRotations.find(function (cmpnt) {
-        return cmpnt._id === event.target.value;
-      });
-      setActiveComponent({
-        cards: component.cards,
-        _id: component._id,
-        name: component.name
-      });
-      changeDisplayedCards(component.cards, filter);
-    }
-  }
-
-  function changeDisplayedCards (unfilteredCards, filterText) {
-    setDisplayedCards(appendPropertiesAndSort(unfilteredCards.filter(function (card) {
-      return (
-        card.name.toLowerCase().includes(filterText.toLowerCase()) ||
-        card.type_line.toLowerCase().includes(filterText.toLowerCase()) ||
-        card.color.toLowerCase().includes(filterText.toLowerCase())
-      );
-    })));
-  }
-
-  function changeFilter (event) {
-    setFilter(event.target.value);
-    changeDisplayedCards(activeComponent.cards, event.target.value);
+    switchComponentHandler(event.target.value);
   }
 
   function changeViewMode (event) {
     setViewMode(event.target.value);
+  }
+
+  function closeComponentForm () {
+    setShowComponentForm(false);
   }
 
   function hidePreview () {
@@ -223,10 +171,6 @@ const Cube = () => {
       image: null,
       image_display: "none"
     });
-  }
-
-  function closeComponentForm () {
-    setShowComponentForm(false);
   }
 
   function movePreview (event) {
@@ -264,43 +208,28 @@ const Cube = () => {
       {creator &&
         <h2>Creator: <Link to={`/account/${creator._id}`}>{creator.name}</Link></h2>
       }
-      {cube &&
+      {componentState.cube && <CubeInfo cube={componentState.cube} />}
+      {componentState.cube && componentState.active_component_id &&
         <React.Fragment>
-          <h2>{cube.name}</h2>
-          <p>{cube.description}</p>
-        </React.Fragment>
-      }
-      {cube && activeComponent && displayedCards &&
-        <React.Fragment>
-          <h3>{activeComponent.name}</h3>
-          <select onChange={changeComponent} value={activeComponent._id}>
-            <option value="mainboard">Mainboard</option>
-            <option value="sideboard">Sideboard</option>
-            {
-              cube.modules.map(function (module) {
-                return <option key={module._id} value={module._id}>{module.name}</option>
-              })
-            }
-            {
-              cube.rotations.map(function (rotation) {
-                return <option key={rotation._id} value={rotation._id}>{rotation.name}</option>
-              })
-            }
-          </select>
+          <ComponentInfo
+            componentState={componentState}
+            changeComponent={changeComponent}
+            updateCubeHandler={updateCubeHandler}
+          />
           <h3>View Mode</h3>
           <select onChange={changeViewMode} value={viewMode}>
             <option value="Curve View">Curve View</option>
             <option value="List View">List View</option>
             <option value="Table View">Table View</option>
           </select>
-          {authentication.userId === cube.creator &&
+          {authentication.userId === componentState.cube.creator &&
             <React.Fragment>
               <ScryfallRequest
                 action="http://localhost:5000/api/cube/"
                 buttonText="Add it!"
                 method="PATCH"
                 onSubmit={addCard}
-                searchPlaceholderText={`Search for a card to add to ${activeComponent.name}`}
+                searchPlaceholderText={`Search for a card to add to ${componentState.active_component_name}`}
               />
               <button onClick={openComponentForm}>Create a Module or Rotation</button>
               <Modal
@@ -348,18 +277,33 @@ const Cube = () => {
           }
           <input
             autoComplete="off"
-            onChange={changeFilter}
+            onChange={filterCardsHandler}
             placeholder="Filter cards by keywords, name or type"
             type="text"
-            value={filter}
+            value={componentState.filter}
           />
-          <CubeView
-            activeComponent={activeComponent}
-            displayedCards={displayedCards}
-            hidePreview={hidePreview}
-            showPreview={showPreview}
-            viewMode={viewMode}
-          />
+          {viewMode === 'Curve View' &&
+            <CurveView
+              componentState={componentState}
+              hidePreview={hidePreview}
+              showPreview={showPreview}
+            />
+          }
+          {viewMode === 'List View' &&
+            <ListView
+              componentState={componentState}
+              hidePreview={hidePreview}
+              showPreview={showPreview}
+              updateCubeHandler={updateCubeHandler}
+            />
+          }
+          {viewMode === 'Table View' &&
+            <TableView
+              componentState={componentState}
+              hidePreview={hidePreview}
+              showPreview={showPreview}
+            />
+          }
         </React.Fragment>
       }
     </div>

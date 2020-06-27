@@ -96,8 +96,10 @@ export const useCardSort = () => {
       type = "Enchantment";
     } else if (type.includes("Artifact")) {
       type = "Artifact";
-    } else {
+    } else if (type.includes("Land")) {
       type = "Land";
+    } else {
+      type = "???"
     }
 
     return type;
