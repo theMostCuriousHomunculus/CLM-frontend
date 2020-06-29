@@ -7,7 +7,8 @@ import Authenticate from './pages/Authenticate';
 import Cube from './pages/Cube';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import MainNav from './components/MainNav';
+// import MainNav from './components/MainNav';
+import Navigation from './components/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
 
 function App() {
@@ -47,7 +48,7 @@ function App() {
     >
       <BrowserRouter>
         <header>
-          <MainNav />
+          <Navigation />
         </header>
         <main>
           <Switch>

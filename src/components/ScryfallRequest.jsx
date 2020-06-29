@@ -1,9 +1,22 @@
 import React, { useRef, useState } from 'react';
+import {
+  Button as MUIButton,
+  Card as MUICard,
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { useRequest } from '../hooks/request-hook';
 
+const useStyles = makeStyles({
+  spaceBetween: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  }
+});
+
 const ScryfallRequest = (props) => {
 
+  const classes = useStyles();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
   const scryfallCardSuggestions = useRef(null);
@@ -126,31 +139,43 @@ const ScryfallRequest = (props) => {
   }
 
   return (
-    <form action={props.action} method={props.method} onSubmit={submitForm}>
-      <input
-        autoComplete="off"
-        id="card-search"
-        list="card-search-results"
-        onChange={scryfallPrintSearch}
-        onKeyUp={scryfallCardSearch}
-        placeholder={props.searchPlaceholderText}
-        required
-        type="text"
-        value={searchText}
-      />
-      <datalist id="card-search-results" ref={scryfallCardSuggestions}>
-        {cardSearchResults && cardSearchResults.map(function (result) {
-          return result;
-        })}
-      </datalist>
-      <label htmlFor="printing">Printing: </label>
-      <select id="printing" name="printing" required>
-        {printSearchResults && printSearchResults.map(function (result) {
-          return result;
-        })}
-      </select>
-      <button>{props.buttonText}</button>
-    </form>
+    <MUICard className="basic-card">
+      <form
+        action={props.action}
+        className={classes.spaceBetween}
+        method={props.method}
+        onSubmit={submitForm}
+      >
+        <span>
+        <label htmlFor="card-search">Add a card to {props.componentState.active_component_name}: </label>
+          <input
+            autoComplete="off"
+            id="card-search"
+            list="card-search-results"
+            onChange={scryfallPrintSearch}
+            onKeyUp={scryfallCardSearch}
+            placeholder={props.searchPlaceholderText}
+            required
+            type="text"
+            value={searchText}
+          />
+        </span>
+        <datalist id="card-search-results" ref={scryfallCardSuggestions}>
+          {cardSearchResults && cardSearchResults.map(function (result) {
+            return result;
+          })}
+        </datalist>
+        <span>
+          <label htmlFor="printing">Printing: </label>
+          <select id="printing" name="printing" required>
+            {printSearchResults && printSearchResults.map(function (result) {
+              return result;
+            })}
+          </select>
+        </span>
+        <MUIButton color="primary" type="submit" variant="contained">{props.buttonText}</MUIButton>
+      </form>
+    </MUICard>
   );
 }
 

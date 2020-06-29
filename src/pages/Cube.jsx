@@ -214,24 +214,22 @@ const Cube = () => {
           <ComponentInfo
             componentState={componentState}
             changeComponent={changeComponent}
+            changeViewMode={changeViewMode}
+            filterCardsHandler={filterCardsHandler}
+            openComponentForm={openComponentForm}
             updateCubeHandler={updateCubeHandler}
+            viewMode={viewMode}
           />
-          <h3>View Mode</h3>
-          <select onChange={changeViewMode} value={viewMode}>
-            <option value="Curve View">Curve View</option>
-            <option value="List View">List View</option>
-            <option value="Table View">Table View</option>
-          </select>
           {authentication.userId === componentState.cube.creator &&
             <React.Fragment>
               <ScryfallRequest
                 action="http://localhost:5000/api/cube/"
                 buttonText="Add it!"
+                componentState={componentState}
                 method="PATCH"
                 onSubmit={addCard}
                 searchPlaceholderText={`Search for a card to add to ${componentState.active_component_name}`}
               />
-              <button onClick={openComponentForm}>Create a Module or Rotation</button>
               <Modal
                 action="http://localhost:5000/api/cube"
                 contentClass="create-cube-component__modal-content"
@@ -275,13 +273,6 @@ const Cube = () => {
               </Modal>
             </React.Fragment>
           }
-          <input
-            autoComplete="off"
-            onChange={filterCardsHandler}
-            placeholder="Filter cards by keywords, name or type"
-            type="text"
-            value={componentState.filter}
-          />
           {viewMode === 'Curve View' &&
             <CurveView
               componentState={componentState}

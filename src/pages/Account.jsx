@@ -1,26 +1,35 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import {
+  Avatar as MUIAvatar,
+  Button as MUIButton,
+  Card as MUICard,
+  CardHeader as MUICardHeader,
+  Typography as MUITypography
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 import Modal from '../components/Modal';
 
+const useStyles = makeStyles({
+  avatarLarge: {
+    height: "150px",
+    width: "150px"
+  }
+});
+
 const Account = () => {
 
   const accountId = useParams().accountId;
   const authentication = useContext(AuthenticationContext);
+  const classes = useStyles();
   const history = useHistory();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
   const [user, setUser] = useState({});
-
-  // const [avatar, setAvatar] = useState('');
-  // const [buds, setBuds] = useState([]);
   const [cubes, setCubes] = useState([]);
-  // const [email, setEmail] = useState('');
-  // const [name, setName] = useState('');
-  // const [receivedBudRequests, setReceivedBudRequests] = useState([]);
-  // const [sentBudRequests, setSentBudRequests] = useState([]);
   const [showCubeForm, setShowCubeForm] = useState(false);
 
   useEffect(() => {
@@ -28,12 +37,6 @@ const Account = () => {
       try {
         const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
         const accountData = await sendRequest('http://localhost:5000/api/account/' + accountId, 'GET', null, headers);
-        // setAvatar(accountData.avatar);
-        // setBuds(accountData.buds);
-        // setEmail(accountData.email);
-        // setName(accountData.name);
-        // setReceivedBudRequests(accountData.received_bud_requests);
-        // setSentBudRequests(accountData.sent_bud_requests);
         setUser(accountData);
         const cubeData = await sendRequest(`http://localhost:5000/api/cube?creator=${accountId}`, 'GET', null, {});
         setCubes(cubeData.cubes);
@@ -107,20 +110,13 @@ const Account = () => {
         />
         <button>Create!</button>
       </Modal>
-      <h2>Basic Info</h2>
-      <ul>
-        <li>{user.name}</li>
-        {accountId === authentication.userId &&
-          <li>{user.email}</li>
-        }
-        {user.avatar &&
-          <li>
-            <div className="circle-avatar-container">
-              <img alt="avatar" className="avatar" src={user.avatar} />
-            </div>
-          </li>
-        }
-      </ul>
+      <MUICard className="basic-card">
+        <MUICardHeader
+          avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
+          title={<MUITypography variant="h2">{user.name}</MUITypography>}
+          subheader={accountId === authentication.userId ? <MUITypography variant="h3">{user.email}</MUITypography> : null}
+        />
+      </MUICard>
       <h2>Cubes</h2>
       {cubes &&
         <ul>
@@ -130,7 +126,7 @@ const Account = () => {
         </ul>
       }
       {accountId === authentication.userId &&
-        <button onClick={openCubeForm}>Create a Cube</button>
+        <MUIButton color="primary" onClick={openCubeForm} variant="contained">Create a Cube</MUIButton>
       }
       <h2>Buds</h2>
       <ul>

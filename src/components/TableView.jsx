@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card, CardHeader } from '@material-ui/core';
 
 const TableView = (props) => {
 
@@ -14,8 +15,8 @@ const TableView = (props) => {
           return card.color === color;
         });
         return (
-          <div className={`table-view-color-container ${color.toLowerCase}-card-container`} key={`table-${color}`}>
-            <h3>{color}</h3>
+          <Card className={`table-view-color-container ${color.toLowerCase}-card-container`} key={`table-${color}`}>
+            <CardHeader title={color} />
             {types.map(function (type) {
               const cards_color_type = cards_color.filter(function (card) {
                 return card.type === type;
@@ -52,10 +53,10 @@ const TableView = (props) => {
                 </React.Fragment>
               );
             })}
-          </div>
+          </Card>
         );
       })}
-      <div className="table-view-color-container multicolor-card-container">
+      <Card className="table-view-color-container multicolor-card-container">
         {multiColors.map(function (color) {
           const cards_color = props.componentState.displayed_cards.filter(function (card) {
             return card.color === color;
@@ -98,7 +99,7 @@ const TableView = (props) => {
             </div>
           );
         })}
-      </div>
+      </Card>
     </div>
   );
 }
