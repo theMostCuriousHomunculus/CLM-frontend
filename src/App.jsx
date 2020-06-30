@@ -47,9 +47,7 @@ function App() {
       }}
     >
       <BrowserRouter>
-        <header>
-          <Navigation />
-        </header>
+        <Navigation />
         <main>
           <Switch>
             <Route path='/' exact>

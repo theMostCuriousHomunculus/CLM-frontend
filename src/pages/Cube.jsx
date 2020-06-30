@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import ComponentInfo from '../components/ComponentInfo';
 import CubeInfo from '../components/CubeInfo';
@@ -197,19 +197,18 @@ const Cube = () => {
 
   return (
     <div onMouseMove={movePreview}>
+
       <HoverPreview
         {...preview}
       />
-      {creator && creator.avatar &&
-        <div className="circle-avatar-container">
-          <img alt="avatar" className="avatar" src={creator.avatar} />
-        </div>
+
+      {componentState.cube &&
+        creator &&
+        <CubeInfo creator={creator} cube={componentState.cube} />
       }
-      {creator &&
-        <h2>Creator: <Link to={`/account/${creator._id}`}>{creator.name}</Link></h2>
-      }
-      {componentState.cube && <CubeInfo cube={componentState.cube} />}
-      {componentState.cube && componentState.active_component_id &&
+
+      {componentState.cube &&
+        componentState.active_component_id &&
         <React.Fragment>
           <ComponentInfo
             componentState={componentState}

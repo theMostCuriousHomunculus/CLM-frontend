@@ -5,6 +5,9 @@ import {
   Button as MUIButton,
   Card as MUICard,
   CardHeader as MUICardHeader,
+  Grid as MUIGrid,
+  List as MUIList,
+  ListItem as MUIListItem,
   Typography as MUITypography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,8 +18,16 @@ import Modal from '../components/Modal';
 
 const useStyles = makeStyles({
   avatarLarge: {
-    height: "150px",
-    width: "150px"
+    height: '150px',
+    width: '150px'
+  },
+  avatarSmall: {
+    height: '75px',
+    marginRight: '16px',
+    width: '75px'
+  },
+  basicCard: {
+    margin: '1rem'
   }
 });
 
@@ -110,7 +121,7 @@ const Account = () => {
         />
         <button>Create!</button>
       </Modal>
-      <MUICard className="basic-card">
+      <MUICard className={classes.basicCard}>
         <MUICardHeader
           avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
           title={<MUITypography variant="h2">{user.name}</MUITypography>}
@@ -128,65 +139,72 @@ const Account = () => {
       {accountId === authentication.userId &&
         <MUIButton color="primary" onClick={openCubeForm} variant="contained">Create a Cube</MUIButton>
       }
-      <h2>Buds</h2>
-      <ul>
-        {user.buds &&
-          user.buds.map(function (bud) {
-            return (
-              <li key={bud}>
-                {bud.avatar &&
-                  <div className="circle-avatar-container">
-                    <img alt="avatar" className="avatar" src={bud.avatar} />
-                  </div>
-                }
-                <Link to={`/account/${bud._id}`}>{bud.name}</Link>
-              </li>
-            );
-          })
+
+      <MUIGrid container>
+        <MUIGrid item xs={12} sm={6} md={4}>
+          <MUICard className={classes.basicCard}>
+            <MUICardHeader title={<MUITypography variant="h3">Buds</MUITypography>} />
+            <MUIList>
+              {user.buds &&
+                user.buds.map(function (bud) {
+                  return (
+                    <MUIListItem key={bud._id}>
+                      {bud.avatar &&
+                        <MUIAvatar alt={bud.name} className={classes.avatarSmall} src={bud.avatar} />
+                      }
+                      <Link to={`/account/${bud._id}`}>{bud.name}</Link>
+                    </MUIListItem>
+                  );
+                })
+              }
+            </MUIList>
+          </MUICard>
+        </MUIGrid>
+
+        {accountId === authentication.userId &&
+          <React.Fragment>
+            <MUIGrid item xs={12} sm={6} md={4}>
+              <MUICard className={classes.basicCard}>
+                <MUICardHeader title={<MUITypography variant="h3">Aspiring Buds</MUITypography>} />
+                <MUIList>
+                  {user.received_bud_requests &&
+                    user.received_bud_requests.map(function (request) {
+                      return (
+                        <MUIListItem key={request._id}>
+                          {request.avatar &&
+                            <MUIAvatar alt={request.name} className={classes.avatarSmall} src={request.avatar} />
+                          }
+                          <Link to={`/account/${request._id}`}>{request.name}</Link>
+                        </MUIListItem>
+                      );
+                    })
+                  }
+                </MUIList>
+              </MUICard>
+            </MUIGrid>
+              
+            <MUIGrid item xs={12} sm={6} md={4}>
+              <MUICard className={classes.basicCard}>
+                <MUICardHeader title={<MUITypography variant="h3">Pending Buds</MUITypography>}/>
+                <MUIList>
+                  {user.sent_bud_requests &&
+                    user.sent_bud_requests.map(function (request) {
+                      return (
+                        <MUIListItem key={request._id}>
+                          {request.avatar &&
+                            <MUIAvatar alt={request.name} className={classes.avatarSmall} src={request.avatar} />
+                          }
+                          <Link to={`/account/${request._id}`}>{request.name}</Link>
+                        </MUIListItem>
+                      );
+                    })
+                  }
+                </MUIList>
+              </MUICard>
+            </MUIGrid>
+          </React.Fragment>
         }
-      </ul>
-      {accountId === authentication.userId &&
-        <React.Fragment>
-          <h2>Aspiring Buds</h2>
-          <ul>
-            {user.received_bud_requests &&
-              user.received_bud_requests.map(function (request) {
-                return (
-                  <li key={request._id}>
-                    {request.avatar &&
-                      <div className="circle-avatar-container">
-                        <img alt="avatar" className="avatar" src={request.avatar} />
-                      </div>
-                    }
-                    <Link to={`/account/${request._id}`}>{request.name}</Link>
-                  </li>
-                );
-              })
-            }
-          </ul>
-        </React.Fragment>
-      }
-      {accountId === authentication.userId &&
-        <React.Fragment>
-          <h2>Pending Buds</h2>
-          <ul>
-            {user.sent_bud_requests &&
-              user.sent_bud_requests.map(function (request) {
-                return (
-                  <li key={request._id}>
-                    {request.avatar &&
-                      <div className="circle-avatar-container">
-                        <img alt="avatar" className="avatar" src={request.avatar} />
-                      </div>
-                    }
-                    <Link to={`/account/${request._id}`}>{request.name}</Link>
-                  </li>
-                );
-              })
-            }
-          </ul>
-        </React.Fragment>
-      }
+      </MUIGrid>
     </React.Fragment>
   );
 }

@@ -14,6 +14,9 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
+  basicCard: {
+    margin: '1rem'
+  },
   cardActions: {
     display: 'flex',
     justifyContent: 'space-between'
@@ -87,7 +90,7 @@ const ComponentInfo = (props) => {
   }
 
   return (
-    <MUICard className="basic-card">
+    <MUICard className={classes.basicCard}>
       <MUICardHeader
         title={<MUITypography variant="h3">Component:</MUITypography>}
         subheader={authentication.userId === props.componentState.cube.creator &&

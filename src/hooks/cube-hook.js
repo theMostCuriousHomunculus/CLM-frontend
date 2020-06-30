@@ -15,13 +15,13 @@ export const useCube = (state, action) => {
   switch (action.type) {
     case 'FILTER_CARDS':
 
-      displayed_cards = state.active_component_cards.filter(function (card) {
+      displayed_cards = appendPropertiesAndSort(state.active_component_cards.filter(function (card) {
         return (
           card.name.toLowerCase().includes(action.value.toLowerCase()) ||
           card.type_line.toLowerCase().includes(action.value.toLowerCase()) ||
           card.color.toLowerCase().includes(action.value.toLowerCase())
         );
-      });
+      }));
 
       return {
         ...state,

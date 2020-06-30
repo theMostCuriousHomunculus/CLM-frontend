@@ -2,15 +2,19 @@ import React, { useRef, useState } from 'react';
 import {
   Button as MUIButton,
   Card as MUICard,
+  Grid as MUIGrid
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
-  spaceBetween: {
-    display: 'flex',
-    justifyContent: 'space-between'
+  basicCard: {
+    margin: '1rem',
+    padding: '8px'
+  },
+  formInput: {
+    width: '100%'
   }
 });
 
@@ -130,51 +134,60 @@ const ScryfallRequest = (props) => {
     }
   }
 
-  function submitForm (event) {
-    event.preventDefault();
+  function submitForm () {
     setCardSearchResults(null);
     setPrintSearchResults(null);
     setSearchText('');
+    document.getElementById('card-search').focus();
     props.onSubmit();
   }
 
   return (
-    <MUICard className="basic-card">
-      <form
-        action={props.action}
-        className={classes.spaceBetween}
-        method={props.method}
-        onSubmit={submitForm}
-      >
-        <span>
-        <label htmlFor="card-search">Add a card to {props.componentState.active_component_name}: </label>
-          <input
-            autoComplete="off"
-            id="card-search"
-            list="card-search-results"
-            onChange={scryfallPrintSearch}
-            onKeyUp={scryfallCardSearch}
-            placeholder={props.searchPlaceholderText}
-            required
-            type="text"
-            value={searchText}
-          />
-        </span>
-        <datalist id="card-search-results" ref={scryfallCardSuggestions}>
-          {cardSearchResults && cardSearchResults.map(function (result) {
-            return result;
-          })}
-        </datalist>
-        <span>
-          <label htmlFor="printing">Printing: </label>
-          <select id="printing" name="printing" required>
-            {printSearchResults && printSearchResults.map(function (result) {
+    <MUICard className={classes.basicCard}>
+      <MUIGrid alignItems="baseline" container justify="flex-end" spacing={2}>
+
+          <MUIGrid item xs={12} sm={3} lg={2}>
+            <label htmlFor="card-search">Add a card to {props.componentState.active_component_name}: </label>
+          </MUIGrid>
+
+          <MUIGrid item xs={12} sm={9} md={4}>
+            <input
+              autoComplete="off"
+              className={classes.formInput}
+              id="card-search"
+              list="card-search-results"
+              onChange={scryfallPrintSearch}
+              onKeyUp={scryfallCardSearch}
+              placeholder={props.searchPlaceholderText}
+              required
+              type="text"
+              value={searchText}
+            />
+          </MUIGrid>
+
+          <datalist id="card-search-results" ref={scryfallCardSuggestions}>
+            {cardSearchResults && cardSearchResults.map(function (result) {
               return result;
             })}
-          </select>
-        </span>
-        <MUIButton color="primary" type="submit" variant="contained">{props.buttonText}</MUIButton>
-      </form>
+          </datalist>
+
+          <MUIGrid item xs={12} sm={3} md={1}>
+            <label htmlFor="printing">Printing: </label>
+          </MUIGrid>
+
+          <MUIGrid item xs={12} sm={9} md={4}>
+            <select className={classes.formInput} id="printing" name="printing" required>
+              {printSearchResults && printSearchResults.map(function (result) {
+                return result;
+              })}
+            </select>
+          </MUIGrid>
+
+          <MUIGrid item xs={12} lg={1} style={{ textAlign: "right" }}>
+            <MUIButton color="primary" onClick={submitForm} variant="contained">{props.buttonText}</MUIButton>
+          </MUIGrid>
+
+      </MUIGrid>
     </MUICard>
   );
 }

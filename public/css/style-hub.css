@@ -14,42 +14,6 @@ main {
   margin: 1rem auto;
 }
 
-.avatar {
-  height: 100%;
-  left: 50%;
-  position: absolute;
-  transform: translate(-50%, 0);
-}
-
-.avatar-large {
-  height: 150px;
-  width: 150px;
-}
-
-.basic-card {
-  margin: 1rem;
-  padding: 1rem;
-}
-
-.circle-avatar-container {
-  border: solid 3px black;
-  border-radius: 50%;
-  height: 150px;
-  overflow: hidden;
-  position: relative;
-  width: 150px;
-}
-
-.curve-view-color-container,
-.table-view-color-container {
-  border: solid 1px black;
-}
-
-.curve-view-type-container {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-}
-
 .hover-preview-container {
   position: absolute;
 }
@@ -63,28 +27,4 @@ main {
   background-color: blueviolet;
   color: white;
   height: 300px;
-}
-
-.table-view-main-container {
-  display: grid;
-  gap: 0.5rem;
-  grid-template-columns: repeat(7, 1fr);
-  margin: 1rem;
-}
-
-#menu-icon {
-  border: 1px solid #ffc654;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 6.4rem;
-  margin-right: 1rem;
-}
-
-#navigation-toolbar {
-  margin: 0;
-  padding: 0;
-}
-
-#top-navigation {
-  padding: 1rem;
 }
