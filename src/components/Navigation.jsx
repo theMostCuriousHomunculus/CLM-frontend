@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AppBar as MUIAppBar,
   Drawer as MUIDrawer,
-  InputBase as MUIInputBase,
   List as MUIList,
   ListItem as MUIListItem,
   ListItemIcon as MUIListItemIcon,
@@ -12,6 +11,7 @@ import {
 } from '@material-ui/core';
 import { 
   AccountCircle as MUIAccountCircle,
+  AllInclusive as MUIAllInclusive,
   ExitToApp as MUIExitToApp,
   Home as MUIHome,
   Menu as MUIMenu,
@@ -21,29 +21,42 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
+import { useRequest } from '../hooks/request-hook';
 import theme from '../theme';
 
 const useStyles = makeStyles({
+  avatarSmall: {
+    height: '75px',
+    marginRight: '16px',
+    width: '75px'
+  },
   drawer: {
     '& .MuiPaper-root': {
       backgroundColor: theme.palette.primary.main
     }
   },
-  inputRoot: {
-    color: 'inherit',
+  headline: {
+    flexGrow: 1
   },
-  inputInput: {
+  input: {
+    backgroundColor: 'inherit',
+    border: 'none',
+    color: 'inherit',
+    fontFamily: 'Ubuntu, Roboto, Arial, sans-serif',
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      width: '12ch',
+      width: '30ch',
       '&:focus': {
-        width: '20ch',
+        width: '40ch',
       },
     },
+    '&:focus': {
+      outline: 'none'
+    }
   },
   item: {
     color: theme.palette.secondary.main,
@@ -68,10 +81,8 @@ const useStyles = makeStyles({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
       width: 'auto',
     },
   },
@@ -89,17 +100,27 @@ const useStyles = makeStyles({
   }
 });
 
-function Navigation(props) {
+function Navigation (props) {
+
+  const [userSearchResults, setUserSearchResults] = useState([]);
   const authentication = React.useContext(AuthenticationContext);
   const { history } = props;
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+
+  function goToUserProfilePage (event) {
+    const chosenOption = document.getElementById('user-search-results').options.namedItem(event.target.value);
+    if (chosenOption) {
+      history.push('/account/' + chosenOption.getAttribute('data-id'));
+      event.target.value = '';
+    }
+  }
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
-
     setDrawerOpen(open);
   };
 
@@ -116,11 +137,17 @@ function Navigation(props) {
         onClick: () => history.push('/account/' + authentication.userId)
       },
       {
+        icon: <MUIAllInclusive />,
+        name: "Resources",
+        onClick: () => history.push('/resources')
+      },
+      {
         icon: <MUIExitToApp />,
         name: "Logout",
         onClick: authentication.logout
       }
     ];
+
     const loggedOutPages = [
       {
         icon: <MUIHome />,
@@ -128,11 +155,17 @@ function Navigation(props) {
         onClick: () => history.push('/')
       },
       {
+        icon: <MUIAllInclusive />,
+        name: "Resources",
+        onClick: () => history.push('/resources')
+      },
+      {
         icon: <MUIExitToApp />,
-        name: "Login",
+        name: "Login / Register",
         onClick: () => history.push('/account/authenticate')
       }
     ];
+    
     return (
       <div
         className={classes.list}
@@ -166,22 +199,46 @@ function Navigation(props) {
     );
   }
 
+  async function searchForUsers (event) {
+    try {
+      const matchingUsers = await sendRequest('http://localhost:5000/api/account?name=' + event.target.value,
+        'GET',
+        null,
+        {}
+      );
+      setUserSearchResults(matchingUsers.map(function (match, index) {
+        return (
+          <option data-id={match._id} key={index} name={match.name} value={match.name}>
+            {match.name}
+          </option>
+        );
+      }));
+    } catch (error) {
+      console.log({ 'Error': error.message });
+    }
+  }
+
   return (
     <MUIAppBar position="static">
       <MUIToolbar className={classes.toolbar}>
         <MUIMenu className={classes.menuIcon} color="secondary" onClick={toggleDrawer(true)} />
-        <MUITypography color="secondary" variant="h1">Cube Level Midnight</MUITypography>
+        <MUITypography className={classes.headline} color="secondary" variant="h1">Cube Level Midnight</MUITypography>
         <div className={classes.search}>
           <div className={classes.searchIcon}>
             <MUISearchIcon />
           </div>
-          <MUIInputBase
+          <input
+            className={classes.input}
+            id="user-search-bar"
+            list="user-search-results"
+            onChange={goToUserProfilePage}
+            onKeyUp={searchForUsers}
             placeholder="Search for other users!"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
+            type="text"
           />
+          <datalist id="user-search-results">
+            {userSearchResults}
+          </datalist>
         </div>
       </MUIToolbar>
       <MUIDrawer

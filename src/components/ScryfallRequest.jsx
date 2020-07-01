@@ -166,9 +166,7 @@ const ScryfallRequest = (props) => {
           </MUIGrid>
 
           <datalist id="card-search-results" ref={scryfallCardSuggestions}>
-            {cardSearchResults && cardSearchResults.map(function (result) {
-              return result;
-            })}
+            {cardSearchResults}
           </datalist>
 
           <MUIGrid item xs={12} sm={3} md={1}>

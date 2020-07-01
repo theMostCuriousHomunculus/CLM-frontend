@@ -2,10 +2,6 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
-// const primaryColor = '#0088ff';
-// const secondaryColor = '#ffc654';
-const warningColor = '#ff0000';
-
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -13,9 +9,6 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: lightGreen['A400']
-    },
-    warning: {
-      main: warningColor
     }
   },
   typography: {
@@ -25,7 +18,6 @@ const theme = createMuiTheme({
       'Arial',
       'sans-serif'
     ].join(','),
-
     htmlFontSize: 10,
     h1: {
       fontSize: '6rem'
@@ -40,7 +32,7 @@ const theme = createMuiTheme({
       fontSize: '2.4rem'
     },
     subtitle1: {
-      
+
     },
     subtitle2: {
 

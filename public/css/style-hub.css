@@ -10,8 +10,14 @@ html {
   padding: 0;
 }
 
+body {
+  min-height: 100vh;
+  position: relative;
+}
+
 main {
-  margin: 1rem auto;
+  padding-bottom: 300px;
+  margin: 1rem auto 0 auto;
 }
 
 .hover-preview-container {
@@ -21,10 +27,4 @@ main {
 .hover-preview-image {
   height: 300px;
   z-index: 1;
-}
-
-.site-footer {
-  background-color: blueviolet;
-  color: white;
-  height: 300px;
 }

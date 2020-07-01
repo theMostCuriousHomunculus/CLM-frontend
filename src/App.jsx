@@ -7,8 +7,8 @@ import Authenticate from './pages/Authenticate';
 import Cube from './pages/Cube';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-// import MainNav from './components/MainNav';
 import Navigation from './components/Navigation';
+import Resources from './pages/Resources';
 import { AuthenticationContext } from './contexts/authentication-context';
 
 function App() {
@@ -56,17 +56,18 @@ function App() {
             <Route path='/account/authenticate' exact>
               <Authenticate />
             </Route>
-            <Route path='/account/:accountId' exact>
+            <Route path='/account/:accountId'>
               <Account />
             </Route>
-            <Route path='/cube/:cubeId' exact>
+            <Route path='/cube/:cubeId'>
               <Cube />
+            </Route>
+            <Route path='/resources' exact>
+              <Resources />
             </Route>
           </Switch>
         </main>
-        <footer className="site-footer">
-          <Footer />
-        </footer>
+        <Footer />
       </BrowserRouter>
     </AuthenticationContext.Provider>
   );
