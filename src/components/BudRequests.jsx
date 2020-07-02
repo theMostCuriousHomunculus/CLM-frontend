@@ -46,33 +46,35 @@ const BudRequests = (props) => {
   const classes = useStyles();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
-  function acceptBudRequest (event) {
+  async function acceptBudRequest (event) {
     let formData = {
       action: 'accept',
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
 
-    sendRequest('http://localhost:5000/api/account',
+    await sendRequest('http://localhost:5000/api/account',
       'PATCH',
       JSON.stringify(formData),
       {
       Authorization: 'Bearer ' + authentication.token,
       'Content-Type': 'application/json'
     });
+    props.fetchAccount();
   }
 
-  function rejectBudRequest (event) {
+  async function rejectBudRequest (event) {
     let formData = {
       action: 'reject',
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
-    sendRequest('http://localhost:5000/api/account',
+    await sendRequest('http://localhost:5000/api/account',
     'PATCH',
     JSON.stringify(formData),
     {
       Authorization: 'Bearer ' + authentication.token,
       'Content-Type': 'application/json'
     });
+    props.fetchAccount();
   }
 
   return (

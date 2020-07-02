@@ -7,9 +7,14 @@ import {
   CardActions as MUICardActions,
   CardContent as MUICardContent,
   CardHeader as MUICardHeader,
+  Dialog as MUIDialog,
+  DialogActions as MUIDialogActions,
+  DialogContent as MUIDialogContent,
+  DialogTitle as MUIDialogTitle,
   Grid as MUIGrid,
   List as MUIList,
   ListItem as MUIListItem,
+  TextField as MUITextField,
   Typography as MUITypography
 } from '@material-ui/core';
 import {
@@ -20,7 +25,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 import BudRequests from '../components/BudRequests';
-import Modal from '../components/Modal';
+import ScryfallRequest from '../components/ScryfallRequest';
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -66,35 +71,38 @@ const Account = () => {
   const [showCubeForm, setShowCubeForm] = useState(false);
 
   useEffect(() => {
-    const fetchAccount = async function () {
-      try {
-        const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
-        const accountData = await sendRequest(`http://localhost:5000/api/account/${accountId}`, 'GET', null, headers);
-        setUser(accountData);
-        const cubeData = await sendRequest(`http://localhost:5000/api/cube?creator=${accountId}`, 'GET', null, {});
-        setCubes(cubeData.cubes);
-      } catch (error) {
-        console.log('Error: ' + error.message);
-      }
-    };
     fetchAccount();
-  }, [accountId, authentication.token, sendRequest]);
+  }, [accountId, authentication.token]);
 
-  function closeCubeForm () {
-    setShowCubeForm(false);
+  async function changeAvatar (chosenCard) {
+    try {
+      const accountChanges = JSON.stringify({
+        avatar: chosenCard.art_crop
+      });
+
+      await sendRequest(
+        'http://localhost:5000/api/account/',
+        'PATCH',
+        accountChanges,
+        {
+          Authorization: 'Bearer ' + authentication.token,
+          'Content-Type': 'application/json'
+        }
+      );
+      fetchAccount();
+
+    } catch (error) {
+      console.log({ 'Error': error.message });
+    }
   }
 
-  function openCubeForm () {
-    setShowCubeForm(true);
-  }
-
-  function deleteBud (event) {
+  async function deleteBud (event) {
     let formData = {
       action: 'remove',
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
 
-    sendRequest('http://localhost:5000/api/account',
+    await sendRequest('http://localhost:5000/api/account',
       'PATCH',
       JSON.stringify(formData),
       {
@@ -102,15 +110,28 @@ const Account = () => {
         'Content-Type': 'application/json'
       }
     );
+    fetchAccount();
   }
 
-  function sendBudRequest (event) {
+  async function fetchAccount () {
+    try {
+      const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
+      const accountData = await sendRequest(`http://localhost:5000/api/account/${accountId}`, 'GET', null, headers);
+      setUser(accountData);
+      const cubeData = await sendRequest(`http://localhost:5000/api/cube?creator=${accountId}`, 'GET', null, {});
+      setCubes(cubeData.cubes);
+    } catch (error) {
+      console.log('Error: ' + error.message);
+    }
+  };
+
+  async function sendBudRequest (event) {
     let formData = {
       action: 'send',
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
 
-    sendRequest('http://localhost:5000/api/account',
+    await sendRequest('http://localhost:5000/api/account',
       'PATCH',
       JSON.stringify(formData),
       {
@@ -118,6 +139,7 @@ const Account = () => {
         'Content-Type': 'application/json'
       }
     );
+    fetchAccount();
   }
 
   async function submitCubeForm (event) {
@@ -128,7 +150,6 @@ const Account = () => {
       document.getElementById('cube-description').value :
       undefined;
 
-    console.log(formInputs);
     try {
       const responseData = await sendRequest(
         'http://localhost:5000/api/cube',
@@ -147,35 +168,6 @@ const Account = () => {
 
   return (
     <React.Fragment>
-      <Modal
-        action="http://localhost:5000/api/cube"
-        contentClass="create-cube__modal-content"
-        footerClass="create-cube__modal-acitons"
-        footer={<button onClick={closeCubeForm}>Cancel</button>}
-        header="Create a New Cube!"
-        method="POST"
-        onCancel={closeCubeForm}
-        onSubmit={submitCubeForm}
-        show={showCubeForm}
-      >
-        <input
-          autoComplete="off"
-          id="cube-name"
-          name="name"
-          placeholder="Cube Name"
-          required={true}
-          type="text"
-        />
-        <textarea
-          autoComplete="off"
-          id="cube-description"
-          name="description"
-          placeholder="Description"
-          required={false}
-          type="text"
-        />
-        <button>Create!</button>
-      </Modal>
 
       <MUICard className={classes.basicCard}>
         <MUICardHeader
@@ -183,7 +175,23 @@ const Account = () => {
           title={<MUITypography variant="h2">{user.name}</MUITypography>}
           subheader={accountId === authentication.userId ? <MUITypography variant="h3">{user.email}</MUITypography> : null}
         />
-        {accountId !== authentication.userId &&
+        {accountId === authentication.userId &&
+          <MUICardActions>
+            <ScryfallRequest
+              action="http://localhost:5000/api/account/"
+              buttonText="Change Avatar"
+              labelText="Change your avatar"
+              method="PATCH"
+              onSubmit={changeAvatar}
+            />
+          </MUICardActions>
+        }
+        {authentication.isLoggedIn &&
+          accountId !== authentication.userId &&
+          user.buds &&
+          user.buds.filter(function (bud) {
+            return bud._id === authentication.userId;
+          }).length === 0 &&
           <MUICardActions className={classes.cardActions}>
             <MUIButton
               color="primary"
@@ -218,7 +226,45 @@ const Account = () => {
         </MUICardContent>
         {accountId === authentication.userId &&
           <MUICardActions className={classes.cardActions}>
-            <MUIButton color="primary" onClick={openCubeForm} variant="contained">Create a Cube</MUIButton>
+            <MUIButton color="primary" onClick={() => setShowCubeForm(true)} variant="contained">Create a Cube</MUIButton>
+            <MUIDialog open={showCubeForm} onClose={() => setShowCubeForm(false)}>
+              <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
+              <MUIDialogContent>
+
+                <MUITextField
+                  autoComplete="off"
+                  autoFocus
+                  fullWidth
+                  id="cube-name"
+                  label="Cube Name"
+                  required={true}
+                  type="text"
+                />
+
+                <MUITextField
+                  autoComplete="off"
+                  fullWidth
+                  id="cube-description"
+                  label="Description"
+                  multiline
+                  required={false}
+                  rows={3}
+                  type="text"
+                />
+
+              </MUIDialogContent>
+              <MUIDialogActions>
+
+                <MUIButton  color="primary" onClick={() => setShowCubeForm(false)} variant="contained">
+                  Cancel
+                </MUIButton>
+
+                <MUIButton color="primary" onClick={submitCubeForm} variant="contained">
+                  Create!
+                </MUIButton>
+
+              </MUIDialogActions>
+            </MUIDialog>
           </MUICardActions>
         }
       </MUICard>
@@ -255,7 +301,7 @@ const Account = () => {
         </MUIGrid>
 
         {accountId === authentication.userId &&
-          <BudRequests user={user} />
+          <BudRequests user={user} fetchAccount={fetchAccount} />
         }
       </MUIGrid>
     </React.Fragment>

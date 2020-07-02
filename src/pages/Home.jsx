@@ -4,8 +4,7 @@ import {
   CardContent as MUICardContent,
   CardHeader as MUICardHeader,
   Grid as MUIGrid,
-  Typography as MUITypography,
-  Typography
+  Typography as MUITypography
 } from '@material-ui/core';
 import {
   ControlCamera as MUIControlCameraIcon,
@@ -48,20 +47,20 @@ const Home = () => {
 
   return (
     <React.Fragment>
-      <MUICard>
+      <MUICard className={classes.basicCard}>
         <MUICardHeader
           title={<MUITypography variant="h2">A New Tool for Cube Curators</MUITypography>}
           subheader={
             <React.Fragment>
               <MUITypography variant="subtitle1">Cube Level Midnight lets you do it all.</MUITypography>
-              {authentication.isLoggedIn &&
+              {!authentication.isLoggedIn &&
                 <MUITypography variant="subtitle2">Create an account or login to get started building cubes and connecting with your buds!</MUITypography>
               }
             </React.Fragment>
           }
         />
         <MUICardContent>
-          <MUITypography variant="body1"><MUIControlCameraIcon /> Do you want maximum control over your cube?</MUITypography>
+          <MUITypography variant="body1"><MUIControlCameraIcon /> Do you want total control over your cube?</MUITypography>
           <MUITypography variant="body1"><MUIPaletteIcon /> Do you want to maximize the variety of play experiences your cube offers with minimal impact to the quality of gameplay?</MUITypography>
           <MUITypography variant="body1"><MUITimerIcon /> Do you want to draft your cube in real time with your buds?</MUITypography>
 

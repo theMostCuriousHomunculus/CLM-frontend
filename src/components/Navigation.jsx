@@ -65,7 +65,7 @@ const useStyles = makeStyles({
     }
   },
   list: {
-    width: 250
+    width: 350
   },
   menuIcon: {
     border: '1px solid',
@@ -165,7 +165,7 @@ function Navigation (props) {
         onClick: () => history.push('/account/authenticate')
       }
     ];
-    
+
     return (
       <div
         className={classes.list}

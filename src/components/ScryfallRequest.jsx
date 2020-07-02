@@ -1,41 +1,52 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import {
   Button as MUIButton,
-  Card as MUICard,
-  Grid as MUIGrid
+  CircularProgress as MUICircularProgress,
+  Grid as MUIGrid,
+  List as MUIList,
+  ListItem as MUIListItem,
+  ListItemText as MUIListItemText,
+  Menu as MUIMenu,
+  MenuItem as MUIMenuItem,
+  TextField as MUITextField
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 
 import { useRequest } from '../hooks/request-hook';
 
-const useStyles = makeStyles({
-  basicCard: {
-    margin: '1rem',
-    padding: '8px'
-  },
-  formInput: {
-    width: '100%'
-  }
-});
-
 const ScryfallRequest = (props) => {
 
-  const classes = useStyles();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
-  const scryfallCardSuggestions = useRef(null);
-  const [searchText, setSearchText] = useState('');
-  const [cardSearchResults, setCardSearchResults] = useState(null);
-  const [printSearchResults, setPrintSearchResults] = useState(null);
+  const cardSearchInput = React.useRef(null);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [availablePrintings, setAvailablePrintings] = React.useState([]);
+  const [cardSearchResults, setCardSearchResults] = React.useState([]);
+  const [chosenCard, setChosenCard] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
+
+  const handleClickListItem = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (event, index) => {
+    setSelectedPrintIndex(index);
+    setChosenCard({ ...chosenCard, ...availablePrintings[index] });
+    setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   async function scryfallCardSearch (event) {
-  
     if (event.target.value.length > 2) {
       try {
-        let matches = await sendRequest('https://api.scryfall.com/cards/search?q=' + event.target.value.replace(" ", "_"));
+        let matches = await sendRequest(`https://api.scryfall.com/cards/search?q=${event.target.value}` , 'GET', null, {});
         if (matches.data) {
-          setCardSearchResults(matches.data.map(function (match, index) {
-            // some card properties are handled differently on cards that transform
+          setCardSearchResults(matches.data.map(function (match) {
             let loyalty, mana_cost, power, toughness, type_line;
             if (match.layout === "transform") {
               if (match.card_faces[0].loyalty) {
@@ -66,127 +77,160 @@ const ScryfallRequest = (props) => {
             }
 
             return (
-              <option
-                data-cmc={match.cmc}
-                data-color_identity={JSON.stringify(match.color_identity)}
-                data-keywords={JSON.stringify(match.keywords)}
-                data-loyalty={loyalty}
-                data-mana_cost={mana_cost}
-                data-oracle_id={match.oracle_id}
-                data-power={power}
-                data-prints_search_uri={match.prints_search_uri}
-                data-toughness={toughness}
-                data-type_line={type_line}
-                key={`card-${index}`}
-                name={match.name}
-                value={match.name}
-              >
-                {match.name}
-              </option>
+              {
+                cmc: match.cmc,
+                color_identity: match.color_identity,
+                keywords: match.keywords,
+                loyalty,
+                mana_cost,
+                oracle_id: match.oracle_id,
+                power,
+                prints_search_uri: match.prints_search_uri,
+                toughness,
+                type_line,
+                name: match.name,
+                value: match.name
+              }
             );
           }));
         } else {
-            return <option disabled selected value="No matches..." />;
+          setCardSearchResults([]);
         }
       } catch (error) {
         console.log({ 'Error': error.message });
+        setCardSearchResults([]);
       }
     } else {
-      setCardSearchResults(null);
+      setCardSearchResults([]);
     }
   }
 
-  async function scryfallPrintSearch (event) {
-
-    setSearchText(event.target.value);
-    const chosenOption = scryfallCardSuggestions.current.options.namedItem(event.target.value);
-
-    if (chosenOption) {
-      const prints_search_uri = chosenOption.getAttribute("data-prints_search_uri");
-      try {
-        let printings = await sendRequest(prints_search_uri);
-            
-        setPrintSearchResults(printings.data.map(function(print, index) {
-          let back_image, image;
-          if (print.layout === "transform") {
-            back_image = print.card_faces[1].image_uris.large;
-            image = print.card_faces[0].image_uris.large;
-          } else {
-            image = print.image_uris.large;
+  async function scryfallPrintSearch (prints_search_uri, cardDetails) {
+    try {
+      let printings = await sendRequest(prints_search_uri);
+      printings = printings.data.map(function(print) {
+        let art_crop, back_image, image;
+        if (print.layout === "transform") {
+          art_crop = print.card_faces[0].image_uris.art_crop;
+          back_image = print.card_faces[1].image_uris.large;
+          image = print.card_faces[0].image_uris.large;
+        } else {
+          art_crop = print.image_uris.art_crop;
+          image = print.image_uris.large;
+        }
+        return (
+          {
+            art_crop,
+            back_image,
+            image,
+            printing: print.set_name + " - " + print.collector_number,
+            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
           }
-          return (
-            <option
-              data-back_image={back_image}
-              data-image={image}
-              data-purchase_link={print.purchase_uris.tcgplayer.split("&")[0]}
-              key={`print-${index}`}
-              value={print.set_name + " - " + print.collector_number}
-            >
-              {print.set_name + " - " + print.collector_number}
-            </option>
-          );
-        }));
-      } catch (error) {
-        console.log({ 'Error': error.message });
-      }
-    } else {
-      return <option disabled selected value="No matches..." />;
+        );
+      })
+      setAvailablePrintings(printings);
+      setChosenCard({ ...chosenCard, ...cardDetails, ...printings[0] });
+    } catch (error) {
+      console.log({ 'Error': error.message });
+      setAvailablePrintings([]);
     }
+    setSelectedPrintIndex(0);
   }
 
   function submitForm () {
-    setCardSearchResults(null);
-    setPrintSearchResults(null);
-    setSearchText('');
-    document.getElementById('card-search').focus();
-    props.onSubmit();
+    setAnchorEl(null);
+    setAvailablePrintings([]);
+    setCardSearchResults([]);
+    setSelectedPrintIndex(0);
+    document.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
+    cardSearchInput.current.focus();
+    props.onSubmit(chosenCard);
+    setChosenCard(null);
   }
 
   return (
-    <MUICard className={classes.basicCard}>
-      <MUIGrid alignItems="baseline" container justify="flex-end" spacing={2}>
+    <MUIGrid alignItems="baseline" container justify="flex-end" spacing={2}>
 
-          <MUIGrid item xs={12} sm={3} lg={2}>
-            <label htmlFor="card-search">Add a card to {props.componentState.active_component_name}: </label>
-          </MUIGrid>
-
-          <MUIGrid item xs={12} sm={9} md={4}>
-            <input
-              autoComplete="off"
-              className={classes.formInput}
-              id="card-search"
-              list="card-search-results"
-              onChange={scryfallPrintSearch}
+      <MUIGrid item xs={12} md={6} lg={5}>
+        <MUIAutocomplete
+          clearOnBlur={false}
+          clearOnEscape={true}
+          getOptionLabel={(option) => option.name}
+          getOptionSelected={function (option, value) {
+            return option.name === value.name;
+          }}
+          id="chosen-card"
+          loading={loading}
+          onChange={function (event, value, reason) {
+            if (reason === 'select-option') {
+              let cardDetails = { ...value };
+              delete cardDetails.value;
+              scryfallPrintSearch(value.prints_search_uri, { ...cardDetails });
+            }
+          }}
+          onClose={() => setOpen(false)}
+          onOpen={() => setOpen(true)}
+          open={open}
+          options={cardSearchResults}
+          renderInput={(params) => (
+            <MUITextField
+              {...params}
+              inputRef={cardSearchInput}
+              label={props.labelText}
               onKeyUp={scryfallCardSearch}
-              placeholder={props.searchPlaceholderText}
-              required
-              type="text"
-              value={searchText}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <React.Fragment>
+                    {loading ? <MUICircularProgress color="inherit" size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </React.Fragment>
+                )
+              }}
             />
-          </MUIGrid>
-
-          <datalist id="card-search-results" ref={scryfallCardSuggestions}>
-            {cardSearchResults}
-          </datalist>
-
-          <MUIGrid item xs={12} sm={3} md={1}>
-            <label htmlFor="printing">Printing: </label>
-          </MUIGrid>
-
-          <MUIGrid item xs={12} sm={9} md={4}>
-            <select className={classes.formInput} id="printing" name="printing" required>
-              {printSearchResults && printSearchResults.map(function (result) {
-                return result;
-              })}
-            </select>
-          </MUIGrid>
-
-          <MUIGrid item xs={12} lg={1} style={{ textAlign: "right" }}>
-            <MUIButton color="primary" onClick={submitForm} variant="contained">{props.buttonText}</MUIButton>
-          </MUIGrid>
-
+          )}
+        />
       </MUIGrid>
-    </MUICard>
+
+      <MUIGrid item xs={12} md={6} lg={5}>
+        <MUIList component="nav">
+          <MUIListItem
+            button
+            aria-haspopup="true"
+            aria-controls="lock-menu"
+            onClick={handleClickListItem}
+          >
+            <MUIListItemText
+              primary="Selected Printing"
+              secondary={availablePrintings[selectedPrintIndex] && availablePrintings[selectedPrintIndex].printing}
+            />
+          </MUIListItem>
+        </MUIList>
+        <MUIMenu
+          id="printing"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          {availablePrintings.map((option, index) => (
+            <MUIMenuItem
+              key={`printing-${index}`}
+              disabled={index === 0}
+              selected={index === selectedPrintIndex}
+              onClick={(event) => handleMenuItemClick(event, index)}
+            >
+              {option.printing}
+            </MUIMenuItem>
+          ))}
+        </MUIMenu>
+      </MUIGrid>
+
+      <MUIGrid item xs={12} lg={2} style={{ textAlign: "right" }}>
+        <MUIButton color="primary" onClick={submitForm} variant="contained">{props.buttonText}</MUIButton>
+      </MUIGrid>
+
+    </MUIGrid>
   );
 }
 
