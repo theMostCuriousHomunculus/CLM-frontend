@@ -3,12 +3,18 @@ import deepPurple from '@material-ui/core/colors/deepPurple';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
 const theme = createMuiTheme({
+  
   palette: {
     primary: {
       main: deepPurple[400]
     },
     secondary: {
       main: lightGreen['A400']
+    },
+    warning: {
+      dark: '#df5f00',
+      light: '#ff9f3f',
+      main: '#ff7f1f'
     }
   },
   typography: {

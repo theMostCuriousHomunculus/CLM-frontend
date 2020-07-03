@@ -104,12 +104,12 @@ const Cube = () => {
     }
   }
 
-  function changeComponent (event) {
-    switchComponentHandler(event.target.value);
+  function changeComponent (component_id) {
+    switchComponentHandler(component_id);
   }
 
-  function changeViewMode (event) {
-    setViewMode(event.target.value);
+  function changeViewMode (mode) {
+    setViewMode(mode);
   }
 
   function hidePreview () {

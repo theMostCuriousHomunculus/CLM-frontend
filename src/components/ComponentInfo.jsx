@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 import {
   Button as MUIButton,
   Card as MUICard,
@@ -9,6 +9,12 @@ import {
   DialogActions as MUIDialogActions,
   DialogContent as MUIDialogContent,
   DialogTitle as MUIDialogTitle,
+  Grid as MUIGrid,
+  List as MUIList,
+  ListItem as MUIListItem,
+  ListItemText as MUIListItemText,
+  Menu as MUIMenu,
+  MenuItem as MUIMenuItem,
   TextField as MUITextField,
   Typography as MUITypography
 } from '@material-ui/core';
@@ -16,6 +22,7 @@ import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
+import theme from '../theme';
 import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
@@ -26,14 +33,8 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'space-between'
   },
-  flex: {
-    display: 'flex'
-  },
   marginRight: {
     marginRight: '1rem'
-  },
-  numberWidth: {
-    width: '6rem'
   },
   radioButton: {
     marginRight: '1rem'
@@ -46,20 +47,29 @@ const useStyles = makeStyles({
     width: 'auto'
   },
   warningButton: {
-    backgroundColor: '#ff0000',
+    backgroundColor: theme.palette.warning.main,
     color: '#ffffff',
     '&:hover': {
-      backgroundColor: '#df2000'
+      backgroundColor: theme.palette.warning.dark
     }
   }
 });
 
 const ComponentInfo = (props) => {
 
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
-  const authentication = useContext(AuthenticationContext);
+  const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
+  const [componentName, setComponentName] = React.useState(props.componentState.active_component_name);
+  const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
+  const [rotationSize, setRotationSize] = React.useState(props.componentState.active_rotation_size);
+  const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
+
+  React.useEffect(() => {
+    setComponentName(props.componentState.active_component_name);
+    setRotationSize(props.componentState.active_rotation_size);
+  }, [props.componentState.active_component_id]);
 
   async function addComponent (event) {
     event.preventDefault();
@@ -118,14 +128,48 @@ const ComponentInfo = (props) => {
     props.updateCubeHandler(updatedCube);
   }
 
+  const handleClickListItemComponent = (event) => {
+    setComponentAnchorEl(event.currentTarget);
+  }
+
+  const handleClickListItemView = (event) => {
+    setViewAnchorEl(event.currentTarget);
+  };
+  
+  const handleCloseComponent = () => {
+    setComponentAnchorEl(null)
+  }
+
+  const handleCloseView = () => {
+    setViewAnchorEl(null);
+  };
+
+  const handleComponentNameChange = (event) => {
+    setComponentName(event.target.value);
+  };
+
+  const handleMenuItemClickComponent = (component_id) => {
+    props.changeComponent(component_id);
+    setComponentAnchorEl(null);
+  };
+
+  const handleMenuItemClickView = (event) => {
+    props.changeViewMode(event.target.textContent);
+    setViewAnchorEl(null);
+  };
+
+  const handleRotationSizeChange = (event) => {
+    setRotationSize(event.target.value);
+  };
+
   async function submitComponentChanges () {
     const action = props.componentState.active_component_type === 'module' ? 'edit_module' : 'edit_rotation';
     const componentChanges = JSON.stringify({
       action: action,
       component: props.componentState.active_component_id,
       cube_id: props.componentState.cube._id,
-      name: props.componentState.active_component_name,
-      size: props.componentState.active_rotation_size
+      name: componentName,
+      size: rotationSize
     });
     const updatedCube = await sendRequest(
       'http://localhost:5000/api/cube',
@@ -141,83 +185,149 @@ const ComponentInfo = (props) => {
 
   return (
     <MUICard className={classes.basicCard}>
+
       <MUICardHeader
-        title={<MUITypography variant="h3">Component:</MUITypography>}
-        subheader={authentication.userId === props.componentState.cube.creator &&
-          props.componentState.active_component_type !== 'mainboard' &&
-          props.componentState.active_component_type !== 'sideboard' ?
-          <input
-            autoComplete="off"
-            onBlur={submitComponentChanges}
-            // onChange={props.changeComponentName}
-            type="text"
-            value={props.componentState.active_component_name}
-          /> :
-          <MUITypography variant="h4">{props.componentState.active_component_name}</MUITypography>
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            {authentication.userId === props.componentState.cube.creator &&
+              props.componentState.active_component_type !== 'mainboard' &&
+              props.componentState.active_component_type !== 'sideboard' ?
+              <React.Fragment>
+                <MUITextField
+                  autoComplete="off"
+                  label="Active Component"
+                  onBlur={submitComponentChanges}
+                  onChange={handleComponentNameChange}
+                  type="text"
+                  value={componentName}
+                  variant="outlined"
+                />
+                {props.componentState.active_component_type === 'rotation' &&
+                  <MUITextField
+                    label="Rotation Size"
+                    min="0"
+                    onBlur={submitComponentChanges}
+                    onChange={handleRotationSizeChange}
+                    step="1"
+                    type="number"
+                    value={rotationSize}
+                    variant="outlined"
+                  />
+                }
+              </React.Fragment> :
+              <React.Fragment>
+                <div>
+                  <MUITypography variant="h3">Active Component:</MUITypography>
+                  <MUITypography variant="h4">{props.componentState.active_component_name}</MUITypography>
+                </div>
+                {props.componentState.active_component_type === 'rotation' &&
+                  <MUITypography variant="h4">Rotation Size: {props.componentState.active_rotation_size}</MUITypography>
+                }
+              </React.Fragment>
+            }
+          </div>
         }
       />
+
       <MUICardContent>
-        <div className={classes.flex}>
-          <label className={classes.marginRight} htmlFor="view-selector">View Mode:</label>
-          <select className={classes.remainingWidth} id="view-selector" onChange={props.changeViewMode} value={props.viewMode}>
-            <option value="Curve View">Curve View</option>
-            <option value="List View">List View</option>
-            <option value="Table View">Table View</option>
-          </select>
-        </div>
-        <div className={classes.flex}>
-          <label className={classes.marginRight} htmlFor="search-filter">Search Filter:</label>
-          <input
-            autoComplete="off"
-            className={classes.remainingWidth}
-            id="search-filter"
-            onChange={props.filterCardsHandler}
-            placeholder="Filter cards by keywords, name or type"
-            type="text"
-            value={props.componentState.filter}
-          />
-        </div>
-        <div>Matches: <strong>{props.componentState.displayed_cards.length}</strong></div>
-        {authentication.userId === props.componentState.cube.creator &&
-          props.componentState.active_component_type === 'rotation' &&
-          <React.Fragment>
-            <label htmlFor="rotation-size">Rotation Size:</label>
-            <input
-              className={classes.numberWidth}
-              min="0"
-              onBlur={submitComponentChanges}
-              // onChange={props.changeRotationSize}
-              step="1"
-              type="number"
-              value={props.componentState.active_rotation_size}
+
+        <MUIGrid container alignItems="center" justify="flex-end">
+          <MUIGrid item xs={3}>
+            <MUIList component="nav">
+              <MUIListItem
+                button
+                aria-haspopup="true"
+                aria-controls="lock-menu"
+                onClick={handleClickListItemView}
+              >
+                <MUIListItemText
+                  primary="View Mode"
+                  secondary={props.viewMode}
+                />
+              </MUIListItem>
+            </MUIList>
+            <MUIMenu
+              id="view-selector"
+              anchorEl={viewAnchorEl}
+              keepMounted
+              open={Boolean(viewAnchorEl)}
+              onClose={handleCloseView}
+            >
+              {["Curve View", "List View", "Table View"].map((option) => (
+                <MUIMenuItem
+                  key={option}
+                  onClick={handleMenuItemClickView}
+                  selected={option === props.viewMode}
+                >
+                  {option}
+                </MUIMenuItem>
+              ))}
+            </MUIMenu>
+          </MUIGrid>
+
+          <MUIGrid item xs={9}>
+            <MUITextField
+              autoComplete="off"
+              id="search-filter"
+              label="Filter cards by color, keywords, name or type"
+              onChange={props.filterCardsHandler}
+              style={{ width: '100%' }}
+              type="text"
+              value={props.componentState.filter}
+              variant="outlined"
             />
-          </React.Fragment>
-        }
-        {authentication.userId !== props.componentState.cube.creator &&
-          props.componentState.active_component_type === 'rotation' &&
-          <React.Fragment>
-            <span>Rotation Size: {props.componentState.active_rotation_size}</span>
-          </React.Fragment>
-        }
+          </MUIGrid>
+
+          <MUIGrid item xs={12} style={{ textAlign: 'right' }}>
+            <MUITypography variant="body1">
+              Matches: <strong>{props.componentState.displayed_cards.length}</strong>
+            </MUITypography>
+          </MUIGrid>
+
+        </MUIGrid>
       </MUICardContent>
+
       <MUICardActions className={classes.cardActions}>
-        <span>
-          <label className={classes.marginRight} htmlFor="component-selector">Switch Component:</label>
-          <select id="component-selector" onChange={props.changeComponent} value={props.componentState.active_component_id}>
-            <option value="mainboard">Mainboard</option>
-            <option value="sideboard">Sideboard</option>
-            {
-              props.componentState.cube.modules.map(function (module) {
-                return <option key={module._id} value={module._id}>{module.name}</option>
-              })
-            }
-            {
-              props.componentState.cube.rotations.map(function (rotation) {
-                return <option key={rotation._id} value={rotation._id}>{rotation.name}</option>
-              })
-            }
-          </select>
-        </span>
+
+        <MUIList component="nav">
+          <MUIListItem
+            button
+            aria-haspopup="true"
+            aria-controls="lock-menu"
+            onClick={handleClickListItemComponent}
+          >
+            <MUIListItemText
+              primary="Switch Component"
+              secondary={props.componentState.active_component_name}
+            />
+          </MUIListItem>
+        </MUIList>
+        <MUIMenu
+          id="component-selector"
+          anchorEl={componentAnchorEl}
+          keepMounted
+          open={Boolean(componentAnchorEl)}
+          onClose={handleCloseComponent}
+        >
+          {[{ name: 'Mainboard', _id: 'mainboard' },
+            { name: 'Sideboard', _id: 'sideboard' },
+            ...props.componentState.cube.modules.map(function (module) {
+              return { name: module.name, _id: module._id };
+            }),
+            ...props.componentState.cube.rotations.map(function (rotation) {
+              return { name: rotation.name, _id: rotation._id };
+            })].map((component) => (
+              <MUIMenuItem
+                key={component._id}
+                onClick={() => handleMenuItemClickComponent(component._id)}
+                selected={component.active_component_id === component._id}
+              >
+                {component.name}
+              </MUIMenuItem>
+            ))
+          }
+        </MUIMenu>
+
         {authentication.userId === props.componentState.cube.creator &&
           <React.Fragment>
             <MUIButton

@@ -5,6 +5,7 @@ import {
   Card as MUICard,
   CardContent as MUICardContent,
   CardHeader as MUICardHeader,
+  TextField as MUITextField,
   Typography as MUITypography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -65,12 +66,13 @@ const CubeInfo = (props) => {
           <MUIAvatar alt={props.creator.name} className={classes.avatarLarge} src={props.creator.avatar} />
         }
         title={authentication.userId === props.cube.creator ?
-          <input
+          <MUITextField
+            label="Cube Name"
             onBlur={submitCubeChanges}
             onChange={changeCubeName}
-            placeholder="Cube Name"
             type="text"
             value={cubeName}
+            variant="outlined"
           /> :
           <MUITypography variant="h2">{props.cube.name}</MUITypography>
         }
@@ -82,16 +84,22 @@ const CubeInfo = (props) => {
       />
 
       <MUICardContent>
-        <MUITypography variant="h3">Description: {authentication.userId === props.cube.creator ?
-          <textarea
+        {authentication.userId === props.cube.creator ?
+          <MUITextField
+            fullWidth={true}
+            label="Cube Description"
+            multiline
             onBlur={submitCubeChanges}
             onChange={changeCubeDescription}
-            placeholder="Cube Description"
+            rows={3}
             value={cubeDescription}
+            variant="outlined"
           /> :
-          <MUITypography variant="body1">{props.cube.description}</MUITypography>
+          <React.Fragment>
+            <MUITypography variant="h3">Description:</MUITypography>
+            <MUITypography variant="body1">{props.cube.description}</MUITypography>
+          </React.Fragment>
         }        
-        </MUITypography>
       </MUICardContent>
 
     </MUICard>

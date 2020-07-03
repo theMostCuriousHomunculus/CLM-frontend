@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AppBar as MUIAppBar,
+  CircularProgress as MUICircularProgress,
   Drawer as MUIDrawer,
   List as MUIList,
   ListItem as MUIListItem,
   ListItemIcon as MUIListItemIcon,
   ListItemText as MUIListItemText,
+  TextField as MUITextField,
   Toolbar as MUIToolbar,
   Typography as MUITypography
 } from '@material-ui/core';
@@ -19,6 +21,7 @@ import {
 } from '@material-ui/icons';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
+import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
@@ -39,23 +42,10 @@ const useStyles = makeStyles({
     flexGrow: 1
   },
   input: {
-    backgroundColor: 'inherit',
-    border: 'none',
-    color: 'inherit',
-    fontFamily: 'Ubuntu, Roboto, Arial, sans-serif',
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '30ch',
-      '&:focus': {
-        width: '40ch',
-      },
-    },
-    '&:focus': {
-      outline: 'none'
+    margin: '0.75rem 0.75rem 0.75rem 5.5rem',
+    width: '40rem',
+    '& input[type=text]': {
+      color: '#ffffff',
     }
   },
   item: {
@@ -71,7 +61,7 @@ const useStyles = makeStyles({
     border: '1px solid',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '6.4rem',
+    fontSize: '7.1rem',
     marginRight: '1rem'
   },
   search: {
@@ -102,19 +92,22 @@ const useStyles = makeStyles({
 
 function Navigation (props) {
 
-  const [userSearchResults, setUserSearchResults] = useState([]);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [userSearchResults, setUserSearchResults] = React.useState([]);
   const authentication = React.useContext(AuthenticationContext);
   const { history } = props;
   const classes = useStyles();
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
-  function goToUserProfilePage (event) {
-    const chosenOption = document.getElementById('user-search-results').options.namedItem(event.target.value);
-    if (chosenOption) {
-      history.push('/account/' + chosenOption.getAttribute('data-id'));
-      event.target.value = '';
-    }
+  const { loading, sendRequest } = useRequest();
+
+  function goToUserProfilePage (user_id) {
+    history.push(`/account/${user_id}`);
+    setUserSearchResults([]);
+    // not a great way to clear the search text; using setTimeout because of asynchronous javascript
+    setTimeout(function () {
+      document.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
+    }, 0);
   }
 
   const toggleDrawer = (open) => (event) => {
@@ -200,21 +193,19 @@ function Navigation (props) {
   }
 
   async function searchForUsers (event) {
-    try {
-      const matchingUsers = await sendRequest('http://localhost:5000/api/account?name=' + event.target.value,
-        'GET',
-        null,
-        {}
-      );
-      setUserSearchResults(matchingUsers.map(function (match, index) {
-        return (
-          <option data-id={match._id} key={index} name={match.name} value={match.name}>
-            {match.name}
-          </option>
+    if (event.target.value.length > 2) {
+      try {
+        const matchingUsers = await sendRequest('http://localhost:5000/api/account?name=' + event.target.value,
+          'GET',
+          null,
+          {}
         );
-      }));
-    } catch (error) {
-      console.log({ 'Error': error.message });
+        setUserSearchResults(matchingUsers);
+      } catch (error) {
+        console.log({ 'Error': error.message });
+      }
+    } else {
+      setUserSearchResults([]);
     }
   }
 
@@ -227,18 +218,43 @@ function Navigation (props) {
           <div className={classes.searchIcon}>
             <MUISearchIcon />
           </div>
-          <input
-            className={classes.input}
+          <MUIAutocomplete
+            clearOnBlur={false}
+            clearOnEscape={true}
+            getOptionLabel={(option) => option.name}
+            getOptionSelected={function (option, value) {
+              return option.name === value.name;
+            }}
             id="user-search-bar"
-            list="user-search-results"
-            onChange={goToUserProfilePage}
-            onKeyUp={searchForUsers}
-            placeholder="Search for other users!"
-            type="text"
+            loading={loading}
+            onChange={function (event, value, reason) {
+              if (reason === 'select-option') {
+                goToUserProfilePage(value._id);
+              }
+            }}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
+            open={open}
+            options={userSearchResults}
+            renderInput={(params) => (
+              <MUITextField
+                {...params}
+                className={classes.input}
+                label="Search for Other Users!"
+                onKeyUp={searchForUsers}
+                variant="outlined"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {loading ? <MUICircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  )
+                }}
+              />
+            )}
           />
-          <datalist id="user-search-results">
-            {userSearchResults}
-          </datalist>
         </div>
       </MUIToolbar>
       <MUIDrawer

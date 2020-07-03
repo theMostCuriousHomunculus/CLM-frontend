@@ -23,6 +23,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
+import theme from '../theme';
 import { useRequest } from '../hooks/request-hook';
 import BudRequests from '../components/BudRequests';
 import ScryfallRequest from '../components/ScryfallRequest';
@@ -50,10 +51,10 @@ const useStyles = makeStyles({
     display: 'inline'
   },
   warningButton: {
-    backgroundColor: '#ff0000',
+    backgroundColor: theme.palette.warning.main,
     color: '#ffffff',
     '&:hover': {
-      backgroundColor: '#df2000'
+      backgroundColor: theme.palette.warning.dark
     }
   }
 });

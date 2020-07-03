@@ -142,14 +142,14 @@ const ScryfallRequest = (props) => {
     setAvailablePrintings([]);
     setCardSearchResults([]);
     setSelectedPrintIndex(0);
-    document.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
+    document.getElementsByClassName('MuiAutocomplete-clearIndicator')[1].click();
     cardSearchInput.current.focus();
     props.onSubmit(chosenCard);
     setChosenCard(null);
   }
 
   return (
-    <MUIGrid alignItems="baseline" container justify="flex-end" spacing={2}>
+    <MUIGrid alignItems="center" container justify="flex-end" spacing={2}>
 
       <MUIGrid item xs={12} md={6} lg={5}>
         <MUIAutocomplete
@@ -178,6 +178,7 @@ const ScryfallRequest = (props) => {
               inputRef={cardSearchInput}
               label={props.labelText}
               onKeyUp={scryfallCardSearch}
+              variant="outlined"
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -216,7 +217,6 @@ const ScryfallRequest = (props) => {
           {availablePrintings.map((option, index) => (
             <MUIMenuItem
               key={`printing-${index}`}
-              disabled={index === 0}
               selected={index === selectedPrintIndex}
               onClick={(event) => handleMenuItemClick(event, index)}
             >
