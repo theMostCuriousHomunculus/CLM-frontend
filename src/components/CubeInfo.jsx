@@ -1,13 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Avatar as MUIAvatar,
-  Card as MUICard,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  TextField as MUITextField,
-  Typography as MUITypography
-} from '@material-ui/core';
+import { Avatar as MUIAvatar } from '@material-ui/core/Avatar';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { TextField as MUITextField } from '@material-ui/core/TextField';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -25,12 +23,12 @@ const useStyles = makeStyles({
 
 const CubeInfo = (props) => {
 
-  const authentication = useContext(AuthenticationContext);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { sendRequest } = useRequest();
 
-  const [cubeDescription, setCubeDescription] = useState(props.cube.description);
-  const [cubeName, setCubeName] = useState(props.cube.name);
+  const [cubeDescription, setCubeDescription] = React.useState(props.cube.description);
+  const [cubeName, setCubeName] = React.useState(props.cube.name);
 
   function changeCubeDescription (event) {
     setCubeDescription(event.target.value);
@@ -48,7 +46,7 @@ const CubeInfo = (props) => {
       name: cubeName
     });
     await sendRequest(
-      'http://localhost:5000/api/cube',
+      `${process.env.REACT_APP_BACKEND_URL}/cube`,
       'PATCH',
       cubeChanges,
       {

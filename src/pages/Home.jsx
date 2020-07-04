@@ -1,16 +1,12 @@
-import React, { useContext } from 'react';
-import {
-  Card as MUICard,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  Grid as MUIGrid,
-  Typography as MUITypography
-} from '@material-ui/core';
-import {
-  ControlCamera as MUIControlCameraIcon,
-  Palette as MUIPaletteIcon,
-  Timer as MUITimerIcon
-} from '@material-ui/icons';
+import React from 'react';
+import { Card as MUICard } from '@material-ui/core/Card';
+import {CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { Grid as MUIGrid } from '@material-ui/core/Grid';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
+import { ControlCamera as MUIControlCameraIcon } from '@material-ui/icons/ControlCamera';
+import { Palette as MUIPaletteIcon } from '@material-ui/icons/Palette';
+import { Timer as MUITimerIcon } from '@material-ui/icons/Timer';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -23,7 +19,7 @@ const useStyles = makeStyles({
 
 const Home = () => {
 
-  const authentication = useContext(AuthenticationContext);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
 
   const components = [
@@ -60,7 +56,7 @@ const Home = () => {
           }
         />
         <MUICardContent>
-          <MUITypography variant="body1"><MUIControlCameraIcon /> Do you want total control over your cube?</MUITypography>
+          <MUITypography variant="body1"><MUIControlCameraIcon /> Do you want more control over your cube?</MUITypography>
           <MUITypography variant="body1"><MUIPaletteIcon /> Do you want to maximize the variety of play experiences your cube offers with minimal impact to the quality of gameplay?</MUITypography>
           <MUITypography variant="body1"><MUITimerIcon /> Do you want to draft your cube in real time with your buds?</MUITypography>
 

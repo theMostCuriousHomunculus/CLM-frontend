@@ -1,15 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
-import {
-  Avatar as MUIAvatar,
-  Button as MUIButton,
-  Card as MUICard,
-  CardActions as MUICardActions,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  TextField as MUITextField,
-  Typography as MUITypography
-} from '@material-ui/core';
+import { Button as MUIButton } from '@material-ui/core/Button';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardActions as MUICardActions } from '@material-ui/core/CardActions';
+import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { TextField as MUITextField } from '@material-ui/core/TextField';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -29,10 +26,10 @@ const useStyles = makeStyles({
 
 const Authenticate = () => {
 
-  const authentication = useContext(AuthenticationContext);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const history = useHistory();
-  const [mode, setMode] = useState('Login');
+  const [mode, setMode] = React.useState('Login');
 
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
@@ -46,7 +43,7 @@ const Authenticate = () => {
 
   async function login () {
     try {
-      const response = await fetch('http://localhost:5000/api/account/login',
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/account/login`,
         {
           method: 'PATCH',
           body: JSON.stringify({
@@ -80,7 +77,7 @@ const Authenticate = () => {
       const randomIndex = Math.floor(Math.random() * randomCardPrintings.data.length);
       const avatar = randomCardPrintings.data[randomIndex].image_uris.art_crop;
 
-      const response = await fetch('http://localhost:5000/api/account',
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/account`,
         {
           method: 'POST',
           body: JSON.stringify({

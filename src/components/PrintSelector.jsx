@@ -1,21 +1,21 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
 const PrintSelector = (props) => {
 
-  const authentication = useContext(AuthenticationContext);
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const authentication = React.useContext(AuthenticationContext);
+  const { sendRequest } = useRequest();
 
-  const [disabled, setDisabled] = useState(true);
-  const [icon, setIcon] = useState(
+  const [disabled, setDisabled] = React.useState(true);
+  const [icon, setIcon] = React.useState(
     <i
       className="fas fa-lock"
       onClick={enablePrintChange}
     ></i>
   );
-  const [printOptions, setPrintOptions] = useState([
+  const [printOptions, setPrintOptions] = React.useState([
     <option
       data-back_image={props.card.back_image}
       data-image={props.card.image}
@@ -96,7 +96,7 @@ const PrintSelector = (props) => {
       purchase_link: selectedPrinting.getAttribute('data-purchase_link')
     });
     const updatedCube = await sendRequest(
-      'http://localhost:5000/api/cube',
+      `${process.env.REACT_APP_BACKEND_URL}/cube`,
       'PATCH',
       cardChanges,
       {

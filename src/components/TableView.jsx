@@ -1,18 +1,38 @@
 import React from 'react';
-import {
-  Card as MUICard,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  Typography as MUITypography
-} from '@material-ui/core';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import theme from '../theme';
+
 const useStyles = makeStyles({
+  basicCard: {
+    height: '100%',
+    width: '100%'
+  },
   black: {
     backgroundColor: '#8f8f8f'
   },
   blue: {
     backgroundColor: '#5f8fdf'
+  },
+  cardWrapper: {
+    margin: '0.5rem',
+    textAlign: 'center',
+    [theme.breakpoints.up('xs')]: {
+      width: '100%'
+    },
+    [theme.breakpoints.up('sm')]: {
+      width: 'calc((100% - 2rem) / 2)'
+    },
+    [theme.breakpoints.up('md')]: {
+      width: 'calc((100% - 4rem) / 4)'
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: 'calc((100% - 7rem) / 7)'
+    }
   },
   colorless: {
     backgroundColor: '#bfbfbf'
@@ -27,14 +47,14 @@ const useStyles = makeStyles({
     backgroundColor: '#df5f5f'
   },
   tableViewMainContainer: {
-    display: 'grid',
-    gap: '0.5rem',
-    gridTemplateColumns: 'repeat(7, 1fr)',
-    margin: '1rem',
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    padding: '0.5rem'
   },
   white: {
     backgroundColor: '#efefef'
-  }
+  }  
 });
 
 const TableView = (props) => {
@@ -54,90 +74,38 @@ const TableView = (props) => {
             return card.color === color;
           });
           return (
-            <MUICard className={classes[`${color.toLowerCase()}`]} key={`table-${color}`}>
-              <MUICardHeader title={<MUITypography variant="h3">{color}</MUITypography>} />
-              <MUICardContent>
-                {types.map(function (type) {
-                  const cards_color_type = cards_color.filter(function (card) {
-                    return card.type === type;
-                  });
-                  return (
-                    <React.Fragment key={type}>
-                      {cards_color_type.length > 0 &&
-                        <div>
-                          <h4>{type}</h4>
-                          <React.Fragment>
-                            {costs.map(function (cost) {
-                              const cards_color_type_cost = cards_color_type.filter(function (card) {
-                                return card.cost === cost;
-                              });
-                              return (
-                                <div key={cost}>
-                                  {cards_color_type_cost.map(function (card) {
-                                    return (
-                                      <div
-                                        back_image={card.back_image}
-                                        image={card.image}
-                                        key={card._id}
-                                        onMouseOut={props.hidePreview}
-                                        onMouseOver={props.showPreview}
-                                      >
-                                        {card.name}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              );
-                            })}
-                          </React.Fragment>
-                        </div>
-                      }
-                    </React.Fragment>
-                  );
-                })}
-              </MUICardContent>
-            </MUICard>
-          );
-        })}
-      </React.Fragment>
-      <MUICard className={classes.multicolor}>
-        <MUICardHeader title={<MUITypography variant="h3">Multicolor</MUITypography>} />
-        <MUICardContent>
-          {multiColors.map(function (color) {
-            const cards_color = props.componentState.displayed_cards.filter(function (card) {
-              return card.color === color;
-            });
-            return (
-              <React.Fragment key={color}>
-                {cards_color.length > 0 &&
-                  <div>
-                    <MUITypography variant="h4">{color}</MUITypography>
-                    <React.Fragment>
-                      {[true, false].map(function (isCreature) {
-                        const cards_color_isCreature = cards_color.filter(function (card) {
-                          return isCreature ? card.type === "Creature" : card.type !== "Creature";
-                        });
-                        return (
-                          <div key={isCreature ? "a" : "b"}>
-                            <h4>{isCreature ? "Creature" : "Non-Creature"}</h4>
+            <div className={classes.cardWrapper} key={`table-${color}`}>
+              <MUICard className={classes[`${color.toLowerCase()}`] + ' ' + classes.basicCard}>
+                <MUICardHeader title={<MUITypography variant="h3">{color}</MUITypography>} />
+                <MUICardContent>
+                  {types.map(function (type) {
+                    const cards_color_type = cards_color.filter(function (card) {
+                      return card.type === type;
+                    });
+                    return (
+                      <React.Fragment key={type}>
+                        {cards_color_type.length > 0 &&
+                          <div>
+                            <MUITypography variant="h4">{type}</MUITypography>
                             <React.Fragment>
                               {costs.map(function (cost) {
-                                const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
+                                const cards_color_type_cost = cards_color_type.filter(function (card) {
                                   return card.cost === cost;
                                 });
                                 return (
                                   <div key={cost}>
-                                    {cards_color_isCreature_cost.map(function (card) {
+                                    {cards_color_type_cost.map(function (card) {
                                       return (
-                                        <div
+                                        <MUITypography
                                           back_image={card.back_image}
                                           image={card.image}
                                           key={card._id}
                                           onMouseOut={props.hidePreview}
                                           onMouseOver={props.showPreview}
+                                          variant="body1"
                                         >
                                           {card.name}
-                                        </div>
+                                        </MUITypography>
                                       );
                                     })}
                                   </div>
@@ -145,16 +113,74 @@ const TableView = (props) => {
                               })}
                             </React.Fragment>
                           </div>
-                        );
-                      })}
-                    </React.Fragment>
-                  </div>
-                }
-              </React.Fragment>
-            );
-          })}
-        </MUICardContent>
-      </MUICard>
+                        }
+                      </React.Fragment>
+                    );
+                  })}
+                </MUICardContent>
+              </MUICard>
+            </div>
+          );
+        })}
+      </React.Fragment>
+      <div className={classes.cardWrapper}>
+        <MUICard className={classes.multicolor + ' ' + classes.basicCard}>
+          <MUICardHeader title={<MUITypography variant="h3">Multicolor</MUITypography>} />
+          <MUICardContent>
+            {multiColors.map(function (color) {
+              const cards_color = props.componentState.displayed_cards.filter(function (card) {
+                return card.color === color;
+              });
+              return (
+                <React.Fragment key={color}>
+                  {cards_color.length > 0 &&
+                    <div>
+                      <MUITypography variant="h4">{color}</MUITypography>
+                      <React.Fragment>
+                        {[true, false].map(function (isCreature) {
+                          const cards_color_isCreature = cards_color.filter(function (card) {
+                            return isCreature ? card.type === "Creature" : card.type !== "Creature";
+                          });
+                          return (
+                            <div key={isCreature ? "a" : "b"}>
+                              <MUITypography variant="h5">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
+                              <React.Fragment>
+                                {costs.map(function (cost) {
+                                  const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
+                                    return card.cost === cost;
+                                  });
+                                  return (
+                                    <div key={cost}>
+                                      {cards_color_isCreature_cost.map(function (card) {
+                                        return (
+                                          <MUITypography
+                                            back_image={card.back_image}
+                                            image={card.image}
+                                            key={card._id}
+                                            onMouseOut={props.hidePreview}
+                                            onMouseOver={props.showPreview}
+                                            variant="body1"
+                                          >
+                                            {card.name}
+                                          </MUITypography>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+                                })}
+                              </React.Fragment>
+                            </div>
+                          );
+                        })}
+                      </React.Fragment>
+                    </div>
+                  }
+                </React.Fragment>
+              );
+            })}
+          </MUICardContent>
+        </MUICard>
+      </div>
     </div>
   );
 }

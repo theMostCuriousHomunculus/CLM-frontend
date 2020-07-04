@@ -1,24 +1,20 @@
 import React from 'react';
-import {
-  AppBar as MUIAppBar,
-  CircularProgress as MUICircularProgress,
-  Drawer as MUIDrawer,
-  List as MUIList,
-  ListItem as MUIListItem,
-  ListItemIcon as MUIListItemIcon,
-  ListItemText as MUIListItemText,
-  TextField as MUITextField,
-  Toolbar as MUIToolbar,
-  Typography as MUITypography
-} from '@material-ui/core';
-import { 
-  AccountCircle as MUIAccountCircle,
-  AllInclusive as MUIAllInclusive,
-  ExitToApp as MUIExitToApp,
-  Home as MUIHome,
-  Menu as MUIMenu,
-  Search as MUISearchIcon
-} from '@material-ui/icons';
+import { AppBar as MUIAppBar } from '@material-ui/core/AppBar';
+import { CircularProgress as MUICircularProgress } from '@material-ui/core/CircularProgress';
+import { Drawer as MUIDrawer } from '@material-ui/core/Drawer';
+import { List as MUIList } from '@material-ui/core/List';
+import { ListItem as MUIListItem } from '@material-ui/core/ListItem';
+import { ListItemIcon as MUIListItemIcon } from '@material-ui/core/ListItemIcon';
+import { ListItemText as MUIListItemText } from '@material-ui/core/ListItemText';
+import { TextField as MUITextField } from '@material-ui/core/TextField';
+import { Toolbar as MUIToolbar } from '@material-ui/core/Toolbar';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
+import { AccountCircle as MUIAccountCircleIcon } from '@material-ui/icons/AccountCircle';
+import { AllInclusive as MUIAllInclusiveIcon } from '@material-ui/icons/AllInclusive';
+import { ExitToApp as MUIExitToAppIcon } from '@material-ui/icons/ExitToApp';
+import { Home as MUIHomeIcon } from '@material-ui/icons/Home';
+import { Menu as MUIMenuIcon } from '@material-ui/icons/Menu';
+import { Search as MUISearchIcon } from '@material-ui/icons/Search';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
@@ -28,22 +24,16 @@ import { useRequest } from '../hooks/request-hook';
 import theme from '../theme';
 
 const useStyles = makeStyles({
-  avatarSmall: {
-    height: '75px',
-    marginRight: '16px',
-    width: '75px'
-  },
   drawer: {
     '& .MuiPaper-root': {
       backgroundColor: theme.palette.primary.main
     }
   },
-  headline: {
-    flexGrow: 1
+  headlineContainer: {
+    textAlign: 'left'
   },
   input: {
     margin: '0.75rem 0.75rem 0.75rem 5.5rem',
-    width: '40rem',
     '& input[type=text]': {
       color: '#ffffff',
     }
@@ -71,22 +61,46 @@ const useStyles = makeStyles({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: 'auto',
-    },
+    '& .MuiAutocomplete-root': {
+      [theme.breakpoints.down('sm')]: {
+        width: 275
+      },
+      [theme.breakpoints.up('md')]: {
+        width: '36rem'
+      }
+    }
   },
   searchIcon: {
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
     alignItems: 'center',
+    color: '#ffffff',
+    display: 'flex',
+    height: '100%',
     justifyContent: 'center',
+    padding: theme.spacing(0, 2),
+    pointerEvents: 'none',
+    position: 'absolute'
+  },
+  sideBar: {
+    [theme.breakpoints.up('md')]: {
+      display: 'none'
+    },
+    width: 350
   },
   toolbar: {
+    display: 'flex',
+    justifyContent: 'space-between',
     padding: '1rem'
+  },
+  topBar: {
+    [theme.breakpoints.down('sm')]: {
+      display: 'none'
+    },
+    width: '42rem'
+  },
+  topBarContainer: {
+    display: 'flex',
+    flexGrow: 1,
+    justifyContent: 'flex-end'
   }
 });
 
@@ -101,13 +115,17 @@ function Navigation (props) {
 
   const { loading, sendRequest } = useRequest();
 
-  function goToUserProfilePage (user_id) {
+  function goToUserProfilePage (user_id, props) {
     history.push(`/account/${user_id}`);
     setUserSearchResults([]);
-    // not a great way to clear the search text; using setTimeout because of asynchronous javascript
-    setTimeout(function () {
-      document.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
-    }, 0);
+    if (props === 'side') {
+      setDrawerOpen(false);
+    } else {
+      // not a great way to clear the search text; using setTimeout because of asynchronous javascript
+      setTimeout(function () {
+        document.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
+      }, 0);
+    }
   }
 
   const toggleDrawer = (open) => (event) => {
@@ -120,22 +138,22 @@ function Navigation (props) {
   function NavLinks () {
     const loggedInPages = [
       {
-        icon: <MUIHome />,
+        icon: <MUIHomeIcon />,
         name: "Home",
         onClick: () => history.push('/')
       },
       {
-        icon: <MUIAccountCircle />,
+        icon: <MUIAccountCircleIcon />,
         name: "My Profile",
         onClick: () => history.push('/account/' + authentication.userId)
       },
       {
-        icon: <MUIAllInclusive />,
+        icon: <MUIAllInclusiveIcon />,
         name: "Resources",
         onClick: () => history.push('/resources')
       },
       {
-        icon: <MUIExitToApp />,
+        icon: <MUIExitToAppIcon />,
         name: "Logout",
         onClick: authentication.logout
       }
@@ -143,17 +161,17 @@ function Navigation (props) {
 
     const loggedOutPages = [
       {
-        icon: <MUIHome />,
+        icon: <MUIHomeIcon />,
         name: "Home",
         onClick: () => history.push('/')
       },
       {
-        icon: <MUIAllInclusive />,
+        icon: <MUIAllInclusiveIcon />,
         name: "Resources",
         onClick: () => history.push('/resources')
       },
       {
-        icon: <MUIExitToApp />,
+        icon: <MUIExitToAppIcon />,
         name: "Login / Register",
         onClick: () => history.push('/account/authenticate')
       }
@@ -192,10 +210,56 @@ function Navigation (props) {
     );
   }
 
+  function UserSearchBar (props) {
+    return (
+      <div className={(props === 'side' ? classes.sideBar : classes.topBar) + ' ' + classes.search}>
+        <div className={classes.searchIcon}>
+          <MUISearchIcon />
+        </div>
+        <MUIAutocomplete
+          clearOnBlur={false}
+          clearOnEscape={true}
+          getOptionLabel={(option) => option.name}
+          getOptionSelected={function (option, value) {
+            return option.name === value.name;
+          }}
+          loading={loading}
+          onChange={function (event, value, reason) {
+            if (reason === 'select-option') {
+              goToUserProfilePage(value._id, props);
+            }
+          }}
+          onClose={() => setOpen(false)}
+          onOpen={() => setOpen(true)}
+          open={open}
+          options={userSearchResults}
+          renderInput={(params) => (
+            <MUITextField
+              {...params}
+              className={classes.input}
+              label="Search for Other Users!"
+              onKeyUp={searchForUsers}
+              variant="outlined"
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <React.Fragment>
+                    {loading ? <MUICircularProgress color="inherit" size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </React.Fragment>
+                )
+              }}
+            />
+          )}
+        />
+      </div>
+    );
+  }
+
   async function searchForUsers (event) {
     if (event.target.value.length > 2) {
       try {
-        const matchingUsers = await sendRequest('http://localhost:5000/api/account?name=' + event.target.value,
+        const matchingUsers = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account?name=${event.target.value}`,
           'GET',
           null,
           {}
@@ -212,49 +276,12 @@ function Navigation (props) {
   return (
     <MUIAppBar position="static">
       <MUIToolbar className={classes.toolbar}>
-        <MUIMenu className={classes.menuIcon} color="secondary" onClick={toggleDrawer(true)} />
-        <MUITypography className={classes.headline} color="secondary" variant="h1">Cube Level Midnight</MUITypography>
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
-            <MUISearchIcon />
-          </div>
-          <MUIAutocomplete
-            clearOnBlur={false}
-            clearOnEscape={true}
-            getOptionLabel={(option) => option.name}
-            getOptionSelected={function (option, value) {
-              return option.name === value.name;
-            }}
-            id="user-search-bar"
-            loading={loading}
-            onChange={function (event, value, reason) {
-              if (reason === 'select-option') {
-                goToUserProfilePage(value._id);
-              }
-            }}
-            onClose={() => setOpen(false)}
-            onOpen={() => setOpen(true)}
-            open={open}
-            options={userSearchResults}
-            renderInput={(params) => (
-              <MUITextField
-                {...params}
-                className={classes.input}
-                label="Search for Other Users!"
-                onKeyUp={searchForUsers}
-                variant="outlined"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {loading ? <MUICircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  )
-                }}
-              />
-            )}
-          />
+        <MUIMenuIcon className={classes.menuIcon} color="secondary" onClick={toggleDrawer(true)} />
+        <div className={classes.headlineContainer}>
+          <MUITypography color="secondary" variant="h1">Cube Level Midnight</MUITypography>
+        </div>
+        <div className={classes.topBarContainer}>
+          {UserSearchBar('top')}
         </div>
       </MUIToolbar>
       <MUIDrawer
@@ -264,6 +291,7 @@ function Navigation (props) {
         onClose={toggleDrawer(false)}
         open={drawerOpen}
       >
+        {UserSearchBar('side')}
         {NavLinks()}
       </MUIDrawer>
     </MUIAppBar>

@@ -1,14 +1,12 @@
-import React, { useContext } from 'react';
-import {
-  Card as MUICard,
-  Grid as MUIGrid,
-  Table as MUITable,
-  TableBody as MUITableBody,
-  TableCell as MUITableCell,
-  TableContainer as MUITableContainer,
-  TableHead as MUITableHead,
-  TableRow as MUITableRow
-} from '@material-ui/core';
+import React from 'react';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { Grid as MUIGrid } from '@material-ui/core/Grid';
+import { Table as MUITable } from '@material-ui/core/Table';
+import { TableBody as MUITableBody } from '@material-ui/core/TableBody';
+import { TableCell as MUITableCell } from '@material-ui/core/TableCell';
+import { TableContainer as MUITableContainer } from '@material-ui/core/TableContainer';
+import { TableHead as MUITableHead } from '@material-ui/core/TableHead';
+import { TableRow as MUITableRow } from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 
 import PrintSelector from './PrintSelector';
@@ -42,9 +40,9 @@ const useStyles = makeStyles({
 
 const ListView = (props) => {
 
-  const authentication = useContext(AuthenticationContext);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { sendRequest } = useRequest();
 
   async function moveDeleteCard (event) {
     const action = 'move_or_delete_card';
@@ -58,7 +56,7 @@ const ListView = (props) => {
       destination
     });
     const updatedCube = await sendRequest(
-      'http://localhost:5000/api/cube',
+      `${process.env.REACT_APP_BACKEND_URL}/cube`,
       'PATCH',
       moveInfo,
       {
@@ -82,7 +80,7 @@ const ListView = (props) => {
     cardChanges[property_name] = event.target.value;
     cardChanges = JSON.stringify(cardChanges);
     const updatedCube = await sendRequest(
-      'http://localhost:5000/api/cube',
+      `${process.env.REACT_APP_BACKEND_URL}/cube`,
       'PATCH',
       cardChanges,
       {
@@ -115,7 +113,7 @@ const ListView = (props) => {
         cube_id: props.componentState.cube._id
       });
       const updatedCube = await sendRequest(
-        'http://localhost:5000/api/cube/',
+        `${process.env.REACT_APP_BACKEND_URL}/cube/`,
         'PATCH',
         cardChanges,
         {

@@ -1,25 +1,21 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import {
-  Avatar as MUIAvatar,
-  Button as MUIButton,
-  Card as MUICard,
-  CardActions as MUICardActions,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  Dialog as MUIDialog,
-  DialogActions as MUIDialogActions,
-  DialogContent as MUIDialogContent,
-  DialogTitle as MUIDialogTitle,
-  Grid as MUIGrid,
-  List as MUIList,
-  ListItem as MUIListItem,
-  TextField as MUITextField,
-  Typography as MUITypography
-} from '@material-ui/core';
-import {
-  PersonAdd as MUIPersonAddIcon
-} from '@material-ui/icons';
+import { Avatar as MUIAvatar } from '@material-ui/core/Avatar';
+import { Button as MUIButton } from '@material-ui/core/Button';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardActions as MUICardActions } from '@material-ui/core/CardActions';
+import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { Dialog as MUIDialog } from '@material-ui/core/Dialog';
+import { DialogActions as MUIDialogActions } from '@material-ui/core/DialogActions';
+import { DialogContent as MUIDialogContent } from '@material-ui/core/DialogContent';
+import { DialogTitle as MUIDialogTitle } from '@material-ui/core/DialogTitle';
+import { Grid as MUIGrid } from '@material-ui/core/Grid';
+import { List as MUIList } from '@material-ui/core/List';
+import { ListItem as MUIListItem } from '@material-ui/core/ListItem';
+import { TextField as MUITextField } from '@material-ui/core/TextField';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
+import { PersonAdd as MUIPersonAddIcon } from '@material-ui/icons/PersonAdd';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -62,16 +58,16 @@ const useStyles = makeStyles({
 const Account = () => {
 
   const accountId = useParams().accountId;
-  const authentication = useContext(AuthenticationContext);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const history = useHistory();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { sendRequest } = useRequest();
 
-  const [user, setUser] = useState({});
-  const [cubes, setCubes] = useState([]);
-  const [showCubeForm, setShowCubeForm] = useState(false);
+  const [user, setUser] = React.useState({});
+  const [cubes, setCubes] = React.useState([]);
+  const [showCubeForm, setShowCubeForm] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchAccount();
   }, [accountId, authentication.token]);
 
@@ -82,7 +78,7 @@ const Account = () => {
       });
 
       await sendRequest(
-        'http://localhost:5000/api/account/',
+        `${process.env.REACT_APP_BACKEND_URL}/account/`,
         'PATCH',
         accountChanges,
         {
@@ -103,7 +99,7 @@ const Account = () => {
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
 
-    await sendRequest('http://localhost:5000/api/account',
+    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
       'PATCH',
       JSON.stringify(formData),
       {
@@ -117,9 +113,9 @@ const Account = () => {
   async function fetchAccount () {
     try {
       const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
-      const accountData = await sendRequest(`http://localhost:5000/api/account/${accountId}`, 'GET', null, headers);
+      const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
       setUser(accountData);
-      const cubeData = await sendRequest(`http://localhost:5000/api/cube?creator=${accountId}`, 'GET', null, {});
+      const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creator=${accountId}`, 'GET', null, {});
       setCubes(cubeData.cubes);
     } catch (error) {
       console.log('Error: ' + error.message);
@@ -132,7 +128,7 @@ const Account = () => {
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
 
-    await sendRequest('http://localhost:5000/api/account',
+    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
       'PATCH',
       JSON.stringify(formData),
       {
@@ -153,7 +149,7 @@ const Account = () => {
 
     try {
       const responseData = await sendRequest(
-        'http://localhost:5000/api/cube',
+        `${process.env.REACT_APP_BACKEND_URL}/cube`,
         'POST',
         JSON.stringify(formInputs),
         {
@@ -179,10 +175,8 @@ const Account = () => {
         {accountId === authentication.userId &&
           <MUICardActions>
             <ScryfallRequest
-              action="http://localhost:5000/api/account/"
               buttonText="Change Avatar"
               labelText="Change your avatar"
-              method="PATCH"
               onSubmit={changeAvatar}
             />
           </MUICardActions>

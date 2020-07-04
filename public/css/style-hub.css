@@ -4,27 +4,13 @@ html {
 
 * {
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.6rem;
+  font-family: 'Ubuntu', 'Roboto', 'Arial', sans-serif;
   margin: 0;
   padding: 0;
 }
 
 body {
+  max-width: 100vw;
   min-height: 100vh;
   position: relative;
-}
-
-main {
-  padding-bottom: 300px;
-  margin: 1rem auto 0 auto;
-}
-
-.hover-preview-container {
-  position: absolute;
-}
-
-.hover-preview-image {
-  height: 300px;
-  z-index: 1;
 }

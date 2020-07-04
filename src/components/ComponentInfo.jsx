@@ -1,24 +1,22 @@
 import React from 'react';
-import {
-  Button as MUIButton,
-  Card as MUICard,
-  CardActions as MUICardActions,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  Dialog as MUIDialog,
-  DialogActions as MUIDialogActions,
-  DialogContent as MUIDialogContent,
-  DialogTitle as MUIDialogTitle,
-  Grid as MUIGrid,
-  List as MUIList,
-  ListItem as MUIListItem,
-  ListItemText as MUIListItemText,
-  Menu as MUIMenu,
-  MenuItem as MUIMenuItem,
-  TextField as MUITextField,
-  Typography as MUITypography
-} from '@material-ui/core';
-import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
+import { Button as MUIButton } from '@material-ui/core/Button';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardActions as MUICardActions } from '@material-ui/core/CardActions';
+import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { Dialog as MUIDialog } from '@material-ui/core/Dialog';
+import { DialogActions as MUIDialogActions } from '@material-ui/core/DialogActions';
+import { DialogContent as MUIDialogContent } from '@material-ui/core/DialogContent';
+import { DialogTitle as MUIDialogTitle } from '@material-ui/core/DialogTitle';
+import { Grid as MUIGrid } from '@material-ui/core/Grid';
+import { List as MUIList } from '@material-ui/core/List';
+import { ListItem as MUIListItem } from '@material-ui/core/ListItem';
+import { ListItemText as MUIListItemText } from '@material-ui/core/ListItemText';
+import { Menu as MUIMenu } from '@material-ui/core/Menu';
+import { MenuItem as MUIMenuItem } from '@material-ui/core/MenuItem';
+import { TextField as MUITextField } from '@material-ui/core/TextField';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
+import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons/DeleteForever';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -64,12 +62,12 @@ const ComponentInfo = (props) => {
   const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { sendRequest } = useRequest();
 
   React.useEffect(() => {
     setComponentName(props.componentState.active_component_name);
     setRotationSize(props.componentState.active_rotation_size);
-  }, [props.componentState.active_component_id]);
+  }, [props.componentState.active_component_id, props.componentState.cube]);
 
   async function addComponent (event) {
     event.preventDefault();
@@ -84,7 +82,7 @@ const ComponentInfo = (props) => {
 
     try {
       const updatedCube = await sendRequest(
-        'http://localhost:5000/api/cube/',
+        `${process.env.REACT_APP_BACKEND_URL}/cube/`,
         'PATCH',
         componentData,
         {
@@ -117,7 +115,7 @@ const ComponentInfo = (props) => {
       cube_id: props.componentState.cube._id
     });
     const updatedCube = await sendRequest(
-      'http://localhost:5000/api/cube',
+      `${process.env.REACT_APP_BACKEND_URL}/cube`,
       'PATCH',
       deleteInfo,
       {
@@ -172,7 +170,7 @@ const ComponentInfo = (props) => {
       size: rotationSize
     });
     const updatedCube = await sendRequest(
-      'http://localhost:5000/api/cube',
+      `${process.env.REACT_APP_BACKEND_URL}/cube`,
       'PATCH',
       componentChanges,
       {
@@ -191,7 +189,8 @@ const ComponentInfo = (props) => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             {authentication.userId === props.componentState.cube.creator &&
               props.componentState.active_component_type !== 'mainboard' &&
-              props.componentState.active_component_type !== 'sideboard' ?
+              props.componentState.active_component_type !== 'sideboard' &&
+              (componentName || componentName.length === 0) ?
               <React.Fragment>
                 <MUITextField
                   autoComplete="off"
@@ -203,6 +202,7 @@ const ComponentInfo = (props) => {
                   variant="outlined"
                 />
                 {props.componentState.active_component_type === 'rotation' &&
+                  rotationSize &&
                   <MUITextField
                     label="Rotation Size"
                     min="0"
@@ -269,7 +269,7 @@ const ComponentInfo = (props) => {
             <MUITextField
               autoComplete="off"
               id="search-filter"
-              label="Filter cards by color, keywords, name or type"
+              label="Filter by color, keywords, name or type"
               onChange={props.filterCardsHandler}
               style={{ width: '100%' }}
               type="text"

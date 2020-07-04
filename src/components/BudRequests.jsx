@@ -1,19 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Avatar as MUIAvatar,
-  Button as MUIButton,
-  Card as MUICard,
-  CardHeader as MUICardHeader,
-  Grid as MUIGrid,
-  List as MUIList,
-  ListItem as MUIListItem,
-  Typography as MUITypography
-} from '@material-ui/core';
-import {
-  PersonAdd as MUIPersonAddIcon,
-  NotInterested as MUINotInterestedIcon
-} from '@material-ui/icons';
+import { Avatar as MUIAvatar } from '@material-ui/core/Avatar';
+import { Button as MUIButton } from '@material-ui/core/Button';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { Grid as MUIGrid } from '@material-ui/core/Grid';
+import { List as MUIList } from '@material-ui/core/List';
+import { ListItem as MUIListItem } from '@material-ui/core/ListItem';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
+import { PersonAdd as MUIPersonAddIcon } from '@material-ui/icons/PersonAdd';
+import { NotInterested as MUINotInterestedIcon } from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -43,9 +39,9 @@ const useStyles = makeStyles({
 
 const BudRequests = (props) => {
 
-  const authentication = useContext(AuthenticationContext);
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { sendRequest } = useRequest();
 
   async function acceptBudRequest (event) {
     let formData = {
@@ -53,7 +49,7 @@ const BudRequests = (props) => {
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
 
-    await sendRequest('http://localhost:5000/api/account',
+    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
       'PATCH',
       JSON.stringify(formData),
       {
@@ -68,7 +64,7 @@ const BudRequests = (props) => {
       action: 'reject',
       other_user_id: event.currentTarget.getAttribute('data-id')
     };
-    await sendRequest('http://localhost:5000/api/account',
+    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
     'PATCH',
     JSON.stringify(formData),
     {

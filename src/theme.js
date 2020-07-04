@@ -2,8 +2,63 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
+const defaultTheme = createMuiTheme();
+const { breakpoints } = defaultTheme;
+
 const theme = createMuiTheme({
-  
+  ...defaultTheme,
+  overrides: {
+    MuiTypography: {
+      h1: {
+        fontSize: '6rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '4rem'
+        }
+      },
+      h2: {
+        fontSize: '3.75rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '2.5rem'
+        }
+      },
+      h3: {
+        fontSize: '3rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '2rem'
+        }
+      },
+      h4: {
+        fontSize: '2.4rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1.6rem'
+        }
+      },
+      h5: {
+        fontSize: '2rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1.4rem'
+        }
+      },
+      body1: {
+        fontSize: '1.6rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1.2rem'
+        }
+      },
+      body2: {
+        fontSize: '1.2rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1rem'
+        }
+      },
+      button: {
+        fontSize: '1.6rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1.2rem'
+        }
+      }
+    }
+  },
   palette: {
     primary: {
       main: deepPurple[400]
@@ -24,34 +79,7 @@ const theme = createMuiTheme({
       'Arial',
       'sans-serif'
     ].join(','),
-    htmlFontSize: 10,
-    h1: {
-      fontSize: '6rem'
-    },
-    h2: {
-      fontSize: '3.75rem'
-    },
-    h3: {
-      fontSize: '3rem'
-    },
-    h4: {
-      fontSize: '2.4rem'
-    },
-    subtitle1: {
-
-    },
-    subtitle2: {
-
-    },
-    body1: {
-      fontSize: '1.6rem',
-    },
-    body2: {
-      fontSize: '1.2rem',
-    },
-    button: {
-      fontSize: '1.6rem',
-    }
+    htmlFontSize: 10
   }
 })
 

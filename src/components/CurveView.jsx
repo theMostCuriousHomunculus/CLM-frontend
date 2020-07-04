@@ -1,10 +1,8 @@
 import React from 'react';
-import {
-  Card as MUICard,
-  CardContent as MUICardContent,
-  CardHeader as MUICardHeader,
-  Typography as MUITypography
-} from '@material-ui/core';
+import { Card as MUICard } from '@material-ui/core/Card';
+import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
+import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
+import { Typography as MUITypography } from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 const black = '#8f8f8f';
@@ -102,7 +100,7 @@ const CubeView = (props) => {
                 });
                 return (
                   <React.Fragment key={isCreature ? "a" : "b"}>
-                    <h4>{isCreature ? "Creature" : "Non-Creature"}</h4>
+                    <MUITypography variant="h4">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
                     <div className={classes.curveViewTypeContainer}>
                       {costs.map(function (cost) {
                         const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
@@ -110,18 +108,19 @@ const CubeView = (props) => {
                         });
                         return (
                           <div key={cost}>
-                            <h5>{cost} CMC</h5>
+                            <MUITypography variant="h5">{cost} CMC</MUITypography>
                             {cards_color_isCreature_cost.map(function (card) {
                               return (
-                                <div
+                                <MUITypography
                                   back_image={card.back_image}
                                   image={card.image}
                                   key={card._id}
                                   onMouseOut={props.hidePreview}
                                   onMouseOver={props.showPreview}
+                                  variant="body1"
                                 >
                                   {card.name}
-                                </div>
+                                </MUITypography>
                               );
                             })}
                           </div>

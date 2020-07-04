@@ -99,7 +99,7 @@ export const useCube = (state, action) => {
         });
         active_component_cards = module.cards;
         active_component_id = module._id;
-        active_component_name = state.active_component_name;
+        active_component_name = module.name;
         active_component_type = 'module';
       } else {
         rotation = action.value.rotations.find(function (rotation) {
@@ -107,7 +107,7 @@ export const useCube = (state, action) => {
         });
         active_component_cards = rotation.cards;
         active_component_id = rotation._id;
-        active_component_name = state.active_component_name;
+        active_component_name = rotation.name;
         active_component_type = 'rotation';
       }
 
