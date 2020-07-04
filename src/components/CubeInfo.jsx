@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar as MUIAvatar } from '@material-ui/core/Avatar';
-import { Card as MUICard } from '@material-ui/core/Card';
-import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
-import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
-import { TextField as MUITextField } from '@material-ui/core/TextField';
-import { Typography as MUITypography } from '@material-ui/core/Typography';
+import MUIAvatar from '@material-ui/core/Avatar';
+import MUICard from '@material-ui/core/Card';
+import MUICardContent from '@material-ui/core/CardContent';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import MUITextField from '@material-ui/core/TextField';
+import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';

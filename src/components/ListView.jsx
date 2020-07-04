@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card as MUICard } from '@material-ui/core/Card';
-import { Grid as MUIGrid } from '@material-ui/core/Grid';
-import { Table as MUITable } from '@material-ui/core/Table';
-import { TableBody as MUITableBody } from '@material-ui/core/TableBody';
-import { TableCell as MUITableCell } from '@material-ui/core/TableCell';
-import { TableContainer as MUITableContainer } from '@material-ui/core/TableContainer';
-import { TableHead as MUITableHead } from '@material-ui/core/TableHead';
-import { TableRow as MUITableRow } from '@material-ui/core/TableRow';
+import MUICard from '@material-ui/core/Card';
+import MUIGrid from '@material-ui/core/Grid';
+import MUITable from '@material-ui/core/Table';
+import MUITableBody from '@material-ui/core/TableBody';
+import MUITableCell from '@material-ui/core/TableCell';
+import MUITableContainer from '@material-ui/core/TableContainer';
+import MUITableHead from '@material-ui/core/TableHead';
+import MUITableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 
 import PrintSelector from './PrintSelector';

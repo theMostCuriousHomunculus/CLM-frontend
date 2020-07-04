@@ -1,12 +1,12 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button as MUIButton } from '@material-ui/core/Button';
-import { Card as MUICard } from '@material-ui/core/Card';
-import { CardActions as MUICardActions } from '@material-ui/core/CardActions';
-import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
-import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
-import { TextField as MUITextField } from '@material-ui/core/TextField';
-import { Typography as MUITypography } from '@material-ui/core/Typography';
+import MUIButton from '@material-ui/core/Button';
+import MUICard from '@material-ui/core/Card';
+import MUICardActions from '@material-ui/core/CardActions';
+import MUICardContent from '@material-ui/core/CardContent';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import MUITextField from '@material-ui/core/TextField';
+import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -31,7 +31,7 @@ const Authenticate = () => {
   const history = useHistory();
   const [mode, setMode] = React.useState('Login');
 
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { sendRequest } = useRequest();
 
   function toggleMode (prevState) {
     if (prevState === 'Login') {

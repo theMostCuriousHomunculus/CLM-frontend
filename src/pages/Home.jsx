@@ -1,12 +1,12 @@
 import React from 'react';
-import { Card as MUICard } from '@material-ui/core/Card';
-import {CardContent as MUICardContent } from '@material-ui/core/CardContent';
-import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
-import { Grid as MUIGrid } from '@material-ui/core/Grid';
-import { Typography as MUITypography } from '@material-ui/core/Typography';
-import { ControlCamera as MUIControlCameraIcon } from '@material-ui/icons/ControlCamera';
-import { Palette as MUIPaletteIcon } from '@material-ui/icons/Palette';
-import { Timer as MUITimerIcon } from '@material-ui/icons/Timer';
+import MUICard from '@material-ui/core/Card';
+import MUICardContent from '@material-ui/core/CardContent';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIGrid from '@material-ui/core/Grid';
+import MUITypography from '@material-ui/core/Typography';
+import MUIControlCameraIcon from '@material-ui/icons/ControlCamera';
+import MUIPaletteIcon from '@material-ui/icons/Palette';
+import MUITimerIcon from '@material-ui/icons/Timer';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';

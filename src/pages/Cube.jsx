@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Card as MUICard } from '@material-ui/core/Card';
+import MUICard from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/styles';
 
 import ComponentInfo from '../components/ComponentInfo';

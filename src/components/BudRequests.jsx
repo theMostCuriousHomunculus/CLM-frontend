@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar as MUIAvatar } from '@material-ui/core/Avatar';
-import { Button as MUIButton } from '@material-ui/core/Button';
-import { Card as MUICard } from '@material-ui/core/Card';
-import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
-import { Grid as MUIGrid } from '@material-ui/core/Grid';
-import { List as MUIList } from '@material-ui/core/List';
-import { ListItem as MUIListItem } from '@material-ui/core/ListItem';
-import { Typography as MUITypography } from '@material-ui/core/Typography';
-import { PersonAdd as MUIPersonAddIcon } from '@material-ui/icons/PersonAdd';
-import { NotInterested as MUINotInterestedIcon } from '@material-ui/icons/NotInterested';
+import MUIAvatar from '@material-ui/core/Avatar';
+import MUIButton from '@material-ui/core/Button';
+import MUICard from '@material-ui/core/Card';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIGrid from '@material-ui/core/Grid';
+import MUIList from '@material-ui/core/List';
+import MUIListItem from '@material-ui/core/ListItem';
+import MUITypography from '@material-ui/core/Typography';
+import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
+import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';

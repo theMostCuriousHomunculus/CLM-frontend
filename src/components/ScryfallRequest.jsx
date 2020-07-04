@@ -1,14 +1,13 @@
 import React from 'react';
-import { Button as MUIButton } from '@material-ui/core/Button';
-
-import { CircularProgress as MUICircularProgress } from '@material-ui/core/CircularProgress';
-import { Grid as MUIGrid } from '@material-ui/core/Grid';
-import { List as MUIList } from '@material-ui/core/List';
-import { ListItem as MUIListItem } from '@material-ui/core/ListItem';
-import { ListItemText as MUIListItemText } from '@material-ui/core/ListItemText';
-import { Menu as MUIMenu } from '@material-ui/core/Menu';
-import { MenuItem as MUIMenuItem } from '@material-ui/core/MenuItem';
-import { TextField as MUITextField } from '@material-ui/core/TextField';
+import MUIButton from '@material-ui/core/Button';
+import MUICircularProgress from '@material-ui/core/CircularProgress';
+import MUIGrid from '@material-ui/core/Grid';
+import MUIList from '@material-ui/core/List';
+import MUIListItem from '@material-ui/core/ListItem';
+import MUIListItemText from '@material-ui/core/ListItemText';
+import MUIMenu from '@material-ui/core/Menu';
+import MUIMenuItem from '@material-ui/core/MenuItem';
+import MUITextField from '@material-ui/core/TextField';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 
 import { useRequest } from '../hooks/request-hook';

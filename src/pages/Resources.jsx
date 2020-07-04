@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button as MUIButton } from '@material-ui/core/Button';
-import { Card as MUICard } from '@material-ui/core/Card';
-import { CardActions as MUICardActions } from '@material-ui/core/CardActions';
-import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
-import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
-import { Grid as MUIGrid } from '@material-ui/core/Grid';
-import { Typography as MUITypography } from '@material-ui/core/Typography';
+import { Button as MUIButton } from '@material-ui/core';
+import { Card as MUICard } from '@material-ui/core';
+import { CardActions as MUICardActions } from '@material-ui/core';
+import { CardContent as MUICardContent } from '@material-ui/core';
+import { CardHeader as MUICardHeader } from '@material-ui/core';
+import { Grid as MUIGrid } from '@material-ui/core';
+import { Typography as MUITypography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({

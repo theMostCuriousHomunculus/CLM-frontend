@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card as MUICard } from '@material-ui/core/Card';
-import { CardContent as MUICardContent } from '@material-ui/core/CardContent';
-import { CardHeader as MUICardHeader } from '@material-ui/core/CardHeader';
-import { Typography as MUITypography } from '@material-ui/core/Typography';
+import MUICard from '@material-ui/core/Card';
+import MUICardContent from '@material-ui/core/CardContent';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 const black = '#8f8f8f';

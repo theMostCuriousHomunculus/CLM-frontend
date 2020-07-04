@@ -1,19 +1,26 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import MUICard from '@material-ui/core/Card';
+import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Account from './pages/Account';
-import Authenticate from './pages/Authenticate';
-import Cube from './pages/Cube';
 import Footer from './components/Footer';
-import Home from './pages/Home';
 import Navigation from './components/Navigation';
-import Resources from './pages/Resources';
+
 import { AuthenticationContext } from './contexts/authentication-context';
 import { useRequest } from './hooks/request-hook';
 
+const Account = React.lazy(() => import('./pages/Account'));
+const Authenticate = React.lazy(() => import('./pages/Authenticate'));
+const Cube = React.lazy(() => import('./pages/Cube'));
+const Home = React.lazy(() => import('./pages/Home'));
+const Resources = React.lazy(() => import('./pages/Resources'));
+
 const useStyles = makeStyles({
+  loading: {
+    margin: '1rem'
+  },
   main: {
     paddingBottom: 300,
     margin: '1rem auto 0 auto'
@@ -48,7 +55,7 @@ function App() {
       'PATCH',
       null,
       {
-        Authorization: 'Bearer ' + authentication.token,
+        Authorization: 'Bearer ' + Cookies.get('authentication_token'),
         'Content-Type': 'application/json'
       }
     );
@@ -73,23 +80,31 @@ function App() {
       <BrowserRouter>
         <Navigation />
         <main className={classes.main}>
-          <Switch>
-            <Route path='/' exact>
-              <Home />
-            </Route>
-            <Route path='/account/authenticate' exact>
-              <Authenticate />
-            </Route>
-            <Route path='/account/:accountId'>
-              <Account />
-            </Route>
-            <Route path='/cube/:cubeId'>
-              <Cube />
-            </Route>
-            <Route path='/resources' exact>
-              <Resources />
-            </Route>
-          </Switch>
+          <React.Suspense 
+            fallback={
+              <MUICard className={classes.loading}>
+                <MUITypography variant="h2">Please wait while the application loads...</MUITypography>
+              </MUICard>
+            }
+          >
+            <Switch>
+              <Route path='/' exact>
+                <Home />
+              </Route>
+              <Route path='/account/authenticate' exact>
+                <Authenticate />
+              </Route>
+              <Route path='/account/:accountId'>
+                <Account />
+              </Route>
+              <Route path='/cube/:cubeId'>
+                <Cube />
+              </Route>
+              <Route path='/resources' exact>
+                <Resources />
+              </Route>
+            </Switch>
+          </React.Suspense>
         </main>
         <Footer />
       </BrowserRouter>
