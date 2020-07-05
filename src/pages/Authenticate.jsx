@@ -19,8 +19,7 @@ const useStyles = makeStyles({
   centeredCard: {
     justifyContent: 'center',
     margin: '1rem auto',
-    minWidth: '600px',
-    width: '75%'
+    minWidth: '360px'
   }
 });
 

@@ -34,9 +34,6 @@ const useStyles = makeStyles({
     marginRight: '16px',
     width: '75px'
   },
-  basicCard: {
-    margin: '1rem'
-  },
   cardActions: {
     justifyContent: 'flex-end'
   },
@@ -166,7 +163,7 @@ const Account = () => {
   return (
     <React.Fragment>
 
-      <MUICard className={classes.basicCard}>
+      <MUICard>
         <MUICardHeader
           avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
           title={<MUITypography variant="h2">{user.name}</MUITypography>}
@@ -187,6 +184,13 @@ const Account = () => {
           user.buds.filter(function (bud) {
             return bud._id === authentication.userId;
           }).length === 0 &&
+          user.received_bud_requests.filter(function (request) {
+            return request._id === authentication.userId;
+          }).length === 0 &&
+          user.sent_bud_requests.filter(function (request) {
+            return request._id === authentication.userId;
+          }).length === 0 &&
+          // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
           <MUICardActions className={classes.cardActions}>
             <MUIButton
               color="primary"
@@ -200,7 +204,7 @@ const Account = () => {
         }
       </MUICard>
 
-      <MUICard className={classes.basicCard}>
+      <MUICard>
         <MUICardHeader title={<MUITypography variant="h3">Cubes</MUITypography>} />
         <MUICardContent>
           <MUIList>
@@ -266,7 +270,7 @@ const Account = () => {
 
       <MUIGrid container>
         <MUIGrid item xs={12} sm={6} md={4}>
-          <MUICard className={classes.basicCard}>
+          <MUICard>
             <MUICardHeader title={<MUITypography variant="h3">Buds</MUITypography>} />
             <MUIList>
               {user.buds &&
@@ -276,7 +280,9 @@ const Account = () => {
                       {bud.avatar &&
                         <MUIAvatar alt={bud.name} className={classes.avatarSmall} src={bud.avatar} />
                       }
-                      <Link className={classes.flexGrow} to={`/account/${bud._id}`}>{bud.name}</Link>
+                      <MUITypography className={classes.flexGrow} variant="body1">
+                        <Link to={`/account/${bud._id}`}>{bud.name}</Link>
+                      </MUITypography>
                       {accountId === authentication.userId &&
                         <MUIButton
                           className={classes.warningButton}

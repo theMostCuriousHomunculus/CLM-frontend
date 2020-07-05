@@ -15,9 +15,6 @@ const useStyles = makeStyles({
   avatarLarge: {
     height: "150px",
     width: "150px"
-  },
-  basicCard: {
-    margin: '1rem'
   }
 });
 
@@ -57,7 +54,7 @@ const CubeInfo = (props) => {
   }
 
   return (
-    <MUICard className={classes.basicCard}>
+    <MUICard>
 
       <MUICardHeader
         avatar={props.creator.avatar &&

@@ -22,9 +22,6 @@ const useStyles = makeStyles({
     marginRight: '16px',
     width: '75px'
   },
-  basicCard: {
-    margin: '1rem'
-  },
   flexGrow: {
     flexGrow: 1
   },
@@ -77,7 +74,7 @@ const BudRequests = (props) => {
   return (
     <React.Fragment>
       <MUIGrid item xs={12} sm={6} md={4}>
-        <MUICard className={classes.basicCard}>
+        <MUICard>
           <MUICardHeader title={<MUITypography variant="h3">Aspiring Buds</MUITypography>} />
           <MUIList>
             {props.user.received_bud_requests &&
@@ -87,7 +84,9 @@ const BudRequests = (props) => {
                     {request.avatar &&
                       <MUIAvatar alt={request.name} className={classes.avatarSmall} src={request.avatar} />
                     }
-                    <Link className={classes.flexGrow} to={`/account/${request._id}`}>{request.name}</Link>
+                    <MUITypography className={classes.flexGrow} variant="body1">
+                      <Link to={`/account/${request._id}`}>{request.name}</Link>
+                    </MUITypography>
                     <MUIButton
                       className={classes.warningButton}
                       data-id={request._id}
@@ -114,7 +113,7 @@ const BudRequests = (props) => {
       </MUIGrid>
         
       <MUIGrid item xs={12} sm={6} md={4}>
-        <MUICard className={classes.basicCard}>
+        <MUICard>
           <MUICardHeader title={<MUITypography variant="h3">Pending Buds</MUITypography>}/>
           <MUIList>
             {props.user.sent_bud_requests &&
@@ -124,7 +123,9 @@ const BudRequests = (props) => {
                     {request.avatar &&
                       <MUIAvatar alt={request.name} className={classes.avatarSmall} src={request.avatar} />
                     }
-                    <Link to={`/account/${request._id}`}>{request.name}</Link>
+                    <MUITypography variant="body1">
+                      <Link to={`/account/${request._id}`}>{request.name}</Link>
+                    </MUITypography>
                   </MUIListItem>
                 );
               })

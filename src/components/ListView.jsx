@@ -15,9 +15,6 @@ import { useRequest } from '../hooks/request-hook';
 import theme from '../theme';
 
 const useStyles = makeStyles({
-  basicCard: {
-    margin: '1rem'
-  },
   body: {
     '& *': {
       fontSize: '1.6rem'
@@ -129,7 +126,7 @@ const ListView = (props) => {
   }
 
   return (
-    <MUICard className={classes.basicCard}>
+    <MUICard>
       <MUITableContainer className={classes.container}>
         <MUITable stickyHeader className={classes.table}>
           <MUITableHead className={classes.head}>

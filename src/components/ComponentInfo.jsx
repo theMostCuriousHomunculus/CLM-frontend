@@ -24,9 +24,6 @@ import theme from '../theme';
 import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
-  basicCard: {
-    margin: '1rem'
-  },
   cardActions: {
     display: 'flex',
     justifyContent: 'space-between'
@@ -182,7 +179,7 @@ const ComponentInfo = (props) => {
   }
 
   return (
-    <MUICard className={classes.basicCard}>
+    <MUICard>
 
       <MUICardHeader
         title={

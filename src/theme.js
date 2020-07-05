@@ -8,6 +8,18 @@ const { breakpoints } = defaultTheme;
 const theme = createMuiTheme({
   ...defaultTheme,
   overrides: {
+    MuiCard: {
+      root: {
+        margin: '1rem',
+        maxWidth: 'calc(100vw - 2rem)'
+      }
+    },
+    MuiCardHeader: {
+      content: {
+        width: 'calc(100% - 166px)',
+        wordBreak: 'break-word'
+      }
+    },
     MuiTypography: {
       h1: {
         fontSize: '6rem',
@@ -17,47 +29,47 @@ const theme = createMuiTheme({
       },
       h2: {
         fontSize: '3.75rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '2.5rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '2.5rem'
+        // }
       },
       h3: {
         fontSize: '3rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '2rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '2rem'
+        // }
       },
       h4: {
         fontSize: '2.4rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.6rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '1.6rem'
+        // }
       },
       h5: {
         fontSize: '2rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.4rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '1.4rem'
+        // }
       },
       body1: {
         fontSize: '1.6rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.2rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '1.2rem'
+        // }
       },
       body2: {
         fontSize: '1.2rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '1rem'
+        // }
       },
       button: {
         fontSize: '1.6rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.2rem'
-        }
+        // [breakpoints.down('sm')]: {
+        //   fontSize: '1.2rem'
+        // }
       }
-    }
+    }    
   },
   palette: {
     primary: {

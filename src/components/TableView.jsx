@@ -50,6 +50,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
+    marginBottom: '1rem',
     padding: '0.5rem'
   },
   white: {

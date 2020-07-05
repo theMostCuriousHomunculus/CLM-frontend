@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import MUICard from '@material-ui/core/Card';
-import { makeStyles } from '@material-ui/styles';
 
 import ComponentInfo from '../components/ComponentInfo';
 import CubeInfo from '../components/CubeInfo';
@@ -14,18 +13,10 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { useCube } from '../hooks/cube-hook';
 import { useRequest } from '../hooks/request-hook';
 
-const useStyles = makeStyles({
-  basicCard: {
-    margin: '1rem',
-    padding: '8px'
-  }
-})
-
 const Cube = () => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
-  const classes = useStyles();
   const { sendRequest } = useRequest();
 
   const [componentState, dispatch] = React.useReducer(useCube, {
@@ -176,7 +167,7 @@ const Cube = () => {
             viewMode={viewMode}
           />
           {authentication.userId === componentState.cube.creator &&
-            <MUICard className={classes.basicCard}>
+            <MUICard>
               <ScryfallRequest
                 buttonText="Add it!"
                 labelText={`Add a card to ${componentState.active_component_name}`}
