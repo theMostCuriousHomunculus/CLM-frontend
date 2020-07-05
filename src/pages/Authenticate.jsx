@@ -11,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const useStyles = makeStyles({
   cardActions: {
@@ -30,7 +31,7 @@ const Authenticate = () => {
   const history = useHistory();
   const [mode, setMode] = React.useState('Login');
 
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
   function toggleMode (prevState) {
     if (prevState === 'Login') {
@@ -105,51 +106,56 @@ const Authenticate = () => {
   }
 
   return (
-    <MUICard className={classes.centeredCard}>
-      <MUICardHeader
-        title={<MUITypography variant="h2">{mode}</MUITypography>}
-      />
-      <MUICardContent>
-      
-      <MUITextField
-        autoComplete="off"
-        autoFocus
-        fullWidth
-        id="email"
-        label="Email Address"
-        required={true}
-        type="email"
-      />
-      {mode === 'Register' &&
-        <MUITextField
-          autoComplete="off"
-          fullWidth
-          id="name"
-          label="Account Name"
-          required={true}
-          type="text"
-        />
+    <React.Fragment>
+      {loading ?
+        <LoadingSpinner /> :
+        <MUICard className={classes.centeredCard}>
+          <MUICardHeader
+            title={<MUITypography variant="h2">{mode}</MUITypography>}
+          />
+          <MUICardContent>
+          
+          <MUITextField
+            autoComplete="off"
+            autoFocus
+            fullWidth
+            id="email"
+            label="Email Address"
+            required={true}
+            type="email"
+          />
+          {mode === 'Register' &&
+            <MUITextField
+              autoComplete="off"
+              fullWidth
+              id="name"
+              label="Account Name"
+              required={true}
+              type="text"
+            />
+          }
+          <MUITextField
+            autoComplete="off"
+            fullWidth
+            id="password"
+            label="Password"
+            required={true}
+            type="password"
+          />
+
+          </MUICardContent>
+
+          <MUICardActions className={classes.cardActions}>
+            <MUIButton color="primary" onClick={() => toggleMode (mode)} variant="contained">
+              {mode === 'Login' ? "Don't have an account yet?" : 'Already have an account?'}
+            </MUIButton>
+            <MUIButton color="primary" onClick={mode === 'Login' ? login : register} variant="contained">
+              {mode}!
+            </MUIButton>
+          </MUICardActions>
+        </MUICard>
       }
-      <MUITextField
-        autoComplete="off"
-        fullWidth
-        id="password"
-        label="Password"
-        required={true}
-        type="password"
-      />
-
-      </MUICardContent>
-
-      <MUICardActions className={classes.cardActions}>
-        <MUIButton color="primary" onClick={() => toggleMode (mode)} variant="contained">
-          {mode === 'Login' ? "Don't have an account yet?" : 'Already have an account?'}
-        </MUIButton>
-        <MUIButton color="primary" onClick={mode === 'Login' ? login : register} variant="contained">
-          {mode}!
-        </MUIButton>
-      </MUICardActions>
-    </MUICard>
+    </React.Fragment>    
   );
 }
 

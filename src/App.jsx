@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import MUICard from '@material-ui/core/Card';
-import MUITypography from '@material-ui/core/Typography';
+import MUICircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Footer from './components/Footer';
@@ -83,7 +83,7 @@ function App() {
           <React.Suspense 
             fallback={
               <MUICard className={classes.loading}>
-                <MUITypography variant="h2">Please wait while the application loads...</MUITypography>
+                <MUICircularProgress />
               </MUICard>
             }
           >

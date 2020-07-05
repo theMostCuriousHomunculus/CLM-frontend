@@ -10,6 +10,7 @@ import theme from '../theme';
 const useStyles = makeStyles({
   basicCard: {
     height: '100%',
+    margin: 0,
     width: '100%'
   },
   black: {
@@ -50,8 +51,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    marginBottom: '1rem',
-    padding: '0.5rem'
+    margin: '0 0.5rem 1rem 0.5rem'
   },
   white: {
     backgroundColor: '#efefef'
@@ -86,7 +86,7 @@ const TableView = (props) => {
                     return (
                       <React.Fragment key={type}>
                         {cards_color_type.length > 0 &&
-                          <div>
+                          <React.Fragment>
                             <MUITypography variant="h4">{type}</MUITypography>
                             <React.Fragment>
                               {costs.map(function (cost) {
@@ -94,26 +94,30 @@ const TableView = (props) => {
                                   return card.cost === cost;
                                 });
                                 return (
-                                  <div key={cost}>
-                                    {cards_color_type_cost.map(function (card) {
-                                      return (
-                                        <MUITypography
-                                          back_image={card.back_image}
-                                          image={card.image}
-                                          key={card._id}
-                                          onMouseOut={props.hidePreview}
-                                          onMouseOver={props.showPreview}
-                                          variant="body1"
-                                        >
-                                          {card.name}
-                                        </MUITypography>
-                                      );
-                                    })}
-                                  </div>
+                                  <React.Fragment key={cost}>
+                                    {cards_color_type_cost.length > 0 &&
+                                      <div>
+                                        {cards_color_type_cost.map(function (card) {
+                                          return (
+                                            <MUITypography
+                                              back_image={card.back_image}
+                                              image={card.image}
+                                              key={card._id}
+                                              onMouseOut={props.hidePreview}
+                                              onMouseOver={props.showPreview}
+                                              variant="body1"
+                                            >
+                                              {card.name}
+                                            </MUITypography>
+                                          );
+                                        })}
+                                      </div>
+                                    }
+                                  </React.Fragment>
                                 );
                               })}
                             </React.Fragment>
-                          </div>
+                          </React.Fragment>
                         }
                       </React.Fragment>
                     );
@@ -151,22 +155,26 @@ const TableView = (props) => {
                                     return card.cost === cost;
                                   });
                                   return (
-                                    <div key={cost}>
-                                      {cards_color_isCreature_cost.map(function (card) {
-                                        return (
-                                          <MUITypography
-                                            back_image={card.back_image}
-                                            image={card.image}
-                                            key={card._id}
-                                            onMouseOut={props.hidePreview}
-                                            onMouseOver={props.showPreview}
-                                            variant="body1"
-                                          >
-                                            {card.name}
-                                          </MUITypography>
-                                        );
-                                      })}
-                                    </div>
+                                    <React.Fragment key={cost}>
+                                      {cards_color_isCreature_cost.length > 0 &&
+                                        <div>
+                                          {cards_color_isCreature_cost.map(function (card) {
+                                            return (
+                                              <MUITypography
+                                                back_image={card.back_image}
+                                                image={card.image}
+                                                key={card._id}
+                                                onMouseOut={props.hidePreview}
+                                                onMouseOver={props.showPreview}
+                                                variant="body1"
+                                              >
+                                                {card.name}
+                                              </MUITypography>
+                                            );
+                                          })}
+                                        </div>
+                                      }
+                                    </React.Fragment>
                                   );
                                 })}
                               </React.Fragment>

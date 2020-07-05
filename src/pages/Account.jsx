@@ -22,6 +22,7 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import theme from '../theme';
 import { useRequest } from '../hooks/request-hook';
 import BudRequests from '../components/BudRequests';
+import LoadingSpinner from '../components/LoadingSpinner';
 import ScryfallRequest from '../components/ScryfallRequest';
 
 const useStyles = makeStyles({
@@ -58,7 +59,7 @@ const Account = () => {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const history = useHistory();
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
   const [user, setUser] = React.useState({});
   const [cubes, setCubes] = React.useState([]);
@@ -162,149 +163,154 @@ const Account = () => {
 
   return (
     <React.Fragment>
+      {loading ?
+        <LoadingSpinner /> :
+        <React.Fragment>
 
-      <MUICard>
-        <MUICardHeader
-          avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
-          title={<MUITypography variant="h2">{user.name}</MUITypography>}
-          subheader={accountId === authentication.userId ? <MUITypography variant="h3">{user.email}</MUITypography> : null}
-        />
-        {accountId === authentication.userId &&
-          <MUICardActions>
-            <ScryfallRequest
-              buttonText="Change Avatar"
-              labelText="Change your avatar"
-              onSubmit={changeAvatar}
-            />
-          </MUICardActions>
-        }
-        {authentication.isLoggedIn &&
-          accountId !== authentication.userId &&
-          user.buds &&
-          user.buds.filter(function (bud) {
-            return bud._id === authentication.userId;
-          }).length === 0 &&
-          user.received_bud_requests.filter(function (request) {
-            return request._id === authentication.userId;
-          }).length === 0 &&
-          user.sent_bud_requests.filter(function (request) {
-            return request._id === authentication.userId;
-          }).length === 0 &&
-          // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
-          <MUICardActions className={classes.cardActions}>
-            <MUIButton
-              color="primary"
-              data-id={accountId}
-              onClick={sendBudRequest}
-              variant="contained"
-            >
-              <MUIPersonAddIcon />
-            </MUIButton>
-          </MUICardActions>
-        }
-      </MUICard>
-
-      <MUICard>
-        <MUICardHeader title={<MUITypography variant="h3">Cubes</MUITypography>} />
-        <MUICardContent>
-          <MUIList>
-            {cubes.map(function (cube) {
-              return (
-                <MUIListItem className={classes.inline} key={cube._id}>
-                  <MUIButton
-                    color="secondary"
-                    onClick={() => history.push(`/cube/${cube._id}`)}
-                    variant="contained"
-                  >
-                    {cube.name}
-                  </MUIButton>
-                </MUIListItem>
-              );
-            })}
-          </MUIList>
-        </MUICardContent>
-        {accountId === authentication.userId &&
-          <MUICardActions className={classes.cardActions}>
-            <MUIButton color="primary" onClick={() => setShowCubeForm(true)} variant="contained">Create a Cube</MUIButton>
-            <MUIDialog open={showCubeForm} onClose={() => setShowCubeForm(false)}>
-              <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
-              <MUIDialogContent>
-
-                <MUITextField
-                  autoComplete="off"
-                  autoFocus
-                  fullWidth
-                  id="cube-name"
-                  label="Cube Name"
-                  required={true}
-                  type="text"
-                />
-
-                <MUITextField
-                  autoComplete="off"
-                  fullWidth
-                  id="cube-description"
-                  label="Description"
-                  multiline
-                  required={false}
-                  rows={3}
-                  type="text"
-                />
-
-              </MUIDialogContent>
-              <MUIDialogActions>
-
-                <MUIButton  color="primary" onClick={() => setShowCubeForm(false)} variant="contained">
-                  Cancel
-                </MUIButton>
-
-                <MUIButton color="primary" onClick={submitCubeForm} variant="contained">
-                  Create!
-                </MUIButton>
-
-              </MUIDialogActions>
-            </MUIDialog>
-          </MUICardActions>
-        }
-      </MUICard>
-
-      <MUIGrid container>
-        <MUIGrid item xs={12} sm={6} md={4}>
           <MUICard>
-            <MUICardHeader title={<MUITypography variant="h3">Buds</MUITypography>} />
-            <MUIList>
-              {user.buds &&
-                user.buds.map(function (bud) {
+            <MUICardHeader
+              avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
+              title={<MUITypography variant="h2">{user.name}</MUITypography>}
+              subheader={accountId === authentication.userId ? <MUITypography variant="h3">{user.email}</MUITypography> : null}
+            />
+            {accountId === authentication.userId &&
+              <MUICardActions>
+                <ScryfallRequest
+                  buttonText="Change Avatar"
+                  labelText="Change your avatar"
+                  onSubmit={changeAvatar}
+                />
+              </MUICardActions>
+            }
+            {authentication.isLoggedIn &&
+              accountId !== authentication.userId &&
+              user.buds &&
+              user.buds.filter(function (bud) {
+                return bud._id === authentication.userId;
+              }).length === 0 &&
+              user.received_bud_requests.filter(function (request) {
+                return request._id === authentication.userId;
+              }).length === 0 &&
+              user.sent_bud_requests.filter(function (request) {
+                return request._id === authentication.userId;
+              }).length === 0 &&
+              // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
+              <MUICardActions className={classes.cardActions}>
+                <MUIButton
+                  color="primary"
+                  data-id={accountId}
+                  onClick={sendBudRequest}
+                  variant="contained"
+                >
+                  <MUIPersonAddIcon />
+                </MUIButton>
+              </MUICardActions>
+            }
+          </MUICard>
+
+          <MUICard>
+            <MUICardHeader title={<MUITypography variant="h3">Cubes</MUITypography>} />
+            <MUICardContent>
+              <MUIList>
+                {cubes.map(function (cube) {
                   return (
-                    <MUIListItem key={bud._id}>
-                      {bud.avatar &&
-                        <MUIAvatar alt={bud.name} className={classes.avatarSmall} src={bud.avatar} />
-                      }
-                      <MUITypography className={classes.flexGrow} variant="body1">
-                        <Link to={`/account/${bud._id}`}>{bud.name}</Link>
-                      </MUITypography>
-                      {accountId === authentication.userId &&
-                        <MUIButton
-                          className={classes.warningButton}
-                          data-id={bud._id}
-                          onClick={deleteBud}
-                          variant="contained"
-                        >
-                          Delete Bud
-                        </MUIButton>
-                      }
+                    <MUIListItem className={classes.inline} key={cube._id}>
+                      <MUIButton
+                        color="secondary"
+                        onClick={() => history.push(`/cube/${cube._id}`)}
+                        variant="contained"
+                      >
+                        {cube.name}
+                      </MUIButton>
                     </MUIListItem>
                   );
-                })
-              }
-            </MUIList>
-          </MUICard>
-        </MUIGrid>
+                })}
+              </MUIList>
+            </MUICardContent>
+            {accountId === authentication.userId &&
+              <MUICardActions className={classes.cardActions}>
+                <MUIButton color="primary" onClick={() => setShowCubeForm(true)} variant="contained">Create a Cube</MUIButton>
+                <MUIDialog open={showCubeForm} onClose={() => setShowCubeForm(false)}>
+                  <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
+                  <MUIDialogContent>
 
-        {accountId === authentication.userId &&
-          <BudRequests user={user} fetchAccount={fetchAccount} />
-        }
-      </MUIGrid>
+                    <MUITextField
+                      autoComplete="off"
+                      autoFocus
+                      fullWidth
+                      id="cube-name"
+                      label="Cube Name"
+                      required={true}
+                      type="text"
+                    />
+
+                    <MUITextField
+                      autoComplete="off"
+                      fullWidth
+                      id="cube-description"
+                      label="Description"
+                      multiline
+                      required={false}
+                      rows={3}
+                      type="text"
+                    />
+
+                  </MUIDialogContent>
+                  <MUIDialogActions>
+
+                    <MUIButton  color="primary" onClick={() => setShowCubeForm(false)} variant="contained">
+                      Cancel
+                    </MUIButton>
+
+                    <MUIButton color="primary" onClick={submitCubeForm} variant="contained">
+                      Create!
+                    </MUIButton>
+
+                  </MUIDialogActions>
+                </MUIDialog>
+              </MUICardActions>
+            }
+          </MUICard>
+
+          <MUIGrid container>
+            <MUIGrid item xs={12} sm={6} md={4}>
+              <MUICard>
+                <MUICardHeader title={<MUITypography variant="h3">Buds</MUITypography>} />
+                <MUIList>
+                  {user.buds &&
+                    user.buds.map(function (bud) {
+                      return (
+                        <MUIListItem key={bud._id}>
+                          {bud.avatar &&
+                            <MUIAvatar alt={bud.name} className={classes.avatarSmall} src={bud.avatar} />
+                          }
+                          <MUITypography className={classes.flexGrow} variant="body1">
+                            <Link to={`/account/${bud._id}`}>{bud.name}</Link>
+                          </MUITypography>
+                          {accountId === authentication.userId &&
+                            <MUIButton
+                              className={classes.warningButton}
+                              data-id={bud._id}
+                              onClick={deleteBud}
+                              variant="contained"
+                            >
+                              Delete Bud
+                            </MUIButton>
+                          }
+                        </MUIListItem>
+                      );
+                    })
+                  }
+                </MUIList>
+              </MUICard>
+            </MUIGrid>
+
+            {accountId === authentication.userId &&
+              <BudRequests user={user} fetchAccount={fetchAccount} />
+            }
+          </MUIGrid>
+        </React.Fragment>
+      }
     </React.Fragment>
   );
 }

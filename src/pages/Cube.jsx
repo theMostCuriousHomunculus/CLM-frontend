@@ -7,6 +7,7 @@ import CubeInfo from '../components/CubeInfo';
 import CurveView from '../components/CurveView';
 import HoverPreview from '../components/HoverPreview';
 import ListView from '../components/ListView';
+import LoadingSpinner from '../components/LoadingSpinner';
 import ScryfallRequest from '../components/ScryfallRequest';
 import TableView from '../components/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -17,7 +18,7 @@ const Cube = () => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
   const [componentState, dispatch] = React.useReducer(useCube, {
     active_component_cards: [],
@@ -144,62 +145,67 @@ const Cube = () => {
   }
 
   return (
-    <div onMouseMove={movePreview}>
+    <React.Fragment>
+      {loading ?
+        <LoadingSpinner /> :
+        <div onMouseMove={movePreview}>
 
-      <HoverPreview
-        {...preview}
-      />
-
-      {componentState.cube &&
-        creator &&
-        <CubeInfo creator={creator} cube={componentState.cube} />
-      }
-
-      {componentState.cube &&
-        componentState.active_component_id &&
-        <React.Fragment>
-          <ComponentInfo
-            componentState={componentState}
-            changeComponent={changeComponent}
-            changeViewMode={changeViewMode}
-            filterCardsHandler={filterCardsHandler}
-            updateCubeHandler={updateCubeHandler}
-            viewMode={viewMode}
+          <HoverPreview
+            {...preview}
           />
-          {authentication.userId === componentState.cube.creator &&
-            <MUICard>
-              <ScryfallRequest
-                buttonText="Add it!"
-                labelText={`Add a card to ${componentState.active_component_name}`}
-                onSubmit={addCard}
+
+          {componentState.cube &&
+            creator &&
+            <CubeInfo creator={creator} cube={componentState.cube} />
+          }
+
+          {componentState.cube &&
+            componentState.active_component_id &&
+            <React.Fragment>
+              <ComponentInfo
+                componentState={componentState}
+                changeComponent={changeComponent}
+                changeViewMode={changeViewMode}
+                filterCardsHandler={filterCardsHandler}
+                updateCubeHandler={updateCubeHandler}
+                viewMode={viewMode}
               />
-            </MUICard>
+              {authentication.userId === componentState.cube.creator &&
+                <MUICard>
+                  <ScryfallRequest
+                    buttonText="Add it!"
+                    labelText={`Add a card to ${componentState.active_component_name}`}
+                    onSubmit={addCard}
+                  />
+                </MUICard>
+              }
+              {viewMode === 'Curve View' &&
+                <CurveView
+                  componentState={componentState}
+                  hidePreview={hidePreview}
+                  showPreview={showPreview}
+                />
+              }
+              {viewMode === 'List View' &&
+                <ListView
+                  componentState={componentState}
+                  hidePreview={hidePreview}
+                  showPreview={showPreview}
+                  updateCubeHandler={updateCubeHandler}
+                />
+              }
+              {viewMode === 'Table View' &&
+                <TableView
+                  componentState={componentState}
+                  hidePreview={hidePreview}
+                  showPreview={showPreview}
+                />
+              }
+            </React.Fragment>
           }
-          {viewMode === 'Curve View' &&
-            <CurveView
-              componentState={componentState}
-              hidePreview={hidePreview}
-              showPreview={showPreview}
-            />
-          }
-          {viewMode === 'List View' &&
-            <ListView
-              componentState={componentState}
-              hidePreview={hidePreview}
-              showPreview={showPreview}
-              updateCubeHandler={updateCubeHandler}
-            />
-          }
-          {viewMode === 'Table View' &&
-            <TableView
-              componentState={componentState}
-              hidePreview={hidePreview}
-              showPreview={showPreview}
-            />
-          }
-        </React.Fragment>
+        </div>
       }
-    </div>
+    </React.Fragment>
   );
 }
 

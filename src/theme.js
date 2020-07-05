@@ -10,14 +10,31 @@ const theme = createMuiTheme({
   overrides: {
     MuiCard: {
       root: {
+        padding: 8,
         margin: '1rem',
         maxWidth: 'calc(100vw - 2rem)'
+      }
+    },
+    MuiCardActions: {
+      root: {
+        padding: 0
+      }
+    },
+    MuiCardContent: {
+      root: {
+        padding: 0,
+        '&:last-child': {
+          paddingBottom: 0
+        }
       }
     },
     MuiCardHeader: {
       content: {
         width: 'calc(100% - 166px)',
         wordBreak: 'break-word'
+      },
+      root: {
+        padding: '0 0 16px 0'
       }
     },
     MuiTypography: {
