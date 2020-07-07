@@ -24,6 +24,10 @@ import { useRequest } from '../hooks/request-hook';
 import theme from '../theme';
 
 const useStyles = makeStyles({
+  appBar: {
+    // background: `linear-gradient(${theme.palette.primary.light}, ${theme.palette.primary.dark})`
+    background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+  },
   drawer: {
     '& .MuiPaper-root': {
       backgroundColor: theme.palette.primary.main
@@ -274,7 +278,7 @@ function Navigation (props) {
   }
 
   return (
-    <MUIAppBar position="static">
+    <MUIAppBar className={classes.appBar} position="static">
       <MUIToolbar className={classes.toolbar}>
         <MUIMenuIcon className={classes.menuIcon} color="secondary" onClick={toggleDrawer(true)} />
         <div className={classes.headlineContainer}>

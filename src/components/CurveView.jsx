@@ -15,6 +15,7 @@ const white = '#efefef';
 const useStyles = makeStyles({
   azorius: {
     background: `linear-gradient(45deg, ${white}, ${blue})`
+    // background: `radial-gradient(${white}, #a7bfe7, ${blue})`
   },
   black: {
     backgroundColor: black

@@ -5,7 +5,7 @@ import theme from '../theme';
 
 const useStyles = makeStyles({
   footer: {
-    backgroundColor: theme.palette.primary.main,
+    background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
     bottom: 0,
     color: theme.palette.secondary.main,
     height: '300px',

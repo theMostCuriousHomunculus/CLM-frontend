@@ -1,19 +1,13 @@
 import React from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUIGrid from '@material-ui/core/Grid';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
-import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,6 +18,8 @@ import { useRequest } from '../hooks/request-hook';
 import BudRequests from '../components/BudRequests';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ScryfallRequest from '../components/ScryfallRequest';
+import UserCubeCard from '../components/UserCubeCard';
+import UserDraftCard from '../components/UserDraftCard';
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -58,12 +54,10 @@ const Account = () => {
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const history = useHistory();
   const { loading, sendRequest } = useRequest();
 
   const [user, setUser] = React.useState({});
   const [cubes, setCubes] = React.useState([]);
-  const [showCubeForm, setShowCubeForm] = React.useState(false);
 
   React.useEffect(() => {
     fetchAccount();
@@ -137,30 +131,6 @@ const Account = () => {
     fetchAccount();
   }
 
-  async function submitCubeForm (event) {
-    event.preventDefault();
-    let formInputs = {};
-    formInputs.name = document.getElementById('cube-name').value;
-    formInputs.description = document.getElementById('cube-description').value ?
-      document.getElementById('cube-description').value :
-      undefined;
-
-    try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube`,
-        'POST',
-        JSON.stringify(formInputs),
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-      history.push(`/cube/${responseData._id}`);
-    } catch (error) {
-      console.log({ 'Error': error.message });
-    }
-  }
-
   return (
     <React.Fragment>
       {loading ?
@@ -208,69 +178,17 @@ const Account = () => {
             }
           </MUICard>
 
-          <MUICard>
-            <MUICardHeader title={<MUITypography variant="h3">Cubes</MUITypography>} />
-            <MUICardContent>
-              <MUIList>
-                {cubes.map(function (cube) {
-                  return (
-                    <MUIListItem className={classes.inline} key={cube._id}>
-                      <MUIButton
-                        color="secondary"
-                        onClick={() => history.push(`/cube/${cube._id}`)}
-                        variant="contained"
-                      >
-                        {cube.name}
-                      </MUIButton>
-                    </MUIListItem>
-                  );
-                })}
-              </MUIList>
-            </MUICardContent>
-            {accountId === authentication.userId &&
-              <MUICardActions className={classes.cardActions}>
-                <MUIButton color="primary" onClick={() => setShowCubeForm(true)} variant="contained">Create a Cube</MUIButton>
-                <MUIDialog open={showCubeForm} onClose={() => setShowCubeForm(false)}>
-                  <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
-                  <MUIDialogContent>
+          <MUIGrid container>
 
-                    <MUITextField
-                      autoComplete="off"
-                      autoFocus
-                      fullWidth
-                      id="cube-name"
-                      label="Cube Name"
-                      required={true}
-                      type="text"
-                    />
+            <MUIGrid item xs={12} lg={6}>
+              <UserCubeCard classes={classes} cubes={cubes} />
+            </MUIGrid>
 
-                    <MUITextField
-                      autoComplete="off"
-                      fullWidth
-                      id="cube-description"
-                      label="Description"
-                      multiline
-                      required={false}
-                      rows={3}
-                      type="text"
-                    />
+            <MUIGrid item xs={12} lg={6}>
+              <UserDraftCard buds={user.buds} classes={classes} cubes={cubes} />
+            </MUIGrid>
 
-                  </MUIDialogContent>
-                  <MUIDialogActions>
-
-                    <MUIButton  color="primary" onClick={() => setShowCubeForm(false)} variant="contained">
-                      Cancel
-                    </MUIButton>
-
-                    <MUIButton color="primary" onClick={submitCubeForm} variant="contained">
-                      Create!
-                    </MUIButton>
-
-                  </MUIDialogActions>
-                </MUIDialog>
-              </MUICardActions>
-            }
-          </MUICard>
+          </MUIGrid>
 
           <MUIGrid container>
             <MUIGrid item xs={12} sm={6} md={4}>

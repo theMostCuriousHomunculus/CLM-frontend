@@ -11,9 +11,13 @@ import Navigation from './components/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
 import { useRequest } from './hooks/request-hook';
 
+import socketIOClient from "socket.io-client";
+const ENDPOINT = "http://127.0.0.1:5000";
+
 const Account = React.lazy(() => import('./pages/Account'));
 const Authenticate = React.lazy(() => import('./pages/Authenticate'));
 const Cube = React.lazy(() => import('./pages/Cube'));
+const Draft = React.lazy(() => import('./pages/Draft'));
 const Home = React.lazy(() => import('./pages/Home'));
 const Resources = React.lazy(() => import('./pages/Resources'));
 
@@ -32,8 +36,22 @@ function App() {
   const classes = useStyles();
   const { sendRequest } = useRequest();
 
+  const [draft, setDraft] = React.useState(undefined);
+  const [socket, setSocket] = React.useState(undefined);
   const [token, setToken] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
+
+  React.useEffect(function () {
+    if (socket) {
+      socket.on("newDraft", function (new_draft) {
+        setDraft(new_draft);
+      });
+    }
+  }, [socket]);
+
+  React.useEffect(function () {
+    setSocket(socketIOClient(ENDPOINT));
+  }, []);
 
   const login = React.useCallback((uid, tkn) => {
     setToken(tkn);
@@ -67,6 +85,27 @@ function App() {
     }
   }, [login]);
 
+  // {socket &&
+  //   <div>
+  //     {draft &&
+  //       <React.Fragment>
+  //         <p>{draft.name}</p>
+  //         <p>{draft.host}</p>
+  //       </React.Fragment>
+  //     }
+  //     <input id="new-draft-name" placeholder="create a new draft" type="text"></input>
+  //     <button onClick={function () {
+  //       const draftInput = document.getElementById('new-draft-name');
+  //       socket.emit('createDraft', draftInput.value, userId);
+  //       draftInput.value = '';
+  //       draftInput.focus();
+  //     }}
+  //     >
+  //       Preach!
+  //     </button>
+  //   </div>
+  // }
+
   return (
     <AuthenticationContext.Provider
       value={{
@@ -80,6 +119,7 @@ function App() {
       <BrowserRouter>
         <Navigation />
         <main className={classes.main}>
+        
           <React.Suspense 
             fallback={
               <MUICard className={classes.loading}>
@@ -99,6 +139,9 @@ function App() {
               </Route>
               <Route path='/cube/:cubeId'>
                 <Cube />
+              </Route>
+              <Route path='/draft/:draftId'>
+                <Draft />
               </Route>
               <Route path='/resources' exact>
                 <Resources />
