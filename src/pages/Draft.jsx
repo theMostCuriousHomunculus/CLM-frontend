@@ -69,7 +69,7 @@ const Draft = () => {
       picks: []
     }});
     setErrorMessage(undefined);
-    setSocket(io(`http://localhost:5000`));
+    setSocket(io(`${process.env.REACT_APP_BACKEND_URL.replace('/api', '')}`));
   }, []);
 
   React.useEffect(function () {
