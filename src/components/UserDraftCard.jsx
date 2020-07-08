@@ -21,6 +21,12 @@ import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUISwitch from '@material-ui/core/Switch';
+import MUITable from '@material-ui/core/Table';
+import MUITableBody from '@material-ui/core/TableBody';
+import MUITableCell from '@material-ui/core/TableCell';
+import MUITableContainer from '@material-ui/core/TableContainer';
+import MUITableHead from '@material-ui/core/TableHead';
+import MUITableRow from '@material-ui/core/TableRow';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -115,7 +121,7 @@ const UserDraftCard = (props) => {
         <MUICard>
           <MUICardHeader title={<MUITypography variant="h3">Drafts</MUITypography>} />
           <MUICardContent>
-
+            
           </MUICardContent>
           {accountId === authentication.userId &&
             <MUICardActions className={props.classes.cardActions}>
