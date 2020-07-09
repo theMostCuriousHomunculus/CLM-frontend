@@ -56,8 +56,9 @@ const Account = () => {
   const classes = useStyles();
   const { loading, sendRequest } = useRequest();
 
-  const [user, setUser] = React.useState({});
   const [cubes, setCubes] = React.useState([]);
+  const [drafts, setDrafts] = React.useState([]);
+  const [user, setUser] = React.useState({});
 
   React.useEffect(() => {
     fetchAccount();
@@ -109,6 +110,8 @@ const Account = () => {
       setUser(accountData);
       const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creator=${accountId}`, 'GET', null, {});
       setCubes(cubeData.cubes);
+      const draftData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/draft?drafter=${accountId}`, 'GET', null, {});
+      setDrafts(draftData.drafts);
     } catch (error) {
       console.log('Error: ' + error.message);
     }
@@ -185,7 +188,7 @@ const Account = () => {
             </MUIGrid>
 
             <MUIGrid item xs={12} lg={6}>
-              <UserDraftCard buds={user.buds} classes={classes} cubes={cubes} />
+              <UserDraftCard buds={user.buds} classes={classes} cubes={cubes} drafts={drafts} />
             </MUIGrid>
 
           </MUIGrid>

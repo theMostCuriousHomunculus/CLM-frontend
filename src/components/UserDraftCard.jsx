@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
@@ -33,10 +33,14 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
+import theme from '../theme';
 
 const useStyles = makeStyles({
   budSwitch: {
     padding: 4
+  },
+  container: {
+    maxHeight: '40vh'
   },
   flex: {
     alignItems: 'center',
@@ -46,6 +50,16 @@ const useStyles = makeStyles({
   formControl: {
     display: 'block'
   },
+  head: {
+    '& *': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.secondary.main,
+      fontSize: '2.4rem'
+    }
+  },
+  table: {
+    minWidth: 350
+  }
 });
 
 const UserDraftCard = (props) => {
@@ -117,151 +131,177 @@ const UserDraftCard = (props) => {
 
   return (
     <React.Fragment>
-      {props.cubes && selectedCube &&
-        <MUICard>
-          <MUICardHeader title={<MUITypography variant="h3">Drafts</MUITypography>} />
-          <MUICardContent>
-            
-          </MUICardContent>
-          {accountId === authentication.userId &&
-            <MUICardActions className={props.classes.cardActions}>
-              <MUIButton color="primary" onClick={() => setShowDraftForm(true)} variant="contained">Start a New Draft</MUIButton>
-              <MUIDialog open={showDraftForm} onClose={() => setShowDraftForm(false)}>
-                <MUIDialogTitle>Start A New Draft</MUIDialogTitle>
-                <MUIDialogContent>
+      <MUICard>
+        <MUICardHeader title={<MUITypography variant="h3">Drafts</MUITypography>} />
+        <MUICardContent>
+          <MUITableContainer className={classes.container}>
+            <MUITable stickyHeader className={classes.table}>
+              <MUITableHead className={classes.head}>
+                <MUITableRow>
+                  <MUITableCell>Draft Name</MUITableCell>
+                  <MUITableCell>Host</MUITableCell>
+                  <MUITableCell>Created On</MUITableCell>
+                </MUITableRow>
+              </MUITableHead>
+              <MUITableBody className={classes.body}>
+                {props.drafts.map(function (draft) {
+                  return (
+                    <MUITableRow key={draft._id}>
+                      <MUITableCell>
+                        <Link to={`/draft/${draft._id}`}>{draft.name}</Link>
+                      </MUITableCell>
+                      <MUITableCell>
+                        <MUIAvatar alt={draft.host.name} className={props.classes.avatarSmall} src={draft.host.avatar} />
+                        <Link to ={`/account/${draft.host._id}`}>{draft.host.name}</Link>
+                      </MUITableCell>
+                      <MUITableCell>
+                        {draft.createdAt}
+                      </MUITableCell>
+                    </MUITableRow>
+                  );
+                })}
+              </MUITableBody>
+            </MUITable>
+          </MUITableContainer>
+        </MUICardContent>
+        {props.cubes && selectedCube && accountId === authentication.userId &&
+          <MUICardActions className={props.classes.cardActions}>
+            <MUIButton color="primary" onClick={() => setShowDraftForm(true)} variant="contained">Start a New Draft</MUIButton>
+            <MUIDialog open={showDraftForm} onClose={() => setShowDraftForm(false)}>
+              <MUIDialogTitle>Start A New Draft</MUIDialogTitle>
+              <MUIDialogContent>
 
-                  <MUITextField
-                    autoComplete="off"
-                    autoFocus
-                    fullWidth
-                    id="draft-name"
-                    label="Draft Name"
-                    required={true}
-                    type="text"
-                  />
+                <MUITextField
+                  autoComplete="off"
+                  autoFocus
+                  fullWidth
+                  id="draft-name"
+                  label="Draft Name"
+                  required={true}
+                  type="text"
+                />
 
-                  <MUIList component="nav">
-                    <MUIListItem
-                      button
-                      aria-haspopup="true"
-                      aria-controls="lock-menu"
-                      onClick={(event) => setAnchorEl(event.currentTarget)}
-                    >
-                      <MUIListItemText
-                        primary="Cube to Draft"
-                        secondary={selectedCube.name}
-                      />
-                    </MUIListItem>
-                  </MUIList>
-                  <MUIMenu
-                    id="cube-to-draft-selector"
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={() => setAnchorEl(null)}
+                <MUIList component="nav">
+                  <MUIListItem
+                    button
+                    aria-haspopup="true"
+                    aria-controls="lock-menu"
+                    onClick={(event) => setAnchorEl(event.currentTarget)}
                   >
-                    {props.cubes.map(function (cube) {
+                    <MUIListItemText
+                      primary="Cube to Draft"
+                      secondary={selectedCube.name}
+                    />
+                  </MUIListItem>
+                </MUIList>
+                <MUIMenu
+                  id="cube-to-draft-selector"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  {props.cubes.map(function (cube) {
+                    return (
+                      <MUIMenuItem
+                        key={cube._id}
+                        onClick={() => handleMenuItemClick(cube._id)}
+                        selected={selectedCube._id === cube._id}
+                      >
+                        {cube.name}
+                      </MUIMenuItem>
+                    );
+                  })}
+                </MUIMenu>
+
+                <MUIFormControl component="fieldset" className={classes.formControl}>
+                  <MUIFormLabel component="legend">Buds to Invite</MUIFormLabel>
+                  <MUIFormGroup>
+                    {props.buds.map(function (bud) {
                       return (
-                        <MUIMenuItem
-                          key={cube._id}
-                          onClick={() => handleMenuItemClick(cube._id)}
-                          selected={selectedCube._id === cube._id}
-                        >
-                          {cube.name}
-                        </MUIMenuItem>
+                        <MUIFormControlLabel
+                          className={classes.budSwitch}
+                          control={
+                            <MUISwitch
+                              inputRef={function (inputElement) {
+                                if (inputElement) {
+                                  inputElement.classList.add('other-drafters');
+                                }
+                              }}
+                              value={bud._id}
+                            />
+                          }
+                          key={bud._id}
+                          label={
+                            <span className={classes.flex}>
+                              <MUIAvatar alt={bud.name} className={props.classes.avatarSmall} component="span" src={bud.avatar} />
+                              <MUITypography variant="subtitle1">{bud.name}</MUITypography>
+                            </span>
+                          }
+                        />
                       );
                     })}
-                  </MUIMenu>
+                  </MUIFormGroup>
+                </MUIFormControl>
 
-                  <MUIFormControl component="fieldset" className={classes.formControl}>
-                    <MUIFormLabel component="legend">Buds to Invite</MUIFormLabel>
-                    <MUIFormGroup>
-                      {props.buds.map(function (bud) {
-                        return (
-                          <MUIFormControlLabel
-                            className={classes.budSwitch}
-                            control={
-                              <MUISwitch
-                                inputRef={function (inputElement) {
-                                  if (inputElement) {
-                                    inputElement.classList.add('other-drafters');
-                                  }
-                                }}
-                                value={bud._id}
-                              />
-                            }
-                            key={bud._id}
-                            label={
-                              <span className={classes.flex}>
-                                <MUIAvatar alt={bud.name} className={props.classes.avatarSmall} component="span" src={bud.avatar} />
-                                <MUITypography variant="subtitle1">{bud.name}</MUITypography>
-                              </span>
-                            }
-                          />
-                        );
-                      })}
-                    </MUIFormGroup>
-                  </MUIFormControl>
+                <MUIFormControl component="fieldset" className={classes.formControl}>
+                  <MUIFormLabel component="legend">Modules to Include</MUIFormLabel>
+                  <MUIFormGroup>
+                    {selectedCube.modules.map(function (module) {
+                      return (
+                        <MUIFormControlLabel
+                          control={
+                            <MUICheckbox
+                              inputRef={function (inputElement) {
+                                if (inputElement) {
+                                  inputElement.classList.add('modules');
+                                }
+                              }}
+                              value={module._id}
+                            />
+                          }
+                          key={module._id}
+                          label={module.name}
+                        />
+                      );
+                    })}
+                  </MUIFormGroup>
+                </MUIFormControl>
 
-                  <MUIFormControl component="fieldset" className={classes.formControl}>
-                    <MUIFormLabel component="legend">Modules to Include</MUIFormLabel>
-                    <MUIFormGroup>
-                      {selectedCube.modules.map(function (module) {
-                        return (
-                          <MUIFormControlLabel
-                            control={
-                              <MUICheckbox
-                                inputRef={function (inputElement) {
-                                  if (inputElement) {
-                                    inputElement.classList.add('modules');
-                                  }
-                                }}
-                                value={module._id}
-                              />
-                            }
-                            key={module._id}
-                            label={module.name}
-                          />
-                        );
-                      })}
-                    </MUIFormGroup>
-                  </MUIFormControl>
+                <MUITextField
+                  autoComplete="off"
+                  id="cards-per-pack"
+                  InputProps={{ inputProps: { min: 0 } }}
+                  label="Cards per Pack"
+                  required={true}
+                  type="number"
+                />
 
-                  <MUITextField
-                    autoComplete="off"
-                    id="cards-per-pack"
-                    InputProps={{ inputProps: { min: 0 } }}
-                    label="Cards per Pack"
-                    required={true}
-                    type="number"
-                  />
+                <MUITextField
+                  autoComplete="off"
+                  id="packs-per-drafter"
+                  InputProps={{ inputProps: { min: 0 } }}
+                  label="Packs per Drafter"
+                  required={true}
+                  type="number"
+                />
 
-                  <MUITextField
-                    autoComplete="off"
-                    id="packs-per-drafter"
-                    InputProps={{ inputProps: { min: 0 } }}
-                    label="Packs per Drafter"
-                    required={true}
-                    type="number"
-                  />
+              </MUIDialogContent>
+              <MUIDialogActions>
 
-                </MUIDialogContent>
-                <MUIDialogActions>
+                <MUIButton  color="primary" onClick={() => setShowDraftForm(false)} variant="contained">
+                  Cancel
+                </MUIButton>
 
-                  <MUIButton  color="primary" onClick={() => setShowDraftForm(false)} variant="contained">
-                    Cancel
-                  </MUIButton>
+                <MUIButton color="primary" onClick={submitDraftForm} variant="contained">
+                  Create!
+                </MUIButton>
 
-                  <MUIButton color="primary" onClick={submitDraftForm} variant="contained">
-                    Create!
-                  </MUIButton>
-
-                </MUIDialogActions>
-              </MUIDialog>
-            </MUICardActions>
-          }
-        </MUICard>
-      }
+              </MUIDialogActions>
+            </MUIDialog>
+          </MUICardActions>
+        }
+      </MUICard>
     </React.Fragment>
   );
 };

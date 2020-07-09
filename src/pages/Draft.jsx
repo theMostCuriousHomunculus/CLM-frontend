@@ -125,7 +125,11 @@ const Draft = () => {
                         lg={card.back_image ? 6 : 3}
                         xl={card.back_image ? 4 : 2}
                       >
-                        <MUIButton className={classes.cardImageContainer} onClick={() => socket.emit('selectCard', card._id, draftId, authentication.userId)}>
+                        <MUIButton
+                          className={classes.cardImageContainer}
+                          onClick={function () {
+                            socket.emit('selectCard', card._id, draftId, authentication.userId);
+                          }}>
                           <img alt={card.name} className={classes.cardImage} src={card.image} />
                           {card.back_image &&
                             <img alt={card.name} className={classes.cardImage} src={card.back_image} />
