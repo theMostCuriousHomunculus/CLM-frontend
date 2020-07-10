@@ -18,7 +18,7 @@ const Cube = () => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
-  const { loading, sendRequest } = useRequest();
+  const { sendRequest } = useRequest();
 
   const [componentState, dispatch] = React.useReducer(useCube, {
     active_component_cards: [],
@@ -41,6 +41,7 @@ const Cube = () => {
     right: undefined,
     top: 0
   });
+  const [loading, setLoading] = React.useState(true);
   const [viewMode, setViewMode] = React.useState('Table View');
 
   function filterCardsHandler (event) {
@@ -65,6 +66,7 @@ const Cube = () => {
       } catch (error) {
         console.log('Error: ' + error.message);
       }
+      setLoading(false);
     };
     fetchCube();
   }, [cubeId]);

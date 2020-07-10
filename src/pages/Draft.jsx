@@ -7,9 +7,7 @@ import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-// import LoadingSpinner from '../components/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
-// import { useRequest } from '../hooks/request-hook';
 
 import io from "socket.io-client";
 
@@ -50,7 +48,6 @@ const Draft = () => {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const draftId = useParams().draftId;
-  // const { loading, sendRequest } = useRequest();
   const [errorMessage, setErrorMessage] = React.useState(undefined);
   const [socket, setSocket] = React.useState(undefined);
 
@@ -170,13 +167,15 @@ const Draft = () => {
                 </MUIGrid>
                 {draftState.pack.length === 0 &&
                   draftState.picks.length === 0 &&
-                  <p>Other drafters are still making their picks; yell at them to hurry up!</p>
+                  <MUITypography variant="body1">
+                    Other drafters are still making their picks; yell at them to hurry up!
+                  </MUITypography>
                 }
               </React.Fragment>
             }
           </React.Fragment>
           {errorMessage &&
-            <p>{errorMessage}</p>
+            <MUITypography variant="body1">{errorMessage}</MUITypography>
           }
         </div>
       }

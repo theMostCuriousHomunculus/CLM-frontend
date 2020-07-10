@@ -33,14 +33,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
-import theme from '../theme';
 
 const useStyles = makeStyles({
   budSwitch: {
     padding: 4
-  },
-  container: {
-    maxHeight: '40vh'
   },
   flex: {
     alignItems: 'center',
@@ -49,16 +45,6 @@ const useStyles = makeStyles({
   },
   formControl: {
     display: 'block'
-  },
-  head: {
-    '& *': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.secondary.main,
-      fontSize: '2.4rem'
-    }
-  },
-  table: {
-    minWidth: 350
   }
 });
 
@@ -134,16 +120,16 @@ const UserDraftCard = (props) => {
       <MUICard>
         <MUICardHeader title={<MUITypography variant="h3">Drafts</MUITypography>} />
         <MUICardContent>
-          <MUITableContainer className={classes.container}>
-            <MUITable stickyHeader className={classes.table}>
-              <MUITableHead className={classes.head}>
+          <MUITableContainer className={props.classes.tableContainer}>
+            <MUITable stickyHeader className={props.classes.table}>
+              <MUITableHead className={props.classes.tableHead}>
                 <MUITableRow>
                   <MUITableCell>Draft Name</MUITableCell>
                   <MUITableCell>Host</MUITableCell>
                   <MUITableCell>Created On</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
-              <MUITableBody className={classes.body}>
+              <MUITableBody className={props.classes.tableBody}>
                 {props.drafts.map(function (draft) {
                   return (
                     <MUITableRow key={draft._id}>

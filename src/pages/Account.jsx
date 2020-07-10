@@ -40,6 +40,24 @@ const useStyles = makeStyles({
   inline: {
     display: 'inline'
   },
+  table: {
+    minWidth: 350
+  },
+  tableBody: {
+    '& *': {
+      fontSize: '1.6rem'
+    }
+  },
+  tableContainer: {
+    maxHeight: '40vh'
+  },
+  tableHead: {
+    '& *': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.secondary.main,
+      fontSize: '2.4rem'
+    }
+  },
   warningButton: {
     backgroundColor: theme.palette.warning.main,
     color: '#ffffff',

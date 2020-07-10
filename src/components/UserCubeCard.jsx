@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
@@ -9,8 +9,12 @@ import MUIDialog from '@material-ui/core/Dialog';
 import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
+import MUITable from '@material-ui/core/Table';
+import MUITableBody from '@material-ui/core/TableBody';
+import MUITableCell from '@material-ui/core/TableCell';
+import MUITableContainer from '@material-ui/core/TableContainer';
+import MUITableHead from '@material-ui/core/TableHead';
+import MUITableRow from '@material-ui/core/TableRow';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 
@@ -53,21 +57,30 @@ const UserCubeCard = (props) => {
     <MUICard>
       <MUICardHeader title={<MUITypography variant="h3">Cubes</MUITypography>} />
       <MUICardContent>
-        <MUIList>
-          {props.cubes.map(function (cube) {
-            return (
-              <MUIListItem className={props.classes.inline} key={cube._id}>
-                <MUIButton
-                  color="secondary"
-                  onClick={() => history.push(`/cube/${cube._id}`)}
-                  variant="contained"
-                >
-                  {cube.name}
-                </MUIButton>
-              </MUIListItem>
-            );
-          })}
-        </MUIList>
+        <MUITableContainer className={props.classes.tableContainer}>
+          <MUITable stickyHeader className={props.classes.table}>
+            <MUITableHead className={props.classes.tableHead}>
+              <MUITableRow>
+                <MUITableCell>Cube Name</MUITableCell>
+                <MUITableCell>Description</MUITableCell>
+              </MUITableRow>
+            </MUITableHead>
+            <MUITableBody className={props.classes.tableBody}>
+              {props.cubes.map(function (cube) {
+                return (
+                  <MUITableRow key={cube._id}>
+                    <MUITableCell>
+                      <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
+                    </MUITableCell>
+                    <MUITableCell>
+                      {cube.description}
+                    </MUITableCell>
+                  </MUITableRow>
+                );
+              })}
+            </MUITableBody>
+          </MUITable>
+        </MUITableContainer>
       </MUICardContent>
       {accountId === authentication.userId &&
         <MUICardActions className={props.classes.cardActions}>

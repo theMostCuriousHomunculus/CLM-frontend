@@ -77,7 +77,7 @@ const TableView = (props) => {
           return (
             <div className={classes.cardWrapper} key={`table-${color}`}>
               <MUICard className={classes[`${color.toLowerCase()}`] + ' ' + classes.basicCard}>
-                <MUICardHeader title={<MUITypography variant="h3">{color}</MUITypography>} />
+                <MUICardHeader title={<MUITypography variant="h3">{`${color} (${cards_color.length})`}</MUITypography>} />
                 <MUICardContent>
                   {types.map(function (type) {
                     const cards_color_type = cards_color.filter(function (card) {
@@ -87,7 +87,7 @@ const TableView = (props) => {
                       <React.Fragment key={type}>
                         {cards_color_type.length > 0 &&
                           <React.Fragment>
-                            <MUITypography variant="h4">{type}</MUITypography>
+                            <MUITypography variant="h4">{`${type} (${cards_color_type.length})`}</MUITypography>
                             <React.Fragment>
                               {costs.map(function (cost) {
                                 const cards_color_type_cost = cards_color_type.filter(function (card) {
@@ -140,7 +140,7 @@ const TableView = (props) => {
                 <React.Fragment key={color}>
                   {cards_color.length > 0 &&
                     <div>
-                      <MUITypography variant="h4">{color}</MUITypography>
+                      <MUITypography variant="h4">{`${color} (${cards_color.length})`}</MUITypography>
                       <React.Fragment>
                         {[true, false].map(function (isCreature) {
                           const cards_color_isCreature = cards_color.filter(function (card) {
@@ -148,7 +148,7 @@ const TableView = (props) => {
                           });
                           return (
                             <div key={isCreature ? "a" : "b"}>
-                              <MUITypography variant="h5">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
+                              <MUITypography variant="h5">{isCreature ? "Creature" : "Non-Creature"} {`(${cards_color_isCreature.length})`}</MUITypography>
                               <React.Fragment>
                                 {costs.map(function (cost) {
                                   const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
