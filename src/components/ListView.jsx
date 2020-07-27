@@ -1,5 +1,6 @@
 import React from 'react';
 import MUICard from '@material-ui/core/Card';
+import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIGrid from '@material-ui/core/Grid';
 import MUITable from '@material-ui/core/Table';
 import MUITableBody from '@material-ui/core/TableBody';
@@ -20,6 +21,21 @@ const useStyles = makeStyles({
       fontSize: '1.6rem'
     }
   },
+  colorCheckbox: {
+    padding: 0,
+    '& .MuiIconButton-label': {
+      height: 30,
+      width: 30
+    },
+    '& input': {
+      height: 30,
+      width: 30
+    },
+    '& svg': {
+      height: 30,
+      width: 30
+    }
+  },
   container: {
     maxHeight: '80vh'
   },
@@ -29,6 +45,10 @@ const useStyles = makeStyles({
       color: theme.palette.secondary.main,
       fontSize: '2.4rem'
     }
+  },
+  manaSymbol: {
+    height: 30,
+    width: 30
   },
   table: {
     minWidth: 650
@@ -89,9 +109,12 @@ const ListView = (props) => {
   }
 
   async function submitColorIdentityChange (event) {
+    let target = event.target.tagName === "path" ? event.target.parentNode.previousElementSibling : event.target.previousElementSibling;
+    // this is kind of hacky but it works.  eventually i should break out checkboxes into their own components and use state rather than props to determine if a checkbox is checked
+    target.checked = !target.checked;
     const action = 'edit_card';
-    const card_id = event.target.getAttribute('data-card_id');
-    const color_checkboxes = document.getElementsByClassName(event.target.getAttribute('class'));
+    const card_id = target.getAttribute('data-card_id');
+    const color_checkboxes = document.getElementsByClassName(target.getAttribute('class'));
     let color_identity = [];
 
     for (let checkbox of color_checkboxes) {
@@ -124,6 +147,14 @@ const ListView = (props) => {
       console.log({ 'Error': error.message });
     }
   }
+
+  const colorSVGMap = new Map([
+    ["W", "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/8/8e/W.svg?version=d74ba6b898f8815799b1506eb06fdf74"],
+    ["U", "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/9/9f/U.svg?version=f798d6a151a43adc05e23e534adea262"],
+    ["B", "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/2/2f/B.svg?version=ce85e9f6be68b450719ddd2f2ad08548"],
+    ["R", "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/8/87/R.svg?version=60170f319a53b4c3410c43cdbb95699f"],
+    ["G", "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/8/88/G.svg?version=cf85f35170391f8fbeb037dc18cc3c50"]
+  ]);
 
   return (
     <MUICard>
@@ -158,17 +189,22 @@ const ListView = (props) => {
                       <MUIGrid container justify="space-around">
                         {["W", "U", "B", "R", "G"].map(function (color) {
                           return (
-                            <MUIGrid item key={color} xs={4}>
-                              <input
+                            <MUIGrid item key={color} style={{ alignItems: "center", display: "flex", justifyContent: "center" }} xs={4}>
+                              <MUICheckbox
                                 checked={card.color_identity.includes(color) ? true : false}
-                                className={`color-indicator-${card._id}`}
-                                data-card_id={card._id}
-                                name="color_identity[]"
-                                onChange={submitColorIdentityChange}
-                                type="checkbox"
+                                className={classes.colorCheckbox}
+                                color="primary"
+                                inputProps={{
+                                  className: `color-indicator-${card._id}`,
+                                  "data-card_id": card._id,
+                                  name: "color_identity[]"
+                                }}
+                                onClick={submitColorIdentityChange}
                                 value={color}
                               />
-                              <label> : {color} </label>
+                              <label style={{ height: 30, width: 30 }}>
+                                <img alt={color} className={classes.manaSymbol} src={colorSVGMap.get(color)}></img>
+                              </label>
                             </MUIGrid>
                           );
                         })}
@@ -243,7 +279,7 @@ const ListView = (props) => {
                       </React.Fragment>
                     }
                   </MUITableCell>
-                  <MUITableCell><a href={card.purchase_link}>Buy It Now!</a></MUITableCell>
+                  <MUITableCell><a href={card.purchase_link}><img alt="tcgplayer-logo" src="https://tcgplayer-marketing.s3.amazonaws.com/web/svg-embeds/logos/tcgplayer-logo-full-color.svg"></img></a></MUITableCell>
                 </MUITableRow>
               );
             })}
