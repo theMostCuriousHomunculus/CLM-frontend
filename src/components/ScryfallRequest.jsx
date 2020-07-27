@@ -121,6 +121,7 @@ const ScryfallRequest = (props) => {
             art_crop,
             back_image,
             image,
+            mtgo_id: print.mtgo_id,
             printing: print.set_name + " - " + print.collector_number,
             purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
           }
