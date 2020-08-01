@@ -29,7 +29,10 @@ const Authenticate = () => {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const history = useHistory();
+  const [email, setEmail] = React.useState('');
   const [mode, setMode] = React.useState('Login');
+  const [name, setName] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const { loading, sendRequest } = useRequest();
 
@@ -43,26 +46,19 @@ const Authenticate = () => {
 
   async function login () {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/account/login`,
+      const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/login`,
+        'PATCH',
+        JSON.stringify({
+          email,
+          password
+        }),
         {
-          method: 'PATCH',
-          body: JSON.stringify({
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value
-          }),
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          'Content-Type': 'application/json'
         }
       );
-      const responseData = await response.json();
 
-      if (response.ok) {
-        authentication.login(responseData.userId, responseData.token);
-        history.push('/');
-      } else {
-        alert(responseData.message);
-      }
+      authentication.login(response.userId, response.token);
+      history.push('/');
 
     } catch (error) {
       console.log({ Error: error.message });
@@ -77,28 +73,21 @@ const Authenticate = () => {
       const randomIndex = Math.floor(Math.random() * randomCardPrintings.data.length);
       const avatar = randomCardPrintings.data[randomIndex].image_uris.art_crop;
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/account`,
+      const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
+        'POST',
+        JSON.stringify({
+          avatar,
+          email,
+          name,
+          password
+        }),
         {
-          method: 'POST',
-          body: JSON.stringify({
-            avatar,
-            email: document.getElementById('email').value,
-            name: document.getElementById('name').value,
-            password: document.getElementById('password').value
-          }),
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          'Content-Type': 'application/json'
         }
       );
-      const responseData = await response.json();
         
-      if (response.ok) {
-        authentication.login(responseData.userId, responseData.token);
-        history.push('/');
-      } else {
-        alert(responseData.message);
-      }
+      authentication.login(response.userId, response.token);
+      history.push('/');
 
     } catch (error) {
       console.log({ Error: error.message });
@@ -119,28 +108,31 @@ const Authenticate = () => {
             autoComplete="off"
             autoFocus
             fullWidth
-            id="email"
             label="Email Address"
+            onChange={(event) => setEmail(event.target.value)}
             required={true}
             type="email"
+            value={email}
           />
           {mode === 'Register' &&
             <MUITextField
               autoComplete="off"
               fullWidth
-              id="name"
               label="Account Name"
+              onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
+              value={name}
             />
           }
           <MUITextField
             autoComplete="off"
             fullWidth
-            id="password"
             label="Password"
+            onChange={(event) => setPassword(event.target.value)}
             required={true}
             type="password"
+            value={password}
           />
 
           </MUICardContent>

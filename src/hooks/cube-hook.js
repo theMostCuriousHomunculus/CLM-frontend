@@ -113,6 +113,9 @@ export const useCube = (state, action) => {
 
       const filter = sameCube ? state.filter : '';
       displayed_cards = appendPropertiesAndSort(active_component_cards.filter(function (card) {
+        console.log(card.name);
+        console.log(card.type_line);
+        console.log(card.color);
         return (
           card.name.toLowerCase().includes(filter.toLowerCase()) ||
           card.type_line.toLowerCase().includes(filter.toLowerCase()) ||
@@ -129,7 +132,7 @@ export const useCube = (state, action) => {
         active_component_type,
         cube: action.value,
         displayed_cards,
-        filter: state.filter
+        filter
       };
 
     default:

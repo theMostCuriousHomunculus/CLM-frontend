@@ -19,6 +19,7 @@ const PrintSelector = (props) => {
     <option
       data-back_image={props.card.back_image}
       data-image={props.card.image}
+      data-mtgo_id={props.card.mtgo_id}
       data-purchase_link={props.card.purchase_link}
       key={`option-${props.card._id}`}
       value={props.card.printing}
@@ -63,6 +64,7 @@ const PrintSelector = (props) => {
           <option
             data-back_image={back_image}
             data-image={image}
+            data-mtgo_id={print.mtgo_id}
             data-purchase_link={print.purchase_uris.tcgplayer.split("&")[0]}
             key={`print-${index}`}
             value={print.set_name + " - " + print.collector_number}
@@ -92,6 +94,7 @@ const PrintSelector = (props) => {
       component: props.componentState.active_component_id,
       cube_id: props.componentState.cube._id,
       image: selectedPrinting.getAttribute('data-image'),
+      mtgo_id: selectedPrinting.getAttribute('data-mtgo_id'),
       printing: selectedPrinting.value,
       purchase_link: selectedPrinting.getAttribute('data-purchase_link')
     });
