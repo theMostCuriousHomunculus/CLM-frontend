@@ -111,15 +111,12 @@ export const useCube = (state, action) => {
         active_component_type = 'rotation';
       }
 
-      const filter = sameCube ? state.filter : '';
       displayed_cards = appendPropertiesAndSort(active_component_cards.filter(function (card) {
-        console.log(card.name);
-        console.log(card.type_line);
-        console.log(card.color);
         return (
-          card.name.toLowerCase().includes(filter.toLowerCase()) ||
-          card.type_line.toLowerCase().includes(filter.toLowerCase()) ||
-          card.color.toLowerCase().includes(filter.toLowerCase())
+          card.name.toLowerCase().includes(state.filter.toLowerCase()) ||
+          card.type_line.toLowerCase().includes(state.filter.toLowerCase()) ||
+          // color is a pseudo property assigned by appendPropertiesAndSort, so running into an error here due to the fact that i am trying to access this property before it has been set
+          card.color.toLowerCase().includes(state.filter.toLowerCase())
         );
       }));
       active_rotation_size = rotation ? rotation.size : undefined;
@@ -132,7 +129,7 @@ export const useCube = (state, action) => {
         active_component_type,
         cube: action.value,
         displayed_cards,
-        filter
+        filter: state.filter
       };
 
     default:
