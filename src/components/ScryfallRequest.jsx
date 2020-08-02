@@ -29,7 +29,7 @@ const ScryfallRequest = (props) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuItemClick = (event, index) => {
+  const handleMenuItemClick = (/*event, */index) => {
     setSelectedPrintIndex(index);
     setChosenCard({ ...chosenCard, ...availablePrintings[index] });
     setAnchorEl(null);
@@ -217,7 +217,7 @@ const ScryfallRequest = (props) => {
             <MUIMenuItem
               key={`printing-${index}`}
               selected={index === selectedPrintIndex}
-              onClick={(event) => handleMenuItemClick(event, index)}
+              onClick={(/*event*/) => handleMenuItemClick(/*event, */index)}
             >
               {option.printing}
             </MUIMenuItem>

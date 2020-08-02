@@ -1,4 +1,10 @@
 import React from 'react';
+import MUICircularProgress from '@material-ui/core/CircularProgress';
+import MUIList from '@material-ui/core/List';
+import MUIListItem from '@material-ui/core/ListItem';
+import MUIListItemText from '@material-ui/core/ListItemText';
+import MUIMenu from '@material-ui/core/Menu';
+import MUIMenuItem from '@material-ui/core/MenuItem';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
@@ -6,97 +12,29 @@ import { useRequest } from '../hooks/request-hook';
 const PrintSelector = (props) => {
 
   const authentication = React.useContext(AuthenticationContext);
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
-  const [disabled, setDisabled] = React.useState(true);
-  const [icon, setIcon] = React.useState(
-    <i
-      className="fas fa-lock"
-      onClick={enablePrintChange}
-    ></i>
-  );
-  const [printOptions, setPrintOptions] = React.useState([
-    <option
-      data-back_image={props.card.back_image}
-      data-image={props.card.image}
-      data-mtgo_id={props.card.mtgo_id}
-      data-purchase_link={props.card.purchase_link}
-      key={`option-${props.card._id}`}
-      value={props.card.printing}
-    >
-      {props.card.printing}
-    </option>
-  ]);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [availablePrintings, setAvailablePrintings] = React.useState([{
+    back_image: props.card.back_image,
+    image: props.card.image,
+    mtgo_id: props.card.mtgo_id,
+    printing: props.card.printing,
+    purchase_link: props.card.purchase_link
+  }]);
+  const [cardDetails, setCardDetails] = React.useState({ ...props.card });
+  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
 
-  function disablePrintChange () {
-    setIcon(
-      <i
-        className="fas fa-lock"
-        onClick={enablePrintChange}
-      ></i>
-    );
-    setDisabled(true);
-  }
-
-  async function enablePrintChange () {
-
-    setIcon(
-      <i
-        className="fas fa-lock-open"
-        onClick={disablePrintChange}
-      ></i>
-    );
-    setDisabled(false);
-
-    const prints_search_uri = document.getElementById(`print-selector-${props.card._id}`).getAttribute("data-prints_search_uri");
-
-    try {
-      let printings = await sendRequest(prints_search_uri);
-      const prints = printings.data.map(function(print, index) {
-        let back_image, image;
-        if (print.layout === "transform") {
-          back_image = print.card_faces[1].image_uris.large;
-          image = print.card_faces[0].image_uris.large;
-        } else {
-          image = print.image_uris.large;
-        }
-        return (
-          <option
-            data-back_image={back_image}
-            data-image={image}
-            data-mtgo_id={print.mtgo_id}
-            data-purchase_link={print.purchase_uris.tcgplayer.split("&")[0]}
-            key={`print-${index}`}
-            value={print.set_name + " - " + print.collector_number}
-          >
-            {print.set_name + " - " + print.collector_number}
-          </option>
-        );
-      });
-      setPrintOptions(prints);
-      document.getElementById(`print-selector-${props.card._id}`).focus();
-    } catch (error) {
-      console.log({ 'Error': error.message });
-    }
-  }
-
-  async function submitPrintChange (event) {
-    disablePrintChange();
-
-    const action = 'edit_card';
-    const card_id = event.target.getAttribute('data-card_id');
-    const selectedPrinting = event.target.options[event.target.selectedIndex];
-
+  async function handleMenuItemClick (index) {
+    setSelectedPrintIndex(index);
+    setCardDetails({ ...cardDetails, ...availablePrintings[index] });
+    setAnchorEl(null);
     const cardChanges = JSON.stringify({
-      action,
-      back_image: selectedPrinting.getAttribute('data-back_image'),
-      card_id,
-      component: props.componentState.active_component_id,
-      cube_id: props.componentState.cube._id,
-      image: selectedPrinting.getAttribute('data-image'),
-      mtgo_id: selectedPrinting.getAttribute('data-mtgo_id'),
-      printing: selectedPrinting.value,
-      purchase_link: selectedPrinting.getAttribute('data-purchase_link')
+      action: 'edit_card',
+      card_id: props.card._id,
+      cube_id: props.cube_id,
+      ...cardDetails,
+      ...availablePrintings[index]
     });
     const updatedCube = await sendRequest(
       `${process.env.REACT_APP_BACKEND_URL}/cube`,
@@ -108,24 +46,72 @@ const PrintSelector = (props) => {
       }
     );
     props.updateCubeHandler(updatedCube);
+  };
+
+  async function enablePrintChange (event) {
+
+    setAnchorEl(event.currentTarget);
+
+    try {
+      let printings = await sendRequest(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${props.card.oracle_id}&unique=prints`);
+      printings = printings.data.map(function(print) {
+        let /*art_crop, */back_image, image;
+        if (print.layout === "transform") {
+          back_image = print.card_faces[1].image_uris.large;
+          image = print.card_faces[0].image_uris.large;
+        } else {
+          image = print.image_uris.large;
+        }
+        return (
+          {
+            back_image,
+            image,
+            mtgo_id: print.mtgo_id,
+            printing: print.set_name + " - " + print.collector_number,
+            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
+          }
+        );
+      });
+      setAvailablePrintings(printings);
+    } catch (error) {
+      console.log({ 'Error': error.message });
+    }
   }
 
   return(
     <React.Fragment>
-      {icon}
-      <select
-        data-card_id={props.card._id}
-        data-prints_search_uri={`https://api.scryfall.com/cards/search?q=oracleid=${props.card.oracle_id}&unique=prints`}
-        disabled={disabled}
-        id={`print-selector-${props.card._id}`}
-        onBlur={disablePrintChange}
-        onChange={submitPrintChange}
-        value={props.card.printing}
+      <MUIList component="nav">
+        <MUIListItem
+          button
+          aria-haspopup="true"
+          aria-controls="lock-menu"
+          onClick={enablePrintChange}
+        >
+          <MUIListItemText
+            primary="Selected Printing"
+            secondary={availablePrintings[selectedPrintIndex].printing}
+          />
+        </MUIListItem>
+      </MUIList>
+      <MUIMenu
+        id="printing"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
       >
-        {printOptions.map(function (printOption) {
-          return printOption;
-        })}
-      </select>
+        {loading ?
+          <MUICircularProgress color="primary" size={20} /> :
+          availablePrintings.map((option, index) => (
+          <MUIMenuItem
+            key={`${props.card._id}-printing-${index}`}
+            selected={index === selectedPrintIndex}
+            onClick={() => handleMenuItemClick(index)}
+          >
+            {option.printing}
+          </MUIMenuItem>
+        ))}
+      </MUIMenu>
     </React.Fragment>
   );
 }

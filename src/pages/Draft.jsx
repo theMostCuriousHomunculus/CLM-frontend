@@ -12,6 +12,7 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
 import io from "socket.io-client";
+import SelectConfirmationDialogue from '../components/SelectConfirmationDialog';
 
 const draftReducer = (state, action) => {
   switch (action.type) {
@@ -49,7 +50,7 @@ const useStyles = makeStyles({
     margin: 0,
     width: '100%'
   }
-})
+});
 
 const Draft = () => {
 
@@ -57,8 +58,10 @@ const Draft = () => {
   const { sendRequest } = useRequest();
   const classes = useStyles();
   const draftId = useParams().draftId;
+  const [dialogueDisplayed, setDialogueDisplayed] = React.useState(false);
   const [drafterUsername, setDrafterUsername] = React.useState(undefined);
   const [errorMessage, setErrorMessage] = React.useState(undefined);
+  const [selectedCard, setSelectedCard] = React.useState(undefined);
   const [socket, setSocket] = React.useState(undefined);
 
   const [draftState, dispatch] = React.useReducer(draftReducer, {
@@ -119,10 +122,20 @@ const Draft = () => {
     dispatch({ type: 'UPDATE_DRAFT', value: data });
   }
 
+  function selectCardHandler (cardId) {
+    socket.emit('selectCard', cardId, draftId, authentication.userId);
+  }
+
   return (
     <React.Fragment>
       {socket &&
         <div>
+          <SelectConfirmationDialogue
+            card={selectedCard}
+            open={dialogueDisplayed}
+            selectCardHandler={selectCardHandler}
+            toggleOpen={() => setDialogueDisplayed(false)}
+          />
           <React.Fragment>
             {draftState.name &&
               <React.Fragment>
@@ -148,8 +161,9 @@ const Draft = () => {
                       >
                         <MUIButton
                           className={classes.cardImageContainer}
-                          onClick={function () {
-                            socket.emit('selectCard', card._id, draftId, authentication.userId);
+                          onClick={() => {
+                            setSelectedCard(card);
+                            setDialogueDisplayed(true)
                           }}>
                           <img alt={card.name} className={classes.cardImage} src={card.image} />
                           {card.back_image &&
@@ -159,6 +173,13 @@ const Draft = () => {
                       </MUIGrid>
                     );
                   })}
+                  {// displays if the drafter who passes to this drafter has not yet made his pick
+                    draftState.pack.length === 0 &&
+                    draftState.picks.length === 0 &&
+                    <MUITypography variant="body1">
+                      Other drafters are still making their picks; yell at them to hurry up!
+                    </MUITypography>
+                  }
                   {// displays once the drafter has made all their picks
                     draftState.picks.length > 0 &&
                     <React.Fragment>
@@ -217,12 +238,6 @@ const Draft = () => {
                     </React.Fragment>
                   }
                 </MUIGrid>
-                {draftState.pack.length === 0 &&
-                  draftState.picks.length === 0 &&
-                  <MUITypography variant="body1">
-                    Other drafters are still making their picks; yell at them to hurry up!
-                  </MUITypography>
-                }
               </React.Fragment>
             }
           </React.Fragment>
