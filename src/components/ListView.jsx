@@ -8,11 +8,12 @@ import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 
+import ColorCheckboxes from './ColorCheckboxes';
 import PrintSelector from './PrintSelector';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 import theme from '../theme';
-import ColorCheckboxes from './ColorCheckboxes';
+import { ReactComponent as TCGPlayerLogo } from '../images/tcgplayer-logo-full-color.svg';
 
 const useStyles = makeStyles({
   body: {
@@ -32,6 +33,11 @@ const useStyles = makeStyles({
   },
   table: {
     minWidth: 650
+  },
+  tableCell: {
+    height: '100%',
+    paddingBottom: 4,
+    paddingTop: 4
   }
 });
 
@@ -109,14 +115,15 @@ const ListView = (props) => {
                 <MUITableRow key={card._id}>
                   <MUITableCell
                     back_image={card.back_image}
+                    className={classes.tableCell}
                     image={card.image}
-                    key={card._id}
                     onMouseOut={props.hidePreview}
                     onMouseOver={props.showPreview}
+                    style={{ cursor: 'default' }}
                   >
                     {card.name}
                   </MUITableCell>
-                  <MUITableCell>
+                  <MUITableCell className={classes.tableCell}>
                     {props.componentState.cube.creator === authentication.userId ?
                       <ColorCheckboxes
                         active_component_id={props.componentState.active_component_id}
@@ -131,7 +138,7 @@ const ListView = (props) => {
                       </React.Fragment>
                     }
                   </MUITableCell>
-                  <MUITableCell>
+                  <MUITableCell className={classes.tableCell}>
                     {props.componentState.cube.creator === authentication.userId ?
                       <input
                         data-card_id={card._id}
@@ -148,7 +155,7 @@ const ListView = (props) => {
                       </React.Fragment>
                     }
                   </MUITableCell>
-                  <MUITableCell>
+                  <MUITableCell className={classes.tableCell}>
                     {props.componentState.cube.creator === authentication.userId ?
                       <input
                         data-card_id={card._id}
@@ -162,7 +169,7 @@ const ListView = (props) => {
                       </React.Fragment>
                     }
                   </MUITableCell>
-                  <MUITableCell>
+                  <MUITableCell className={classes.tableCell}>
                     {props.componentState.cube.creator === authentication.userId ?
                       <select
                         data-card_id={card._id}
@@ -184,7 +191,7 @@ const ListView = (props) => {
                       </React.Fragment>
                     }
                   </MUITableCell>
-                  <MUITableCell>
+                  <MUITableCell className={classes.tableCell}>
                     {props.componentState.cube.creator === authentication.userId ?
                       <PrintSelector
                         card={card}
@@ -196,7 +203,11 @@ const ListView = (props) => {
                       </React.Fragment>
                     }
                   </MUITableCell>
-                  <MUITableCell><a href={card.purchase_link}><img alt="tcgplayer-logo" src="https://tcgplayer-marketing.s3.amazonaws.com/web/svg-embeds/logos/tcgplayer-logo-full-color.svg"></img></a></MUITableCell>
+                  <MUITableCell className={classes.tableCell}>
+                    <a href={card.purchase_link}>
+                      <TCGPlayerLogo />
+                    </a>
+                  </MUITableCell>
                 </MUITableRow>
               );
             })}

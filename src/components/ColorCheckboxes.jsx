@@ -5,6 +5,11 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
+import { ReactComponent as WhiteManaSymbol } from '../images/white-mana-symbol.svg';
+import { ReactComponent as BlueManaSymbol } from '../images/blue-mana-symbol.svg';
+import { ReactComponent as BlackManaSymbol } from '../images/black-mana-symbol.svg';
+import { ReactComponent as RedManaSymbol } from '../images/red-mana-symbol.svg';
+import { ReactComponent as GreenManaSymbol } from '../images/green-mana-symbol.svg';
 
 const useStyles = makeStyles({
   colorCheckbox: {
@@ -41,27 +46,27 @@ const ColorCheckboxes = (props) => {
 
   const colorObj = {
     "W": {
-      "icon": "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/8/8e/W.svg?version=d74ba6b898f8815799b1506eb06fdf74",
+      "icon": <WhiteManaSymbol className={classes.manaSymbol} />,
       "state": whiteChecked,
       "updater": setWhiteChecked
     },
     "U": {
-      "icon": "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/9/9f/U.svg?version=f798d6a151a43adc05e23e534adea262",
+      "icon": <BlueManaSymbol className={classes.manaSymbol} />,
       "state": blueChecked,
       "updater": setBlueChecked
     },
     "B": {
-      "icon": "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/2/2f/B.svg?version=ce85e9f6be68b450719ddd2f2ad08548",
+      "icon": <BlackManaSymbol className={classes.manaSymbol} />,
       "state": blackChecked,
       "updater": setBlackChecked
     },
     "R": {
-      "icon": "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/8/87/R.svg?version=60170f319a53b4c3410c43cdbb95699f",
+      "icon": <RedManaSymbol className={classes.manaSymbol} />,
       "state": redChecked,
       "updater": setRedChecked
     },
     "G": {
-      "icon": "https://gamepedia.cursecdn.com/mtgsalvation_gamepedia/8/88/G.svg?version=cf85f35170391f8fbeb037dc18cc3c50",
+      "icon": <GreenManaSymbol className={classes.manaSymbol} />,
       "state": greenChecked,
       "updater": setGreenChecked
     }
@@ -119,7 +124,7 @@ const ColorCheckboxes = (props) => {
             value={color}
           />
           <label style={{ height: 30, width: 30 }}>
-            <img alt={color} className={classes.manaSymbol} src={colorObj[color]['icon']}></img>
+            {colorObj[color]['icon']}
           </label>
         </MUIGrid>
       );
@@ -128,4 +133,4 @@ const ColorCheckboxes = (props) => {
   );
 }
 
-export default ColorCheckboxes;
+export default React.memo(ColorCheckboxes);

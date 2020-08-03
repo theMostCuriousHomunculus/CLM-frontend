@@ -118,6 +118,7 @@ const CubeView = (props) => {
                                   key={card._id}
                                   onMouseOut={props.hidePreview}
                                   onMouseOver={props.showPreview}
+                                  style={{ cursor: 'default' }}
                                   variant="body1"
                                 >
                                   {card.name}

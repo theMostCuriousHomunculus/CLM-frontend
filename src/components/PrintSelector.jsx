@@ -116,4 +116,4 @@ const PrintSelector = (props) => {
   );
 }
 
-export default PrintSelector;
+export default React.memo(PrintSelector);
