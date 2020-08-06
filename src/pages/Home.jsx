@@ -1,8 +1,12 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
+import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
+import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIGrid from '@material-ui/core/Grid';
+import MUIComputerIcon from '@material-ui/icons/Computer';
+// import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 import MUIControlCameraIcon from '@material-ui/icons/ControlCamera';
 import MUIPaletteIcon from '@material-ui/icons/Palette';
@@ -21,8 +25,9 @@ const Home = () => {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
+  const history = useHistory();
 
-  const components = [
+  /*const components = [
     {
       description: "You can probably guess what the mainboard of your cube is; the cards you are happy with having show up in every draft.  These cards have a relatively high power level and do the types of things that most decks in that card's colors want to be doing.",
       type: 'Mainboard'
@@ -39,7 +44,7 @@ const Home = () => {
       description: "A rotation is a collection of cards with similar colors, mana costs and functions from which a specified number will be randomly included each time you draft your cube.  Rotations are a great way to help keep your cube feeling fresh.  As an example, a lower power level cube might be interested in some small number of cheap blue blockers being available in every draft.  However, there are a plethora of options and none are strictly better than the others.  With a rotation, Aegis Turtle might be included in one draft and the next might feature Fog Bank.  You specify the number of cards in each individual rotation that should be included in each draft.",
       type: 'Rotation'
     }
-  ]
+  ]*/
 
   return (
     <React.Fragment>
@@ -56,14 +61,19 @@ const Home = () => {
           }
         />
         <MUICardContent>
-          <MUITypography variant="body1"><MUIControlCameraIcon /> Do you want more control over your cube?</MUITypography>
-          <MUITypography variant="body1"><MUIPaletteIcon /> Do you want to maximize the variety of play experiences your cube offers with minimal impact to the quality of gameplay?</MUITypography>
-          <MUITypography variant="body1"><MUITimerIcon /> Do you want to draft your cube in real time with your buds?</MUITypography>
-
+          <MUITypography variant="body1"><MUIControlCameraIcon /> Increase Your Control Over Your Cube</MUITypography>
+          <MUITypography variant="body1"><MUIPaletteIcon /> Offer Your Group Diverse Play Experiences</MUITypography>
+          <MUITypography variant="body1"><MUITimerIcon /> Draft Your Cube in Real Time with Your Buds</MUITypography>
+          <MUITypography variant="body1"><MUIComputerIcon /> Export Draft Picks to CSV Files for Quick and Easy MTGO Play</MUITypography>
+          <MUICardActions style={{ justifyContent: 'flex-end' }}>
+            <MUIButton color="primary" onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')} variant="contained">
+              Check Out Casey's MTGO Cube!
+            </MUIButton>
+          </MUICardActions>
         </MUICardContent>
       </MUICard>
 
-      <MUIGrid container>
+      {/*<MUIGrid container>
         {components.map(function (component, index) {
           return (
             <MUIGrid item key={index} xs={12} md={6} lg={3}>
@@ -76,7 +86,7 @@ const Home = () => {
             </MUIGrid>
           );
         })}
-      </MUIGrid>
+      </MUIGrid>*/}
     </React.Fragment>
   );
 }
