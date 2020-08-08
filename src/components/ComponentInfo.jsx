@@ -4,6 +4,7 @@ import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MUIDialog from '@material-ui/core/Dialog';
 import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
@@ -16,7 +17,6 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -123,26 +123,6 @@ const ComponentInfo = (props) => {
     props.updateCubeHandler(updatedCube);
   }
 
-  const handleClickListItemComponent = (event) => {
-    setComponentAnchorEl(event.currentTarget);
-  }
-
-  const handleClickListItemView = (event) => {
-    setViewAnchorEl(event.currentTarget);
-  };
-  
-  const handleCloseComponent = () => {
-    setComponentAnchorEl(null)
-  }
-
-  const handleCloseView = () => {
-    setViewAnchorEl(null);
-  };
-
-  const handleComponentNameChange = (event) => {
-    setComponentName(event.target.value);
-  };
-
   const handleMenuItemClickComponent = (component_id) => {
     props.changeComponent(component_id);
     setComponentAnchorEl(null);
@@ -151,10 +131,6 @@ const ComponentInfo = (props) => {
   const handleMenuItemClickView = (event) => {
     props.changeViewMode(event.target.textContent);
     setViewAnchorEl(null);
-  };
-
-  const handleRotationSizeChange = (event) => {
-    setRotationSize(event.target.value);
   };
 
   async function submitComponentChanges () {
@@ -186,26 +162,23 @@ const ComponentInfo = (props) => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             {authentication.userId === props.componentState.cube.creator &&
               props.componentState.active_component_type !== 'mainboard' &&
-              props.componentState.active_component_type !== 'sideboard' &&
-              (componentName || componentName.length === 0) ?
+              props.componentState.active_component_type !== 'sideboard' ?
               <React.Fragment>
                 <MUITextField
                   autoComplete="off"
                   label="Active Component"
                   onBlur={submitComponentChanges}
-                  onChange={handleComponentNameChange}
+                  onChange={(event) => setComponentName(event.target.value)}
                   type="text"
                   value={componentName}
                   variant="outlined"
                 />
                 {props.componentState.active_component_type === 'rotation' &&
-                  rotationSize &&
                   <MUITextField
                     label="Rotation Size"
-                    min="0"
+                    inputProps={{ max: props.componentState.active_component_cards.length, min: 0, step: 1 }}
                     onBlur={submitComponentChanges}
-                    onChange={handleRotationSizeChange}
-                    step="1"
+                    onChange={(event) => setRotationSize(event.target.value)}
                     type="number"
                     value={rotationSize}
                     variant="outlined"
@@ -235,7 +208,7 @@ const ComponentInfo = (props) => {
                 button
                 aria-haspopup="true"
                 aria-controls="lock-menu"
-                onClick={handleClickListItemView}
+                onClick={(event) => setViewAnchorEl(event.currentTarget)}
               >
                 <MUIListItemText
                   primary="View Mode"
@@ -248,7 +221,7 @@ const ComponentInfo = (props) => {
               anchorEl={viewAnchorEl}
               keepMounted
               open={Boolean(viewAnchorEl)}
-              onClose={handleCloseView}
+              onClose={() => setViewAnchorEl(null)}
             >
               {["Curve View", "List View", "Table View"].map((option) => (
                 <MUIMenuItem
@@ -291,7 +264,7 @@ const ComponentInfo = (props) => {
             button
             aria-haspopup="true"
             aria-controls="lock-menu"
-            onClick={handleClickListItemComponent}
+            onClick={(event) => setComponentAnchorEl(event.currentTarget)}
           >
             <MUIListItemText
               primary="Switch Component"
@@ -304,7 +277,7 @@ const ComponentInfo = (props) => {
           anchorEl={componentAnchorEl}
           keepMounted
           open={Boolean(componentAnchorEl)}
-          onClose={handleCloseComponent}
+          onClose={() => setComponentAnchorEl(null)}
         >
           {[{ name: 'Mainboard', _id: 'mainboard' },
             { name: 'Sideboard', _id: 'sideboard' },
@@ -394,7 +367,7 @@ const ComponentInfo = (props) => {
           <MUIButton
             className={classes.warningButton}
             onClick={deleteComponent}
-            startIcon={<DeleteForeverIcon />}
+            startIcon={<MUIDeleteForeverIcon />}
             variant="contained"
           >
             Delete this {props.componentState.active_component_type === 'module' ? 'Module' : 'Rotation'}
