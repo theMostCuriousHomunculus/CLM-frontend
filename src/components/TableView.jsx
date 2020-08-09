@@ -5,7 +5,10 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import alphabeticalSort from '../functions/alphabetical-sort';
+import cardType from '../functions/card-type';
 import theme from '../theme';
+import { monoColors, multiColors } from '../constants/color-objects';
 
 const useStyles = makeStyles({
   basicCard: {
@@ -14,10 +17,10 @@ const useStyles = makeStyles({
     width: '100%'
   },
   black: {
-    backgroundColor: '#8f8f8f'
+    backgroundColor: monoColors.find((color) => color.name === "Black").hex
   },
   blue: {
-    backgroundColor: '#5f8fdf'
+    backgroundColor: monoColors.find((color) => color.name === "Blue").hex
   },
   cardWrapper: {
     margin: '0.5rem',
@@ -36,16 +39,16 @@ const useStyles = makeStyles({
     }
   },
   colorless: {
-    backgroundColor: '#bfbfbf'
+    backgroundColor: monoColors.find((color) => color.name === "Colorless").hex
   },
   green: {
-    backgroundColor: '#8fdf8f'
+    backgroundColor: monoColors.find((color) => color.name === "Green").hex
   },
   multicolor: {
     backgroundColor: '#efef8f'
   },
   red: {
-    backgroundColor: '#df5f5f'
+    backgroundColor: monoColors.find((color) => color.name === "Red").hex
   },
   tableViewMainContainer: {
     display: 'flex',
@@ -54,7 +57,7 @@ const useStyles = makeStyles({
     margin: '0 0.5rem 1rem 0.5rem'
   },
   white: {
-    backgroundColor: '#efefef'
+    backgroundColor: monoColors.find((color) => color.name === "White").hex
   }  
 });
 
@@ -62,26 +65,23 @@ const TableView = (props) => {
 
   const classes = useStyles();
 
-  const monoColors = ["White", "Blue", "Black", "Red", "Green", "Colorless"];
-  const multiColors = ["Azorius", "Boros", "Dimir", "Golgari", "Gruul", "Izzet", "Orzhov", "Rakdos", "Selesnya", "Simic", "Abzan", "Bant", "Esper", "Grixis", "Jeskai", "Jund", "Mardu", "Naya", "Sultai", "Temur", "WUBR", "WUBG", "WURG", "WBRG", "UBRG", "WUBRG"];
-  const types = ["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"];
-  const costs = ["0", "1", "2", "3", "4", "5", "6", "7+"];
+  const costs = [0, 1, 2, 3, 4, 5, 6, 7];
 
   return (
     <div className={classes.tableViewMainContainer}>
       <React.Fragment>
         {monoColors.map(function (color) {
           const cards_color = props.componentState.displayed_cards.filter(function (card) {
-            return card.color === color;
+            return card.color_identity.toString() === color.color_identity;
           });
           return (
-            <div className={classes.cardWrapper} key={`table-${color}`}>
-              <MUICard className={classes[`${color.toLowerCase()}`] + ' ' + classes.basicCard}>
-                <MUICardHeader title={<MUITypography variant="h3">{`${color} (${cards_color.length})`}</MUITypography>} />
+            <div className={classes.cardWrapper} key={`table-${color.name}`}>
+              <MUICard className={classes[`${color.name.toLowerCase()}`] + ' ' + classes.basicCard}>
+                <MUICardHeader title={<MUITypography variant="h3">{`${color.name} (${cards_color.length})`}</MUITypography>} />
                 <MUICardContent>
-                  {types.map(function (type) {
+                  {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
                     const cards_color_type = cards_color.filter(function (card) {
-                      return card.type === type;
+                      return cardType(card.type_line) === type;
                     });
                     return (
                       <React.Fragment key={type}>
@@ -91,13 +91,13 @@ const TableView = (props) => {
                             <React.Fragment>
                               {costs.map(function (cost) {
                                 const cards_color_type_cost = cards_color_type.filter(function (card) {
-                                  return card.cost === cost;
+                                  return card.cmc === cost || (cost === 7 && card.cmc > cost);
                                 });
                                 return (
                                   <React.Fragment key={cost}>
                                     {cards_color_type_cost.length > 0 &&
                                       <div>
-                                        {cards_color_type_cost.map(function (card) {
+                                        {alphabeticalSort(cards_color_type_cost).map(function (card) {
                                           return (
                                             <MUITypography
                                               back_image={card.back_image}
@@ -135,17 +135,17 @@ const TableView = (props) => {
           <MUICardContent>
             {multiColors.map(function (color) {
               const cards_color = props.componentState.displayed_cards.filter(function (card) {
-                return card.color === color;
+                return card.color_identity.toString() === color.color_identity;
               });
               return (
-                <React.Fragment key={color}>
+                <React.Fragment key={color.name}>
                   {cards_color.length > 0 &&
                     <div>
-                      <MUITypography variant="h4">{`${color} (${cards_color.length})`}</MUITypography>
+                      <MUITypography variant="h4">{`${color.name} (${cards_color.length})`}</MUITypography>
                       <React.Fragment>
                         {[true, false].map(function (isCreature) {
                           const cards_color_isCreature = cards_color.filter(function (card) {
-                            return isCreature ? card.type === "Creature" : card.type !== "Creature";
+                            return isCreature ? cardType(card.type_line) === "Creature" : cardType(card.type_line) !== "Creature";
                           });
                           return (
                             <div key={isCreature ? "a" : "b"}>
@@ -153,13 +153,13 @@ const TableView = (props) => {
                               <React.Fragment>
                                 {costs.map(function (cost) {
                                   const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
-                                    return card.cost === cost;
+                                    return card.cmc === cost || (cost === 7 && card.cmc > cost);
                                   });
                                   return (
                                     <React.Fragment key={cost}>
                                       {cards_color_isCreature_cost.length > 0 &&
                                         <div>
-                                          {cards_color_isCreature_cost.map(function (card) {
+                                          {alphabeticalSort(cards_color_isCreature_cost).map(function (card) {
                                             return (
                                               <MUITypography
                                                 back_image={card.back_image}

@@ -1,27 +1,18 @@
-import { useCardSort } from '../hooks/card-sort-hook';
-const { appendPropertiesAndSort } = useCardSort();
+export default function cubeReducer (state, action) {
 
-export const useCube = (state, action) => {
-
-  let displayed_cards;
   let active_component_cards;
   let active_component_id;
   let active_component_name;
   let active_component_type;
   let active_rotation_size;
+  let displayed_cards;
   let module;
   let rotation;
 
   switch (action.type) {
     case 'FILTER_CARDS':
 
-      displayed_cards = appendPropertiesAndSort(state.active_component_cards.filter(function (card) {
-        return (
-          card.name.toLowerCase().includes(action.value.toLowerCase()) ||
-          card.type_line.toLowerCase().includes(action.value.toLowerCase()) ||
-          card.color.toLowerCase().includes(action.value.toLowerCase())
-        );
-      }));
+      displayed_cards = filterCards(state.active_component_cards, action.value);
 
       return {
         ...state,
@@ -56,13 +47,7 @@ export const useCube = (state, action) => {
         active_component_type = 'rotation';
       }
 
-      displayed_cards = appendPropertiesAndSort(active_component_cards.filter(function (card) {
-        return (
-          card.name.toLowerCase().includes(state.filter.toLowerCase()) ||
-          card.type_line.toLowerCase().includes(state.filter.toLowerCase()) ||
-          card.color.toLowerCase().includes(state.filter.toLowerCase())
-        );
-      }));
+      displayed_cards = filterCards(active_component_cards, state.filter);
       active_rotation_size = rotation ? rotation.size : undefined;
 
       return {
@@ -111,14 +96,7 @@ export const useCube = (state, action) => {
         active_component_type = 'rotation';
       }
 
-      displayed_cards = appendPropertiesAndSort(active_component_cards.filter(function (card) {
-        return (
-          card.name.toLowerCase().includes(state.filter.toLowerCase()) ||
-          card.type_line.toLowerCase().includes(state.filter.toLowerCase()) ||
-          // color is a pseudo property assigned by appendPropertiesAndSort, so running into an error here due to the fact that i am trying to access this property before it has been set
-          card.color.toLowerCase().includes(state.filter.toLowerCase())
-        );
-      }));
+      displayed_cards = filterCards(active_component_cards, state.filter);
       active_rotation_size = rotation ? rotation.size : undefined;
 
       return {
@@ -135,4 +113,19 @@ export const useCube = (state, action) => {
     default:
       return state;
   }
+}
+
+function filterCards (activeComponentCards, filterText) {
+  return activeComponentCards.filter(function (card) {
+    const wordArray = filterText.split(" ");
+    return (
+      wordArray.every(function (word) {
+        return (
+          card.keywords.find((keyword) => keyword.toLowerCase().includes(word.toLowerCase())) ||
+          card.name.toLowerCase().includes(word.toLowerCase()) ||
+          card.type_line.toLowerCase().includes(word.toLowerCase())
+        );
+      })
+    );
+  });
 }

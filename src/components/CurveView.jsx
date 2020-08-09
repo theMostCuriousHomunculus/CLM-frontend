@@ -5,12 +5,16 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-const black = '#8f8f8f';
-const blue = '#5f8fdf';
-const colorless = '#bfbfbf';
-const green = '#8fdf8f';
-const red = '#df5f5f';
-const white = '#efefef';
+import alphabeticalSort from '../functions/alphabetical-sort';
+import cardType from '../functions/card-type';
+import { monoColors, multiColors } from '../constants/color-objects';
+
+const black = monoColors.find((color) => color.name === "Black").hex;
+const blue = monoColors.find((color) => color.name === "Blue").hex;
+const colorless = monoColors.find((color) => color.name === "Colorless").hex;
+const green = monoColors.find((color) => color.name === "Green").hex;
+const red = monoColors.find((color) => color.name === "Red").hex;
+const white = monoColors.find((color) => color.name === "White").hex;
 
 const useStyles = makeStyles({
   azorius: {
@@ -81,36 +85,32 @@ const CubeView = (props) => {
 
   const classes = useStyles();
 
-  const monoColors = ["White", "Blue", "Black", "Red", "Green", "Colorless"];
-  const multiColors = ["Azorius", "Boros", "Dimir", "Golgari", "Gruul", "Izzet", "Orzhov", "Rakdos", "Selesnya", "Simic", "Abzan", "Bant", "Esper", "Grixis", "Jeskai", "Jund", "Mardu", "Naya", "Sultai", "Temur", "WUBR", "WUBG", "WURG", "WBRG", "UBRG", "WUBRG"];
-  const costs = ["0", "1", "2", "3", "4", "5", "6", "7+"];
-
   return (
     <div className={classes.curveViewMainContainer}>
       {[...monoColors, ...multiColors].map(function (color) {
         const cards_color = props.componentState.displayed_cards.filter(function (card) {
-          return card.color === color;
+          return card.color_identity.toString() === color.color_identity;
         });
         return (
-          <MUICard className={(classes[`${color.toLowerCase()}`] || classes.multicolor) + " " + classes.curveViewSubContainer} key={`curve-${color}`}>
-            <MUICardHeader title={<MUITypography variant="h3">{color}</MUITypography>} />
+          <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor) + " " + classes.curveViewSubContainer} key={`curve-${color.name}`}>
+            <MUICardHeader title={<MUITypography variant="h3">{color.name}</MUITypography>} />
             <MUICardContent>
               {[true, false].map(function (isCreature) {
                 const cards_color_isCreature = cards_color.filter(function (card) {
-                  return isCreature ? card.type === "Creature" : card.type !== "Creature";
+                  return isCreature ? cardType(card.type_line) === "Creature" : cardType(card.type_line) !== "Creature";
                 });
                 return (
                   <React.Fragment key={isCreature ? "a" : "b"}>
                     <MUITypography variant="h4">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
                     <div className={classes.curveViewTypeContainer}>
-                      {costs.map(function (cost) {
+                      {[0, 1, 2, 3, 4, 5, 6, 7].map(function (cost) {
                         const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
-                          return card.cost === cost;
+                          return card.cmc === cost || (cost === 7 && card.cmc > cost);
                         });
                         return (
                           <div key={cost}>
                             <MUITypography variant="h5">{cost} CMC</MUITypography>
-                            {cards_color_isCreature_cost.map(function (card) {
+                            {alphabeticalSort(cards_color_isCreature_cost).map(function (card) {
                               return (
                                 <MUITypography
                                   back_image={card.back_image}

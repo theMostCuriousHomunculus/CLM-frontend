@@ -239,7 +239,7 @@ const ComponentInfo = (props) => {
             <MUITextField
               autoComplete="off"
               id="search-filter"
-              label="Filter by color, keywords, name or type"
+              label="Filter by keywords, name or type"
               onChange={props.filterCardsHandler}
               style={{ width: '100%' }}
               type="text"

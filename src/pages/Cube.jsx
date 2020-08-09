@@ -4,6 +4,7 @@ import MUICard from '@material-ui/core/Card';
 
 import ComponentInfo from '../components/ComponentInfo';
 import CubeInfo from '../components/CubeInfo';
+import cubeReducer from '../functions/cube-reducer';
 import CurveView from '../components/CurveView';
 import HoverPreview from '../components/HoverPreview';
 import ListView from '../components/ListView';
@@ -11,16 +12,15 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ScryfallRequest from '../components/ScryfallRequest';
 import TableView from '../components/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { useCube } from '../hooks/cube-hook';
 import { useRequest } from '../hooks/request-hook';
 
 const Cube = () => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
-  const [componentState, dispatch] = React.useReducer(useCube, {
+  const [componentState, dispatch] = React.useReducer(cubeReducer, {
     active_component_cards: [],
     active_component_id: 'mainboard',
     active_component_name: 'Mainboard',
@@ -41,7 +41,6 @@ const Cube = () => {
     right: undefined,
     top: 0
   });
-  const [loading, setLoading] = React.useState(true);
   const [viewMode, setViewMode] = React.useState('Table View');
 
   function filterCardsHandler (event) {
@@ -66,10 +65,9 @@ const Cube = () => {
       } catch (error) {
         console.log('Error: ' + error.message);
       }
-      setLoading(false);
     };
     fetchCube();
-  }, [cubeId]);
+  }, []);
 
   async function addCard (chosenCard) {
     delete chosenCard.art_crop;
@@ -162,7 +160,6 @@ const Cube = () => {
           }
 
           {componentState.cube &&
-            componentState.active_component_id &&
             <React.Fragment>
               <ComponentInfo
                 componentState={componentState}

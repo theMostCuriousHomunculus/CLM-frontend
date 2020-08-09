@@ -8,12 +8,14 @@ import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 
+import alphabeticalSort from '../functions/alphabetical-sort';
 import ColorCheckboxes from './ColorCheckboxes';
 import PrintSelector from './PrintSelector';
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { useRequest } from '../hooks/request-hook';
 import theme from '../theme';
+import { AuthenticationContext } from '../contexts/authentication-context';
+import { monoColors, multiColors } from '../constants/color-objects';
 import { ReactComponent as TCGPlayerLogo } from '../images/tcgplayer-logo-full-color.svg';
+import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
   body: {
@@ -110,7 +112,7 @@ const ListView = (props) => {
             </MUITableRow>
           </MUITableHead>
           <MUITableBody className={classes.body}>
-            {props.componentState.displayed_cards.map(function (card) {
+            {alphabeticalSort(props.componentState.displayed_cards).map(function (card) {
               return (
                 <MUITableRow key={card._id}>
                   <MUITableCell
@@ -134,7 +136,9 @@ const ListView = (props) => {
                       />
                       :
                       <React.Fragment>
-                        {card.color}
+                        {[...monoColors, ...multiColors].find(function(color) {
+                          return color.color_identity === card.color_identity.toString();
+                        }).name}
                       </React.Fragment>
                     }
                   </MUITableCell>
