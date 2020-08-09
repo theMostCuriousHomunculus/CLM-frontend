@@ -2,15 +2,15 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import MUICard from '@material-ui/core/Card';
 
-import ComponentInfo from '../components/ComponentInfo';
-import CubeInfo from '../components/CubeInfo';
+import ComponentInfo from '../components/Cube Page/ComponentInfo';
+import CubeInfo from '../components/Cube Page/CubeInfo';
 import cubeReducer from '../functions/cube-reducer';
-import CurveView from '../components/CurveView';
-import HoverPreview from '../components/HoverPreview';
-import ListView from '../components/ListView';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ScryfallRequest from '../components/ScryfallRequest';
-import TableView from '../components/TableView';
+import CurveView from '../components/Cube Page/CurveView';
+import HoverPreview from '../components/Cube Page/HoverPreview';
+import ListView from '../components/Cube Page/ListView';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
+import TableView from '../components/Cube Page/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 

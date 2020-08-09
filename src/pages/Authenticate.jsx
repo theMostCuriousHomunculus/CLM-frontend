@@ -9,9 +9,9 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
-import LoadingSpinner from '../components/LoadingSpinner';
 
 const useStyles = makeStyles({
   cardActions: {
@@ -104,36 +104,36 @@ const Authenticate = () => {
           />
           <MUICardContent>
           
-          <MUITextField
-            autoComplete="off"
-            autoFocus
-            fullWidth
-            label="Email Address"
-            onChange={(event) => setEmail(event.target.value)}
-            required={true}
-            type="email"
-            value={email}
-          />
-          {mode === 'Register' &&
+            <MUITextField
+              autoComplete="off"
+              autoFocus
+              fullWidth
+              label="Email Address"
+              onChange={(event) => setEmail(event.target.value)}
+              required={true}
+              type="email"
+              value={email}
+            />
+            {mode === 'Register' &&
+              <MUITextField
+                autoComplete="off"
+                fullWidth
+                label="Account Name"
+                onChange={(event) => setName(event.target.value)}
+                required={true}
+                type="text"
+                value={name}
+              />
+            }
             <MUITextField
               autoComplete="off"
               fullWidth
-              label="Account Name"
-              onChange={(event) => setName(event.target.value)}
+              label="Password"
+              onChange={(event) => setPassword(event.target.value)}
               required={true}
-              type="text"
-              value={name}
+              type="password"
+              value={password}
             />
-          }
-          <MUITextField
-            autoComplete="off"
-            fullWidth
-            label="Password"
-            onChange={(event) => setPassword(event.target.value)}
-            required={true}
-            type="password"
-            value={password}
-          />
 
           </MUICardContent>
 

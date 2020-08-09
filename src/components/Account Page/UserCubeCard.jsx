@@ -18,8 +18,8 @@ import MUITableRow from '@material-ui/core/TableRow';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { useRequest } from '../hooks/request-hook';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { useRequest } from '../../hooks/request-hook';
 
 const UserCubeCard = (props) => {
 

@@ -3,13 +3,13 @@ import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIGrid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { useRequest } from '../hooks/request-hook';
-import { ReactComponent as WhiteManaSymbol } from '../images/white-mana-symbol.svg';
-import { ReactComponent as BlueManaSymbol } from '../images/blue-mana-symbol.svg';
-import { ReactComponent as BlackManaSymbol } from '../images/black-mana-symbol.svg';
-import { ReactComponent as RedManaSymbol } from '../images/red-mana-symbol.svg';
-import { ReactComponent as GreenManaSymbol } from '../images/green-mana-symbol.svg';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { useRequest } from '../../hooks/request-hook';
+import { ReactComponent as WhiteManaSymbol } from '../../images/white-mana-symbol.svg';
+import { ReactComponent as BlueManaSymbol } from '../../images/blue-mana-symbol.svg';
+import { ReactComponent as BlackManaSymbol } from '../../images/black-mana-symbol.svg';
+import { ReactComponent as RedManaSymbol } from '../../images/red-mana-symbol.svg';
+import { ReactComponent as GreenManaSymbol } from '../../images/green-mana-symbol.svg';
 
 const useStyles = makeStyles({
   colorCheckbox: {

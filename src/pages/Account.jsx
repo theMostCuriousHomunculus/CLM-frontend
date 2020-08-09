@@ -15,11 +15,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import theme from '../theme';
 import { useRequest } from '../hooks/request-hook';
-import BudRequests from '../components/BudRequests';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ScryfallRequest from '../components/ScryfallRequest';
-import UserCubeCard from '../components/UserCubeCard';
-import UserDraftCard from '../components/UserDraftCard';
+import BudRequests from '../components/Account Page/BudRequests';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
+import UserCubeCard from '../components/Account Page/UserCubeCard';
+import UserDraftCard from '../components/Account Page/UserDraftCard';
 
 const useStyles = makeStyles({
   avatarLarge: {

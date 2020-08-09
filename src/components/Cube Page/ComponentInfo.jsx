@@ -19,9 +19,9 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import theme from '../theme';
-import { useRequest } from '../hooks/request-hook';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import theme from '../../theme';
+import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   cardActions: {

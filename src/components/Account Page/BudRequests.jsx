@@ -12,9 +12,9 @@ import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import theme from '../theme';
-import { useRequest } from '../hooks/request-hook';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import theme from '../../theme';
+import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   avatarSmall: {

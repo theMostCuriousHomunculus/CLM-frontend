@@ -10,7 +10,7 @@ import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 
-import { useRequest } from '../hooks/request-hook';
+import { useRequest } from '../../hooks/request-hook';
 
 const ScryfallRequest = (props) => {
 

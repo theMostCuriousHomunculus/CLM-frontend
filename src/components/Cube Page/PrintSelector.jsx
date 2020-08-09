@@ -6,8 +6,8 @@ import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { useRequest } from '../hooks/request-hook';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { useRequest } from '../../hooks/request-hook';
 
 const PrintSelector = (props) => {
 

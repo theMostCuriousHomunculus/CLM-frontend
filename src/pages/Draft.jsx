@@ -12,7 +12,7 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
 import io from "socket.io-client";
-import SelectConfirmationDialogue from '../components/SelectConfirmationDialog';
+import SelectConfirmationDialogue from '../components/Draft Page/SelectConfirmationDialog';
 
 const draftReducer = (state, action) => {
   switch (action.type) {
@@ -188,7 +188,7 @@ const Draft = () => {
                         <CSVLink
                           className={classes.downloadLink}
                           data={draftState.picks.reduce(function (a, c) {
-                            return a + " ,1," + c.mtgo_id + ", , , , \n";
+                            return c ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
                           }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
                           filename={`${draftState.name + " - " + drafterUsername}.csv`}
                           target="_blank"
@@ -202,7 +202,7 @@ const Draft = () => {
                               <CSVLink
                                 className={classes.downloadLink}
                                 data={drftr.picks.reduce(function (a, c) {
-                                  return a + " ,1," + c + ", , , , \n";
+                                  return c ? a + " ,1," + c + ", , , , \n" : a;
                                 }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
                                 filename={`${draftState.name + " - " + drftr.name}.csv`}
                                 target="_blank"
@@ -214,23 +214,25 @@ const Draft = () => {
                         })}
                       </MUIGrid>
                       <React.Fragment>
-                        {draftState.picks.map(function (card) {
+                        {draftState.picks.map(function (card, index) {
                           return (
                             <MUIGrid
                               item
-                              key={card._id}
+                              key={`pick${index}`}
                               xs={12}
-                              sm={card.back_image ? 12 : 6}
-                              md={card.back_image ? 8 : 4}
-                              lg={card.back_image ? 6 : 3}
-                              xl={card.back_image ? 4 : 2}
+                              sm={card && card.back_image ? 12 : 6}
+                              md={card && card.back_image ? 8 : 4}
+                              lg={card && card.back_image ? 6 : 3}
+                              xl={card && card.back_image ? 4 : 2}
                             >
-                              <MUICard className={classes.cardImageContainer}>
-                                <img alt={card.name} className={classes.cardImage} src={card.image} />
-                                {card.back_image &&
-                                  <img alt={card.name} className={classes.cardImage} src={card.back_image} />
-                                }
-                              </MUICard>
+                              {card &&
+                                <MUICard className={classes.cardImageContainer}>
+                                  <img alt={card.name} className={classes.cardImage} src={card.image} />
+                                  {card.back_image &&
+                                    <img alt={card.name} className={classes.cardImage} src={card.back_image} />
+                                  }
+                                </MUICard>
+                              }
                             </MUIGrid>
                           );
                         })}

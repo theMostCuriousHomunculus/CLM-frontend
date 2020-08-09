@@ -5,10 +5,10 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import alphabeticalSort from '../functions/alphabetical-sort';
-import cardType from '../functions/card-type';
-import theme from '../theme';
-import { monoColors, multiColors } from '../constants/color-objects';
+import alphabeticalSort from '../../functions/alphabetical-sort';
+import cardType from '../../functions/card-type';
+import theme from '../../theme';
+import { monoColors, multiColors } from '../../constants/color-objects';
 
 const useStyles = makeStyles({
   basicCard: {

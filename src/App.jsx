@@ -5,8 +5,8 @@ import MUICard from '@material-ui/core/Card';
 import MUICircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Footer from './components/Footer';
-import Navigation from './components/Navigation';
+import Footer from './components/miscellaneous/Footer';
+import Navigation from './components/Main Navigation/Navigation';
 
 import { AuthenticationContext } from './contexts/authentication-context';
 import { useRequest } from './hooks/request-hook';
