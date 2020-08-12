@@ -19,7 +19,7 @@ import BudRequests from '../components/Account Page/BudRequests';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import UserCubeCard from '../components/Account Page/UserCubeCard';
-import UserDraftCard from '../components/Account Page/UserDraftCard';
+import UserEventCard from '../components/Account Page/UserEventCard';
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -75,7 +75,7 @@ const Account = () => {
   const { loading, sendRequest } = useRequest();
 
   const [cubes, setCubes] = React.useState([]);
-  const [drafts, setDrafts] = React.useState([]);
+  const [events, setEvents] = React.useState([]);
   const [user, setUser] = React.useState({});
 
   React.useEffect(() => {
@@ -128,8 +128,8 @@ const Account = () => {
       setUser(accountData);
       const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creator=${accountId}`, 'GET', null, {});
       setCubes(cubeData.cubes);
-      const draftData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/draft?drafter=${accountId}`, 'GET', null, {});
-      setDrafts(draftData.drafts);
+      const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?player=${accountId}`, 'GET', null, {});
+      setEvents(eventData.events);
     } catch (error) {
       console.log('Error: ' + error.message);
     }
@@ -206,7 +206,7 @@ const Account = () => {
             </MUIGrid>
 
             <MUIGrid item xs={12} lg={6}>
-              <UserDraftCard buds={user.buds} classes={classes} cubes={cubes} drafts={drafts} />
+              <UserEventCard buds={user.buds} classes={classes} cubes={cubes} events={events} />
             </MUIGrid>
 
           </MUIGrid>

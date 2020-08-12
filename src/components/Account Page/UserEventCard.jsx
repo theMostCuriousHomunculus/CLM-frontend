@@ -48,7 +48,7 @@ const useStyles = makeStyles({
   }
 });
 
-const UserDraftCard = (props) => {
+const UserEventCard = (props) => {
 
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
@@ -56,38 +56,46 @@ const UserDraftCard = (props) => {
   const history = useHistory();
   const { sendRequest } = useRequest();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [cubeAnchorEl, setCubeAnchorEl] = React.useState(null);
+  const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
+  const [eventType, setEventType] = React.useState('draft');
   const [selectedCube, setSelectedCube] = React.useState(null);
-  const [showDraftForm, setShowDraftForm] = React.useState(false);
+  const [showEventForm, setShowEventForm] = React.useState(false);
 
   React.useEffect(function () {
     setSelectedCube(props.cubes[0]);
   }, [props.cubes]);
 
-  const handleMenuItemClick = (cube_id) => {
+  const handleCubeMenuItemClick = (cube_id) => {
     const clickedCube = props.cubes.find(function (cube) {
       return cube._id === cube_id;
     });
     setSelectedCube(clickedCube);
-    setAnchorEl(null);
+    setCubeAnchorEl(null);
   };
 
-  async function submitDraftForm () {
+  const handleEventMenuItemClick = (event_type) => {
+    setEventType(event_type);
+    setEventAnchorEl(null);
+  };
+
+  async function submitEventForm () {
     let formInputs = {};
     formInputs.cards_per_pack = parseInt(document.getElementById('cards-per-pack').value);
     formInputs.cube = selectedCube._id;
-    formInputs.name = document.getElementById('draft-name').value;
-    formInputs.packs_per_drafter = parseInt(document.getElementById('packs-per-drafter').value);
+    formInputs.event_type = eventType;
+    formInputs.name = document.getElementById('event-name').value;
+    formInputs.packs_per_player = parseInt(document.getElementById('packs-per-player').value);
 
-    const otherDraftersElements = document.getElementsByClassName('other-drafters');
-    let otherDraftersIds = [];
+    const otherPlayersElements = document.getElementsByClassName('other-players');
+    let otherPlayersIds = [];
 
-    for (let drafter of otherDraftersElements) {
-      if (drafter.checked) {
-        otherDraftersIds.push(drafter.value);
+    for (let player of otherPlayersElements) {
+      if (player.checked) {
+        otherPlayersIds.push(player.value);
       }
     }
-    formInputs['other_drafters[]'] = otherDraftersIds;
+    formInputs['other_players[]'] = otherPlayersIds;
 
     const moduleElements = document.getElementsByClassName('modules');
     let moduleIds = [];
@@ -101,7 +109,7 @@ const UserDraftCard = (props) => {
 
     try {
       const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/draft`,
+        `${process.env.REACT_APP_BACKEND_URL}/event`,
         'POST',
         JSON.stringify(formInputs),
         {
@@ -109,7 +117,7 @@ const UserDraftCard = (props) => {
           'Content-Type': 'application/json'
         }
       );
-      history.push(`/draft/${responseData._id}`);
+      history.push(`/event/${responseData._id}`);
     } catch (error) {
       console.log({ 'Error': error.message });
     }
@@ -118,30 +126,30 @@ const UserDraftCard = (props) => {
   return (
     <React.Fragment>
       <MUICard>
-        <MUICardHeader title={<MUITypography variant="h3">Drafts</MUITypography>} />
+        <MUICardHeader title={<MUITypography variant="h3">Events</MUITypography>} />
         <MUICardContent>
           <MUITableContainer className={props.classes.tableContainer}>
             <MUITable stickyHeader className={props.classes.table}>
               <MUITableHead className={props.classes.tableHead}>
                 <MUITableRow>
-                  <MUITableCell>Draft Name</MUITableCell>
+                  <MUITableCell>Event Name</MUITableCell>
                   <MUITableCell>Host</MUITableCell>
                   <MUITableCell>Created On</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody className={props.classes.tableBody}>
-                {props.drafts.map(function (draft) {
+                {props.events.map(function (event) {
                   return (
-                    <MUITableRow key={draft._id}>
+                    <MUITableRow key={event._id}>
                       <MUITableCell>
-                        <Link to={`/draft/${draft._id}`}>{draft.name}</Link>
+                        <Link to={`/event/${event._id}`}>{event.name}</Link>
                       </MUITableCell>
                       <MUITableCell>
-                        <MUIAvatar alt={draft.host.name} className={props.classes.avatarSmall} src={draft.host.avatar} />
-                        <Link to ={`/account/${draft.host._id}`}>{draft.host.name}</Link>
+                        <MUIAvatar alt={event.host.name} className={props.classes.avatarSmall} src={event.host.avatar} />
+                        <Link to ={`/account/${event.host._id}`}>{event.host.name}</Link>
                       </MUITableCell>
                       <MUITableCell>
-                        {draft.createdAt}
+                        {event.createdAt}
                       </MUITableCell>
                     </MUITableRow>
                   );
@@ -152,17 +160,17 @@ const UserDraftCard = (props) => {
         </MUICardContent>
         {props.cubes && selectedCube && accountId === authentication.userId &&
           <MUICardActions className={props.classes.cardActions}>
-            <MUIButton color="primary" onClick={() => setShowDraftForm(true)} variant="contained">Start a New Draft</MUIButton>
-            <MUIDialog open={showDraftForm} onClose={() => setShowDraftForm(false)}>
-              <MUIDialogTitle>Start A New Draft</MUIDialogTitle>
+            <MUIButton color="primary" onClick={() => setShowEventForm(true)} variant="contained">Start a New Event</MUIButton>
+            <MUIDialog open={showEventForm} onClose={() => setShowEventForm(false)}>
+              <MUIDialogTitle>Start A New Event</MUIDialogTitle>
               <MUIDialogContent>
 
                 <MUITextField
                   autoComplete="off"
                   autoFocus
                   fullWidth
-                  id="draft-name"
-                  label="Draft Name"
+                  id="event-name"
+                  label="Event Name"
                   required={true}
                   type="text"
                 />
@@ -172,32 +180,67 @@ const UserDraftCard = (props) => {
                     button
                     aria-haspopup="true"
                     aria-controls="lock-menu"
-                    onClick={(event) => setAnchorEl(event.currentTarget)}
+                    onClick={(event) => setCubeAnchorEl(event.currentTarget)}
                   >
                     <MUIListItemText
-                      primary="Cube to Draft"
+                      primary="Cube to Use"
                       secondary={selectedCube.name}
                     />
                   </MUIListItem>
                 </MUIList>
                 <MUIMenu
-                  id="cube-to-draft-selector"
-                  anchorEl={anchorEl}
+                  id="cube-to-use-selector"
+                  anchorEl={cubeAnchorEl}
                   keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={() => setAnchorEl(null)}
+                  open={Boolean(cubeAnchorEl)}
+                  onClose={() => setCubeAnchorEl(null)}
                 >
                   {props.cubes.map(function (cube) {
                     return (
                       <MUIMenuItem
                         key={cube._id}
-                        onClick={() => handleMenuItemClick(cube._id)}
+                        onClick={() => handleCubeMenuItemClick(cube._id)}
                         selected={selectedCube._id === cube._id}
                       >
                         {cube.name}
                       </MUIMenuItem>
                     );
                   })}
+                </MUIMenu>
+
+                <MUIList component="nav">
+                  <MUIListItem
+                    button
+                    aria-haspopup="true"
+                    aria-controls="lock-menu"
+                    onClick={(event) => setEventAnchorEl(event.currentTarget)}
+                  >
+                    <MUIListItemText
+                      primary="Event Type"
+                      secondary={eventType}
+                    />
+                  </MUIListItem>
+                </MUIList>
+                <MUIMenu
+                  id="event-type-selector"
+                  anchorEl={eventAnchorEl}
+                  keepMounted
+                  open={Boolean(eventAnchorEl)}
+                  onClose={() => setEventAnchorEl(null)}
+                >
+                  <MUIMenuItem
+                    onClick={() => handleEventMenuItemClick('draft')}
+                    selected={eventType === 'draft'}
+                  >
+                    Draft
+                  </MUIMenuItem>
+
+                  <MUIMenuItem
+                    onClick={() => handleEventMenuItemClick('sealed')}
+                    selected={eventType === 'sealed'}
+                  >
+                    Sealed
+                  </MUIMenuItem>
                 </MUIMenu>
 
                 <MUIFormControl component="fieldset" className={classes.formControl}>
@@ -211,7 +254,7 @@ const UserDraftCard = (props) => {
                             <MUISwitch
                               inputRef={function (inputElement) {
                                 if (inputElement) {
-                                  inputElement.classList.add('other-drafters');
+                                  inputElement.classList.add('other-players');
                                 }
                               }}
                               value={bud._id}
@@ -265,9 +308,9 @@ const UserDraftCard = (props) => {
 
                 <MUITextField
                   autoComplete="off"
-                  id="packs-per-drafter"
+                  id="packs-per-player"
                   InputProps={{ inputProps: { min: 0 } }}
-                  label="Packs per Drafter"
+                  label="Packs per Player"
                   required={true}
                   type="number"
                 />
@@ -275,11 +318,11 @@ const UserDraftCard = (props) => {
               </MUIDialogContent>
               <MUIDialogActions>
 
-                <MUIButton  color="primary" onClick={() => setShowDraftForm(false)} variant="contained">
+                <MUIButton  color="primary" onClick={() => setShowEventForm(false)} variant="contained">
                   Cancel
                 </MUIButton>
 
-                <MUIButton color="primary" onClick={submitDraftForm} variant="contained">
+                <MUIButton color="primary" onClick={submitEventForm} variant="contained">
                   Create!
                 </MUIButton>
 
@@ -292,4 +335,4 @@ const UserDraftCard = (props) => {
   );
 };
 
-export default UserDraftCard;
+export default UserEventCard;

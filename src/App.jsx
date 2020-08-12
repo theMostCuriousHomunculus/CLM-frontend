@@ -14,7 +14,7 @@ import { useRequest } from './hooks/request-hook';
 const Account = React.lazy(() => import('./pages/Account'));
 const Authenticate = React.lazy(() => import('./pages/Authenticate'));
 const Cube = React.lazy(() => import('./pages/Cube'));
-const Draft = React.lazy(() => import('./pages/Draft'));
+const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
 const Resources = React.lazy(() => import('./pages/Resources'));
 
@@ -102,8 +102,8 @@ function App() {
               <Route path='/cube/:cubeId'>
                 <Cube />
               </Route>
-              <Route path='/draft/:draftId'>
-                <Draft />
+              <Route path='/event/:eventId'>
+                <Event />
               </Route>
               <Route path='/resources' exact>
                 <Resources />

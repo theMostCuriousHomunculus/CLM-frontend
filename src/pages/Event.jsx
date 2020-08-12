@@ -1,22 +1,22 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { CSVLink } from "react-csv";
 import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
+import { CSVLink } from "react-csv";
 import { makeStyles } from '@material-ui/core/styles';
+import { useParams } from 'react-router-dom';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
 import io from "socket.io-client";
-import SelectConfirmationDialogue from '../components/Draft Page/SelectConfirmationDialog';
+import SelectConfirmationDialogue from '../components/Event Page/SelectConfirmationDialog';
 
-const draftReducer = (state, action) => {
+const eventReducer = (state, action) => {
   switch (action.type) {
-    case 'UPDATE_DRAFT':
+    case 'UPDATE_EVENT':
       return {
         ...state,
         ...action.value
@@ -43,7 +43,7 @@ const useStyles = makeStyles({
   downloadLink: {
     fontSize: '1.6rem'
   },
-  draftersList: {
+  playersList: {
     padding: 8
   },
   gridContainer: {
@@ -52,24 +52,24 @@ const useStyles = makeStyles({
   }
 });
 
-const Draft = () => {
+const Event = () => {
 
   const authentication = React.useContext(AuthenticationContext);
   const { sendRequest } = useRequest();
   const classes = useStyles();
-  const draftId = useParams().draftId;
+  const eventId = useParams().eventId;
   const [dialogueDisplayed, setDialogueDisplayed] = React.useState(false);
-  const [drafterUsername, setDrafterUsername] = React.useState(undefined);
+  const [playerUsername, setPlayerUsername] = React.useState(undefined);
   const [errorMessage, setErrorMessage] = React.useState(undefined);
   const [selectedCard, setSelectedCard] = React.useState(undefined);
   const [socket, setSocket] = React.useState(undefined);
 
-  const [draftState, dispatch] = React.useReducer(draftReducer, {
-    drafters: [],
+  const [eventState, dispatch] = React.useReducer(eventReducer, {
+    players: [],
     name: '',
-    other_drafters_picks: [],
+    other_players_card_pools: [],
     pack: [],
-    picks: []
+    card_pool: []
   });
 
   React.useEffect(function () {
@@ -80,16 +80,16 @@ const Draft = () => {
         null,
         { Authorization: 'Bearer ' + authentication.token }
       );
-      setDrafterUsername(accountData.name);
+      setPlayerUsername(accountData.name);
     }
     fetchData();
-    updateDraftHandler({ action: 'UPDATE_DRAFT', value: {
-      drafters: [],
-      name: '',
-      other_drafters_picks: [],
-      pack: [],
-      picks: []
-    }});
+    // updateEventHandler({ action: 'UPDATE_EVENT', value: {
+    //   players: [],
+    //   name: '',
+    //   other_players_cards: [],
+    //   pack: [],
+    //   card_pool: []
+    // }});
     setErrorMessage(undefined);
     setSocket(io(`${process.env.REACT_APP_BACKEND_URL.replace('/api', '')}`));
   }, []);
@@ -97,33 +97,33 @@ const Draft = () => {
   React.useEffect(function () {
     if (socket) {
 
-      socket.emit('join', draftId, authentication.userId);
+      socket.emit('join', eventId, authentication.userId);
 
-      socket.on('admittance', function (draftInfo) {
-        updateDraftHandler(draftInfo);
+      socket.on('admittance', function (eventInfo) {
+        updateEventHandler(eventInfo);
       });
 
       socket.on('bounce', function (error) {
         setErrorMessage(error);
       });
 
-      socket.on('updateDraftStatus', function (draftInfo) {
-        updateDraftHandler(draftInfo);
+      socket.on('updateEventStatus', function (eventInfo) {
+        updateEventHandler(eventInfo);
       });
 
       return function () {
-        socket.emit('leave', draftId, authentication.userId);
+        socket.emit('leave', eventId, authentication.userId);
         socket.disconnect();
       }
     }
   }, [socket]);
 
-  function updateDraftHandler (data) {
-    dispatch({ type: 'UPDATE_DRAFT', value: data });
+  function updateEventHandler (data) {
+    dispatch({ type: 'UPDATE_EVENT', value: data });
   }
 
   function selectCardHandler (cardId) {
-    socket.emit('selectCard', cardId, draftId, authentication.userId);
+    socket.emit('selectCard', cardId, eventId, authentication.userId);
   }
 
   return (
@@ -137,18 +137,18 @@ const Draft = () => {
             toggleOpen={() => setDialogueDisplayed(false)}
           />
           <React.Fragment>
-            {draftState.name &&
+            {eventState.name &&
               <React.Fragment>
-                <div className={classes.draftersList}>
-                  <MUITypography variant="h2">{draftState.name}</MUITypography>
-                  {draftState.drafters.map(function (drafter) {
+                <div className={classes.playersList}>
+                  <MUITypography variant="h2">{eventState.name}</MUITypography>
+                  {eventState.players.map(function (player) {
                     return (
-                      <MUIAvatar alt={drafter.name} className={classes.avatarSmall} key={drafter.drafter} src={drafter.avatar} />
+                      <MUIAvatar alt={player.name} className={classes.avatarSmall} key={player.player} src={player.avatar} />
                     );
                   })}
                 </div>
                 <MUIGrid className={classes.gridContainer} container justify="space-between" spacing={2}>
-                  {draftState.pack.map(function (card) {
+                  {eventState.pack.map(function (card) {
                     return (
                       <MUIGrid
                         item
@@ -174,51 +174,52 @@ const Draft = () => {
                     );
                   })}
                   {// displays if the drafter who passes to this drafter has not yet made his pick
-                    draftState.pack.length === 0 &&
-                    draftState.picks.length === 0 &&
-                    <MUITypography variant="body1">
-                      Other drafters are still making their picks; yell at them to hurry up!
-                    </MUITypography>
+                    eventState.pack.length === 0 &&
+                    eventState.card_pool.length === 0 &&
+                    <MUIGrid item xs={12}>
+                      <MUITypography variant="body1">
+                        Other drafters are still making their picks; yell at them to hurry up!
+                      </MUITypography>
+                    </MUIGrid>
                   }
                   {// displays once the drafter has made all their picks
-                    draftState.picks.length > 0 &&
+                    eventState.card_pool.length > 0 &&
                     <React.Fragment>
                       <MUIGrid item xs={12}>
-                        <MUITypography variant="h3">Your Picks:</MUITypography>
                         <CSVLink
                           className={classes.downloadLink}
-                          data={draftState.picks.reduce(function (a, c) {
+                          data={eventState.card_pool.reduce(function (a, c) {
                             return c ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
                           }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                          filename={`${draftState.name + " - " + drafterUsername}.csv`}
+                          filename={`${eventState.name + " - " + playerUsername}.csv`}
                           target="_blank"
                         >
-                          Download your picks in CSV format for MTGO drafting!
+                          Download your card pool in CSV format for MTGO play!
                         </CSVLink>
-                        {draftState.other_drafters_picks.map(function (drftr) {
+                        {eventState.other_players_card_pools.map(function (plr) {
                           return (
                             <React.Fragment>
                               <br />
                               <CSVLink
                                 className={classes.downloadLink}
-                                data={drftr.picks.reduce(function (a, c) {
+                                data={plr.card_pool.reduce(function (a, c) {
                                   return c ? a + " ,1," + c + ", , , , \n" : a;
                                 }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                                filename={`${draftState.name + " - " + drftr.name}.csv`}
+                                filename={`${eventState.name + " - " + plr.name}.csv`}
                                 target="_blank"
                               >
-                                Download {drftr.name}'s picks in CSV format for MTGO drafting!
+                                Download {plr.name}'s card pool in CSV format for MTGO play!
                               </CSVLink>
                             </React.Fragment>
                           );
                         })}
                       </MUIGrid>
                       <React.Fragment>
-                        {draftState.picks.map(function (card, index) {
+                        {eventState.card_pool.map(function (card, index) {
                           return (
                             <MUIGrid
                               item
-                              key={`pick${index}`}
+                              key={`cardpool-${index}`}
                               xs={12}
                               sm={card && card.back_image ? 12 : 6}
                               md={card && card.back_image ? 8 : 4}
@@ -252,4 +253,4 @@ const Draft = () => {
   );
 };
 
-export default Draft;
+export default Event;
