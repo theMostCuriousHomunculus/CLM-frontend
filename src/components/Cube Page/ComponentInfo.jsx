@@ -64,7 +64,7 @@ const ComponentInfo = (props) => {
   React.useEffect(() => {
     setComponentName(props.componentState.active_component_name);
     setRotationSize(props.componentState.active_rotation_size);
-  }, [props.componentState.active_component_id, props.componentState.cube]);
+  }, [props.componentState.active_component_name, props.componentState.active_rotation_size]);
 
   async function addComponent (event) {
     event.preventDefault();

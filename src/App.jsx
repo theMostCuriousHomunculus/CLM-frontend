@@ -44,14 +44,7 @@ function App() {
   }, []);
 
   const logout = React.useCallback(() => {
-    removeTokensOnServer();
-    setToken(null);
-    Cookies.remove('authentication_token');
-    setUserId(null);
-    Cookies.remove('user_id');
-  }, []);
-
-  function removeTokensOnServer () {
+    // removeTokensOnServer();
     sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/logoutAll`,
       'PATCH',
       null,
@@ -60,7 +53,22 @@ function App() {
         'Content-Type': 'application/json'
       }
     );
-  }
+    setToken(null);
+    Cookies.remove('authentication_token');
+    setUserId(null);
+    Cookies.remove('user_id');
+  }, [sendRequest]);
+
+  // function removeTokensOnServer () {
+  //   sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/logoutAll`,
+  //     'PATCH',
+  //     null,
+  //     {
+  //       Authorization: 'Bearer ' + Cookies.get('authentication_token'),
+  //       'Content-Type': 'application/json'
+  //     }
+  //   );
+  // }
 
   React.useEffect(() => {
     if (Cookies.get('user_id') && Cookies.get('authentication_token')) {

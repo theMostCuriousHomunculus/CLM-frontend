@@ -2,9 +2,12 @@ import React from 'react';
 import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
+import MUICardContent from '@material-ui/core/CardContent';
+import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 import { CSVLink } from "react-csv";
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
@@ -43,8 +46,8 @@ const useStyles = makeStyles({
   downloadLink: {
     fontSize: '1.6rem'
   },
-  playersList: {
-    padding: 8
+  flexGrow: {
+    flexGrow: 1
   },
   gridContainer: {
     margin: 0,
@@ -83,16 +86,9 @@ const Event = () => {
       setPlayerUsername(accountData.name);
     }
     fetchData();
-    // updateEventHandler({ action: 'UPDATE_EVENT', value: {
-    //   players: [],
-    //   name: '',
-    //   other_players_cards: [],
-    //   pack: [],
-    //   card_pool: []
-    // }});
     setErrorMessage(undefined);
     setSocket(io(`${process.env.REACT_APP_BACKEND_URL.replace('/api', '')}`));
-  }, []);
+  }, [authentication.token, authentication.userId, sendRequest]);
 
   React.useEffect(function () {
     if (socket) {
@@ -116,7 +112,7 @@ const Event = () => {
         socket.disconnect();
       }
     }
-  }, [socket]);
+  }, [authentication.userId, eventId, socket]);
 
   function updateEventHandler (data) {
     dispatch({ type: 'UPDATE_EVENT', value: data });
@@ -139,14 +135,34 @@ const Event = () => {
           <React.Fragment>
             {eventState.name &&
               <React.Fragment>
-                <div className={classes.playersList}>
-                  <MUITypography variant="h2">{eventState.name}</MUITypography>
-                  {eventState.players.map(function (player) {
-                    return (
-                      <MUIAvatar alt={player.name} className={classes.avatarSmall} key={player.player} src={player.avatar} />
-                    );
-                  })}
-                </div>
+                <MUICard>
+                  <MUICardHeader title={<MUITypography variant="h2">{eventState.name}</MUITypography>} />
+                  <MUICardContent>
+                    <MUIGrid container justify="space-around" spacing={2}>
+                      {eventState.players.map(function (player) {
+                        return (
+                          <MUIGrid
+                            item
+                            key={player.playerId}
+                            xs={6}
+                            sm={4}
+                            md={3}
+                            lg={2}
+                            xl={1}
+                          >
+                            <Link to={`/account/${player.playerId}`}>
+                              <MUIAvatar
+                                alt={player.name}
+                                className={classes.avatarSmall}
+                                src={player.avatar}
+                              />
+                            </Link>
+                          </MUIGrid>
+                        );
+                      })}
+                    </MUIGrid>
+                  </MUICardContent>
+                </MUICard>
                 <MUIGrid className={classes.gridContainer} container justify="space-between" spacing={2}>
                   {eventState.pack.map(function (card) {
                     return (
@@ -182,7 +198,7 @@ const Event = () => {
                       </MUITypography>
                     </MUIGrid>
                   }
-                  {// displays once the drafter has made all their picks
+                  {// displays once the drafter has made all their picks (or immediately if it is a sealed event)
                     eventState.card_pool.length > 0 &&
                     <React.Fragment>
                       <MUIGrid item xs={12}>
@@ -198,7 +214,7 @@ const Event = () => {
                         </CSVLink>
                         {eventState.other_players_card_pools.map(function (plr) {
                           return (
-                            <React.Fragment>
+                            <React.Fragment key={plr.playerId}>
                               <br />
                               <CSVLink
                                 className={classes.downloadLink}

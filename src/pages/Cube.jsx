@@ -67,7 +67,7 @@ const Cube = () => {
       }
     };
     fetchCube();
-  }, []);
+  }, [cubeId, sendRequest]);
 
   async function addCard (chosenCard) {
     delete chosenCard.art_crop;

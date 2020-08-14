@@ -78,9 +78,23 @@ const Account = () => {
   const [events, setEvents] = React.useState([]);
   const [user, setUser] = React.useState({});
 
+  const fetchAccount = React.useCallback(async function() {
+    try {
+      const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
+      const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
+      setUser(accountData);
+      const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creator=${accountId}`, 'GET', null, {});
+      setCubes(cubeData.cubes);
+      const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?player=${accountId}`, 'GET', null, {});
+      setEvents(eventData.events);
+    } catch (error) {
+      console.log('Error: ' + error.message);
+    }
+  }, [accountId, authentication.token, sendRequest]);
+
   React.useEffect(() => {
     fetchAccount();
-  }, [accountId, authentication.token]);
+  }, [fetchAccount]);
 
   async function changeAvatar (chosenCard) {
     try {
@@ -120,20 +134,6 @@ const Account = () => {
     );
     fetchAccount();
   }
-
-  async function fetchAccount () {
-    try {
-      const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
-      const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
-      setUser(accountData);
-      const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creator=${accountId}`, 'GET', null, {});
-      setCubes(cubeData.cubes);
-      const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?player=${accountId}`, 'GET', null, {});
-      setEvents(eventData.events);
-    } catch (error) {
-      console.log('Error: ' + error.message);
-    }
-  };
 
   async function sendBudRequest (event) {
     let formData = {
