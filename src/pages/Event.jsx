@@ -205,7 +205,7 @@ const Event = () => {
                         <CSVLink
                           className={classes.downloadLink}
                           data={eventState.card_pool.reduce(function (a, c) {
-                            return c ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
+                            return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
                           }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
                           filename={`${eventState.name + " - " + playerUsername}.csv`}
                           target="_blank"
@@ -219,7 +219,7 @@ const Event = () => {
                               <CSVLink
                                 className={classes.downloadLink}
                                 data={plr.card_pool.reduce(function (a, c) {
-                                  return c ? a + " ,1," + c + ", , , , \n" : a;
+                                  return c && c.mtgo_id ? a + " ,1," + c + ", , , , \n" : a;
                                 }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
                                 filename={`${eventState.name + " - " + plr.name}.csv`}
                                 target="_blank"
