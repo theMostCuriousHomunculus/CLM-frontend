@@ -77,13 +77,17 @@ const Event = () => {
 
   React.useEffect(function () {
     async function fetchData () {
-      const accountData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/account/${authentication.userId}`,
-        'GET',
-        null,
-        { Authorization: 'Bearer ' + authentication.token }
-      );
-      setPlayerUsername(accountData.name);
+      try {
+        const accountData = await sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/account/${authentication.userId}`,
+          'GET',
+          null,
+          { Authorization: 'Bearer ' + authentication.token }
+        );
+        setPlayerUsername(accountData.name);
+      } catch (error) {
+        console.log(error);
+      }
     }
     fetchData();
     setErrorMessage(undefined);
