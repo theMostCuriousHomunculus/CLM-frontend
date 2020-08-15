@@ -1,9 +1,11 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIGrid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 import { ReactComponent as WhiteManaSymbol } from '../../images/white-mana-symbol.svg';
 import { ReactComponent as BlueManaSymbol } from '../../images/blue-mana-symbol.svg';
@@ -35,40 +37,42 @@ const useStyles = makeStyles({
 
 const ColorCheckboxes = (props) => {
 
+  const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
+  const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
   const classes = useStyles();
-  const [whiteChecked, setWhiteChecked] = React.useState(props.color_identity.includes("W"));
-  const [blueChecked, setBlueChecked] = React.useState(props.color_identity.includes("U"));
-  const [blackChecked, setBlackChecked] = React.useState(props.color_identity.includes("B"));
-  const [redChecked, setRedChecked] = React.useState(props.color_identity.includes("R"));
-  const [greenChecked, setGreenChecked] = React.useState(props.color_identity.includes("G"));
+  // const [whiteChecked, setWhiteChecked] = React.useState(props.color_identity.includes("W"));
+  // const [blueChecked, setBlueChecked] = React.useState(props.color_identity.includes("U"));
+  // const [blackChecked, setBlackChecked] = React.useState(props.color_identity.includes("B"));
+  // const [redChecked, setRedChecked] = React.useState(props.color_identity.includes("R"));
+  // const [greenChecked, setGreenChecked] = React.useState(props.color_identity.includes("G"));
 
   const colorObj = {
     "W": {
       "icon": <WhiteManaSymbol className={classes.manaSymbol} />,
-      "state": whiteChecked,
-      "updater": setWhiteChecked
+      "state": /*whiteChecked*/props.color_identity.includes("W"),
+      // "updater": setWhiteChecked
     },
     "U": {
       "icon": <BlueManaSymbol className={classes.manaSymbol} />,
-      "state": blueChecked,
-      "updater": setBlueChecked
+      "state": /*blueChecked*/props.color_identity.includes("U"),
+      // "updater": setBlueChecked
     },
     "B": {
       "icon": <BlackManaSymbol className={classes.manaSymbol} />,
-      "state": blackChecked,
-      "updater": setBlackChecked
+      "state": /*blackChecked*/props.color_identity.includes("B"),
+      // "updater": setBlackChecked
     },
     "R": {
       "icon": <RedManaSymbol className={classes.manaSymbol} />,
-      "state": redChecked,
-      "updater": setRedChecked
+      "state": /*redChecked*/props.color_identity.includes("R"),
+      // "updater": setRedChecked
     },
     "G": {
       "icon": <GreenManaSymbol className={classes.manaSymbol} />,
-      "state": greenChecked,
-      "updater": setGreenChecked
+      "state": /*greenChecked*/props.color_identity.includes("G"),
+      // "updater": setGreenChecked
     }
   };
 
@@ -81,16 +85,15 @@ const ColorCheckboxes = (props) => {
       if (key !== color && value.state) color_identity.push(key);
     }
 
-    colorObj[color]['updater'](!colorObj[color]['state']);
+    // colorObj[color]['updater'](!colorObj[color]['state']);
 
     try {
-
       const cardChanges = JSON.stringify({
         action: 'edit_card',
         card_id: props.card_id,
         color_identity: color_identity.sort(),
-        component: props.active_component_id,
-        cube_id: props.cube_id
+        component: /*props*/cubeState.active_component_id,
+        cube_id: /*props.cube_id*/cubeId
       });
       const updatedCube = await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/cube/`,
@@ -101,10 +104,11 @@ const ColorCheckboxes = (props) => {
           'Content-Type': 'application/json'
         }
       );
-      props.updateCubeHandler(updatedCube);
+      // props.updateCubeHandler(updatedCube);
+      dispatch('UPDATE_CUBE', updatedCube);
 
     } catch (error) {
-      console.log({ 'Error': error.message });
+      console.log(error);
     }
   }
   

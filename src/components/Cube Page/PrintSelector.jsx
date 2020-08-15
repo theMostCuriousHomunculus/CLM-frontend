@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import MUICircularProgress from '@material-ui/core/CircularProgress';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
@@ -7,11 +8,14 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 
 const PrintSelector = (props) => {
 
+  const cubeId = useParams().cubeId
   const authentication = React.useContext(AuthenticationContext);
+  const dispatch = useCube(false)[1];
   const { loading, sendRequest } = useRequest();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -32,7 +36,7 @@ const PrintSelector = (props) => {
     const cardChanges = JSON.stringify({
       action: 'edit_card',
       card_id: props.card._id,
-      cube_id: props.cube_id,
+      cube_id: cubeId,
       ...cardDetails,
       ...availablePrintings[index]
     });
@@ -45,7 +49,7 @@ const PrintSelector = (props) => {
         'Content-Type': 'application/json'
       }
     );
-    props.updateCubeHandler(updatedCube);
+    dispatch('UPDATE_CUBE', updatedCube);
   };
 
   async function enablePrintChange (event) {
@@ -74,7 +78,7 @@ const PrintSelector = (props) => {
       });
       setAvailablePrintings(printings);
     } catch (error) {
-      console.log({ 'Error': error.message });
+      console.log(error);
     }
   }
 

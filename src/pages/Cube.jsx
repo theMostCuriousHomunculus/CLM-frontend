@@ -4,7 +4,6 @@ import MUICard from '@material-ui/core/Card';
 
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
-import cubeReducer from '../functions/cube-reducer';
 import CurveView from '../components/Cube Page/CurveView';
 import HoverPreview from '../components/Cube Page/HoverPreview';
 import ListView from '../components/Cube Page/ListView';
@@ -12,25 +11,16 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
+import { useCube } from '../hooks/cube-hook';
 import { useRequest } from '../hooks/request-hook';
 
 const Cube = () => {
 
-  const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
+  const cubeId = useParams().cubeId;
   const [loading, setLoading] = React.useState(true);
+  const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
-
-  const [componentState, dispatch] = React.useReducer(cubeReducer, {
-    active_component_cards: [],
-    active_component_id: 'mainboard',
-    active_component_name: 'Mainboard',
-    active_rotation_size: undefined,
-    active_component_type: 'mainboard',
-    cube: null,
-    displayed_cards: [],
-    filter: ''
-  });
 
   const [creator, setCreator] = React.useState(null);
   const [preview, setPreview] = React.useState({
@@ -42,34 +32,21 @@ const Cube = () => {
     right: undefined,
     top: 0
   });
-  const [viewMode, setViewMode] = React.useState('Table View');
-
-  const filterCardsHandler = React.useCallback(function (event) {
-    dispatch({ type: 'FILTER_CARDS', value: event.target.value });
-  }, []);
-
-  const updateCubeHandler = React.useCallback(function (cube) {
-    dispatch({ type: 'UPDATE_CUBE', value: cube });
-  }, []);
-
-  const switchComponentHandler = React.useCallback(function (component_id) {
-    dispatch({ type: 'SWITCH_COMPONENT', value: component_id });
-  }, []);
 
   React.useEffect(() => {
     const fetchCube = async function () {
       try {
         const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, 'GET', null, {});
-        updateCubeHandler(cubeData);
+        dispatch('UPDATE_CUBE', cubeData);
         const creatorData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${cubeData.creator}`, 'GET', null, {});
         setCreator(creatorData);
       } catch (error) {
-        console.log('Error: ' + error.message);
+        console.log(error);
       }
       setLoading(false);
     };
     fetchCube();
-  }, [cubeId, sendRequest, updateCubeHandler]);
+  }, [cubeId, dispatch, sendRequest]);
 
   async function addCard (chosenCard) {
     delete chosenCard.art_crop;
@@ -77,7 +54,7 @@ const Cube = () => {
       const cardData = JSON.stringify({
         ...chosenCard,
         action: 'add_card',
-        component: componentState.active_component_id,
+        component: cubeState.active_component_id,
         cube_id: cubeId
       });
 
@@ -90,7 +67,7 @@ const Cube = () => {
           'Content-Type': 'application/json'
         }
       );
-      updateCubeHandler(updatedCube);
+      dispatch('UPDATE_CUBE', updatedCube);
 
     } catch (error) {
       console.log({ 'Error': error.message });
@@ -142,64 +119,44 @@ const Cube = () => {
     <React.Fragment>
       {loading ?
         <LoadingSpinner /> :
-        <div onMouseMove={movePreview}>
+        <React.Fragment>
 
-          <HoverPreview
-            {...preview}
-          />
-
-          {componentState.cube &&
-            creator &&
-            <CubeInfo creator={creator} cube={componentState.cube} />
+          {creator &&
+            <CubeInfo creator={creator} />
           }
 
-          {componentState.cube &&
-            <React.Fragment>
-              <ComponentInfo
-                componentId={componentState.active_component_id}
-                componentName={componentState.active_component_name}
-                componentType={componentState.active_component_type}
-                rotationSize={componentState.active_rotation_size}
-                switchComponentHandler={switchComponentHandler}
-                setViewMode={setViewMode}
-                filterCardsHandler={filterCardsHandler}
-                updateCubeHandler={updateCubeHandler}
-                viewMode={viewMode}
+          <ComponentInfo />
+          {authentication.userId === cubeState.cube.creator &&
+            <MUICard>
+              <ScryfallRequest
+                buttonText="Add it!"
+                labelText={`Add a card to ${cubeState.active_component_name}`}
+                onSubmit={addCard}
               />
-              {authentication.userId === componentState.cube.creator &&
-                <MUICard>
-                  <ScryfallRequest
-                    buttonText="Add it!"
-                    labelText={`Add a card to ${componentState.active_component_name}`}
-                    onSubmit={addCard}
-                  />
-                </MUICard>
-              }
-              {viewMode === 'Curve View' &&
-                <CurveView
-                  componentState={componentState}
-                  hidePreview={hidePreview}
-                  showPreview={showPreview}
-                />
-              }
-              {viewMode === 'List View' &&
-                <ListView
-                  componentState={componentState}
-                  hidePreview={hidePreview}
-                  showPreview={showPreview}
-                  updateCubeHandler={updateCubeHandler}
-                />
-              }
-              {viewMode === 'Table View' &&
-                <TableView
-                  componentState={componentState}
-                  hidePreview={hidePreview}
-                  showPreview={showPreview}
-                />
-              }
-            </React.Fragment>
+            </MUICard>
           }
-        </div>
+          <div onMouseMove={movePreview}>
+            <HoverPreview {...preview} />
+            {cubeState.view_mode === 'Curve' &&
+              <CurveView
+                hidePreview={hidePreview}
+                showPreview={showPreview}
+              />
+            }
+            {cubeState.view_mode === 'List' &&
+              <ListView
+                hidePreview={hidePreview}
+                showPreview={showPreview}
+              />
+            }
+            {cubeState.view_mode === 'Table' &&
+              <TableView
+                hidePreview={hidePreview}
+                showPreview={showPreview}
+              />
+            }
+          </div>
+        </React.Fragment>
       }
     </React.Fragment>
   );

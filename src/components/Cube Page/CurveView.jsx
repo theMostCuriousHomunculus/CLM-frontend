@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import alphabeticalSort from '../../functions/alphabetical-sort';
 import cardType from '../../functions/card-type';
 import { monoColors, multiColors } from '../../constants/color-objects';
+import { useCube } from '../../hooks/cube-hook';
 
 const black = monoColors.find((color) => color.name === "Black").hex;
 const blue = monoColors.find((color) => color.name === "Blue").hex;
@@ -83,12 +84,14 @@ const useStyles = makeStyles({
 
 const CubeView = (props) => {
 
+  console.log('render');
+  const cubeState = useCube(true)[0];
   const classes = useStyles();
 
   return (
     <div className={classes.curveViewMainContainer}>
       {[...monoColors, ...multiColors].map(function (color) {
-        const cards_color = props.componentState.displayed_cards.filter(function (card) {
+        const cards_color = cubeState.displayed_cards.filter(function (card) {
           return card.color_identity.toString() === color.color_identity;
         });
         return (

@@ -19,8 +19,9 @@ import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
-import { AuthenticationContext } from '../../contexts/authentication-context';
 import theme from '../../theme';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
@@ -80,23 +81,19 @@ const useStyles = makeStyles({
   }
 });
 
-const ComponentInfo = React.memo((props) => {
+const ComponentInfo = React.memo(() => {
 
   const cubeId = useParams().cubeId;
-  const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
-  const [componentName, setComponentName] = React.useState(props.componentName);
-  const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
-  const [newComponentName, setNewComponentName] = React.useState('');
-  const [rotationSize, setRotationSize] = React.useState(props.rotationSize);
-  const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
-  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
+
+  const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
 
-  React.useEffect(() => {
-    setComponentName(props.componentName);
-    setRotationSize(props.rotationSize);
-  }, [props.componentName, props.rotationSize]);
+  const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
+  const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
+  const [newComponentName, setNewComponentName] = React.useState('');
+  const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
+  const authentication = React.useContext(AuthenticationContext);
 
   async function addComponent () {
     const action = document.getElementById('module').checked ? 'add_module' : 'add_rotation';
@@ -117,7 +114,7 @@ const ComponentInfo = React.memo((props) => {
           'Content-Type': 'application/json'
         }
       );
-      props.updateCubeHandler(updatedCube);
+      dispatch('UPDATE_CUBE', updatedCube);
 
       let component_id;
       if (action === 'add_module') {
@@ -127,7 +124,7 @@ const ComponentInfo = React.memo((props) => {
       }
 
       setDialogIsOpen(false);
-      props.switchComponentHandler(component_id);
+      dispatch('SWITCH_COMPONENT', component_id);
 
     } catch (error) {
       console.log(error);
@@ -135,10 +132,10 @@ const ComponentInfo = React.memo((props) => {
   }
 
   async function deleteComponent () {
-    const action = props.componentType === 'module' ? 'delete_module' : 'delete_rotation';
+    const action = cubeState.active_component_type === 'module' ? 'delete_module' : 'delete_rotation';
     const deleteInfo = JSON.stringify({
       action: action,
-      component: props.componentId,
+      component: cubeState.active_component_id,
       cube_id: cubeId
     });
     const updatedCube = await sendRequest(
@@ -150,27 +147,27 @@ const ComponentInfo = React.memo((props) => {
         'Content-Type': 'application/json'
       }
     );
-    props.updateCubeHandler(updatedCube);
+    dispatch('UPDATE_CUBE', updatedCube);
   }
 
   const handleMenuItemClickComponent = (component_id) => {
-    props.switchComponentHandler(component_id);
+    dispatch('SWITCH_COMPONENT', component_id);
     setComponentAnchorEl(null);
   };
 
   const handleMenuItemClickView = (event) => {
-    props.setViewMode(event.target.textContent);
+    dispatch('SWITCH_VIEW_MODE', event.target.textContent);
     setViewAnchorEl(null);
   };
 
   async function submitComponentChanges () {
-    const action = props.componentType === 'module' ? 'edit_module' : 'edit_rotation';
+    const action = cubeState.active_component_type === 'module' ? 'edit_module' : 'edit_rotation';
     const componentChanges = JSON.stringify({
       action: action,
-      component: props.componentId,
+      component: cubeState.active_component_id,
       cube_id: cubeId,
-      name: componentName,
-      size: rotationSize
+      name: cubeState.active_component_name,
+      size: cubeState.active_rotation_size
     });
     const updatedCube = await sendRequest(
       `${process.env.REACT_APP_BACKEND_URL}/cube`,
@@ -181,26 +178,25 @@ const ComponentInfo = React.memo((props) => {
         'Content-Type': 'application/json'
       }
     );
-    props.updateCubeHandler(updatedCube);
+    dispatch('UPDATE_CUBE', updatedCube);
   }
 
   return (
     <MUICard>
       <MUICardHeader
         className={classes.cardHeader}
-        title={(authentication.userId === props.componentState.cube.creator &&
-          props.componentType !== 'mainboard' &&
-          props.componentType !== 'sideboard') ?
+        title={(authentication.userId === cubeState.cube.creator &&
+          cubeState.active_component_type !== 'builtIn') ?
           <MUITextField
             autoComplete="off"
             inputProps={{ onBlur: submitComponentChanges }}
             label="Active Component"
-            onChange={(event) => setComponentName(event.target.value)}
+            onChange={(event) => dispatch('CHANGE_COMPONENT_NAME', event.target.value)}
             type="text"
-            value={componentName}
+            value={cubeState.active_component_name}
             variant="outlined"
           /> :
-          <MUITypography variant="h3">{props.componentName}</MUITypography>
+          <MUITypography variant="h3">{cubeState.active_component_name}</MUITypography>
         }
         action={
           <React.Fragment>
@@ -214,7 +210,7 @@ const ComponentInfo = React.memo((props) => {
                 >
                   <MUIListItemText
                     primary="Switch Component"
-                    secondary={componentName}
+                    secondary={cubeState.active_component_name}
                   />
                 </MUIListItem>
               </MUIList>
@@ -227,10 +223,10 @@ const ComponentInfo = React.memo((props) => {
               >
                 {[{ name: 'Mainboard', _id: 'mainboard' },
                   { name: 'Sideboard', _id: 'sideboard' },
-                  ...props.componentState.cube.modules.map(function (module) {
+                  ...cubeState.cube.modules.map(function (module) {
                     return { name: module.name, _id: module._id };
                   }),
-                  ...props.componentState.cube.rotations.map(function (rotation) {
+                  ...cubeState.cube.rotations.map(function (rotation) {
                     return { name: rotation.name, _id: rotation._id };
                   })].map((component) => (
                     <MUIMenuItem
@@ -254,7 +250,7 @@ const ComponentInfo = React.memo((props) => {
                 >
                   <MUIListItemText
                     primary="View Mode"
-                    secondary={props.viewMode}
+                    secondary={cubeState.view_mode}
                   />
                 </MUIListItem>
               </MUIList>
@@ -265,11 +261,11 @@ const ComponentInfo = React.memo((props) => {
                 open={Boolean(viewAnchorEl)}
                 onClose={() => setViewAnchorEl(null)}
               >
-                {["Curve View", "List View", "Table View"].map((option) => (
+                {["Curve", "List", "Table"].map((option) => (
                   <MUIMenuItem
                     key={option}
                     onClick={handleMenuItemClickView}
-                    selected={option === props.viewMode}
+                    selected={option === cubeState.view_mode}
                   >
                     {option}
                   </MUIMenuItem>
@@ -281,7 +277,7 @@ const ComponentInfo = React.memo((props) => {
       />
 
       <MUICardContent className={classes.cardContent}>
-        {authentication.userId === props.componentState.cube.creator &&
+        {authentication.userId === cubeState.cube.creator &&
           <React.Fragment>
             <MUIButton
               color="primary"
@@ -346,47 +342,46 @@ const ComponentInfo = React.memo((props) => {
           </React.Fragment>
         }
 
-        {props.componentType === 'rotation' &&
-          (authentication.userId === props.componentState.cube.creator ?
+        {cubeState.active_component_type === 'rotation' &&
+          (authentication.userId === cubeState.cube.creator ?
           <MUITextField
             className={classes.rotationSizeField}
             label="Size"
-            inputProps={{ max: props.componentState.active_component_cards.length, min: 0, step: 1 }}
+            inputProps={{ max: cubeState.active_component_cards.length, min: 0, step: 1 }}
             onBlur={submitComponentChanges}
-            onChange={(event) => setRotationSize(event.target.value)}
+            onChange={(event) => dispatch('CHANGE_ROTATION_SIZE', event.target.value)}
             type="number"
-            value={rotationSize}
+            value={cubeState.active_rotation_size}
             variant="outlined"
           /> :
-          <MUITypography variant="h4">Rotation Size: {props.rotationSize}</MUITypography>)
+          <MUITypography variant="h4">Rotation Size: {cubeState.active_rotation_size}</MUITypography>)
         }
 
-        {authentication.userId === props.componentState.cube.creator &&
-          props.componentType !== 'mainboard' &&
-          props.componentType !== 'sideboard' &&
+        {authentication.userId === cubeState.cube.creator &&
+          cubeState.active_component_type !== 'builtIn' &&
           <MUIButton
             className={classes.warningButton}
             onClick={deleteComponent}
             startIcon={<MUIDeleteForeverIcon />}
             variant="contained"
           >
-            Delete this {props.componentType === 'module' ? 'Module' : 'Rotation'}
+            Delete this {cubeState.active_component_type === 'module' ? 'Module' : 'Rotation'}
           </MUIButton>
         }
       </MUICardContent>
 
       <MUICardActions className={classes.cardActions}>
         <MUITypography variant="h4">
-          Matches: <strong>{props.componentState.displayed_cards.length}</strong>
+          Matches: <strong>{cubeState.displayed_cards.length}</strong>
         </MUITypography>
         <MUITextField
           autoComplete="off"
           fullWidth
           id="search-filter"
           label="Filter by keywords, name or type"
-          onChange={props.filterCardsHandler}
+          onChange={(event) => dispatch('FILTER_CARDS', event.target.value)}
           type="text"
-          value={props.componentState.filter}
+          value={cubeState.filter}
           variant="outlined"
         />
       </MUICardActions>

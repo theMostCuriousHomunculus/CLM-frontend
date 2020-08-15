@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import MUICard from '@material-ui/core/Card';
 import MUITable from '@material-ui/core/Table';
 import MUITableBody from '@material-ui/core/TableBody';
@@ -15,6 +16,7 @@ import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { monoColors, multiColors } from '../../constants/color-objects';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
+import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
@@ -45,8 +47,10 @@ const useStyles = makeStyles({
 
 const ListView = (props) => {
 
+  const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
+  const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
 
   async function moveDeleteCard (event) {
@@ -56,8 +60,8 @@ const ListView = (props) => {
     const moveInfo = JSON.stringify({
       action,
       card_id,
-      component: props.componentState.active_component_id,
-      cube_id: props.componentState.cube._id,
+      component: cubeState.active_component_id,
+      cube_id: cubeId,
       destination
     });
     const updatedCube = await sendRequest(
@@ -69,7 +73,7 @@ const ListView = (props) => {
         'Content-Type': 'application/json'
       }
     );
-    props.updateCubeHandler(updatedCube);
+    dispatch('UPDATE_CUBE', updatedCube);
   }
 
   async function submitCardChange (event) {
@@ -79,8 +83,8 @@ const ListView = (props) => {
     let cardChanges = {
       action,
       card_id,
-      component: props.componentState.active_component_id,
-      cube_id: props.componentState.cube._id
+      component: cubeState.active_component_id,
+      cube_id: cubeId
     };
     cardChanges[property_name] = event.target.value;
     cardChanges = JSON.stringify(cardChanges);
@@ -93,7 +97,7 @@ const ListView = (props) => {
         'Content-Type': 'application/json'
       }
     );
-    props.updateCubeHandler(updatedCube);
+    dispatch('UPDATE_CUBE', updatedCube);
   }
 
   return (
@@ -112,7 +116,7 @@ const ListView = (props) => {
             </MUITableRow>
           </MUITableHead>
           <MUITableBody className={classes.body}>
-            {alphabeticalSort(props.componentState.displayed_cards).map(function (card) {
+            {alphabeticalSort(cubeState.displayed_cards).map(function (card) {
               return (
                 <MUITableRow key={card._id}>
                   <MUITableCell
@@ -126,13 +130,10 @@ const ListView = (props) => {
                     {card.name}
                   </MUITableCell>
                   <MUITableCell className={classes.tableCell}>
-                    {props.componentState.cube.creator === authentication.userId ?
+                    {cubeState.cube.creator === authentication.userId ?
                       <ColorCheckboxes
-                        active_component_id={props.componentState.active_component_id}
                         color_identity={card.color_identity}
                         card_id={card._id}
-                        cube_id={props.componentState.cube._id}
-                        updateCubeHandler={props.updateCubeHandler}
                       />
                       :
                       <React.Fragment>
@@ -143,16 +144,16 @@ const ListView = (props) => {
                     }
                   </MUITableCell>
                   <MUITableCell className={classes.tableCell}>
-                    {props.componentState.cube.creator === authentication.userId ?
+                    {cubeState.cube.creator === authentication.userId ?
                       <input
                         data-card_id={card._id}
+                        defaultValue={card.cmc}
                         max="16"
                         min="0"
                         name="cmc"
-                        onChange={submitCardChange}
+                        onBlur={submitCardChange}
                         step="1"
                         type="number"
-                        value={card.cmc}
                       /> :
                       <React.Fragment>
                         {card.cmc}
@@ -160,13 +161,13 @@ const ListView = (props) => {
                     }
                   </MUITableCell>
                   <MUITableCell className={classes.tableCell}>
-                    {props.componentState.cube.creator === authentication.userId ?
+                    {cubeState.cube.creator === authentication.userId ?
                       <input
                         data-card_id={card._id}
+                        defaultValue={card.type_line}
                         name="type_line"
-                        onChange={submitCardChange}
+                        onBlur={submitCardChange}
                         type="text"
-                        value={card.type_line}
                       /> :
                       <React.Fragment>
                         {card.type_line}
@@ -174,33 +175,32 @@ const ListView = (props) => {
                     }
                   </MUITableCell>
                   <MUITableCell className={classes.tableCell}>
-                    {props.componentState.cube.creator === authentication.userId ?
+                    {cubeState.cube.creator === authentication.userId ?
                       <select
                         data-card_id={card._id}
                         onChange={moveDeleteCard}
-                        value={props.componentState.active_component_id}
+                        value={cubeState.active_component_id}
                       >
                         <option value='mainboard'>Mainboard</option>
                         <option value='sideboard'>Sideboard</option>
-                        {props.componentState.cube.modules.map(function (module) {
+                        {cubeState.cube.modules.map(function (module) {
                           return <option key={module._id} value={module._id}>{module.name}</option>;
                         })}
-                        {props.componentState.cube.rotations.map(function (rotation) {
+                        {cubeState.cube.rotations.map(function (rotation) {
                           return <option key={rotation._id} value={rotation._id}>{rotation.name}</option>;
                         })}
                         <option value='delete'>Delete From Cube</option>
                       </select> :
                       <React.Fragment>
-                        {props.componentState.active_component_name}
+                        {cubeState.active_component_name}
                       </React.Fragment>
                     }
                   </MUITableCell>
                   <MUITableCell className={classes.tableCell}>
-                    {props.componentState.cube.creator === authentication.userId ?
+                    {cubeState.cube.creator === authentication.userId ?
                       <PrintSelector
                         card={card}
-                        cube_id={props.componentState.cube._id}
-                        updateCubeHandler={props.updateCubeHandler}
+                        cube_id={cubeId}
                       /> :
                       <React.Fragment>
                         {card.printing}

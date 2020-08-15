@@ -9,6 +9,7 @@ import alphabeticalSort from '../../functions/alphabetical-sort';
 import cardType from '../../functions/card-type';
 import theme from '../../theme';
 import { monoColors, multiColors } from '../../constants/color-objects';
+import { useCube } from '../../hooks/cube-hook';
 
 const useStyles = makeStyles({
   basicCard: {
@@ -64,14 +65,14 @@ const useStyles = makeStyles({
 const TableView = (props) => {
 
   const classes = useStyles();
-
+  const cubeState = useCube(true)[0];
   const costs = [0, 1, 2, 3, 4, 5, 6, 7];
 
   return (
     <div className={classes.tableViewMainContainer}>
       <React.Fragment>
         {monoColors.map(function (color) {
-          const cards_color = props.componentState.displayed_cards.filter(function (card) {
+          const cards_color = cubeState.displayed_cards.filter(function (card) {
             return card.color_identity.toString() === color.color_identity;
           });
           return (
@@ -134,7 +135,7 @@ const TableView = (props) => {
           <MUICardHeader title={<MUITypography variant="h3">Multicolor</MUITypography>} />
           <MUICardContent>
             {multiColors.map(function (color) {
-              const cards_color = props.componentState.displayed_cards.filter(function (card) {
+              const cards_color = cubeState.displayed_cards.filter(function (card) {
                 return card.color_identity.toString() === color.color_identity;
               });
               return (
