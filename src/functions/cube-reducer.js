@@ -24,10 +24,10 @@ export default function cubeReducer (state, action) {
 
       module = state.cube.modules.find(function (module) {
         return module._id === action.value;
-      });;
+      });
       rotation = state.cube.rotations.find(function (rotation) {
         return rotation._id === action.value;
-      });;
+      });
 
       if (action.value === 'mainboard') {
         active_component_cards = state.cube.mainboard;
@@ -57,9 +57,7 @@ export default function cubeReducer (state, action) {
         active_component_name,
         active_rotation_size,
         active_component_type,
-        cube: state.cube,
-        displayed_cards,
-        filter: state.filter
+        displayed_cards
       };
 
     case 'UPDATE_CUBE':
@@ -100,14 +98,14 @@ export default function cubeReducer (state, action) {
       active_rotation_size = rotation ? rotation.size : undefined;
 
       return {
+        ...state,
         active_component_cards,
         active_component_id,
         active_component_name,
         active_rotation_size,
         active_component_type,
         cube: action.value,
-        displayed_cards,
-        filter: state.filter
+        displayed_cards
       };
 
     default:

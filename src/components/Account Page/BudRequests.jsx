@@ -12,8 +12,9 @@ import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import alphabeticalSort from '../../functions/alphabetical-sort';
 import theme from '../../theme';
+import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
@@ -78,7 +79,7 @@ const BudRequests = (props) => {
           <MUICardHeader title={<MUITypography variant="h3">Aspiring Buds</MUITypography>} />
           <MUIList>
             {props.user.received_bud_requests &&
-              props.user.received_bud_requests.map(function (request) {
+              alphabeticalSort(props.user.received_bud_requests).map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
                     {request.avatar &&
@@ -117,7 +118,7 @@ const BudRequests = (props) => {
           <MUICardHeader title={<MUITypography variant="h3">Pending Buds</MUITypography>}/>
           <MUIList>
             {props.user.sent_bud_requests &&
-              props.user.sent_bud_requests.map(function (request) {
+              alphabeticalSort(props.user.sent_bud_requests).map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
                     {request.avatar &&

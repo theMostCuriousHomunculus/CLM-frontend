@@ -24,9 +24,8 @@ const SelectConfirmationDialogue = (props) => {
     <MUIDialog
       open={props.open}
       onClose={props.toggleOpen}
-      aria-labelledby="alert-dialog-title"
     >
-      <MUIDialogTitle id="alert-dialog-title">{`Are you sure you want to draft ${props.card ? props.card.name : null}?`}</MUIDialogTitle>
+      <MUIDialogTitle>{`Are you sure you want to draft ${props.card ? props.card.name : null}?`}</MUIDialogTitle>
       <MUIDialogContent className={classes.dialogueContent}>
         <img alt={props.card ? props.card.name : null} className={classes.cardImage} src={props.card ? props.card.image : null} />
         {props.card && props.card.back_image &&

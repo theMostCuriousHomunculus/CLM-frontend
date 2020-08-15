@@ -5,11 +5,17 @@ import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIDialogue from '@material-ui/core/Dialog';
+import MUIDialogueActions from '@material-ui/core/DialogActions';
+import MUIDialogueContent from '@material-ui/core/DialogContent';
+import MUIDialogueContentText from '@material-ui/core/DialogContentText'
+import MUIDialogueTitle from '@material-ui/core/DialogTitle';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import theme from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
@@ -19,8 +25,18 @@ const useStyles = makeStyles({
   },
   centeredCard: {
     justifyContent: 'center',
-    margin: '1rem auto',
+    margin: '1rem 8',
     minWidth: '360px'
+  },
+  textField: {
+    margin: 8
+  },
+  warningButton: {
+    backgroundColor: theme.palette.warning.main,
+    color: '#ffffff',
+    '&:hover': {
+      backgroundColor: theme.palette.warning.dark
+    }
   }
 });
 
@@ -34,7 +50,7 @@ const Authenticate = () => {
   const [name, setName] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const { loading, sendRequest } = useRequest();
+  const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
   function toggleMode (prevState) {
     if (prevState === 'Login') {
@@ -59,15 +75,13 @@ const Authenticate = () => {
 
       authentication.login(response.userId, response.token);
       history.push('/');
-
-    } catch (error) {
-      console.log({ Error: error.message });
+    } catch (err) {
+      console.log(err);
     }
   }
 
   async function register () {
     try {
-
       const randomCard = await sendRequest('https://api.scryfall.com/cards/random', 'GET', null, {});
       const randomCardPrintings = await sendRequest(randomCard.prints_search_uri, 'GET', null, {});
       const randomIndex = Math.floor(Math.random() * randomCardPrintings.data.length);
@@ -88,9 +102,8 @@ const Authenticate = () => {
         
       authentication.login(response.userId, response.token);
       history.push('/');
-
-    } catch (error) {
-      console.log({ Error: error.message });
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -98,54 +111,78 @@ const Authenticate = () => {
     <React.Fragment>
       {loading ?
         <LoadingSpinner /> :
-        <MUICard className={classes.centeredCard}>
-          <MUICardHeader
-            title={<MUITypography variant="h2">{mode}</MUITypography>}
-          />
-          <MUICardContent>
-          
-            <MUITextField
-              autoComplete="off"
-              autoFocus
-              fullWidth
-              label="Email Address"
-              onChange={(event) => setEmail(event.target.value)}
-              required={true}
-              type="email"
-              value={email}
+        <React.Fragment>
+          <MUIDialogue
+            open={!!errorMessage}
+            onClose={clearError}
+          >
+            <MUIDialogueTitle>Error</MUIDialogueTitle>
+            <MUIDialogueContent>
+              <MUIDialogueContentText>{errorMessage}</MUIDialogueContentText>
+            </MUIDialogueContent>
+            <MUIDialogueActions>
+              <MUIButton color="primary" onClick={clearError} variant="contained">Try Again</MUIButton>
+            </MUIDialogueActions>
+          </MUIDialogue>
+          <MUICard className={classes.centeredCard}>
+            <MUICardHeader
+              title={<MUITypography variant="h2">{mode}</MUITypography>}
             />
-            {mode === 'Register' &&
+            <MUICardContent>
+            
               <MUITextField
                 autoComplete="off"
+                autoFocus
+                className={classes.textField}
                 fullWidth
-                label="Account Name"
-                onChange={(event) => setName(event.target.value)}
+                label="Email Address"
+                onChange={(event) => setEmail(event.target.value)}
                 required={true}
-                type="text"
-                value={name}
+                type="email"
+                value={email}
+                variant="outlined"
               />
-            }
-            <MUITextField
-              autoComplete="off"
-              fullWidth
-              label="Password"
-              onChange={(event) => setPassword(event.target.value)}
-              required={true}
-              type="password"
-              value={password}
-            />
+              {mode === 'Register' &&
+                <MUITextField
+                  autoComplete="off"
+                  className={classes.textField}
+                  fullWidth
+                  label="Account Name"
+                  onChange={(event) => setName(event.target.value)}
+                  required={true}
+                  type="text"
+                  value={name}
+                  variant="outlined"
+                />
+              }
+              <MUITextField
+                autoComplete="off"
+                className={classes.textField}
+                fullWidth
+                label="Password"
+                onChange={(event) => setPassword(event.target.value)}
+                required={true}
+                type="password"
+                value={password}
+                variant="outlined"
+              />
 
-          </MUICardContent>
+            </MUICardContent>
 
-          <MUICardActions className={classes.cardActions}>
-            <MUIButton color="primary" onClick={() => toggleMode (mode)} variant="contained">
-              {mode === 'Login' ? "Don't have an account yet?" : 'Already have an account?'}
-            </MUIButton>
-            <MUIButton color="primary" onClick={mode === 'Login' ? login : register} variant="contained">
-              {mode}!
-            </MUIButton>
-          </MUICardActions>
-        </MUICard>
+            <MUICardActions className={classes.cardActions}>
+              <MUIButton
+                className={classes.warningButton}
+                onClick={() => toggleMode (mode)}
+                variant="contained"
+              >
+                {mode === 'Login' ? "Don't have an account yet?" : 'Already have an account?'}
+              </MUIButton>
+              <MUIButton color="primary" onClick={mode === 'Login' ? login : register} variant="contained">
+                {mode}!
+              </MUIButton>
+            </MUICardActions>
+          </MUICard>
+        </React.Fragment>
       }
     </React.Fragment>    
   );

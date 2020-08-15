@@ -18,7 +18,8 @@ const Cube = () => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
-  const { loading, sendRequest } = useRequest();
+  const [loading, setLoading] = React.useState(true);
+  const { sendRequest } = useRequest();
 
   const [componentState, dispatch] = React.useReducer(cubeReducer, {
     active_component_cards: [],
@@ -43,17 +44,17 @@ const Cube = () => {
   });
   const [viewMode, setViewMode] = React.useState('Table View');
 
-  function filterCardsHandler (event) {
+  const filterCardsHandler = React.useCallback(function (event) {
     dispatch({ type: 'FILTER_CARDS', value: event.target.value });
-  }
+  }, []);
 
-  function updateCubeHandler (cube) {
+  const updateCubeHandler = React.useCallback(function (cube) {
     dispatch({ type: 'UPDATE_CUBE', value: cube });
-  }
+  }, []);
 
-  function switchComponentHandler (component_id) {
-    dispatch({ type: 'SWITCH_COMPONENT', value: component_id })
-  }
+  const switchComponentHandler = React.useCallback(function (component_id) {
+    dispatch({ type: 'SWITCH_COMPONENT', value: component_id });
+  }, []);
 
   React.useEffect(() => {
     const fetchCube = async function () {
@@ -65,9 +66,10 @@ const Cube = () => {
       } catch (error) {
         console.log('Error: ' + error.message);
       }
+      setLoading(false);
     };
     fetchCube();
-  }, [cubeId, sendRequest]);
+  }, [cubeId, sendRequest, updateCubeHandler]);
 
   async function addCard (chosenCard) {
     delete chosenCard.art_crop;
@@ -93,14 +95,6 @@ const Cube = () => {
     } catch (error) {
       console.log({ 'Error': error.message });
     }
-  }
-
-  function changeComponent (component_id) {
-    switchComponentHandler(component_id);
-  }
-
-  function changeViewMode (mode) {
-    setViewMode(mode);
   }
 
   function hidePreview () {
@@ -162,9 +156,12 @@ const Cube = () => {
           {componentState.cube &&
             <React.Fragment>
               <ComponentInfo
-                componentState={componentState}
-                changeComponent={changeComponent}
-                changeViewMode={changeViewMode}
+                componentId={componentState.active_component_id}
+                componentName={componentState.active_component_name}
+                componentType={componentState.active_component_type}
+                rotationSize={componentState.active_rotation_size}
+                switchComponentHandler={switchComponentHandler}
+                setViewMode={setViewMode}
                 filterCardsHandler={filterCardsHandler}
                 updateCubeHandler={updateCubeHandler}
                 viewMode={viewMode}

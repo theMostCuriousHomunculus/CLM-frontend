@@ -12,14 +12,16 @@ import MUITypography from '@material-ui/core/Typography';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import theme from '../theme';
-import { useRequest } from '../hooks/request-hook';
+import alphabeticalSort from '../functions/alphabetical-sort';
 import BudRequests from '../components/Account Page/BudRequests';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
+import theme from '../theme';
 import UserCubeCard from '../components/Account Page/UserCubeCard';
 import UserEventCard from '../components/Account Page/UserEventCard';
+import { AuthenticationContext } from '../contexts/authentication-context';
+import { useRequest } from '../hooks/request-hook';
+
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -217,7 +219,7 @@ const Account = () => {
                 <MUICardHeader title={<MUITypography variant="h3">Buds</MUITypography>} />
                 <MUIList>
                   {user.buds &&
-                    user.buds.map(function (bud) {
+                    alphabeticalSort(user.buds).map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
                           {bud.avatar &&

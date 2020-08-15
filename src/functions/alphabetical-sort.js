@@ -1,8 +1,8 @@
-export default function alphabeticalSort (cards) {
+export default function alphabeticalSort (objectsWithNameProperty) {
 
-  cards.sort(function (a, b) {
+  objectsWithNameProperty.sort(function (a, b) {
     return a['name'].localeCompare(b['name']);
   });
 
-  return cards;
+  return objectsWithNameProperty;
 }

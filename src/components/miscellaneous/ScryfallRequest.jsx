@@ -20,88 +20,84 @@ const ScryfallRequest = (props) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
+  const [cardSearchInputValue, setCardSearchInputValue] = React.useState('');
   const [cardSearchResults, setCardSearchResults] = React.useState([]);
   const [chosenCard, setChosenCard] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
 
-  const handleClickListItem = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  React.useEffect(function () {
+    const timer = setTimeout(async function () {
+      if (cardSearchInputValue === cardSearchInput.current.value) {
+        try {
+          if (cardSearchInput.current.value.length === 0) throw new Error();
+          let matches = await sendRequest(`https://api.scryfall.com/cards/search?q=${cardSearchInputValue}` , 'GET', null, {});
+          if (matches.data) {
+            setCardSearchResults(matches.data.map(function (match) {
+              let loyalty, mana_cost, power, toughness, type_line;
+              if (match.layout === "transform") {
+                if (match.card_faces[0].loyalty) {
+                  loyalty = match.card_faces[0].loyalty;
+                } else if (match.card_faces[1].loyalty) {
+                  // think baby jace
+                  loyalty = match.card_faces[1].loyalty;
+                }
+                mana_cost = match.card_faces[0].mana_cost;
+                if (match.card_faces[0].power) {
+                  power = match.card_faces[0].power;
+                } else if (match.card_faces[1].power) {
+                  // think elbrus, the binding blade
+                  power = match.card_faces[1].power;
+                }
+                if (match.card_faces[0].toughness) {
+                  toughness = match.card_faces[0].toughness;
+                } else if (match.card_faces[1].toughness) {
+                  toughness = match.card_faces[1].toughness;
+                }
+                type_line = match.card_faces[0].type_line + " / " + match.card_faces[1].type_line;
+              } else {
+                loyalty = match.loyalty;
+                mana_cost = match.mana_cost;
+                power = match.power;
+                toughness = match.toughness;
+                type_line = match.type_line;
+              }
 
-  const handleMenuItemClick = (/*event, */index) => {
+              return (
+                {
+                  cmc: match.cmc,
+                  color_identity: match.color_identity,
+                  keywords: match.keywords,
+                  loyalty,
+                  mana_cost,
+                  oracle_id: match.oracle_id,
+                  power,
+                  prints_search_uri: match.prints_search_uri,
+                  toughness,
+                  type_line,
+                  name: match.name,
+                  value: match.name
+                }
+              );
+            }));
+          } else {
+            setCardSearchResults([]);
+          }
+        } catch (error) {
+          setCardSearchResults([]);
+        }
+      }
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [cardSearchInput, cardSearchInputValue, sendRequest])
+
+  const handleMenuItemClick = (index) => {
     setSelectedPrintIndex(index);
     setChosenCard({ ...chosenCard, ...availablePrintings[index] });
     setAnchorEl(null);
   };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  async function scryfallCardSearch (event) {
-    if (event.target.value.length > 2) {
-      try {
-        let matches = await sendRequest(`https://api.scryfall.com/cards/search?q=${event.target.value}` , 'GET', null, {});
-        if (matches.data) {
-          setCardSearchResults(matches.data.map(function (match) {
-            let loyalty, mana_cost, power, toughness, type_line;
-            if (match.layout === "transform") {
-              if (match.card_faces[0].loyalty) {
-                loyalty = match.card_faces[0].loyalty;
-              } else if (match.card_faces[1].loyalty) {
-                // think baby jace
-                loyalty = match.card_faces[1].loyalty;
-              }
-              mana_cost = match.card_faces[0].mana_cost;
-              if (match.card_faces[0].power) {
-                power = match.card_faces[0].power;
-              } else if (match.card_faces[1].power) {
-                // think elbrus, the binding blade
-                power = match.card_faces[1].power;
-              }
-              if (match.card_faces[0].toughness) {
-                toughness = match.card_faces[0].toughness;
-              } else if (match.card_faces[1].toughness) {
-                toughness = match.card_faces[1].toughness;
-              }
-              type_line = match.card_faces[0].type_line + " / " + match.card_faces[1].type_line;
-            } else {
-              loyalty = match.loyalty;
-              mana_cost = match.mana_cost;
-              power = match.power;
-              toughness = match.toughness;
-              type_line = match.type_line;
-            }
-
-            return (
-              {
-                cmc: match.cmc,
-                color_identity: match.color_identity,
-                keywords: match.keywords,
-                loyalty,
-                mana_cost,
-                oracle_id: match.oracle_id,
-                power,
-                prints_search_uri: match.prints_search_uri,
-                toughness,
-                type_line,
-                name: match.name,
-                value: match.name
-              }
-            );
-          }));
-        } else {
-          setCardSearchResults([]);
-        }
-      } catch (error) {
-        console.log({ 'Error': error.message });
-        setCardSearchResults([]);
-      }
-    } else {
-      setCardSearchResults([]);
-    }
-  }
 
   async function scryfallPrintSearch (prints_search_uri, cardDetails) {
     try {
@@ -176,7 +172,8 @@ const ScryfallRequest = (props) => {
               {...params}
               inputRef={cardSearchInput}
               label={props.labelText}
-              onKeyUp={scryfallCardSearch}
+              onChange={(event) => setCardSearchInputValue(event.target.value)}
+              value={cardSearchInputValue}
               variant="outlined"
               InputProps={{
                 ...params.InputProps,
@@ -198,7 +195,7 @@ const ScryfallRequest = (props) => {
             button
             aria-haspopup="true"
             aria-controls="lock-menu"
-            onClick={handleClickListItem}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
           >
             <MUIListItemText
               primary="Selected Printing"
@@ -211,13 +208,13 @@ const ScryfallRequest = (props) => {
           anchorEl={anchorEl}
           keepMounted
           open={Boolean(anchorEl)}
-          onClose={handleClose}
+          onClose={() => setAnchorEl(null)}
         >
           {availablePrintings.map((option, index) => (
             <MUIMenuItem
               key={`printing-${index}`}
               selected={index === selectedPrintIndex}
-              onClick={(/*event*/) => handleMenuItemClick(/*event, */index)}
+              onClick={() => handleMenuItemClick(index)}
             >
               {option.printing}
             </MUIMenuItem>
