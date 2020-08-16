@@ -10,8 +10,6 @@ let cubeState = {
     modules: [],
     rotations: []
   },
-  cube_description: '',
-  cube_name: '',
   displayed_cards: [],
   filter: '',
   view_mode: 'Table'
@@ -24,18 +22,6 @@ let actions = {
     return {
       ...cubeState,
       active_component_name: newName
-    };
-  },
-  CHANGE_CUBE_DESCRIPTION: function (newDescription) {
-    return {
-      ...cubeState,
-      cube_description: newDescription
-    };
-  },
-  CHANGE_CUBE_NAME: function (newName) {
-    return {
-      ...cubeState,
-      cube_name: newName
     };
   },
   CHANGE_ROTATION_SIZE: function (newSize) {
@@ -124,8 +110,6 @@ let actions = {
         active_rotation_size: undefined,
         active_component_type: 'builtIn',
         cube: updatedCube,
-        cube_description: updatedCube.description,
-        cube_name: updatedCube.name,
         displayed_cards: filterCards(updatedCube.mainboard, cubeState.filter)
       });
     } else if (cubeState.active_component_id === 'sideboard') {
@@ -137,8 +121,6 @@ let actions = {
         active_rotation_size: undefined,
         active_component_type: 'builtIn',
         cube: updatedCube,
-        cube_description: updatedCube.description,
-        cube_name: updatedCube.name,
         displayed_cards: filterCards(updatedCube.sideboard, cubeState.filter)
       };
     } else if (cubeState.active_component_type === 'module') {
@@ -154,8 +136,6 @@ let actions = {
         active_rotation_size: undefined,
         active_component_type: 'module',
         cube: updatedCube,
-        cube_description: updatedCube.description,
-        cube_name: updatedCube.name,
         displayed_cards: filterCards(module.cards, cubeState.filter)
       };
     } else if (cubeState.active_component_type === 'rotation') {
@@ -171,8 +151,6 @@ let actions = {
         active_rotation_size: rotation.size,
         active_component_type: 'rotation',
         cube: updatedCube,
-        cube_description: updatedCube.description,
-        cube_name: updatedCube.name,
         displayed_cards: filterCards(rotation.cards, cubeState.filter)
       };
     } else {

@@ -24,6 +24,8 @@ const CubeInfo = (props) => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
+  const descriptionInput = React.useRef(null);
+  const nameInput = React.useRef(null);
   const classes = useStyles();
   const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
@@ -32,8 +34,8 @@ const CubeInfo = (props) => {
     const cubeChanges = JSON.stringify({
       action: 'edit_cube_info',
       cube_id: cubeId,
-      description: cubeState.cube_description,
-      name: cubeState.cube_name
+      description: descriptionInput.current.value,
+      name: nameInput.current.value
     });
     const updatedCube = await sendRequest(
       `${process.env.REACT_APP_BACKEND_URL}/cube`,
@@ -56,14 +58,14 @@ const CubeInfo = (props) => {
         }
         title={authentication.userId === cubeState.cube.creator ?
           <MUITextField
+            defaultValue={cubeState.cube.name}
+            inputRef={nameInput}
             label="Cube Name"
             onBlur={submitCubeChanges}
-            onChange={(event) => dispatch('CHANGE_CUBE_NAME', event.target.value)}
             type="text"
-            value={cubeState.cube_name}
             variant="outlined"
           /> :
-          <MUITypography variant="h2">{cubeState.cube_name}</MUITypography>
+          <MUITypography variant="h2">{cubeState.cube.name}</MUITypography>
         }
         subheader={
           <MUITypography variant="h3">
@@ -75,18 +77,18 @@ const CubeInfo = (props) => {
       <MUICardContent>
         {authentication.userId === cubeState.cube.creator ?
           <MUITextField
+            defaultValue={cubeState.cube.description}
             fullWidth={true}
+            inputRef={descriptionInput}
             label="Cube Description"
             multiline
             onBlur={submitCubeChanges}
-            onChange={(event) => dispatch('CHANGE_CUBE_DESCRIPTION', event.target.value)}
             rows={3}
-            value={cubeState.cube_description}
             variant="outlined"
           /> :
           <React.Fragment>
             <MUITypography variant="h3">Description:</MUITypography>
-            <MUITypography variant="body1">{cubeState.cube_description}</MUITypography>
+            <MUITypography variant="body1">{cubeState.cube.description}</MUITypography>
           </React.Fragment>
         }        
       </MUICardContent>

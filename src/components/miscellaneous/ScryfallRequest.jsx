@@ -9,11 +9,19 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { useRequest } from '../../hooks/request-hook';
 
+const useStyles = makeStyles({
+  list: {
+    padding: 0
+  }
+});
+
 const ScryfallRequest = (props) => {
 
+  const classes = useStyles();
   const { loading, sendRequest } = useRequest();
 
   const cardSearchInput = React.useRef(null);
@@ -190,7 +198,7 @@ const ScryfallRequest = (props) => {
       </MUIGrid>
 
       <MUIGrid item xs={12} md={6} lg={5}>
-        <MUIList component="nav">
+        <MUIList className={classes.list} component="nav">
           <MUIListItem
             button
             aria-haspopup="true"
