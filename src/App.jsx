@@ -13,6 +13,8 @@ import { useRequest } from './hooks/request-hook';
 
 const Account = React.lazy(() => import('./pages/Account'));
 const Authenticate = React.lazy(() => import('./pages/Authenticate'));
+const Blog = React.lazy(() => import('./pages/Blog'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Cube = React.lazy(() => import('./pages/Cube'));
 const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
@@ -20,11 +22,13 @@ const Resources = React.lazy(() => import('./pages/Resources'));
 
 const useStyles = makeStyles({
   loading: {
-    margin: '1rem'
+    margin: 8
   },
   main: {
-    paddingBottom: 300,
-    margin: '1rem auto 0 auto'
+    flex: '1 0 auto',
+    height: '100%',
+    margin: '0 auto 0 auto',
+    width: '100%'
   }
 });
 
@@ -106,6 +110,12 @@ function App() {
               </Route>
               <Route path='/account/:accountId'>
                 <Account />
+              </Route>
+              <Route path='/blog/:blogPostId'>
+                <BlogPost />
+              </Route>
+              <Route path='/blog'>
+                <Blog />
               </Route>
               <Route path='/cube/:cubeId'>
                 <Cube />

@@ -76,7 +76,10 @@ const BudRequests = (props) => {
     <React.Fragment>
       <MUIGrid item xs={12} sm={6} md={4}>
         <MUICard>
-          <MUICardHeader title={<MUITypography variant="h3">Aspiring Buds</MUITypography>} />
+          <MUICardHeader
+            disableTypography={true}
+            title={<MUITypography variant="subtitle1">Aspiring Buds</MUITypography>}
+          />
           <MUIList>
             {props.user.received_bud_requests &&
               alphabeticalSort(props.user.received_bud_requests).map(function (request) {
@@ -115,7 +118,10 @@ const BudRequests = (props) => {
         
       <MUIGrid item xs={12} sm={6} md={4}>
         <MUICard>
-          <MUICardHeader title={<MUITypography variant="h3">Pending Buds</MUITypography>}/>
+          <MUICardHeader
+            disableTypography={true}
+            title={<MUITypography variant="subtitle1">Pending Buds</MUITypography>}
+          />
           <MUIList>
             {props.user.sent_bud_requests &&
               alphabeticalSort(props.user.sent_bud_requests).map(function (request) {

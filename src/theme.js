@@ -8,23 +8,32 @@ const { breakpoints } = defaultTheme;
 const theme = createMuiTheme({
   ...defaultTheme,
   overrides: {
+    MuiButton: {
+      root: {
+        fontSize: '1rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '0.7rem'
+        }
+      }
+    },
     MuiCard: {
       root: {
-        padding: 8,
-        margin: '1rem',
-        maxWidth: 'calc(100vw - 2rem)'
+        padding: 0,
+        margin: 8
       }
     },
     MuiCardActions: {
       root: {
-        padding: 0
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: 8
       }
     },
     MuiCardContent: {
       root: {
-        padding: 0,
+        padding: 8,
         '&:last-child': {
-          paddingBottom: 0
+          paddingBottom: 8
         }
       }
     },
@@ -34,59 +43,104 @@ const theme = createMuiTheme({
         wordBreak: 'break-word'
       },
       root: {
-        padding: '0 0 16px 0'
+        padding: 8
+      }
+    },
+    MuiCardMedia: {
+      root: {
+        padding: '56.25% 0 0 0',
+        width: '100%'
+      }
+    },
+    MuiGrid: {
+      container: {
+        margin: 0,
+        padding: 8
+      },
+      item: {
+        margin: 0,
+        padding: 0
+      },
+      "spacing-xs-2": {
+        margin: 0,
+        padding: 0,
+        width: '100%'
       }
     },
     MuiTypography: {
       h1: {
-        fontSize: '6rem',
+        fontSize: '4rem',
         [breakpoints.down('sm')]: {
-          fontSize: '4rem'
+          fontSize: '2rem'
         }
       },
       h2: {
-        fontSize: '3.75rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '2.5rem'
-        // }
+        fontSize: '3.5rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1.75rem'
+        }
       },
       h3: {
         fontSize: '3rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '2rem'
-        // }
+        [breakpoints.down('sm')]: {
+          fontSize: '1.5rem'
+        }
       },
       h4: {
-        fontSize: '2.4rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '1.6rem'
-        // }
+        fontSize: '2.5rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1.25rem'
+        }
       },
       h5: {
         fontSize: '2rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '1.4rem'
-        // }
+        [breakpoints.down('sm')]: {
+          fontSize: '1rem'
+        }
       },
       body1: {
-        fontSize: '1.6rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '1.2rem'
-        // }
+        fontSize: '1.5rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '0.85rem'
+        }
       },
       body2: {
-        fontSize: '1.2rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '1rem'
-        // }
+        fontSize: '1rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '0.7rem'
+        }
       },
-      button: {
-        fontSize: '1.6rem',
-        // [breakpoints.down('sm')]: {
-        //   fontSize: '1.2rem'
-        // }
+      subtitle1: {
+        fontSize: '2rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1rem'
+        }
+      },
+      subtitle2: {
+        fontSize: '1.5rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '0.85rem'
+        }
       }
-    }    
+    },
+    MuiTableCell: {
+      body: {
+        fontSize: '1.5rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '0.85rem'
+        }
+      },
+      head: {
+        color: lightGreen['A400'],
+        fontSize: '2rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1rem'
+        }
+      },
+      stickyHeader: {
+        backgroundColor: deepPurple[400]
+      }
+    }
   },
   palette: {
     primary: {
@@ -107,8 +161,7 @@ const theme = createMuiTheme({
       'Roboto',
       'Arial',
       'sans-serif'
-    ].join(','),
-    htmlFontSize: 10
+    ].join(',')
   }
 })
 

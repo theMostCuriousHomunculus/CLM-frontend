@@ -45,20 +45,8 @@ const useStyles = makeStyles({
   table: {
     minWidth: 350
   },
-  tableBody: {
-    '& *': {
-      fontSize: '1.6rem'
-    }
-  },
   tableContainer: {
     maxHeight: '40vh'
-  },
-  tableHead: {
-    '& *': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.secondary.main,
-      fontSize: '2.4rem'
-    }
   },
   warningButton: {
     backgroundColor: theme.palette.warning.main,
@@ -85,7 +73,7 @@ const Account = () => {
       const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
       const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
       setUser(accountData);
-      const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creator=${accountId}`, 'GET', null, {});
+      const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creatorId=${accountId}`, 'GET', null, {});
       setCubes(cubeData.cubes);
       const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?player=${accountId}`, 'GET', null, {});
       setEvents(eventData.events);
@@ -163,8 +151,12 @@ const Account = () => {
           <MUICard>
             <MUICardHeader
               avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
-              title={<MUITypography variant="h2">{user.name}</MUITypography>}
-              subheader={accountId === authentication.userId ? <MUITypography variant="h3">{user.email}</MUITypography> : null}
+              disableTypography={true}
+              title={<MUITypography variant="subtitle1">{user.name}</MUITypography>}
+              subheader={accountId === authentication.userId ?
+                <MUITypography color="textSecondary" variant="subtitle2">{user.email}</MUITypography> :
+                null
+              }
             />
             {accountId === authentication.userId &&
               <MUICardActions>
@@ -216,7 +208,10 @@ const Account = () => {
           <MUIGrid container>
             <MUIGrid item xs={12} sm={6} md={4}>
               <MUICard>
-                <MUICardHeader title={<MUITypography variant="h3">Buds</MUITypography>} />
+                <MUICardHeader
+                  disableTypography={true}
+                  title={<MUITypography variant="subtitle1">Buds</MUITypography>}
+                />
                 <MUIList>
                   {user.buds &&
                     alphabeticalSort(user.buds).map(function (bud) {

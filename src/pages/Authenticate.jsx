@@ -23,14 +23,6 @@ const useStyles = makeStyles({
   cardActions: {
     justifyContent: 'space-between'
   },
-  centeredCard: {
-    justifyContent: 'center',
-    margin: '1rem 8',
-    minWidth: '360px'
-  },
-  textField: {
-    margin: 8
-  },
   warningButton: {
     backgroundColor: theme.palette.warning.main,
     color: '#ffffff',
@@ -124,16 +116,16 @@ const Authenticate = () => {
               <MUIButton color="primary" onClick={clearError} variant="contained">Try Again</MUIButton>
             </MUIDialogueActions>
           </MUIDialogue>
-          <MUICard className={classes.centeredCard}>
+          <MUICard>
             <MUICardHeader
-              title={<MUITypography variant="h2">{mode}</MUITypography>}
+              disableTypography={true}
+              title={<MUITypography variant="subtitle1">{mode}</MUITypography>}
             />
             <MUICardContent>
             
               <MUITextField
                 autoComplete="off"
                 autoFocus
-                className={classes.textField}
                 fullWidth
                 label="Email Address"
                 onChange={(event) => setEmail(event.target.value)}
@@ -145,11 +137,11 @@ const Authenticate = () => {
               {mode === 'Register' &&
                 <MUITextField
                   autoComplete="off"
-                  className={classes.textField}
                   fullWidth
                   label="Account Name"
                   onChange={(event) => setName(event.target.value)}
                   required={true}
+                  style={{ marginTop: 16 }}
                   type="text"
                   value={name}
                   variant="outlined"
@@ -157,11 +149,11 @@ const Authenticate = () => {
               }
               <MUITextField
                 autoComplete="off"
-                className={classes.textField}
                 fullWidth
                 label="Password"
                 onChange={(event) => setPassword(event.target.value)}
                 required={true}
+                style={{ marginTop: 16 }}
                 type="password"
                 value={password}
                 variant="outlined"

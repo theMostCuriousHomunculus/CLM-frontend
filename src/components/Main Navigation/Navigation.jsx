@@ -28,13 +28,13 @@ const useStyles = makeStyles({
     border: '1px solid',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '7.1rem',
-    marginRight: '1rem'
+    fontSize: '4rem',
+    marginRight: 8
   },
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '1rem'
+    padding: 8
   },
   topBarContainer: {
     display: 'flex',

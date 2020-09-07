@@ -96,7 +96,10 @@ const CubeView = (props) => {
         });
         return (
           <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor) + " " + classes.curveViewSubContainer} key={`curve-${color.name}`}>
-            <MUICardHeader title={<MUITypography variant="h3">{color.name}</MUITypography>} />
+            <MUICardHeader
+              disableTypography={true}
+              title={<MUITypography variant="subtitle1">{color.name}</MUITypography>}
+            />
             <MUICardContent>
               {[true, false].map(function (isCreature) {
                 const cards_color_isCreature = cards_color.filter(function (card) {
@@ -104,7 +107,7 @@ const CubeView = (props) => {
                 });
                 return (
                   <React.Fragment key={isCreature ? "a" : "b"}>
-                    <MUITypography variant="h4">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
+                    <MUITypography variant="subtitle2">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
                     <div className={classes.curveViewTypeContainer}>
                       {[0, 1, 2, 3, 4, 5, 6, 7].map(function (cost) {
                         const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
@@ -112,7 +115,7 @@ const CubeView = (props) => {
                         });
                         return (
                           <div key={cost}>
-                            <MUITypography variant="h5">{cost} CMC</MUITypography>
+                            <MUITypography variant="subtitle2">{cost} CMC</MUITypography>
                             {alphabeticalSort(cards_color_isCreature_cost).map(function (card) {
                               return (
                                 <MUITypography
@@ -122,7 +125,7 @@ const CubeView = (props) => {
                                   onMouseOut={props.hidePreview}
                                   onMouseOver={props.showPreview}
                                   style={{ cursor: 'default' }}
-                                  variant="body1"
+                                  variant="body2"
                                 >
                                   {card.name}
                                 </MUITypography>

@@ -6,7 +6,6 @@ const useStyles = makeStyles({
   loading: {
     alignItems: 'center',
     display: 'flex',
-    height: 'calc(100vh - 300px - 10.1rem)',
     justifyContent: 'center'
   }
 })

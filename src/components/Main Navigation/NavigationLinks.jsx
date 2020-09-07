@@ -1,6 +1,7 @@
 import React from 'react';
 import MUIAccountCircleIcon from '@material-ui/icons/AccountCircle';
 import MUIAllInclusiveIcon from '@material-ui/icons/AllInclusive';
+import MUIChatOutlinedIcon from '@material-ui/icons/ChatOutlined';
 import MUIExitToAppIcon from '@material-ui/icons/ExitToApp';
 import MUIHomeIcon from '@material-ui/icons/Home';
 import MUIList from '@material-ui/core/List';
@@ -16,7 +17,7 @@ const useStyles = makeStyles({
   item: {
     color: theme.palette.secondary.main,
     '& span, & svg': {
-      fontSize: '3rem'
+      fontSize: '2rem'
     }
   },
   list: {
@@ -42,6 +43,11 @@ function NavigationLinks (props) {
       onClick: () => history.push('/account/' + authentication.userId)
     },
     {
+      icon: <MUIChatOutlinedIcon />,
+      name: "Blog",
+      onClick: () => history.push('/blog')
+    },
+    {
       icon: <MUIAllInclusiveIcon />,
       name: "Resources",
       onClick: () => history.push('/resources')
@@ -58,6 +64,11 @@ function NavigationLinks (props) {
       icon: <MUIHomeIcon />,
       name: "Home",
       onClick: () => history.push('/')
+    },
+    {
+      icon: <MUIChatOutlinedIcon />,
+      name: "Blog",
+      onClick: () => history.push('/blog')
     },
     {
       icon: <MUIAllInclusiveIcon />,

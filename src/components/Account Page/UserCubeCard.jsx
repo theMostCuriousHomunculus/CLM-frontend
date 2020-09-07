@@ -55,17 +55,20 @@ const UserCubeCard = (props) => {
 
   return (
     <MUICard>
-      <MUICardHeader title={<MUITypography variant="h3">Cubes</MUITypography>} />
+      <MUICardHeader
+        disableTypography={true}
+        title={<MUITypography variant="subtitle1">Cubes</MUITypography>}
+      />
       <MUICardContent>
         <MUITableContainer className={props.classes.tableContainer}>
           <MUITable stickyHeader className={props.classes.table}>
-            <MUITableHead className={props.classes.tableHead}>
+            <MUITableHead>
               <MUITableRow>
-                <MUITableCell>Cube Name</MUITableCell>
+                <MUITableCell>Name</MUITableCell>
                 <MUITableCell>Description</MUITableCell>
               </MUITableRow>
             </MUITableHead>
-            <MUITableBody className={props.classes.tableBody}>
+            <MUITableBody>
               {props.cubes.map(function (cube) {
                 return (
                   <MUITableRow key={cube._id}>

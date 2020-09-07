@@ -56,7 +56,8 @@ const CubeInfo = (props) => {
         avatar={props.creator.avatar &&
           <MUIAvatar alt={props.creator.name} className={classes.avatarLarge} src={props.creator.avatar} />
         }
-        title={authentication.userId === cubeState.cube.creator ?
+        disableTypography={true}
+        title={authentication.userId === props.creator._id ?
           <MUITextField
             defaultValue={cubeState.cube.name}
             inputRef={nameInput}
@@ -65,17 +66,17 @@ const CubeInfo = (props) => {
             type="text"
             variant="outlined"
           /> :
-          <MUITypography variant="h2">{cubeState.cube.name}</MUITypography>
+          <MUITypography variant="subtitle1">{cubeState.cube.name}</MUITypography>
         }
         subheader={
-          <MUITypography variant="h3">
+          <MUITypography color="textSecondary" variant="subtitle2">
             Designed by: <Link to={`/account/${props.creator._id}`}>{props.creator.name}</Link>
           </MUITypography>
         }
       />
 
       <MUICardContent>
-        {authentication.userId === cubeState.cube.creator ?
+        {authentication.userId === props.creator._id ?
           <MUITextField
             defaultValue={cubeState.cube.description}
             fullWidth={true}
@@ -87,7 +88,7 @@ const CubeInfo = (props) => {
             variant="outlined"
           /> :
           <React.Fragment>
-            <MUITypography variant="h3">Description:</MUITypography>
+            <MUITypography variant="subtitle1">Description:</MUITypography>
             <MUITypography variant="body1">{cubeState.cube.description}</MUITypography>
           </React.Fragment>
         }        

@@ -126,18 +126,21 @@ const UserEventCard = (props) => {
   return (
     <React.Fragment>
       <MUICard>
-        <MUICardHeader title={<MUITypography variant="h3">Events</MUITypography>} />
+        <MUICardHeader
+          disableTypography={true}
+          title={<MUITypography variant="subtitle1">Events</MUITypography>}
+        />
         <MUICardContent>
           <MUITableContainer className={props.classes.tableContainer}>
             <MUITable stickyHeader className={props.classes.table}>
-              <MUITableHead className={props.classes.tableHead}>
+              <MUITableHead>
                 <MUITableRow>
-                  <MUITableCell>Event Name</MUITableCell>
+                  <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Host</MUITableCell>
-                  <MUITableCell>Created On</MUITableCell>
+                  <MUITableCell>Date</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
-              <MUITableBody className={props.classes.tableBody}>
+              <MUITableBody>
                 {props.events.map(function (event) {
                   return (
                     <MUITableRow key={event._id}>

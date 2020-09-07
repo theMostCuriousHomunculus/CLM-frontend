@@ -152,7 +152,7 @@ const ScryfallRequest = (props) => {
   }
 
   return (
-    <MUIGrid alignItems="center" container justify="flex-end" spacing={2}>
+    <MUIGrid alignItems="center" container justify="flex-end">
 
       <MUIGrid item xs={12} md={6} lg={5}>
         <MUIAutocomplete

@@ -28,16 +28,13 @@ const useStyles = makeStyles({
   cardActions: {
     alignItems: 'flex-end',
     flexDirection: 'column',
-    paddingTop: 4
   },
   cardContent: {
     display: 'flex',
-    justifyContent: 'space-between',
-    padding: '4px 0 4px 0'
+    justifyContent: 'space-between'
   },
   cardHeader: {
     justifyContent: 'space-between',
-    paddingBottom: 4,
     '& .MuiCardHeader-content': {
       width: 'unset'
     },
@@ -185,7 +182,8 @@ const ComponentInfo = React.memo(() => {
     <MUICard>
       <MUICardHeader
         className={classes.cardHeader}
-        title={(authentication.userId === cubeState.cube.creator &&
+        disableTypography={true}
+        title={(authentication.userId === cubeState.cube.creatorId &&
           cubeState.active_component_type !== 'builtIn') ?
           <MUITextField
             autoComplete="off"
@@ -196,7 +194,7 @@ const ComponentInfo = React.memo(() => {
             value={cubeState.active_component_name}
             variant="outlined"
           /> :
-          <MUITypography variant="h3">{cubeState.active_component_name}</MUITypography>
+          <MUITypography variant="subtitle1">{cubeState.active_component_name}</MUITypography>
         }
         action={
           <React.Fragment>
@@ -277,7 +275,7 @@ const ComponentInfo = React.memo(() => {
       />
 
       <MUICardContent className={classes.cardContent}>
-        {authentication.userId === cubeState.cube.creator &&
+        {authentication.userId === cubeState.cube.creatorId &&
           <React.Fragment>
             <MUIButton
               color="primary"
@@ -343,7 +341,7 @@ const ComponentInfo = React.memo(() => {
         }
 
         {cubeState.active_component_type === 'rotation' &&
-          (authentication.userId === cubeState.cube.creator ?
+          (authentication.userId === cubeState.cube.creatorId ?
           <MUITextField
             className={classes.rotationSizeField}
             label="Size"
@@ -354,10 +352,10 @@ const ComponentInfo = React.memo(() => {
             value={cubeState.active_rotation_size}
             variant="outlined"
           /> :
-          <MUITypography variant="h4">Rotation Size: {cubeState.active_rotation_size}</MUITypography>)
+          <MUITypography variant="subtitle1">Rotation Size: {cubeState.active_rotation_size}</MUITypography>)
         }
 
-        {authentication.userId === cubeState.cube.creator &&
+        {authentication.userId === cubeState.cube.creatorId &&
           cubeState.active_component_type !== 'builtIn' &&
           <MUIButton
             className={classes.warningButton}
@@ -371,7 +369,7 @@ const ComponentInfo = React.memo(() => {
       </MUICardContent>
 
       <MUICardActions className={classes.cardActions}>
-        <MUITypography variant="h4">
+        <MUITypography variant="subtitle1">
           Matches: <strong>{cubeState.displayed_cards.length}</strong>
         </MUITypography>
         <MUITextField

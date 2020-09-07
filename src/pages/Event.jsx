@@ -44,6 +44,7 @@ const useStyles = makeStyles({
     width: 'fit-content'
   },
   downloadLink: {
+    fontFamily: 'Ubuntu, Roboto, Arial, sans-serif',
     fontSize: '1.6rem'
   },
   flexGrow: {
@@ -140,7 +141,10 @@ const Event = () => {
             {eventState.name &&
               <React.Fragment>
                 <MUICard>
-                  <MUICardHeader title={<MUITypography variant="h2">{eventState.name}</MUITypography>} />
+                  <MUICardHeader
+                    disableTypography={true}
+                    title={<MUITypography variant="subtitle1">{eventState.name}</MUITypography>}
+                  />
                   <MUICardContent>
                     <MUIGrid container justify="space-around" spacing={2}>
                       {eventState.players.map(function (player) {

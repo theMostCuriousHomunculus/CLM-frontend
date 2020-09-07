@@ -11,20 +11,12 @@ import MUITypography from '@material-ui/core/Typography';
 import MUIControlCameraIcon from '@material-ui/icons/ControlCamera';
 import MUIPaletteIcon from '@material-ui/icons/Palette';
 import MUITimerIcon from '@material-ui/icons/Timer';
-import { makeStyles } from '@material-ui/core/styles';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
-
-const useStyles = makeStyles({
-  basicCard: {
-    margin: '1rem'
-  }
-});
 
 const Home = () => {
 
   const authentication = React.useContext(AuthenticationContext);
-  const classes = useStyles();
   const history = useHistory();
 
   /*const components = [
@@ -48,22 +40,20 @@ const Home = () => {
 
   return (
     <React.Fragment>
-      <MUICard className={classes.basicCard}>
+      <MUICard>
         <MUICardHeader
-          title={<MUITypography variant="h2">A New Tool for Cube Curators</MUITypography>}
-          subheader={
-            <React.Fragment>
-              <MUITypography variant="subtitle1">Cube Level Midnight lets you do it all.</MUITypography>
-              {!authentication.isLoggedIn &&
-                <MUITypography variant="subtitle2">Create an account or login to get started building cubes and connecting with your buds!</MUITypography>
-              }
-            </React.Fragment>
+          disableTypography={true}
+          title={<MUITypography variant="subtitle1">A New Tool for Cube Curators</MUITypography>}
+          subheader={!authentication.isLoggedIn &&
+            <MUITypography color="textSecondary" variant="subtitle2">
+              Create an account or login to get started building cubes and connecting with your buds!
+            </MUITypography>
           }
         />
         <MUICardContent>
-          <MUITypography variant="body1"><MUIControlCameraIcon /> Increase Your Control Over Your Cube</MUITypography>
-          <MUITypography variant="body1"><MUIPaletteIcon /> Offer Your Group Diverse Play Experiences</MUITypography>
-          <MUITypography variant="body1"><MUITimerIcon /> Draft Your Cube in Real Time with Your Buds</MUITypography>
+          <MUITypography variant="body1"><MUIControlCameraIcon /> Increased Control Over Your Cube</MUITypography>
+          <MUITypography variant="body1"><MUIPaletteIcon /> Diverse Play Experiences</MUITypography>
+          <MUITypography variant="body1"><MUITimerIcon /> Draft in Real Time with Your Buds</MUITypography>
           <MUITypography variant="body1"><MUIComputerIcon /> Export Draft Picks to CSV Files for Quick and Easy MTGO Play</MUITypography>
           <MUICardActions style={{ justifyContent: 'flex-end' }}>
             <MUIButton color="primary" onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')} variant="contained">

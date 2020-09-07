@@ -6,15 +6,16 @@ import theme from '../../theme';
 
 const useStyles = makeStyles({
   footer: {
+    alignItems: 'center',
     background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-    bottom: 0,
     color: theme.palette.secondary.main,
-    height: '300px',
-    padding: '1rem',
-    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0,
+    justifyContent: 'center',
+    padding: 8,
     textAlign: 'center',
     width: '100%',
-    zIndex: -1,
     '& a': {
       color: '#ffffff'
     }
@@ -31,7 +32,7 @@ const Footer = () => {
         <MUITypography variant="body2">All card images, mana symbols, expansions and art related to Magic the Gathering are the property of Wizards of the Coast and its parent company, Hasbro, Inc.</MUITypography>
         <MUITypography variant="body2">Cube Level Midnight uses <a href="https://scryfall.com/">Scryfall.com</a>'s API to search for and display Magic cards, but is not affiliated with, produced or endorsed by Scryfall LLC. This site endeavours to adhere to the Scryfall data guidelines.</MUITypography>
         <MUITypography variant="body2">Opinions expressed by users in comments are not necessarily opinions shared by Cube Level Midnight.</MUITypography>
-        <MUITypography variant="body2">Cube Level Midnight was built by Casey Johnson using MongoDB, Express, Node.js and React.</MUITypography>
+        <MUITypography variant="body2">Cube Level Midnight was built by Casey Johnson using MongoDB, Express, React, Node and Material UI.</MUITypography>
       </footer>
     );
 }

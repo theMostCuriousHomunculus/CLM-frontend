@@ -6,20 +6,8 @@ import { CardContent as MUICardContent } from '@material-ui/core';
 import { CardHeader as MUICardHeader } from '@material-ui/core';
 import { Grid as MUIGrid } from '@material-ui/core';
 import { Typography as MUITypography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles({
-  cardActions: {
-    justifyContent: 'flex-end'
-  },
-  gridContainer: {
-    padding: '1rem'
-  }
-})
 
 const Resources = () => {
-
-  const classes = useStyles();
 
   const resources = [
     {
@@ -37,27 +25,28 @@ const Resources = () => {
   ]
 
   return (
-    <MUIGrid className={classes.gridContainer} container spacing={2}>
-    
+    <MUIGrid container>
       {
         resources.map(function (resource, index) {
           return (
-            <MUIGrid className={classes.gridItem} item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
+            <MUIGrid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
               <MUICard>
-                <MUICardHeader title={<MUITypography variant="h2">{resource.name}</MUITypography>} />
+                <MUICardHeader
+                  disableTypography={true}
+                  title={<MUITypography variant="subtitle1">{resource.name}</MUITypography>}
+                  subheader={<MUITypography color="textSecondary" variant="subtitle2">{resource.platform}</MUITypography>}
+                />
                 <MUICardContent>
                   <MUITypography variant="body1">{resource.description}</MUITypography>
-                  <MUITypography variant="body2">{resource.platform}</MUITypography>
                 </MUICardContent>
-                <MUICardActions className={classes.cardActions}>
-                  <MUIButton color="primary" href={resources.link} variant="contained">Learn More</MUIButton>
+                <MUICardActions>
+                  <MUIButton color="primary" href={resource.link} variant="contained">Learn More</MUIButton>
                 </MUICardActions>
               </MUICard>
             </MUIGrid>
           );
         })
       }
-    
     </MUIGrid>
   );
 }
