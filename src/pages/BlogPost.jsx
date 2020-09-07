@@ -117,7 +117,6 @@ const BlogPost = () => {
 
   React.useEffect(() => {
     if (blogPostId !== 'new-post') {
-      console.log("shouldn't get here");
       const fetchBlogPost = async function () {
         try {
           const blogPostData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`, 'GET', null, {});

@@ -32,7 +32,9 @@ const Cube = () => {
   const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
 
-  const [creator, setCreator] = React.useState(null);
+  const [creator, setCreator] = React.useState({
+    _id: undefined
+  });
   const [preview, setPreview] = React.useState({
     back_image: null,
     container_display: "none",
