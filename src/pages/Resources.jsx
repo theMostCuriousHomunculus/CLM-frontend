@@ -25,7 +25,7 @@ const Resources = () => {
   ]
 
   return (
-    <MUIGrid container>
+    <MUIGrid container spacing={2}>
       {
         resources.map(function (resource, index) {
           return (

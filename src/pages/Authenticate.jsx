@@ -64,8 +64,7 @@ const Authenticate = () => {
           'Content-Type': 'application/json'
         }
       );
-
-      authentication.login(response.userId, response.token);
+      authentication.login(response.isAdmin, response.token, response.userId);
       history.push('/');
     } catch (err) {
       console.log(err);
@@ -92,7 +91,7 @@ const Authenticate = () => {
         }
       );
         
-      authentication.login(response.userId, response.token);
+      authentication.login(false, response.token, response.userId);
       history.push('/');
     } catch (err) {
       console.log(err);

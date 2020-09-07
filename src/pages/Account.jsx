@@ -73,6 +73,7 @@ const Account = () => {
       const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
       const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
       setUser(accountData);
+      // I should clean this up by adding virtuals to the models on the backend; no need for multiple requests to the server to get this data
       const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creatorId=${accountId}`, 'GET', null, {});
       setCubes(cubeData.cubes);
       const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?player=${accountId}`, 'GET', null, {});
@@ -193,7 +194,7 @@ const Account = () => {
             }
           </MUICard>
 
-          <MUIGrid container>
+          <MUIGrid container spacing={2}>
 
             <MUIGrid item xs={12} lg={6}>
               <UserCubeCard classes={classes} cubes={cubes} />
@@ -205,7 +206,7 @@ const Account = () => {
 
           </MUIGrid>
 
-          <MUIGrid container>
+          <MUIGrid container spacing={2}>
             <MUIGrid item xs={12} sm={6} md={4}>
               <MUICard>
                 <MUICardHeader

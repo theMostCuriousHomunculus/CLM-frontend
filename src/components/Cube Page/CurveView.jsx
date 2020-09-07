@@ -35,10 +35,10 @@ const useStyles = makeStyles({
     backgroundColor: colorless
   },
   curveViewMainContainer: {
-    margin: '1rem'
+    marginTop: 16
   },
   curveViewSubContainer: {
-    margin: '1rem 0'
+    margin: 8
   },
   curveViewTypeContainer: {
     display: 'grid',

@@ -16,9 +16,9 @@ const useStyles = makeStyles({
     }
   },
   search: {
-    position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.common.white, 0.15),
+    position: 'relative',
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
@@ -29,6 +29,9 @@ const useStyles = makeStyles({
       [theme.breakpoints.up('md')]: {
         width: '36rem'
       }
+    },
+    '& .MuiFormControl-root': {
+      marginLeft: 56
     }
   },
   searchIcon: {

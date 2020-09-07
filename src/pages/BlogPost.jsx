@@ -88,39 +88,89 @@ const BlogPost = () => {
   const authentication = React.useContext(AuthenticationContext);
   const bodyInput = React.useRef();
   const classes = useStyles();
+  const imageInput = React.useRef();
   const subtitleInput = React.useRef();
   const titleInput = React.useRef();
-  const [blogPost, setBlogPost] = React.useState(undefined);
+  const [blogPost, setBlogPost] = React.useState({
+    article: {
+      _id: undefined,
+      authorId: undefined,
+      body: undefined,
+      comments: [],
+      image: undefined,
+      subtitle: undefined,
+      title: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+      __v: undefined
+    },
+    author: {
+      _id: undefined,
+      avatar: undefined,
+      name: undefined
+    }
+  });
   const { loading, sendRequest } = useRequest();
 
   const blogPostId = useParams().blogPostId;
   const history = useHistory();
 
   React.useEffect(() => {
-    const fetchBlogPost = async function () {
-      try {
-        const blogPostData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`, 'GET', null, {});
-        console.log(blogPostData);
-        setBlogPost(blogPostData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchBlogPost();
-  }, [blogPostId, sendRequest]);
+    if (blogPostId !== 'new-post') {
+      console.log("shouldn't get here");
+      const fetchBlogPost = async function () {
+        try {
+          const blogPostData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`, 'GET', null, {});
+          setBlogPost(blogPostData);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchBlogPost();
+    } else {
+      console.log(authentication.userId);
+      const fetchProfileInfo = async function () {
+        try {
+          const profileData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${authentication.userId}`, 'GET', null, {});
+          setBlogPost((prevState) => ({
+            article: {
+              ...prevState.article,
+              authorId: authentication.userId,
+              body: '',
+              image: '',
+              subtitle: '',
+              title: '',
+              updatedAt: Date.now()
+            },
+            author: {
+              _id: authentication.userId,
+              avatar: profileData.avatar,
+              name: profileData.name
+            }
+          }));
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchProfileInfo();
+    }
+  }, [authentication.userId, blogPostId, sendRequest]);
 
-  async function submitChanges () {
+  async function submitPost () {
+    const method = blogPostId === 'new-post' ? 'POST' : 'PATCH';
+    const urlSuffix = blogPostId === 'new-post' ? '' : `/blog/${blogPostId}`;
     try {
-      await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`,
-        'PATCH',
+      await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog${urlSuffix}`,
+        method,
         JSON.stringify({
           body: bodyInput.current.value,
+          image: imageInput.current.value,
           subtitle: subtitleInput.current.value,
           title: titleInput.current.value
         }),
         {
           Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
+          'Content-Type': 'application/json'
         }
       );
       history.push('/blog');
@@ -133,75 +183,90 @@ const BlogPost = () => {
     <React.Fragment>
       {loading ?
         <LoadingSpinner /> :
-        <React.Fragment>
-          {blogPost &&
-            <MUICard>
-              <MUICardHeader
-                avatar={<MUIAvatar alt={blogPost.author.name} className={classes.avatarLarge} src={blogPost.author.avatar} />}
-                disableTypography={true}
-                title={blogPost.author._id === authentication.userId ?
-                  <MUITextField
-                    defaultValue={blogPost.article.title}
-                    fullWidth
-                    inputRef={titleInput}
-                    label="Title"
-                    type="text"
-                    variant="outlined"
-                  /> :
-                  <MUITypography variant="subtitle1">{blogPost.article.title}</MUITypography>
-                }
-                subheader={
-                  <React.Fragment>
-                    <React.Fragment>
-                      {blogPost.author._id === authentication.userId ?
-                        <MUITextField
-                          defaultValue={blogPost.article.subtitle}
-                          fullWidth
-                          inputRef={subtitleInput}
-                          label="Subtitle"
-                          style={{ marginTop: 16 }}
-                          type="text"
-                          variant="outlined"
-                        /> :
-                        <MUITypography variant="subtitle2">{blogPost.article.subtitle}</MUITypography>
-                      }
-                    </React.Fragment>
-                    <MUITypography color="textSecondary" variant="body2">A work of genius by {blogPost.author.name}.</MUITypography>
-                    <MUITypography color="textSecondary" variant="body2">Last updated {Date(blogPost.article.updatedAt).toLocaleString()}.</MUITypography>
-                  </React.Fragment>
-                }
-              />
-              <MUICardContent>
+        <MUICard>
+          <MUICardHeader
+            avatar={<MUIAvatar alt={blogPost.author.name} className={classes.avatarLarge} src={blogPost.author.avatar} />}
+            disableTypography={true}
+            title={blogPost.author._id === authentication.userId ?
+              <MUITextField
+                defaultValue={blogPost.article.title}
+                fullWidth
+                inputRef={titleInput}
+                label="Title"
+                type="text"
+                variant="outlined"
+              /> :
+              <MUITypography variant="subtitle1">{blogPost.article.title}</MUITypography>
+            }
+            subheader={
+              <React.Fragment>
                 {blogPost.author._id === authentication.userId ?
-                  <MUITextField
-                    defaultValue={blogPost.article.body}
-                    fullWidth
-                    inputRef={bodyInput}
-                    label="Body"
-                    multiline
-                    rows={20}
-                    type="text"
-                    variant="outlined"
-                  /> :
-                  <article className={classes.article}>
-                    <ReactMarkdown escapeHtml={false} source={blogPost.article.body} />
-                  </article>
+                  <React.Fragment>
+                    <MUITextField
+                      defaultValue={blogPost.article.subtitle}
+                      fullWidth
+                      inputRef={subtitleInput}
+                      label="Subtitle"
+                      style={{ marginTop: 16 }}
+                      type="text"
+                      variant="outlined"
+                    />
+                    <MUITextField
+                      defaultValue={blogPost.article.image}
+                      fullWidth
+                      inputRef={imageInput}
+                      label="Image"
+                      style={{ marginTop: 16 }}
+                      type="text"
+                      variant="outlined"
+                    />
+                  </React.Fragment>  :
+                  <MUITypography variant="subtitle2">{blogPost.article.subtitle}</MUITypography>
                 }
-              </MUICardContent>
-              <MUICardActions>
-                {blogPost.author._id === authentication.userId &&
-                  <MUIButton
-                    color="primary"
-                    onClick={submitChanges}
-                    variant="contained"
-                  >
-                    <MUISyncIcon />
-                  </MUIButton>
-                }
-              </MUICardActions>
-            </MUICard>
-          }
-        </React.Fragment>
+                <MUITypography
+                  color="textSecondary"
+                  variant="body2"
+                >
+                A work of genius by {blogPost.author.name}.
+                </MUITypography>
+                <MUITypography
+                  color="textSecondary"
+                  variant="body2"
+                >
+                Last updated {Date(blogPost.article.updatedAt).toLocaleString()}.
+                </MUITypography>
+              </React.Fragment>
+            }
+          />
+          <MUICardContent>
+            {blogPost.author._id === authentication.userId ?
+              <MUITextField
+                defaultValue={blogPost.article.body}
+                fullWidth
+                inputRef={bodyInput}
+                label="Body"
+                multiline
+                rows={20}
+                type="text"
+                variant="outlined"
+              /> :
+              <article className={classes.article}>
+                <ReactMarkdown escapeHtml={false} source={blogPost.article.body} />
+              </article>
+            }
+          </MUICardContent>
+          <MUICardActions>
+            {blogPost.author._id === authentication.userId &&
+              <MUIButton
+                color="primary"
+                onClick={submitPost}
+                variant="contained"
+              >
+                {blogPostId === 'new-post' ? 'Publish' : <MUISyncIcon />}
+              </MUIButton>
+            }
+          </MUICardActions>
+        </MUICard>
       }
     </React.Fragment>
   );

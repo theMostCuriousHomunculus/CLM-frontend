@@ -59,12 +59,36 @@ const theme = createMuiTheme({
       },
       item: {
         margin: 0,
-        padding: 0
+        padding: 0,
+        '& .MuiCard-root': {
+          margin: 0
+        }
       },
       "spacing-xs-2": {
         margin: 0,
         padding: 0,
         width: '100%'
+      }
+    },
+    MuiTableCell: {
+      body: {
+        fontSize: '1.5rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '0.85rem'
+        }
+      },
+      head: {
+        color: lightGreen['A400'],
+        fontSize: '2rem',
+        [breakpoints.down('sm')]: {
+          fontSize: '1rem'
+        }
+      },
+      root: {
+        padding: '4px 8px 4px 8px'
+      },
+      stickyHeader: {
+        backgroundColor: deepPurple[400]
       }
     },
     MuiTypography: {
@@ -121,24 +145,6 @@ const theme = createMuiTheme({
         [breakpoints.down('sm')]: {
           fontSize: '0.85rem'
         }
-      }
-    },
-    MuiTableCell: {
-      body: {
-        fontSize: '1.5rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '0.85rem'
-        }
-      },
-      head: {
-        color: lightGreen['A400'],
-        fontSize: '2rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1rem'
-        }
-      },
-      stickyHeader: {
-        backgroundColor: deepPurple[400]
       }
     }
   },

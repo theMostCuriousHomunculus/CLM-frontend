@@ -37,10 +37,13 @@ function App() {
   const classes = useStyles();
   const { sendRequest } = useRequest();
 
+  const [isAdmin, setIsAdmin] = React.useState(false);
   const [token, setToken] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
 
-  const login = React.useCallback((uid, tkn) => {
+  const login = React.useCallback((admin, tkn, uid) => {
+    setIsAdmin(admin);
+    Cookies.set('is_admin', admin);
     setToken(tkn);
     Cookies.set('authentication_token', tkn);
     setUserId(uid);
@@ -57,6 +60,8 @@ function App() {
         'Content-Type': 'application/json'
       }
     );
+    setIsAdmin(false);
+    Cookies.remove('is_admin');
     setToken(null);
     Cookies.remove('authentication_token');
     setUserId(null);
@@ -76,18 +81,19 @@ function App() {
 
   React.useEffect(() => {
     if (Cookies.get('user_id') && Cookies.get('authentication_token')) {
-      login(Cookies.get('user_id'), Cookies.get('authentication_token'));
+      login(!!(Cookies.get('is_admin') === 'true'), Cookies.get('authentication_token'), Cookies.get('user_id'));
     }
   }, [login]);
 
   return (
     <AuthenticationContext.Provider
       value={{
+        isAdmin,
         isLoggedIn: !!token,
-        token,
-        userId,
         login,
-        logout
+        logout,
+        token,
+        userId
       }}
     >
       <BrowserRouter>
