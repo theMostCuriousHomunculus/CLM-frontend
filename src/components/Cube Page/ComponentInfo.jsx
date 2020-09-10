@@ -97,13 +97,12 @@ const ComponentInfo = React.memo(() => {
 
     const componentData = JSON.stringify({
       action: action,
-      cube_id: cubeId,
       name: newComponentName
     });
 
     try {
       const updatedCube = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/`,
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
         'PATCH',
         componentData,
         {
@@ -132,11 +131,10 @@ const ComponentInfo = React.memo(() => {
     const action = cubeState.active_component_type === 'module' ? 'delete_module' : 'delete_rotation';
     const deleteInfo = JSON.stringify({
       action: action,
-      component: cubeState.active_component_id,
-      cube_id: cubeId
+      component: cubeState.active_component_id
     });
     const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube`,
+      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
       deleteInfo,
       {
@@ -162,12 +160,11 @@ const ComponentInfo = React.memo(() => {
     const componentChanges = JSON.stringify({
       action: action,
       component: cubeState.active_component_id,
-      cube_id: cubeId,
       name: cubeState.active_component_name,
       size: cubeState.active_rotation_size
     });
     const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube`,
+      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
       componentChanges,
       {

@@ -12,7 +12,9 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import Comment from '../components/BlogPost Page/Comment';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import NewComment from '../components/BlogPost Page/NewComment';
 import theme from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
@@ -92,23 +94,20 @@ const BlogPost = () => {
   const subtitleInput = React.useRef();
   const titleInput = React.useRef();
   const [blogPost, setBlogPost] = React.useState({
-    article: {
-      _id: undefined,
-      authorId: undefined,
-      body: undefined,
-      comments: [],
-      image: undefined,
-      subtitle: undefined,
-      title: undefined,
-      createdAt: undefined,
-      updatedAt: undefined,
-      __v: undefined
-    },
+    _id: undefined,
     author: {
       _id: undefined,
       avatar: undefined,
       name: undefined
-    }
+    },
+    body: undefined,
+    comments: [],
+    image: undefined,
+    subtitle: undefined,
+    title: undefined,
+    createdAt: undefined,
+    updatedAt: undefined,
+    __v: undefined
   });
   const { loading, sendRequest } = useRequest();
 
@@ -127,25 +126,22 @@ const BlogPost = () => {
       };
       fetchBlogPost();
     } else {
-      console.log(authentication.userId);
       const fetchProfileInfo = async function () {
         try {
           const profileData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${authentication.userId}`, 'GET', null, {});
           setBlogPost((prevState) => ({
-            article: {
-              ...prevState.article,
-              authorId: authentication.userId,
-              body: '',
-              image: '',
-              subtitle: '',
-              title: '',
-              updatedAt: Date.now()
-            },
+            ...prevState,
             author: {
               _id: authentication.userId,
               avatar: profileData.avatar,
               name: profileData.name
-            }
+            },
+            body: '',
+            comments: [],
+            image: '',
+            subtitle: '',
+            title: '',
+            updatedAt: Date.now()
           }));
         } catch (error) {
           console.log(error);
@@ -154,6 +150,10 @@ const BlogPost = () => {
       fetchProfileInfo();
     }
   }, [authentication.userId, blogPostId, sendRequest]);
+
+  function refreshPage (refreshedArticle) {
+    setBlogPost(refreshedArticle);
+  }
 
   async function submitPost () {
     const method = blogPostId === 'new-post' ? 'POST' : 'PATCH';
@@ -188,21 +188,21 @@ const BlogPost = () => {
             disableTypography={true}
             title={blogPost.author._id === authentication.userId ?
               <MUITextField
-                defaultValue={blogPost.article.title}
+                defaultValue={blogPost.title}
                 fullWidth
                 inputRef={titleInput}
                 label="Title"
                 type="text"
                 variant="outlined"
               /> :
-              <MUITypography variant="subtitle1">{blogPost.article.title}</MUITypography>
+              <MUITypography variant="subtitle1">{blogPost.title}</MUITypography>
             }
             subheader={
               <React.Fragment>
                 {blogPost.author._id === authentication.userId ?
                   <React.Fragment>
                     <MUITextField
-                      defaultValue={blogPost.article.subtitle}
+                      defaultValue={blogPost.subtitle}
                       fullWidth
                       inputRef={subtitleInput}
                       label="Subtitle"
@@ -211,7 +211,7 @@ const BlogPost = () => {
                       variant="outlined"
                     />
                     <MUITextField
-                      defaultValue={blogPost.article.image}
+                      defaultValue={blogPost.image}
                       fullWidth
                       inputRef={imageInput}
                       label="Image"
@@ -220,7 +220,7 @@ const BlogPost = () => {
                       variant="outlined"
                     />
                   </React.Fragment>  :
-                  <MUITypography variant="subtitle2">{blogPost.article.subtitle}</MUITypography>
+                  <MUITypography variant="subtitle2">{blogPost.subtitle}</MUITypography>
                 }
                 <MUITypography
                   color="textSecondary"
@@ -232,7 +232,7 @@ const BlogPost = () => {
                   color="textSecondary"
                   variant="body2"
                 >
-                Last updated {Date(blogPost.article.updatedAt).toLocaleString()}.
+                Last updated {new Date(blogPost.updatedAt).toLocaleString()}.
                 </MUITypography>
               </React.Fragment>
             }
@@ -240,7 +240,7 @@ const BlogPost = () => {
           <MUICardContent>
             {blogPost.author._id === authentication.userId ?
               <MUITextField
-                defaultValue={blogPost.article.body}
+                defaultValue={blogPost.body}
                 fullWidth
                 inputRef={bodyInput}
                 label="Body"
@@ -250,7 +250,7 @@ const BlogPost = () => {
                 variant="outlined"
               /> :
               <article className={classes.article}>
-                <ReactMarkdown escapeHtml={false} source={blogPost.article.body} />
+                <ReactMarkdown escapeHtml={false} source={blogPost.body} />
               </article>
             }
           </MUICardContent>
@@ -267,6 +267,12 @@ const BlogPost = () => {
           </MUICardActions>
         </MUICard>
       }
+      {authentication.isLoggedIn && blogPostId !== 'new-post' &&
+        <NewComment pushNewComment={refreshPage} />
+      }
+      {blogPost.comments.map(function (comment) {
+        return <Comment comment={comment} key={comment._id} />;
+      })}
     </React.Fragment>
   );
 }

@@ -47,11 +47,10 @@ const AuthorizedCardRow = (props) => {
       action,
       card_id,
       component: cubeState.active_component_id,
-      cube_id: cubeId,
       destination
     });
     const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube`,
+      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
       moveInfo,
       {
@@ -69,13 +68,12 @@ const AuthorizedCardRow = (props) => {
     let cardChanges = {
       action,
       card_id,
-      component: cubeState.active_component_id,
-      cube_id: cubeId
+      component: cubeState.active_component_id
     };
     cardChanges[property_name] = event.target.value;
     cardChanges = JSON.stringify(cardChanges);
     const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube`,
+      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
       cardChanges,
       {

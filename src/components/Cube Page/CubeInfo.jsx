@@ -33,12 +33,11 @@ const CubeInfo = (props) => {
   async function submitCubeChanges () {
     const cubeChanges = JSON.stringify({
       action: 'edit_cube_info',
-      cube_id: cubeId,
       description: descriptionInput.current.value,
       name: nameInput.current.value
     });
     const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube`,
+      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
       cubeChanges,
       {

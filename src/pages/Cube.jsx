@@ -65,12 +65,11 @@ const Cube = () => {
       const cardData = JSON.stringify({
         ...chosenCard,
         action: 'add_card',
-        component: cubeState.active_component_id,
-        cube_id: cubeId
+        component: cubeState.active_component_id
       });
 
       const updatedCube = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/`,
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
         'PATCH',
         cardData,
         {

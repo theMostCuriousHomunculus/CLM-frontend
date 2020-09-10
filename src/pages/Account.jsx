@@ -76,7 +76,7 @@ const Account = () => {
       // I should clean this up by adding virtuals to the models on the backend; no need for multiple requests to the server to get this data
       const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creatorId=${accountId}`, 'GET', null, {});
       setCubes(cubeData.cubes);
-      const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?player=${accountId}`, 'GET', null, {});
+      const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?playerId=${accountId}`, 'GET', null, {});
       setEvents(eventData.events);
     } catch (error) {
       console.log('Error: ' + error.message);

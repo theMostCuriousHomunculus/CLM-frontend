@@ -36,12 +36,11 @@ const PrintSelector = (props) => {
     const cardChanges = JSON.stringify({
       action: 'edit_card',
       card_id: props.card._id,
-      cube_id: cubeId,
       ...cardDetails,
       ...availablePrintings[index]
     });
     const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube`,
+      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
       cardChanges,
       {

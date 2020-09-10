@@ -92,11 +92,10 @@ const ColorCheckboxes = (props) => {
         action: 'edit_card',
         card_id: props.card_id,
         color_identity: color_identity.sort(),
-        component: /*props*/cubeState.active_component_id,
-        cube_id: /*props.cube_id*/cubeId
+        component: cubeState.active_component_id
       });
       const updatedCube = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/`,
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
         'PATCH',
         cardChanges,
         {
@@ -104,7 +103,6 @@ const ColorCheckboxes = (props) => {
           'Content-Type': 'application/json'
         }
       );
-      // props.updateCubeHandler(updatedCube);
       dispatch('UPDATE_CUBE', updatedCube);
 
     } catch (error) {
