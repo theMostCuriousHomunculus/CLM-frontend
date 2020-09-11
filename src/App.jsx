@@ -56,8 +56,7 @@ function App() {
       'PATCH',
       null,
       {
-        Authorization: 'Bearer ' + Cookies.get('authentication_token'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + Cookies.get('authentication_token')
       }
     );
     setIsAdmin(false);

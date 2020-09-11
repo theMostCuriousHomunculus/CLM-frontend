@@ -10,9 +10,12 @@ import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   input: {
-    margin: '0.75rem 0.75rem 0.75rem 5.5rem',
+    margin: '8px 8px 8px 56px',
     '& input[type=text]': {
       color: '#ffffff',
+    },
+    '& .MuiInputBase-root': {
+      padding: '8px 40px 8px 8px !important'
     }
   },
   search: {
@@ -24,10 +27,10 @@ const useStyles = makeStyles({
     },
     '& .MuiAutocomplete-root': {
       [theme.breakpoints.down('sm')]: {
-        width: 275
+        width: 286
       },
       [theme.breakpoints.up('md')]: {
-        width: '36rem'
+        width: 576
       }
     },
     '& .MuiFormControl-root': {
@@ -54,7 +57,7 @@ const useStyles = makeStyles({
     [theme.breakpoints.down('sm')]: {
       display: 'none'
     },
-    width: '42rem'
+    width: 640
   }
 });
 

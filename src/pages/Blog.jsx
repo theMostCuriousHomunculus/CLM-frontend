@@ -6,11 +6,13 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUICardMedia from '@material-ui/core/CardMedia';
 import MUICardActions from '@material-ui/core/CardActions';
 import MUICreateIcon from '@material-ui/icons/Create';
+import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core';
 
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import theme from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
@@ -25,7 +27,17 @@ const useStyles = makeStyles({
   },
   iconButton: {
     height: 40
-  }
+  },
+  spaceBetween: {
+    justifyContent: 'space-between'
+  },
+  warningButton: {
+    backgroundColor: theme.palette.warning.main,
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: theme.palette.warning.dark
+    }
+  },
 });
 
 const Blog = () => {
@@ -37,23 +49,38 @@ const Blog = () => {
   const history = useHistory();
 
   React.useEffect(() => {
-    const fetchBlogPosts = async function () {
+    async function fetchBlogPosts () {
       try {
         const blogPostsData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog`, 'GET', null, {});
         setBlogPosts(blogPostsData);
       } catch (error) {
         console.log(error);
       }
-    };
+    }
     fetchBlogPosts();
   }, [sendRequest]);
+
+  async function deleteBlogPost (blogPostId) {
+    try {
+      const remainingBlogPosts = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`,
+        'DELETE',
+        null,
+        {
+          Authorization: 'Bearer ' + authentication.token
+        }
+      );
+      setBlogPosts(remainingBlogPosts);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <React.Fragment>
       {loading ?
         <LoadingSpinner /> :
         <MUIGrid container spacing={2}>
-          {authentication.isAdmin ?
+          {authentication.isAdmin &&
             <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
               <MUICard className={classes.fullHeight}>
                 <MUICardHeader
@@ -74,8 +101,7 @@ const Blog = () => {
                   </MUIButton>
                 </MUICardActions>
               </MUICard>
-            </MUIGrid> :
-            null
+            </MUIGrid>
           }
           {blogPosts.map(function (blogPost) {
             return (
@@ -88,7 +114,17 @@ const Blog = () => {
                   <MUICardMedia
                     image={blogPost.image}
                   />
-                  <MUICardActions>
+                  <MUICardActions className={blogPost.author === authentication.userId ? classes.spaceBetween : null}>
+                    {blogPost.author === authentication.userId &&
+                      <MUIButton
+                        className={classes.warningButton}
+                        onClick={() => deleteBlogPost(blogPost._id)}
+                        startIcon={<MUIDeleteForeverIcon />}
+                        variant="contained"
+                      >
+                        Delete
+                      </MUIButton>
+                    }
                     <MUIButton
                       color="primary"
                       onClick={() => history.push(`/blog/${blogPost._id}`)}

@@ -12,7 +12,7 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Comment from '../components/BlogPost Page/Comment';
+import ExistingComment from '../components/BlogPost Page/ExistingComment';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import NewComment from '../components/BlogPost Page/NewComment';
 import theme from '../theme';
@@ -271,7 +271,7 @@ const BlogPost = () => {
         <NewComment pushNewComment={refreshPage} />
       }
       {blogPost.comments.map(function (comment) {
-        return <Comment comment={comment} key={comment._id} />;
+        return <ExistingComment comment={comment} key={comment._id} deleteComment={refreshPage} />;
       })}
     </React.Fragment>
   );

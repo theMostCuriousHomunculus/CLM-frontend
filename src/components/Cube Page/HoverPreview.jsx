@@ -4,11 +4,11 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles({
   hoverPreviewContainer: {
     display: 'inline-block',
-    position: 'absolute'
+    position: 'absolute',
+    zIndex: 2
   },
   hoverPreviewImage: {
-    height: 300,
-    zIndex: 1
+    height: 300
   }
 });
 
