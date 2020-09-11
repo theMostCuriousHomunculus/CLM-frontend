@@ -157,7 +157,7 @@ const BlogPost = () => {
 
   async function submitPost () {
     const method = blogPostId === 'new-post' ? 'POST' : 'PATCH';
-    const urlSuffix = blogPostId === 'new-post' ? '' : `/blog/${blogPostId}`;
+    const urlSuffix = blogPostId === 'new-post' ? '' : `/${blogPostId}`;
     try {
       await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog${urlSuffix}`,
         method,
