@@ -9,6 +9,11 @@ body {
   position: relative;
 }
 
+.clear-both {
+  clear: both;
+  display: block;
+}
+
 .centered-figure {
   clear: both;
   margin: 20px auto;

@@ -83,16 +83,23 @@ const useStyles = makeStyles({
   avatarLarge: {
     height: '150px',
     width: '150px'
+  },
+  cardHeader: {
+    '& .MuiCardHeader-action': {
+      alignSelf: 'flex-end',
+      margin: '0 0 0 16px'
+    }
   }
 });
 
 const BlogPost = () => {
   const authentication = React.useContext(AuthenticationContext);
-  const bodyInput = React.useRef();
+  const [body, setBody] = React.useState('');
   const classes = useStyles();
-  const imageInput = React.useRef();
-  const subtitleInput = React.useRef();
-  const titleInput = React.useRef();
+  const [image, setImage] = React.useState('');
+  const [subtitle, setSubtitle] = React.useState('');
+  const [title, setTitle] = React.useState('');
+  const [viewMode, setViewMode] = React.useState(undefined)
   const [blogPost, setBlogPost] = React.useState({
     _id: undefined,
     author: {
@@ -120,6 +127,13 @@ const BlogPost = () => {
         try {
           const blogPostData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`, 'GET', null, {});
           setBlogPost(blogPostData);
+          setBody(blogPostData.body);
+          setImage(blogPostData.image);
+          setSubtitle(blogPostData.subtitle);
+          setTitle(blogPostData.title);
+          if (blogPostData.author._id === authentication.userId) {
+            setViewMode('Edit');
+          }
         } catch (error) {
           console.log(error);
         }
@@ -143,6 +157,7 @@ const BlogPost = () => {
             title: '',
             updatedAt: Date.now()
           }));
+          setViewMode('Edit');
         } catch (error) {
           console.log(error);
         }
@@ -162,10 +177,10 @@ const BlogPost = () => {
       await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog${urlSuffix}`,
         method,
         JSON.stringify({
-          body: bodyInput.current.value,
-          image: imageInput.current.value,
-          subtitle: subtitleInput.current.value,
-          title: titleInput.current.value
+          body,
+          image,
+          subtitle,
+          title
         }),
         {
           Authorization: 'Bearer ' + authentication.token,
@@ -178,6 +193,12 @@ const BlogPost = () => {
     }
   }
 
+  function toggleViewMode () {
+    setViewMode((currentViewMode) => {
+      return currentViewMode === 'Edit' ? 'Live' : 'Edit';
+    });
+  }
+
   return (
     <React.Fragment>
       {loading ?
@@ -185,42 +206,43 @@ const BlogPost = () => {
         <MUICard>
           <MUICardHeader
             avatar={<MUIAvatar alt={blogPost.author.name} className={classes.avatarLarge} src={blogPost.author.avatar} />}
+            className={classes.cardHeader}
             disableTypography={true}
             title={blogPost.author._id === authentication.userId ?
               <MUITextField
-                defaultValue={blogPost.title}
                 fullWidth
-                inputRef={titleInput}
                 label="Title"
+                onChange={(event) => setTitle(event.target.value)}
                 type="text"
+                value={title}
                 variant="outlined"
               /> :
-              <MUITypography variant="subtitle1">{blogPost.title}</MUITypography>
+              <MUITypography variant="subtitle1">{title}</MUITypography>
             }
             subheader={
               <React.Fragment>
                 {blogPost.author._id === authentication.userId ?
                   <React.Fragment>
                     <MUITextField
-                      defaultValue={blogPost.subtitle}
                       fullWidth
-                      inputRef={subtitleInput}
                       label="Subtitle"
+                      onChange={(event) => setSubtitle(event.target.value)}
                       style={{ marginTop: 16 }}
                       type="text"
+                      value={subtitle}
                       variant="outlined"
                     />
                     <MUITextField
-                      defaultValue={blogPost.image}
                       fullWidth
-                      inputRef={imageInput}
                       label="Image"
+                      onChange={(event) => setImage(event.target.value)}
                       style={{ marginTop: 16 }}
                       type="text"
+                      value={image}
                       variant="outlined"
                     />
                   </React.Fragment>  :
-                  <MUITypography variant="subtitle2">{blogPost.subtitle}</MUITypography>
+                  <MUITypography variant="subtitle2">{subtitle}</MUITypography>
                 }
                 <MUITypography
                   color="textSecondary"
@@ -236,21 +258,30 @@ const BlogPost = () => {
                 </MUITypography>
               </React.Fragment>
             }
+            action={blogPost.author._id === authentication.userId &&
+              <MUIButton
+                color="secondary"
+                onClick={toggleViewMode}
+                variant="contained"
+              >
+                {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
+              </MUIButton>}
           />
           <MUICardContent>
-            {blogPost.author._id === authentication.userId ?
+            {blogPost.author._id === authentication.userId &&
+              viewMode === 'Edit' ?
               <MUITextField
-                defaultValue={blogPost.body}
                 fullWidth
-                inputRef={bodyInput}
                 label="Body"
+                onChange={(event) => setBody(event.target.value)}
                 multiline
                 rows={20}
                 type="text"
+                value={body}
                 variant="outlined"
               /> :
               <article className={classes.article}>
-                <ReactMarkdown escapeHtml={false} source={blogPost.body} />
+                <ReactMarkdown escapeHtml={false} source={body} />
               </article>
             }
           </MUICardContent>
