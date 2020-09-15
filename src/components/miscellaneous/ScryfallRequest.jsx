@@ -187,7 +187,7 @@ const ScryfallRequest = (props) => {
                 ...params.InputProps,
                 endAdornment: (
                   <React.Fragment>
-                    {loading ? <MUICircularProgress color="inherit" size={20} /> : null}
+                    {loading && <MUICircularProgress color="inherit" size={20} />}
                     {params.InputProps.endAdornment}
                   </React.Fragment>
                 )

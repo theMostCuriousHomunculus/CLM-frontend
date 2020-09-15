@@ -1,11 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import MUICard from '@material-ui/core/Card';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Footer from './components/miscellaneous/Footer';
+import LoadingSpinner from './components/miscellaneous/LoadingSpinner';
 import Navigation from './components/Main Navigation/Navigation';
 
 import { AuthenticationContext } from './contexts/authentication-context';
@@ -21,13 +20,12 @@ const Home = React.lazy(() => import('./pages/Home'));
 const Resources = React.lazy(() => import('./pages/Resources'));
 
 const useStyles = makeStyles({
-  loading: {
-    margin: 8
-  },
   main: {
+    display: 'flex',
     flex: '1 0 auto',
+    flexDirection: 'column',
     height: '100%',
-    margin: '0 auto 0 auto',
+    margin: 'auto',
     width: '100%'
   }
 });
@@ -100,11 +98,7 @@ function App() {
         <main className={classes.main}>
         
           <React.Suspense 
-            fallback={
-              <MUICard className={classes.loading}>
-                <MUICircularProgress />
-              </MUICard>
-            }
+            fallback={<LoadingSpinner />}
           >
             <Switch>
               <Route path='/' exact>
