@@ -91,7 +91,7 @@ const PrintSelector = (props) => {
           onClick={enablePrintChange}
         >
           <MUIListItemText
-            primary="Selected Printing"
+            // primary="Selected Printing"
             secondary={availablePrintings[selectedPrintIndex].printing}
           />
         </MUIListItem>

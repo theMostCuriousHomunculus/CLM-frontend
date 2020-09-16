@@ -203,107 +203,109 @@ const BlogPost = () => {
     <React.Fragment>
       {loading ?
         <LoadingSpinner /> :
-        <MUICard>
-          <MUICardHeader
-            avatar={<MUIAvatar alt={blogPost.author.name} className={classes.avatarLarge} src={blogPost.author.avatar} />}
-            className={classes.cardHeader}
-            disableTypography={true}
-            title={blogPost.author._id === authentication.userId ?
-              <MUITextField
-                fullWidth
-                label="Title"
-                onChange={(event) => setTitle(event.target.value)}
-                type="text"
-                value={title}
-                variant="outlined"
-              /> :
-              <MUITypography variant="subtitle1">{title}</MUITypography>
-            }
-            subheader={
-              <React.Fragment>
-                {blogPost.author._id === authentication.userId ?
-                  <React.Fragment>
-                    <MUITextField
-                      fullWidth
-                      label="Subtitle"
-                      onChange={(event) => setSubtitle(event.target.value)}
-                      style={{ marginTop: 16 }}
-                      type="text"
-                      value={subtitle}
-                      variant="outlined"
-                    />
-                    <MUITextField
-                      fullWidth
-                      label="Image"
-                      onChange={(event) => setImage(event.target.value)}
-                      style={{ marginTop: 16 }}
-                      type="text"
-                      value={image}
-                      variant="outlined"
-                    />
-                  </React.Fragment>  :
-                  <MUITypography variant="subtitle2">{subtitle}</MUITypography>
-                }
-                <MUITypography
-                  color="textSecondary"
-                  variant="body2"
+        <React.Fragment>
+          <MUICard>
+            <MUICardHeader
+              avatar={<MUIAvatar alt={blogPost.author.name} className={classes.avatarLarge} src={blogPost.author.avatar} />}
+              className={classes.cardHeader}
+              disableTypography={true}
+              title={blogPost.author._id === authentication.userId ?
+                <MUITextField
+                  fullWidth
+                  label="Title"
+                  onChange={(event) => setTitle(event.target.value)}
+                  type="text"
+                  value={title}
+                  variant="outlined"
+                /> :
+                <MUITypography variant="subtitle1">{title}</MUITypography>
+              }
+              subheader={
+                <React.Fragment>
+                  {blogPost.author._id === authentication.userId ?
+                    <React.Fragment>
+                      <MUITextField
+                        fullWidth
+                        label="Subtitle"
+                        onChange={(event) => setSubtitle(event.target.value)}
+                        style={{ marginTop: 16 }}
+                        type="text"
+                        value={subtitle}
+                        variant="outlined"
+                      />
+                      <MUITextField
+                        fullWidth
+                        label="Image"
+                        onChange={(event) => setImage(event.target.value)}
+                        style={{ marginTop: 16 }}
+                        type="text"
+                        value={image}
+                        variant="outlined"
+                      />
+                    </React.Fragment>  :
+                    <MUITypography variant="subtitle2">{subtitle}</MUITypography>
+                  }
+                  <MUITypography
+                    color="textSecondary"
+                    variant="body2"
+                  >
+                  A work of genius by {blogPost.author.name}.
+                  </MUITypography>
+                  <MUITypography
+                    color="textSecondary"
+                    variant="body2"
+                  >
+                  Last updated {new Date(blogPost.updatedAt).toLocaleString()}.
+                  </MUITypography>
+                </React.Fragment>
+              }
+              action={blogPost.author._id === authentication.userId &&
+                <MUIButton
+                  color="secondary"
+                  onClick={toggleViewMode}
+                  variant="contained"
                 >
-                A work of genius by {blogPost.author.name}.
-                </MUITypography>
-                <MUITypography
-                  color="textSecondary"
-                  variant="body2"
+                  {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
+                </MUIButton>}
+            />
+            <MUICardContent>
+              {blogPost.author._id === authentication.userId &&
+                viewMode === 'Edit' ?
+                <MUITextField
+                  fullWidth
+                  label="Body"
+                  onChange={(event) => setBody(event.target.value)}
+                  multiline
+                  rows={20}
+                  type="text"
+                  value={body}
+                  variant="outlined"
+                /> :
+                <article className={classes.article}>
+                  <ReactMarkdown escapeHtml={false} source={body} />
+                </article>
+              }
+            </MUICardContent>
+            <MUICardActions>
+              {blogPost.author._id === authentication.userId &&
+                <MUIButton
+                  color="primary"
+                  onClick={submitPost}
+                  variant="contained"
                 >
-                Last updated {new Date(blogPost.updatedAt).toLocaleString()}.
-                </MUITypography>
-              </React.Fragment>
-            }
-            action={blogPost.author._id === authentication.userId &&
-              <MUIButton
-                color="secondary"
-                onClick={toggleViewMode}
-                variant="contained"
-              >
-                {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
-              </MUIButton>}
-          />
-          <MUICardContent>
-            {blogPost.author._id === authentication.userId &&
-              viewMode === 'Edit' ?
-              <MUITextField
-                fullWidth
-                label="Body"
-                onChange={(event) => setBody(event.target.value)}
-                multiline
-                rows={20}
-                type="text"
-                value={body}
-                variant="outlined"
-              /> :
-              <article className={classes.article}>
-                <ReactMarkdown escapeHtml={false} source={body} />
-              </article>
-            }
-          </MUICardContent>
-          <MUICardActions>
-            {blogPost.author._id === authentication.userId &&
-              <MUIButton
-                color="primary"
-                onClick={submitPost}
-                variant="contained"
-              >
-                {blogPostId === 'new-post' ? 'Publish' : <MUISyncIcon />}
-              </MUIButton>
-            }
-          </MUICardActions>
-        </MUICard>
+                  {blogPostId === 'new-post' ? 'Publish' : <MUISyncIcon />}
+                </MUIButton>
+              }
+            </MUICardActions>
+          </MUICard>
+          {authentication.isLoggedIn && blogPostId !== 'new-post' &&
+            <NewComment pushNewComment={refreshPage} />
+          }
+          {blogPost.comments.map(function (comment) {
+            return <ExistingComment comment={comment} key={comment._id} deleteComment={refreshPage} />;
+          })}
+        </React.Fragment>
       }
-      {authentication.isLoggedIn && blogPostId !== 'new-post' &&
-        <NewComment pushNewComment={refreshPage} />
-      }
-      {blogPost.comments.map(function (comment) {
-        return <ExistingComment comment={comment} key={comment._id} deleteComment={refreshPage} />;
-      })}
     </React.Fragment>
   );
 }
