@@ -84,18 +84,20 @@ const Cube = () => {
     }
   }
 
-  function hidePreview () {
-    setPreview({
-      ...preview,
-      back_image: null,
-      container_display: "none",
-      image: null,
-      image_display: "none"
+  const hidePreview = React.useCallback(function () {
+    setPreview(function (currentPreviewState) {
+      return ({
+        ...currentPreviewState,
+        back_image: null,
+        container_display: "none",
+        image: null,
+        image_display: "none"
+      });
     });
-  }
+  }, []);
 
-  function movePreview (event) {
-
+  const movePreview = React.useCallback(function (event) {
+    event.persist();
     const hpcWidth = document.getElementById('hover-preview-container').offsetWidth;
     const windowWidth = window.screen.width;
     let left, right;
@@ -107,23 +109,28 @@ const Cube = () => {
       right = windowWidth - event.pageX - hpcWidth + (hpcWidth * event.pageX / windowWidth) + 'px';
     }
 
-    setPreview({
-      ...preview,
-      left,
-      right,
-      top: event.pageY + 12 + "px"
+    setPreview(function (currentPreviewState) {
+      return ({
+        ...currentPreviewState,
+        left,
+        right,
+        top: event.pageY + 12 + "px"
+      });
     });
-  }
+  }, [])
 
-  function showPreview (event) {
-    setPreview({
-      ...preview,
-      back_image: event.target.getAttribute('back_image'),
-      container_display: "block",
-      image: event.target.getAttribute('image'),
-      image_display: "inline"
+  const showPreview = React.useCallback(function (event) {
+    event.persist();
+    setPreview(function (currentPreviewState) {
+      return ({
+        ...currentPreviewState,
+        back_image: event.target.getAttribute('back_image'),
+        container_display: "block",
+        image: event.target.getAttribute('image'),
+        image_display: "inline"
+      });
     });
-  }
+  }, []);
 
   return (
     <React.Fragment>

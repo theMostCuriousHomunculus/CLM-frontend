@@ -26,17 +26,15 @@ const PrintSelector = (props) => {
     printing: props.card.printing,
     purchase_link: props.card.purchase_link
   }]);
-  const [cardDetails, setCardDetails] = React.useState({ ...props.card });
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
 
   async function handleMenuItemClick (index) {
     setSelectedPrintIndex(index);
-    setCardDetails({ ...cardDetails, ...availablePrintings[index] });
     setAnchorEl(null);
     const cardChanges = JSON.stringify({
       action: 'edit_card',
       card_id: props.card._id,
-      ...cardDetails,
+      ...props.card,
       ...availablePrintings[index]
     });
     const updatedCube = await sendRequest(
@@ -52,13 +50,12 @@ const PrintSelector = (props) => {
   };
 
   async function enablePrintChange (event) {
-
     setAnchorEl(event.currentTarget);
 
     try {
       let printings = await sendRequest(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${props.card.oracle_id}&unique=prints`);
       printings = printings.data.map(function(print) {
-        let /*art_crop, */back_image, image;
+        let back_image, image;
         if (print.layout === "transform") {
           back_image = print.card_faces[1].image_uris.large;
           image = print.card_faces[0].image_uris.large;
@@ -76,6 +73,9 @@ const PrintSelector = (props) => {
         );
       });
       setAvailablePrintings(printings);
+      setSelectedPrintIndex(printings.findIndex(function (print) {
+        return print.printing === props.card.printing;
+      }));
     } catch (error) {
       console.log(error);
     }

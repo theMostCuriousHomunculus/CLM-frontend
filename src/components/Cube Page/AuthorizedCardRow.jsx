@@ -176,7 +176,6 @@ const AuthorizedCardRow = (props) => {
       <MUITableCell className={classes.tableCell}>
         <PrintSelector
           card={props.card}
-          cube_id={cubeId}
         />
       </MUITableCell>
       <MUITableCell className={classes.tableCell}>

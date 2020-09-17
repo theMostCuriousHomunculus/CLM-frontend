@@ -82,9 +82,8 @@ const useStyles = makeStyles({
   }
 });
 
-const CubeView = (props) => {
+const CurveView = (props) => {
 
-  console.log('render');
   const cubeState = useCube(true)[0];
   const classes = useStyles();
 
@@ -146,4 +145,4 @@ const CubeView = (props) => {
   );
 }
 
-export default CubeView;
+export default React.memo(CurveView);

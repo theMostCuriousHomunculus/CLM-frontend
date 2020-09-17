@@ -220,4 +220,4 @@ const TableView = (props) => {
   );
 }
 
-export default TableView;
+export default React.memo(TableView);
