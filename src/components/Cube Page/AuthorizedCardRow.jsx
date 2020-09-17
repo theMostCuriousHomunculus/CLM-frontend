@@ -11,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ColorCheckboxes from './ColorCheckboxes';
 import PrintSelector from './PrintSelector';
+import { monoColors } from '../../constants/color-objects';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
 import { useCube } from '../../hooks/cube-hook';
 
@@ -19,6 +20,11 @@ const useStyles = makeStyles({
     height: '100%',
     paddingBottom: 4,
     paddingTop: 4
+  },
+  tableRow: {
+    '&:hover': {
+      backgroundColor: monoColors[5].hex
+    }
   }
 });
 
@@ -40,10 +46,8 @@ const AuthorizedCardRow = (props) => {
   const classes = useStyles();
   const cubeState = useCube(true)[0];
 
-  // i suspect that these functions being replicated for all the instances of AuthorizedCardRow is what is causing such a lag when switching to ListView...  i should try moving these functions up a level to list view and see if that fixes the problem
-
   return (
-    <MUITableRow>
+    <MUITableRow className={classes.tableRow}>
       <MUITableCell
         back_image={back_image}
         className={classes.tableCell}
@@ -58,6 +62,7 @@ const AuthorizedCardRow = (props) => {
         <ColorCheckboxes
           color_identity={color_identity}
           card_id={_id}
+          submitCardChange={props.submitCardChange}
         />
       </MUITableCell>
       <MUITableCell className={classes.tableCell}>
@@ -65,7 +70,7 @@ const AuthorizedCardRow = (props) => {
           defaultValue={cmc}
           inputProps={{ max: 16, min: 0, step: 1 }}
           margin="dense"
-          onBlur={(event) => props.submitCardChange(_id, "cmc", event.target.value)}
+          onBlur={(event) => props.submitCardChange(_id, { cmc: event.target.value })}
           type="number"
           variant="outlined"
         />
@@ -75,7 +80,7 @@ const AuthorizedCardRow = (props) => {
           autoComplete="off"
           defaultValue={type_line}
           margin="dense"
-          onBlur={(event) => props.submitCardChange(_id, "type_line", event.target.value)}
+          onBlur={(event) => props.submitCardChange(_id, { type_line: event.target.value })}
           type="text"
           variant="outlined"
         />
@@ -127,6 +132,7 @@ const AuthorizedCardRow = (props) => {
       <MUITableCell className={classes.tableCell}>
         <PrintSelector
           card={props.card}
+          submitCardChange={props.submitCardChange}
         />
       </MUITableCell>
       <MUITableCell className={classes.tableCell}>

@@ -1,12 +1,9 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIGrid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useCube } from '../../hooks/cube-hook';
-import { useRequest } from '../../hooks/request-hook';
+import { monoColors } from '../../constants/color-objects';
 import { ReactComponent as WhiteManaSymbol } from '../../images/white-mana-symbol.svg';
 import { ReactComponent as BlueManaSymbol } from '../../images/blue-mana-symbol.svg';
 import { ReactComponent as BlackManaSymbol } from '../../images/black-mana-symbol.svg';
@@ -14,112 +11,87 @@ import { ReactComponent as RedManaSymbol } from '../../images/red-mana-symbol.sv
 import { ReactComponent as GreenManaSymbol } from '../../images/green-mana-symbol.svg';
 
 const useStyles = makeStyles({
+  B: {
+    color: monoColors[2].hex
+  },
   colorCheckbox: {
     padding: 0,
-    '& .MuiIconButton-label': {
-      height: 30,
-      width: 30
-    },
-    '& input': {
-      height: 30,
-      width: 30
-    },
     '& svg': {
-      height: 30,
-      width: 30
+      height: 40,
+      width: 40
     }
   },
+  colorCheckboxContainer: {
+    textAlign: 'center'
+  },
+  G: {
+    color: monoColors[4].hex
+  },
   manaSymbol: {
-    height: 30,
-    width: 30
+    height: 40,
+    width: 40
+  },
+  R: {
+    color: monoColors[3].hex
+  },
+  U: {
+    color: monoColors[1].hex
+  },
+  W: {
+    color: monoColors[0].hex
   }
 });
 
 const ColorCheckboxes = (props) => {
 
-  const cubeId = useParams().cubeId;
-  const authentication = React.useContext(AuthenticationContext);
-  const [cubeState, dispatch] = useCube(true);
-  const { sendRequest } = useRequest();
   const classes = useStyles();
-  // const [whiteChecked, setWhiteChecked] = React.useState(props.color_identity.includes("W"));
 
   const colorObj = {
     "W": {
       "icon": <WhiteManaSymbol className={classes.manaSymbol} />,
-      "state": /*whiteChecked*/props.color_identity.includes("W"),
-      // "updater": setWhiteChecked
+      "checked": props.color_identity.includes("W")
     },
     "U": {
       "icon": <BlueManaSymbol className={classes.manaSymbol} />,
-      "state": props.color_identity.includes("U")
+      "checked": props.color_identity.includes("U")
     },
     "B": {
       "icon": <BlackManaSymbol className={classes.manaSymbol} />,
-      "state": props.color_identity.includes("B")
+      "checked": props.color_identity.includes("B")
     },
     "R": {
       "icon": <RedManaSymbol className={classes.manaSymbol} />,
-      "state": props.color_identity.includes("R")
+      "checked": props.color_identity.includes("R")
     },
     "G": {
       "icon": <GreenManaSymbol className={classes.manaSymbol} />,
-      "state": props.color_identity.includes("G")
+      "checked": props.color_identity.includes("G")
     }
   };
 
-  async function submitColorIdentityChange (color) {
+  function submitColorIdentityChange (color) {
+    let color_identity = [];
 
-    let color_identity = [];    
     for (let [key, value] of Object.entries(colorObj)) {
-      // because state has not been updated yet
-      if (key === color && !value.state) color_identity.push(key);
-      if (key !== color && value.state) color_identity.push(key);
+      if (key === color && !value.checked) color_identity.push(key);
+      if (key !== color && value.checked) color_identity.push(key);
     }
 
-    // colorObj[color]['updater'](!colorObj[color]['state']);
-
-    try {
-      const cardChanges = JSON.stringify({
-        action: 'edit_card',
-        card_id: props.card_id,
-        color_identity: color_identity.sort(),
-        component: cubeState.active_component_id
-      });
-      const updatedCube = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-        'PATCH',
-        cardChanges,
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-      dispatch('UPDATE_CUBE', updatedCube);
-
-    } catch (error) {
-      console.log(error);
-    }
+    props.submitCardChange(props.card_id, { color_identity: color_identity.sort() });
   }
   
   return (
     <MUIGrid container justify="space-around">
     {Array.from(Object.keys(colorObj)).map(function (color) {
       return (
-        <MUIGrid item key={`${color}-${props.card_id}`} style={{ alignItems: "center", display: "flex", justifyContent: "center" }} xs={4}>
+        <MUIGrid className={classes.colorCheckboxContainer} item key={`${color}-${props.card_id}`} xs={4}>
           <MUICheckbox
-            checked={colorObj[color]['state']}
-            className={classes.colorCheckbox}
+            checked={colorObj[color]['checked']}
+            checkedIcon={colorObj[color]['icon']}
+            className={`${classes.colorCheckbox} ${classes[color]}`}
             color="primary"
-            inputProps={{
-              name: "color_identity[]"
-            }}
             onChange={() => submitColorIdentityChange(color)}
-            value={color}
           />
-          <label style={{ height: 30, width: 30 }}>
-            {colorObj[color]['icon']}
-          </label>
         </MUIGrid>
       );
     })}

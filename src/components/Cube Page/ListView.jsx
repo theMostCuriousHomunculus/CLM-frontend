@@ -54,19 +54,16 @@ const ListView = (props) => {
     dispatch('UPDATE_CUBE', updatedCube);
   }
 
-  async function submitCardChange (cardId, propertyName, propertyValue) {
-    const action = 'edit_card';
-    let cardChanges = {
-      action,
-      card_id: cardId,
-      component: cubeState.active_component_id
-    };
-    cardChanges[propertyName] = propertyValue;
-    cardChanges = JSON.stringify(cardChanges);
+  async function submitCardChange (cardId, changes) {
     const updatedCube = await sendRequest(
       `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
       'PATCH',
-      cardChanges,
+      JSON.stringify({
+        action: 'edit_card',
+        card_id: cardId,
+        component: cubeState.active_component_id,
+        ...changes
+      }),
       {
         Authorization: 'Bearer ' + authentication.token,
         'Content-Type': 'application/json'

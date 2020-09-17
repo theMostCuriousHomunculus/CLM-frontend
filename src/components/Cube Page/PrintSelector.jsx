@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import MUICircularProgress from '@material-ui/core/CircularProgress';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
@@ -7,15 +6,10 @@ import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 
 const PrintSelector = (props) => {
 
-  const cubeId = useParams().cubeId
-  const authentication = React.useContext(AuthenticationContext);
-  const dispatch = useCube(false)[1];
   const { loading, sendRequest } = useRequest();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -27,27 +21,6 @@ const PrintSelector = (props) => {
     purchase_link: props.card.purchase_link
   }]);
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
-
-  async function handleMenuItemClick (index) {
-    setSelectedPrintIndex(index);
-    setAnchorEl(null);
-    const cardChanges = JSON.stringify({
-      action: 'edit_card',
-      card_id: props.card._id,
-      ...props.card,
-      ...availablePrintings[index]
-    });
-    const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-      'PATCH',
-      cardChanges,
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    dispatch('UPDATE_CUBE', updatedCube);
-  };
 
   async function enablePrintChange (event) {
     setAnchorEl(event.currentTarget);
@@ -109,7 +82,17 @@ const PrintSelector = (props) => {
           <MUIMenuItem
             key={`${props.card._id}-printing-${index}`}
             selected={index === selectedPrintIndex}
-            onClick={() => handleMenuItemClick(index)}
+            onClick={function () {
+              setSelectedPrintIndex(index);
+              setAnchorEl(null);
+              props.submitCardChange(props.card._id, {
+                back_image: availablePrintings[index].back_image,
+                image: availablePrintings[index].image,
+                mtgo_id: availablePrintings[index].mtgo_id,
+                printing: availablePrintings[index].printing,
+                purchase_link: availablePrintings[index].purchase_link
+              });
+            }}
           >
             {option.printing}
           </MUIMenuItem>

@@ -1,32 +1,32 @@
 const monoColors = [
   {
     color_identity: "W",
-    hex: "#efefef",
+    hex: "#fffbd5",
     name: "White"
   },
   {
     color_identity: "U",
-    hex: "#5f8fdf",
+    hex: "#aae0fa",
     name: "Blue"
   },
   {
     color_identity: "B",
-    hex: "#8f8f8f",
+    hex: "#cbc2bf",
     name: "Black"
   },
   {
     color_identity: "R",
-    hex: "#df5f5f",
+    hex: "#f9aa8f",
     name: "Red"
   },
   {
     color_identity: "G",
-    hex: "#8fdf8f",
+    hex: "#9bd3ae",
     name: "Green"
   },
   {
     color_identity: "",
-    hex: "#bfbfbf",
+    hex: "#e5e7e9",
     name: "Colorless"
   }
 ];
