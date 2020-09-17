@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemText from '@material-ui/core/ListItemText';
@@ -12,10 +11,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ColorCheckboxes from './ColorCheckboxes';
 import PrintSelector from './PrintSelector';
-import { AuthenticationContext } from '../../contexts/authentication-context';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
 import { useCube } from '../../hooks/cube-hook';
-import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   tableCell: {
@@ -27,7 +24,6 @@ const useStyles = makeStyles({
 
 const AuthorizedCardRow = (props) => {
 
-  const cubeId = useParams().cubeId;
   const {
     card: {
       _id,
@@ -41,53 +37,10 @@ const AuthorizedCardRow = (props) => {
     }
   } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [cubeState, dispatch] = useCube(false);
-  const { sendRequest } = useRequest();
+  const cubeState = useCube(true)[0];
 
-  async function moveDeleteCard (destinationComponentId) {
-    const action = 'move_or_delete_card';
-    const destination = destinationComponentId;
-    const moveInfo = JSON.stringify({
-      action,
-      card_id: _id,
-      component: cubeState.active_component_id,
-      destination
-    });
-    const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-      'PATCH',
-      moveInfo,
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    dispatch('UPDATE_CUBE', updatedCube);
-  }
-
-  async function submitCardChange (event) {
-    const action = 'edit_card';
-    const property_name = event.target.getAttribute('name');
-    let cardChanges = {
-      action,
-      card_id: _id,
-      component: cubeState.active_component_id
-    };
-    cardChanges[property_name] = event.target.value;
-    cardChanges = JSON.stringify(cardChanges);
-    const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-      'PATCH',
-      cardChanges,
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    dispatch('UPDATE_CUBE', updatedCube);
-  }
+  // i suspect that these functions being replicated for all the instances of AuthorizedCardRow is what is causing such a lag when switching to ListView...  i should try moving these functions up a level to list view and see if that fixes the problem
 
   return (
     <MUITableRow>
@@ -112,8 +65,7 @@ const AuthorizedCardRow = (props) => {
           defaultValue={cmc}
           inputProps={{ max: 16, min: 0, step: 1 }}
           margin="dense"
-          name="cmc"
-          onBlur={submitCardChange}
+          onBlur={(event) => props.submitCardChange(_id, "cmc", event.target.value)}
           type="number"
           variant="outlined"
         />
@@ -123,8 +75,7 @@ const AuthorizedCardRow = (props) => {
           autoComplete="off"
           defaultValue={type_line}
           margin="dense"
-          name="type_line"
-          onBlur={submitCardChange}
+          onBlur={(event) => props.submitCardChange(_id, "type_line", event.target.value)}
           type="text"
           variant="outlined"
         />
@@ -159,7 +110,7 @@ const AuthorizedCardRow = (props) => {
             })].map((component) => (
               <MUIMenuItem
                 key={`${_id}-${component._id}`}
-                onClick={() => moveDeleteCard(component._id)}
+                onClick={() => props.moveDeleteCard(_id, component._id)}
                 selected={component.active_component_id === component._id}
               >
                 {component.name}
@@ -167,7 +118,7 @@ const AuthorizedCardRow = (props) => {
             ))
           }
           <MUIMenuItem
-            onClick={() => moveDeleteCard('delete')}
+            onClick={() => props.moveDeleteCard(_id, 'delete')}
           >
             Delete from Cube
           </MUIMenuItem>

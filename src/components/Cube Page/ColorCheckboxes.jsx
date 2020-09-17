@@ -43,10 +43,6 @@ const ColorCheckboxes = (props) => {
   const { sendRequest } = useRequest();
   const classes = useStyles();
   // const [whiteChecked, setWhiteChecked] = React.useState(props.color_identity.includes("W"));
-  // const [blueChecked, setBlueChecked] = React.useState(props.color_identity.includes("U"));
-  // const [blackChecked, setBlackChecked] = React.useState(props.color_identity.includes("B"));
-  // const [redChecked, setRedChecked] = React.useState(props.color_identity.includes("R"));
-  // const [greenChecked, setGreenChecked] = React.useState(props.color_identity.includes("G"));
 
   const colorObj = {
     "W": {
@@ -56,23 +52,19 @@ const ColorCheckboxes = (props) => {
     },
     "U": {
       "icon": <BlueManaSymbol className={classes.manaSymbol} />,
-      "state": /*blueChecked*/props.color_identity.includes("U"),
-      // "updater": setBlueChecked
+      "state": props.color_identity.includes("U")
     },
     "B": {
       "icon": <BlackManaSymbol className={classes.manaSymbol} />,
-      "state": /*blackChecked*/props.color_identity.includes("B"),
-      // "updater": setBlackChecked
+      "state": props.color_identity.includes("B")
     },
     "R": {
       "icon": <RedManaSymbol className={classes.manaSymbol} />,
-      "state": /*redChecked*/props.color_identity.includes("R"),
-      // "updater": setRedChecked
+      "state": props.color_identity.includes("R")
     },
     "G": {
       "icon": <GreenManaSymbol className={classes.manaSymbol} />,
-      "state": /*greenChecked*/props.color_identity.includes("G"),
-      // "updater": setGreenChecked
+      "state": props.color_identity.includes("G")
     }
   };
 
