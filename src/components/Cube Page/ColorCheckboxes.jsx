@@ -82,20 +82,20 @@ const ColorCheckboxes = (props) => {
   
   return (
     <MUIGrid container justify="space-around">
-    {Array.from(Object.keys(colorObj)).map(function (color) {
-      return (
-        <MUIGrid className={classes.colorCheckboxContainer} item key={`${color}-${props.card_id}`} xs={4}>
-          <MUICheckbox
-            checked={colorObj[color]['checked']}
-            checkedIcon={colorObj[color]['icon']}
-            className={`${classes.colorCheckbox} ${classes[color]}`}
-            color="primary"
-            onChange={() => submitColorIdentityChange(color)}
-          />
-        </MUIGrid>
-      );
-    })}
-  </MUIGrid>
+      {Array.from(Object.keys(colorObj)).map(function (color) {
+        return (
+          <MUIGrid className={classes.colorCheckboxContainer} item key={`${color}-${props.card_id}`} xs={4}>
+            <MUICheckbox
+              checked={colorObj[color]['checked']}
+              checkedIcon={colorObj[color]['icon']}
+              className={`${classes.colorCheckbox} ${classes[color]}`}
+              color="primary"
+              onChange={() => submitColorIdentityChange(color)}
+            />
+          </MUIGrid>
+        );
+      })}
+    </MUIGrid>
   );
 }
 

@@ -27,13 +27,51 @@ const useStyles = makeStyles({
 
 const ListView = (props) => {
 
+  const [activeMenu, setActiveMenu] = React.useState({ card_id: null, menu: null });
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [availablePrintings, setAvailablePrintings] = React.useState([]);
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
   const [cubeState, dispatch] = useCube(true);
-  const { sendRequest } = useRequest();
+  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
+  const { loading, sendRequest } = useRequest();
+
+  async function enablePrintChange (cardId, event, oracleId, printing) {
+    setActiveMenu({ card_id: cardId, menu: 'print' });
+    setAnchorEl(event.currentTarget);
+
+    try {
+      let printings = await sendRequest(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleId}&unique=prints`);
+      printings = printings.data.map(function(print) {
+        let back_image, image;
+        if (print.layout === "transform") {
+          back_image = print.card_faces[1].image_uris.large;
+          image = print.card_faces[0].image_uris.large;
+        } else {
+          image = print.image_uris.large;
+        }
+        return (
+          {
+            back_image,
+            image,
+            mtgo_id: print.mtgo_id,
+            printing: print.set_name + " - " + print.collector_number,
+            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
+          }
+        );
+      });
+      setAvailablePrintings(printings);
+      setSelectedPrintIndex(printings.findIndex(function (print) {
+        return print.printing === printing;
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async function moveDeleteCard (cardId, destinationComponentId) {
+    setActiveMenu({ card_id: null, menu: null });
     const action = 'move_or_delete_card';
     const destination = destinationComponentId;
     const moveInfo = JSON.stringify({
@@ -94,10 +132,18 @@ const ListView = (props) => {
               alphabeticalSort(cubeState.displayed_cards).map(function (card) {
                 return (
                   <AuthorizedCardRow
+                    activeMenu={activeMenu}
+                    anchorEl={anchorEl}
+                    availablePrintings={availablePrintings}
                     card={card}
+                    enablePrintChange={enablePrintChange}
                     hidePreview={props.hidePreview}
                     key={card._id}
+                    loading={loading}
                     moveDeleteCard={moveDeleteCard}
+                    selectedPrintIndex={selectedPrintIndex}
+                    setActiveMenu={setActiveMenu}
+                    setAnchorEl={setAnchorEl}
                     showPreview={props.showPreview}
                     submitCardChange={submitCardChange}
                   />
