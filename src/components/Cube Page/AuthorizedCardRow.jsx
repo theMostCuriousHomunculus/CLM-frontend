@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ColorCheckboxes from './ColorCheckboxes';
 import { monoColors } from '../../constants/color-objects';
-import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
+// import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
 import { useCube } from '../../hooks/cube-hook';
 
 const useStyles = makeStyles({
@@ -204,7 +204,8 @@ const AuthorizedCardRow = (props) => {
       </MUITableCell>
       <MUITableCell className={classes.tableCell}>
         <a href={purchase_link}>
-          <TCGPlayerLogo />
+          {/*<TCGPlayerLogo />*/}
+          tcgplayer.com
         </a>
       </MUITableCell>
     </MUITableRow>
