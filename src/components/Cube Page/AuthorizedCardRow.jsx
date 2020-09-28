@@ -10,9 +10,9 @@ import MUITableRow from '@material-ui/core/TableRow';
 import MUITextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ColorCheckboxes from './ColorCheckboxes';
+// import ColorCheckboxes from './ColorCheckboxes';
 import { monoColors } from '../../constants/color-objects';
-// import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
+import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
 import { useCube } from '../../hooks/cube-hook';
 
 const useStyles = makeStyles({
@@ -38,7 +38,7 @@ const AuthorizedCardRow = (props) => {
       _id,
       back_image,
       cmc,
-      color_identity,
+      // color_identity,
       image,
       name,
       oracle_id,
@@ -71,13 +71,13 @@ const AuthorizedCardRow = (props) => {
       >
         {name}
       </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      {/*<MUITableCell className={classes.tableCell}>
         <ColorCheckboxes
           color_identity={color_identity}
           card_id={_id}
           submitCardChange={submitCardChange}
         />
-      </MUITableCell>
+      </MUITableCell>*/}
       <MUITableCell className={classes.tableCell}>
         <MUITextField
           defaultValue={cmc}
@@ -204,8 +204,7 @@ const AuthorizedCardRow = (props) => {
       </MUITableCell>
       <MUITableCell className={classes.tableCell}>
         <a href={purchase_link}>
-          {/*<TCGPlayerLogo />*/}
-          tcgplayer.com
+          <TCGPlayerLogo />
         </a>
       </MUITableCell>
     </MUITableRow>

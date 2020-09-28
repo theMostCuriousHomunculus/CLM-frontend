@@ -117,7 +117,7 @@ const ListView = (props) => {
           <MUITableHead>
             <MUITableRow>
               <MUITableCell>Card Name</MUITableCell>
-              <MUITableCell>Color Identity</MUITableCell>
+              {/*<MUITableCell>Color Identity</MUITableCell>*/}
               <MUITableCell>CMC</MUITableCell>
               <MUITableCell>Card Type</MUITableCell>
               {cubeState.cube.creatorId === authentication.userId &&
