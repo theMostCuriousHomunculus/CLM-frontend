@@ -117,7 +117,7 @@ const ListView = (props) => {
           <MUITableHead>
             <MUITableRow>
               <MUITableCell>Card Name</MUITableCell>
-              {/*<MUITableCell>Color Identity</MUITableCell>*/}
+              <MUITableCell>Color Identity</MUITableCell>
               <MUITableCell>CMC</MUITableCell>
               <MUITableCell>Card Type</MUITableCell>
               {cubeState.cube.creatorId === authentication.userId &&
@@ -129,7 +129,7 @@ const ListView = (props) => {
           </MUITableHead>
           <MUITableBody>
             {cubeState.cube.creatorId === authentication.userId ?
-              alphabeticalSort(cubeState.displayed_cards).map(function (card) {
+              alphabeticalSort(cubeState.displayed_cards).slice(0, 10).map(function (card) {
                 return (
                   <AuthorizedCardRow
                     activeMenu={activeMenu}
