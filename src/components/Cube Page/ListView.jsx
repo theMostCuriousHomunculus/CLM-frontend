@@ -1,27 +1,49 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import MUICard from '@material-ui/core/Card';
-import MUITable from '@material-ui/core/Table';
-import MUITableBody from '@material-ui/core/TableBody';
-import MUITableCell from '@material-ui/core/TableCell';
-import MUITableContainer from '@material-ui/core/TableContainer';
-import MUITableHead from '@material-ui/core/TableHead';
-import MUITableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
+import {
+  AutoSizer as RVAutoSizer,
+  CellMeasurer as RVCellMeasurer,
+  CellMeasurerCache as RVCellMeasurerCache,
+  Table as RVTable
+} from 'react-virtualized';
 
 import alphabeticalSort from '../../functions/alphabetical-sort';
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { monoColors } from '../../constants/color-objects';
 import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 import AuthorizedCardRow from './AuthorizedCardRow';
 import UnauthorizedCardRow from './UnauthorizedCardRow';
+import theme from '../../theme';
 
 const useStyles = makeStyles({
-  container: {
-    maxHeight: '80vh'
+  headerCell: {
+    background: "inherit",
+    padding: "8px 0"
   },
-  table: {
-    minWidth: 1200
+  headerRow: {
+    background: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
+    display: "flex",
+    flexGrow: 1,
+    fontFamily: "Ubuntu, Roboto, Arial, sans-serif",
+    fontSize: "2rem",
+    minWidth: 1200,
+    padding: "0 8px"
+  },
+  tableContainer: {
+    height: "80vh",
+    padding: 0
+  },
+  tableRow: {
+    display: "flex",
+    fontFamily: "Ubuntu, Roboto, Arial, sans-serif",
+    minWidth: 1200,
+    '&:hover': {
+      backgroundColor: monoColors[5].hex
+    }
   }
 });
 
@@ -31,10 +53,27 @@ const ListView = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
   const authentication = React.useContext(AuthenticationContext);
+  const cache = React.useRef(new RVCellMeasurerCache({
+    fixedWidth: true,
+    defaultHeight: 96
+  }));
   const classes = useStyles();
   const cubeId = useParams().cubeId;
   const [cubeState, dispatch] = useCube(true);
+  const columnWidths = cubeState.cube.creatorId === authentication.userId ?
+    ["20%", "17.5%", "7.5%", "15%", "17.5%", "12.5%", "10%"] :
+    ["25%", "20%", "10%", "17.5%", "0%", "15%", "12.5%"];
+  const headerColumns = [
+    <div className={classes.headerCell} key="header0" style={{ width: columnWidths[0] }}>Card Name</div>,
+    <div className={classes.headerCell} key="header1" style={{ width: columnWidths[1] }}>Color Identity</div>,
+    <div className={classes.headerCell} key="header2" style={{ width: columnWidths[2] }}>CMC</div>,
+    <div className={classes.headerCell} key="header3" style={{ width: columnWidths[3] }}>Card Type</div>,
+    cubeState.cube.creatorId === authentication.userId && <div className={classes.headerCell} key="header4" style={{ width: columnWidths[4] }}>Move / Delete</div>,
+    <div className={classes.headerCell} key="header5" style={{ width: columnWidths[5] }}>Printing</div>,
+    <div className={classes.headerCell} key="header6" style={{ width: columnWidths[6] }}>Purchase</div>
+  ];
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
+  const sortedCards = alphabeticalSort(cubeState.displayed_cards);
   const { loading, sendRequest } = useRequest();
 
   async function enablePrintChange (cardId, event, oracleId, printing) {
@@ -111,58 +150,71 @@ const ListView = (props) => {
   }
 
   return (
-    <MUICard style={{ marginTop: 16 }}>
-      <MUITableContainer className={classes.container}>
-        <MUITable stickyHeader className={classes.table}>
-          <MUITableHead>
-            <MUITableRow>
-              <MUITableCell>Card Name</MUITableCell>
-              <MUITableCell>Color Identity</MUITableCell>
-              <MUITableCell>CMC</MUITableCell>
-              <MUITableCell>Card Type</MUITableCell>
-              {cubeState.cube.creatorId === authentication.userId &&
-                <MUITableCell>Move / Delete</MUITableCell>
-              }
-              <MUITableCell>Printing</MUITableCell>
-              <MUITableCell>Purchase</MUITableCell>
-            </MUITableRow>
-          </MUITableHead>
-          <MUITableBody>
-            {cubeState.cube.creatorId === authentication.userId ?
-              alphabeticalSort(cubeState.displayed_cards).slice(0, 10).map(function (card) {
+    <MUICard className={classes.tableContainer}>
+      <RVAutoSizer>
+        {function ({width, height}) {
+          return (
+            <RVTable
+              deferredMeasurementCache={cache.current}
+              headerHeight={52.8}
+              headerRowRenderer={function ({style}) {
                 return (
-                  <AuthorizedCardRow
-                    activeMenu={activeMenu}
-                    anchorEl={anchorEl}
-                    availablePrintings={availablePrintings}
-                    card={card}
-                    enablePrintChange={enablePrintChange}
-                    hidePreview={props.hidePreview}
-                    key={card._id}
-                    loading={loading}
-                    moveDeleteCard={moveDeleteCard}
-                    selectedPrintIndex={selectedPrintIndex}
-                    setActiveMenu={setActiveMenu}
-                    setAnchorEl={setAnchorEl}
-                    showPreview={props.showPreview}
-                    submitCardChange={submitCardChange}
-                  />
+                  <div className={classes.headerRow} style={style}>
+                    {headerColumns}
+                  </div>
                 );
-              }) :
-              alphabeticalSort(cubeState.displayed_cards).map(function (card) {
+              }}
+              height={height}
+              rowCount={sortedCards.length}
+              rowGetter={function ({index}) {
+                return sortedCards[index];
+              }}
+              rowHeight={cache.current.rowHeight}
+              rowRenderer={function ({index, key, parent, style}) {
+                const card = sortedCards[index];
                 return (
-                  <UnauthorizedCardRow
-                    card={card}
-                    hidePreview={props.hidePreview}
-                    key={card._id}
-                    showPreview={props.showPreview}
-                  />
+                  <RVCellMeasurer
+                    cache={cache.current}
+                    columnIndex={0}
+                    key={key}
+                    parent={parent}
+                    rowIndex={index}
+                  >
+                    <div className={classes.tableRow} style={style}>
+                      {cubeState.cube.creatorId === authentication.userId ?
+                        <AuthorizedCardRow
+                          activeMenu={activeMenu}
+                          anchorEl={anchorEl}
+                          availablePrintings={availablePrintings}
+                          card={card}
+                          columnWidths={columnWidths}
+                          enablePrintChange={enablePrintChange}
+                          hidePreview={props.hidePreview}
+                          loading={loading}
+                          moveDeleteCard={moveDeleteCard}
+                          selectedPrintIndex={selectedPrintIndex}
+                          setActiveMenu={setActiveMenu}
+                          setAnchorEl={setAnchorEl}
+                          showPreview={props.showPreview}
+                          submitCardChange={submitCardChange}
+                        /> :
+                        <UnauthorizedCardRow
+                          card={card}
+                          columnWidths={columnWidths}
+                          hidePreview={props.hidePreview}
+                          showPreview={props.showPreview}
+                        />
+                      }
+                    </div>
+                  </RVCellMeasurer>
                 );
-              })
-            }
-          </MUITableBody>
-        </MUITable>
-      </MUITableContainer>
+              }}
+              width={width}
+            >
+            </RVTable>
+          );
+        }}
+      </RVAutoSizer>
     </MUICard>
   );
 }

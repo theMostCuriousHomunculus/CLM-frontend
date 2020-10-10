@@ -1,6 +1,4 @@
 import React from 'react';
-import MUITableCell from '@material-ui/core/TableCell';
-import MUITableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { monoColors, multiColors } from '../../constants/color-objects';
@@ -8,9 +6,10 @@ import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-ful
 
 const useStyles = makeStyles({
   tableCell: {
-    height: '100%',
-    paddingBottom: 4,
-    paddingTop: 4
+    alignItems: "center",
+    display: "flex",
+    height: 96,
+    padding: "0 8px"
   }
 });
 
@@ -18,7 +17,6 @@ const UnauthorizedCardRow = (props) => {
 
   const {
     card: {
-      _id,
       back_image,
       cmc,
       color_identity,
@@ -27,42 +25,46 @@ const UnauthorizedCardRow = (props) => {
       printing,
       purchase_link,
       type_line
-    }
+    },
+    columnWidths,
+    hidePreview,
+    showPreview
   } = props;
   const classes = useStyles();
 
   return (
-    <MUITableRow key={_id}>
-      <MUITableCell
+    <React.Fragment>
+      <div
         back_image={back_image}
         className={classes.tableCell}
         image={image}
-        onMouseOut={props.hidePreview}
-        onMouseOver={props.showPreview}
-        style={{ cursor: 'default' }}
+        onMouseOut={hidePreview}
+        onMouseOver={showPreview}
+        style={{ cursor: "default", width: columnWidths[0] }}
       >
         {name}
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[1] }}>
         {[...monoColors, ...multiColors].find(function(color) {
           return color.color_identity === color_identity.toString();
         }).name}
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[2] }}>
         {cmc}
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[3] }}>
         {type_line}
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      {/*not displaying column at index 4 since user is not the cube creator*/}
+      <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
         {printing}
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[6] }}>
         <a href={purchase_link}>
-          <TCGPlayerLogo />
+          <TCGPlayerLogo style={{ width: "100%" }} />
         </a>
-      </MUITableCell>
-    </MUITableRow>
+      </div>
+    </React.Fragment>
   );
 }
 

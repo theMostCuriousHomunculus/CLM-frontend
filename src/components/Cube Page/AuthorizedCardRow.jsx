@@ -5,26 +5,18 @@ import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
-import MUITableCell from '@material-ui/core/TableCell';
-import MUITableRow from '@material-ui/core/TableRow';
 import MUITextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ColorCheckboxes from './ColorCheckboxes';
-import { monoColors } from '../../constants/color-objects';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
 import { useCube } from '../../hooks/cube-hook';
 
 const useStyles = makeStyles({
   tableCell: {
-    height: '100%',
-    paddingBottom: 4,
-    paddingTop: 4
-  },
-  tableRow: {
-    '&:hover': {
-      backgroundColor: monoColors[5].hex
-    }
+    alignItems: "center",
+    display: "flex",
+    padding: "0 8px"
   }
 });
 
@@ -46,6 +38,7 @@ const AuthorizedCardRow = (props) => {
       purchase_link,
       type_line
     },
+    columnWidths,
     enablePrintChange,
     hidePreview,
     loading,
@@ -60,25 +53,25 @@ const AuthorizedCardRow = (props) => {
   const cubeState = useCube(true)[0];
 
   return (
-    <MUITableRow className={classes.tableRow}>
-      <MUITableCell
+    <React.Fragment>
+      <div
         back_image={back_image}
         className={classes.tableCell}
         image={image}
         onMouseOut={hidePreview}
         onMouseOver={showPreview}
-        style={{ cursor: 'default' }}
+        style={{ cursor: "default", width: columnWidths[0] }}
       >
         {name}
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[1] }}>
         <ColorCheckboxes
           color_identity={color_identity}
           card_id={_id}
           submitCardChange={submitCardChange}
         />
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[2] }}>
         <MUITextField
           defaultValue={cmc}
           inputProps={{ max: 16, min: 0, step: 1 }}
@@ -87,8 +80,8 @@ const AuthorizedCardRow = (props) => {
           type="number"
           variant="outlined"
         />
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[3] }}>
         <MUITextField
           autoComplete="off"
           defaultValue={type_line}
@@ -97,8 +90,8 @@ const AuthorizedCardRow = (props) => {
           type="text"
           variant="outlined"
         />
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[4] }}>
         <MUIList component="nav">
           <MUIListItem
             button
@@ -151,8 +144,8 @@ const AuthorizedCardRow = (props) => {
             Delete from Cube
           </MUIMenuItem>
         </MUIMenu>
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
         <MUIList component="nav">
           <MUIListItem
             button
@@ -201,13 +194,13 @@ const AuthorizedCardRow = (props) => {
             ))
           }
         </MUIMenu>
-      </MUITableCell>
-      <MUITableCell className={classes.tableCell}>
+      </div>
+      <div className={classes.tableCell} style={{ width: columnWidths[6] }}>
         <a href={purchase_link}>
-          <TCGPlayerLogo />
+          <TCGPlayerLogo style={{ width: "100%" }} />
         </a>
-      </MUITableCell>
-    </MUITableRow>
+      </div>
+    </React.Fragment>
   );
 }
 
