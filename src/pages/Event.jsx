@@ -151,18 +151,18 @@ const Event = () => {
                         return (
                           <MUIGrid
                             item
-                            key={player.playerId}
+                            key={player.account._id}
                             xs={6}
                             sm={4}
                             md={3}
                             lg={2}
                             xl={1}
                           >
-                            <Link to={`/account/${player.playerId}`}>
+                            <Link to={`/account/${player.account._id}`}>
                               <MUIAvatar
-                                alt={player.name}
+                                alt={player.account.name}
                                 className={classes.avatarSmall}
-                                src={player.avatar}
+                                src={player.account.avatar}
                               />
                             </Link>
                           </MUIGrid>
@@ -222,17 +222,17 @@ const Event = () => {
                         </CSVLink>
                         {eventState.other_players_card_pools.map(function (plr) {
                           return (
-                            <React.Fragment key={plr.playerId}>
+                            <React.Fragment key={plr.account._id}>
                               <br />
                               <CSVLink
                                 className={classes.downloadLink}
                                 data={plr.card_pool.reduce(function (a, c) {
                                   return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
                                 }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                                filename={`${eventState.name + " - " + plr.name}.csv`}
+                                filename={`${eventState.name + " - " + plr.account.name}.csv`}
                                 target="_blank"
                               >
-                                Download {plr.name}'s card pool in CSV format for MTGO play!
+                                Download {plr.account.name}'s card pool in CSV format for MTGO play!
                               </CSVLink>
                             </React.Fragment>
                           );
