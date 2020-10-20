@@ -64,20 +64,17 @@ const Account = () => {
   const classes = useStyles();
   const { loading, sendRequest } = useRequest();
 
-  const [cubes, setCubes] = React.useState([]);
-  const [events, setEvents] = React.useState([]);
-  const [user, setUser] = React.useState({});
+  const [account, setAccount] = React.useState({
+    cubes: [],
+    events: [],
+    user: {}
+  });
 
   const fetchAccount = React.useCallback(async function() {
     try {
       const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
       const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
-      setUser(accountData);
-      // I should clean this up by adding virtuals to the models on the backend; no need for multiple requests to the server to get this data
-      const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube?creatorId=${accountId}`, 'GET', null, {});
-      setCubes(cubeData.cubes);
-      const eventData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/event?playerId=${accountId}`, 'GET', null, {});
-      setEvents(eventData.events);
+      setAccount(accountData);
     } catch (error) {
       console.log('Error: ' + error.message);
     }
@@ -151,11 +148,13 @@ const Account = () => {
 
           <MUICard>
             <MUICardHeader
-              avatar={user.avatar && <MUIAvatar alt={user.name} className={classes.avatarLarge} src={user.avatar} />}
+              avatar={account.user.avatar &&
+                <MUIAvatar alt={account.user.name} className={classes.avatarLarge} src={account.user.avatar} />
+              }
               disableTypography={true}
-              title={<MUITypography variant="subtitle1">{user.name}</MUITypography>}
+              title={<MUITypography variant="subtitle1">{account.user.name}</MUITypography>}
               subheader={accountId === authentication.userId ?
-                <MUITypography color="textSecondary" variant="subtitle2">{user.email}</MUITypography> :
+                <MUITypography color="textSecondary" variant="subtitle2">{account.user.email}</MUITypography> :
                 null
               }
             />
@@ -170,14 +169,14 @@ const Account = () => {
             }
             {authentication.isLoggedIn &&
               accountId !== authentication.userId &&
-              user.buds &&
-              user.buds.filter(function (bud) {
+              account.user.buds &&
+              account.user.buds.filter(function (bud) {
                 return bud._id === authentication.userId;
               }).length === 0 &&
-              user.received_bud_requests.filter(function (request) {
+              account.user.received_bud_requests.filter(function (request) {
                 return request._id === authentication.userId;
               }).length === 0 &&
-              user.sent_bud_requests.filter(function (request) {
+              account.user.sent_bud_requests.filter(function (request) {
                 return request._id === authentication.userId;
               }).length === 0 &&
               // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
@@ -197,11 +196,11 @@ const Account = () => {
           <MUIGrid container spacing={2}>
 
             <MUIGrid item xs={12} lg={6}>
-              <UserCubeCard classes={classes} cubes={cubes} />
+              <UserCubeCard classes={classes} cubes={account.cubes} />
             </MUIGrid>
 
             <MUIGrid item xs={12} lg={6}>
-              <UserEventCard buds={user.buds} classes={classes} cubes={cubes} events={events} />
+              <UserEventCard buds={account.user.buds} classes={classes} cubes={account.cubes} events={account.events} />
             </MUIGrid>
 
           </MUIGrid>
@@ -214,8 +213,8 @@ const Account = () => {
                   title={<MUITypography variant="subtitle1">Buds</MUITypography>}
                 />
                 <MUIList>
-                  {user.buds &&
-                    alphabeticalSort(user.buds).map(function (bud) {
+                  {account.user.buds &&
+                    alphabeticalSort(account.user.buds).map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
                           {bud.avatar &&
@@ -243,7 +242,8 @@ const Account = () => {
             </MUIGrid>
 
             {accountId === authentication.userId &&
-              <BudRequests user={user} fetchAccount={fetchAccount} />
+              // passing fetchAccount as a prop so that the page reloads when a user responds to a request...  there is probably a better way to do this
+              <BudRequests user={account.user} fetchAccount={fetchAccount} />
             }
           </MUIGrid>
         </React.Fragment>
