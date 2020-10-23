@@ -60,7 +60,7 @@ const ListView = (props) => {
   const classes = useStyles();
   const cubeId = useParams().cubeId;
   const [cubeState, dispatch] = useCube(true);
-  const columnWidths = cubeState.cube.creatorId === authentication.userId ?
+  const columnWidths = cubeState.cube.creator._id === authentication.userId ?
     ["20%", "17.5%", "7.5%", "15%", "17.5%", "12.5%", "10%"] :
     ["25%", "20%", "10%", "17.5%", "0%", "15%", "12.5%"];
   const headerColumns = [
@@ -68,7 +68,7 @@ const ListView = (props) => {
     <div className={classes.headerCell} key="header1" style={{ width: columnWidths[1] }}>Color Identity</div>,
     <div className={classes.headerCell} key="header2" style={{ width: columnWidths[2] }}>CMC</div>,
     <div className={classes.headerCell} key="header3" style={{ width: columnWidths[3] }}>Card Type</div>,
-    cubeState.cube.creatorId === authentication.userId && <div className={classes.headerCell} key="header4" style={{ width: columnWidths[4] }}>Move / Delete</div>,
+    cubeState.cube.creator._id === authentication.userId && <div className={classes.headerCell} key="header4" style={{ width: columnWidths[4] }}>Move / Delete</div>,
     <div className={classes.headerCell} key="header5" style={{ width: columnWidths[5] }}>Printing</div>,
     <div className={classes.headerCell} key="header6" style={{ width: columnWidths[6] }}>Purchase</div>
   ];
@@ -181,7 +181,7 @@ const ListView = (props) => {
                     rowIndex={index}
                   >
                     <div className={classes.tableRow} style={style}>
-                      {cubeState.cube.creatorId === authentication.userId ?
+                      {cubeState.cube.creator._id === authentication.userId ?
                         <AuthorizedCardRow
                           activeMenu={activeMenu}
                           anchorEl={anchorEl}
