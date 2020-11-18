@@ -67,7 +67,14 @@ const Account = () => {
   const [account, setAccount] = React.useState({
     cubes: [],
     events: [],
-    user: {}
+    user: {
+      _id: accountId,
+      avatar: "",
+      buds: [],
+      name: "",
+      received_bud_requests: [],
+      sent_bud_requests: []
+    }
   });
 
   const fetchAccount = React.useCallback(async function() {
@@ -169,7 +176,6 @@ const Account = () => {
             }
             {authentication.isLoggedIn &&
               accountId !== authentication.userId &&
-              account.user.buds &&
               account.user.buds.filter(function (bud) {
                 return bud._id === authentication.userId;
               }).length === 0 &&
