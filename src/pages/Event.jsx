@@ -85,7 +85,7 @@ const Event = () => {
           null,
           { Authorization: 'Bearer ' + authentication.token }
         );
-        setPlayerUsername(accountData.name);
+        setPlayerUsername(accountData.user.name);
       } catch (error) {
         console.log(error);
       }
@@ -215,7 +215,7 @@ const Event = () => {
                           data={eventState.card_pool.reduce(function (a, c) {
                             return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
                           }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                          filename={`${eventState.name + " - " + playerUsername}.csv`}
+                          filename={`${eventState.name} - ${playerUsername}.csv`}
                           target="_blank"
                         >
                           Download your card pool in CSV format for MTGO play!
@@ -227,9 +227,9 @@ const Event = () => {
                               <CSVLink
                                 className={classes.downloadLink}
                                 data={plr.card_pool.reduce(function (a, c) {
-                                  return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
+                                  return a + " ,1," + c + ", , , , \n";
                                 }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                                filename={`${eventState.name + " - " + plr.account.name}.csv`}
+                                filename={`${eventState.name} - ${plr.account.name}.csv`}
                                 target="_blank"
                               >
                                 Download {plr.account.name}'s card pool in CSV format for MTGO play!

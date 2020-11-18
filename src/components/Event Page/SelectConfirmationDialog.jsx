@@ -40,8 +40,8 @@ const SelectConfirmationDialogue = (props) => {
           autoFocus
           color="primary"
           onClick={() => {
-          props.toggleOpen();
-          props.selectCardHandler(props.card ? props.card._id : null);
+            props.toggleOpen();
+            props.selectCardHandler(props.card ? props.card._id : null);
           }}
           variant="contained"
         >

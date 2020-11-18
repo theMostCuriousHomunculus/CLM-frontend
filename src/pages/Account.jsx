@@ -130,10 +130,10 @@ const Account = () => {
     fetchAccount();
   }
 
-  async function sendBudRequest (event) {
+  async function sendBudRequest () {
     let formData = {
       action: 'send',
-      other_user_id: event.currentTarget.getAttribute('data-id')
+      other_user_id: accountId
     };
 
     await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
@@ -189,7 +189,6 @@ const Account = () => {
               <MUICardActions className={classes.cardActions}>
                 <MUIButton
                   color="primary"
-                  data-id={accountId}
                   onClick={sendBudRequest}
                   variant="contained"
                 >
