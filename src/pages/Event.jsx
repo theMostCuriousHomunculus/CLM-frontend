@@ -1,21 +1,27 @@
 import React from 'react';
+import arrayMove from 'array-move';
+import io from 'socket.io-client';
 import MUIAvatar from '@material-ui/core/Avatar';
-import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIGrid from '@material-ui/core/Grid';
+import MUIPaper from '@material-ui/core/Paper';
+import MUITab from '@material-ui/core/Tab';
+import MUITabs from '@material-ui/core/Tabs';
+import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
-import { CSVLink } from "react-csv";
+import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
+import PicksDisplay from '../components/Event Page/PicksDisplay';
+import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
+import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
-
-import io from "socket.io-client";
-import SelectConfirmationDialogue from '../components/Event Page/SelectConfirmationDialog';
+import theme from '../theme';
 
 const eventReducer = (state, action) => {
   switch (action.type) {
@@ -27,7 +33,7 @@ const eventReducer = (state, action) => {
     default:
       return state;
   }
-}
+};
 
 const useStyles = makeStyles({
   avatarSmall: {
@@ -35,24 +41,16 @@ const useStyles = makeStyles({
     marginRight: '16px',
     width: '75px'
   },
-  cardImage: {
-    height: 300
-  },
-  cardImageContainer: {
-    margin: '0 auto',
-    padding: 0,
-    width: 'fit-content'
-  },
   downloadLink: {
-    fontFamily: 'Ubuntu, Roboto, Arial, sans-serif',
-    fontSize: '1.6rem'
+    marginLeft: 8
   },
-  flexGrow: {
-    flexGrow: 1
+  paper: {
+    marginLeft: 8,
+    marginRight: 8
   },
-  gridContainer: {
-    margin: 0,
-    width: '100%'
+  tabs: {
+    backgroundColor: theme.palette.secondary.main,
+    borderRadius: 4
   }
 });
 
@@ -62,18 +60,23 @@ const Event = () => {
   const { sendRequest } = useRequest();
   const classes = useStyles();
   const eventId = useParams().eventId;
-  const [dialogueDisplayed, setDialogueDisplayed] = React.useState(false);
-  const [playerUsername, setPlayerUsername] = React.useState(undefined);
-  const [errorMessage, setErrorMessage] = React.useState(undefined);
-  const [selectedCard, setSelectedCard] = React.useState(undefined);
-  const [socket, setSocket] = React.useState(undefined);
+  const [dialogDisplayed, setDialogDisplayed] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState();
+  // this needs to be removed; should not send an http request for this, just send back this info using websockets
+  const [playerUsername, setPlayerUsername] = React.useState();
+  const [selectedCard, setSelectedCard] = React.useState();
+  const [socket, setSocket] = React.useState();
+  const [tabNumber, setTabNumber] = React.useState(0);
 
   const [eventState, dispatch] = React.useReducer(eventReducer, {
-    players: [],
+    chaff: [],
+    finished: false,
+    mainboard: [],
     name: '',
     other_players_card_pools: [],
     pack: [],
-    card_pool: []
+    players: [],
+    sideboard: []
   });
 
   React.useEffect(function () {
@@ -91,187 +94,227 @@ const Event = () => {
       }
     }
     fetchData();
-    setErrorMessage(undefined);
-    setSocket(io(`${process.env.REACT_APP_BACKEND_URL.replace('/api', '')}`));
-  }, [authentication.token, authentication.userId, sendRequest]);
+    setErrorMessage(null);
+    setSocket(io(`${process.env.REACT_APP_BACKEND_URL.replace('/api', '')}`,
+      { query: { eventId, userId: authentication.userId } }));
+  }, [authentication.token, authentication.userId, eventId, sendRequest]);
 
   React.useEffect(function () {
     if (socket) {
 
-      socket.emit('join', eventId, authentication.userId);
+      socket.emit('join');
 
       socket.on('admittance', function (eventInfo) {
-        updateEventHandler(eventInfo);
+        dispatch({ type: 'UPDATE_EVENT', value: eventInfo });
       });
 
-      socket.on('bounce', function (error) {
-        setErrorMessage(error);
+      socket.on('error', function (error) {
+        setErrorMessage(error.message);
       });
 
       socket.on('updateEventStatus', function (eventInfo) {
-        updateEventHandler(eventInfo);
+        dispatch({ type: 'UPDATE_EVENT', value: eventInfo });
       });
 
       return function () {
-        socket.emit('leave', eventId, authentication.userId);
-        socket.disconnect();
+        socket.emit('leave');
+        socket.disconnect(true);
       }
     }
   }, [authentication.userId, eventId, socket]);
 
-  function updateEventHandler (data) {
-    dispatch({ type: 'UPDATE_EVENT', value: data });
+  function moveCard (cardId, fromCards, toCards) {
+    const fromCardsClone = [...eventState[fromCards]];
+    const indexOfCard = fromCardsClone.findIndex(function (card) {
+      return card._id === cardId;
+    });
+    const cardToMove = fromCardsClone.splice(indexOfCard, 1);
+    const toCardsClone = [...eventState[toCards]].concat(cardToMove);
+
+    dispatch({
+      type: 'UPDATE_EVENT',
+      value: {
+        [fromCards]: fromCardsClone,
+        [toCards]: toCardsClone
+      }
+    });
+
+    socket.emit('moveCard', cardId, fromCards, toCards);
   }
 
-  function selectCardHandler (cardId) {
-    socket.emit('selectCard', cardId, eventId, authentication.userId);
-  }
+  function onSortEnd ({ collection, newIndex, oldIndex }) {
+    dispatch({
+      type: 'UPDATE_EVENT',
+      value: {
+        [collection]: arrayMove(eventState[collection], oldIndex, newIndex)
+      }
+    });
+
+    if (collection !== 'pack') {
+      socket.emit('sortCard', collection, newIndex, oldIndex);
+    }
+  };
 
   return (
     <React.Fragment>
       {socket &&
-        <div>
-          <SelectConfirmationDialogue
+        <React.Fragment>
+          <SelectConfirmationDialog
             card={selectedCard}
-            open={dialogueDisplayed}
-            selectCardHandler={selectCardHandler}
-            toggleOpen={() => setDialogueDisplayed(false)}
+            open={dialogDisplayed}
+            selectCardHandler={(cardId) => socket.emit('selectCard', cardId)}
+            toggleOpen={() => setDialogDisplayed(false)}
           />
-          <React.Fragment>
-            {eventState.name &&
-              <React.Fragment>
+
+          <MUICard>
+            <MUICardHeader
+              disableTypography={true}
+              title={<MUITypography variant="h4">{eventState.name}</MUITypography>}
+            />
+            <MUICardContent>
+              <MUIGrid container justify="space-around" spacing={2}>
+                {eventState.players.map(function (player) {
+                  return (
+                    <MUIGrid
+                      container
+                      item
+                      justify="center"
+                      key={player.account._id}
+                      xs={6}
+                      sm={4}
+                      md={3}
+                      lg={2}
+                      xl={1}
+                    >
+                      <MUITooltip title={player.account.name}>
+                        <Link to={`/account/${player.account._id}`}>
+                          <MUIAvatar
+                            alt={player.account.name}
+                            className={classes.avatarSmall}
+                            src={player.account.avatar}
+                          />
+                        </Link>
+                      </MUITooltip>
+                    </MUIGrid>
+                  );
+                })}
+              </MUIGrid>
+            </MUICardContent>
+          </MUICard>
+
+          {// displays if the event is a draft and is not yet finished
+            !eventState.finished &&
+            <React.Fragment>
+              <MUIPaper className={classes.paper}>
+                <MUITabs
+                  className={classes.tabs}
+                  indicatorColor="primary"
+                  onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
+                  textColor="primary"
+                  value={tabNumber}
+                  variant="fullWidth"
+                >
+                  <MUITab label="Current Pack" />
+                  <MUITab label="My Picks" />
+                </MUITabs>
+              </MUIPaper>
+
+              {tabNumber === 0 &&
+                eventState.pack.length > 0 &&
                 <MUICard>
                   <MUICardHeader
                     disableTypography={true}
-                    title={<MUITypography variant="subtitle1">{eventState.name}</MUITypography>}
+                    title={<MUITypography variant="subtitle1">Select a Card to Draft</MUITypography>}
                   />
+                  <SortableList
+                    axis="xy"
+                    cards={eventState.pack}
+                    clickFunction={(cardData) => {
+                      setSelectedCard(cardData);
+                      setDialogDisplayed(true);
+                    }}
+                    fromCollection="pack"
+                    moveCard={() => null}
+                    onSortEnd={onSortEnd}
+                    toCollection1={null}
+                    toCollection2={null}
+                  />
+                </MUICard>
+              }
+
+              {tabNumber === 0 &&
+                eventState.pack.length === 0 &&
+                <MUICard>
+                <MUICardHeader
+                  disableTypography={true}
+                  title={<MUITypography variant="h5">Other drafters are still making their picks...</MUITypography>}
+                />
                   <MUICardContent>
-                    <MUIGrid container justify="space-around" spacing={2}>
-                      {eventState.players.map(function (player) {
-                        return (
-                          <MUIGrid
-                            item
-                            key={player.account._id}
-                            xs={6}
-                            sm={4}
-                            md={3}
-                            lg={2}
-                            xl={1}
-                          >
-                            <Link to={`/account/${player.account._id}`}>
-                              <MUIAvatar
-                                alt={player.account.name}
-                                className={classes.avatarSmall}
-                                src={player.account.avatar}
-                              />
-                            </Link>
-                          </MUIGrid>
-                        );
-                      })}
-                    </MUIGrid>
+                    <MUITypography variant="body1">
+                      Yell at them to hurry up!
+                    </MUITypography>
+                    <MUITypography variant="body1">
+                      While you're waiting, review the picks you've already made.
+                    </MUITypography>
                   </MUICardContent>
                 </MUICard>
-                <MUIGrid className={classes.gridContainer} container justify="space-between" spacing={2}>
-                  {eventState.pack.map(function (card) {
-                    return (
-                      <MUIGrid
-                        item
-                        key={card._id}
-                        xs={12}
-                        sm={card.back_image ? 12 : 6}
-                        md={card.back_image ? 8 : 4}
-                        lg={card.back_image ? 6 : 3}
-                        xl={card.back_image ? 4 : 2}
-                      >
-                        <MUIButton
-                          className={classes.cardImageContainer}
-                          onClick={() => {
-                            setSelectedCard(card);
-                            setDialogueDisplayed(true)
-                          }}>
-                          <img alt={card.name} className={classes.cardImage} src={card.image} />
-                          {card.back_image &&
-                            <img alt={card.name} className={classes.cardImage} src={card.back_image} />
-                          }
-                        </MUIButton>
-                      </MUIGrid>
-                    );
-                  })}
-                  {// displays if the drafter who passes to this drafter has not yet made his pick
-                    eventState.pack.length === 0 &&
-                    eventState.card_pool.length === 0 &&
-                    <MUIGrid item xs={12}>
-                      <MUITypography variant="body1">
-                        Other drafters are still making their picks; yell at them to hurry up!
-                      </MUITypography>
-                    </MUIGrid>
-                  }
-                  {// displays once the drafter has made all their picks (or immediately if it is a sealed event)
-                    eventState.card_pool.length > 0 &&
-                    <React.Fragment>
-                      <MUIGrid item xs={12}>
-                        <CSVLink
-                          className={classes.downloadLink}
-                          data={eventState.card_pool.reduce(function (a, c) {
-                            return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
-                          }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                          filename={`${eventState.name} - ${playerUsername}.csv`}
-                          target="_blank"
-                        >
-                          Download your card pool in CSV format for MTGO play!
-                        </CSVLink>
-                        {eventState.other_players_card_pools.map(function (plr) {
-                          return (
-                            <React.Fragment key={plr.account._id}>
-                              <br />
-                              <CSVLink
-                                className={classes.downloadLink}
-                                data={plr.card_pool.reduce(function (a, c) {
-                                  return a + " ,1," + c + ", , , , \n";
-                                }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
-                                filename={`${eventState.name} - ${plr.account.name}.csv`}
-                                target="_blank"
-                              >
-                                Download {plr.account.name}'s card pool in CSV format for MTGO play!
-                              </CSVLink>
-                            </React.Fragment>
-                          );
-                        })}
-                      </MUIGrid>
-                      <React.Fragment>
-                        {eventState.card_pool.map(function (card, index) {
-                          return (
-                            <MUIGrid
-                              item
-                              key={`cardpool-${index}`}
-                              xs={12}
-                              sm={card && card.back_image ? 12 : 6}
-                              md={card && card.back_image ? 8 : 4}
-                              lg={card && card.back_image ? 6 : 3}
-                              xl={card && card.back_image ? 4 : 2}
-                            >
-                              {card &&
-                                <MUICard className={classes.cardImageContainer}>
-                                  <img alt={card.name} className={classes.cardImage} src={card.image} />
-                                  {card.back_image &&
-                                    <img alt={card.name} className={classes.cardImage} src={card.back_image} />
-                                  }
-                                </MUICard>
-                              }
-                            </MUIGrid>
-                          );
-                        })}
-                      </React.Fragment>
-                    </React.Fragment>
-                  }
-                </MUIGrid>
-              </React.Fragment>
-            }
-          </React.Fragment>
+              }
+
+              {tabNumber === 1 &&
+                <PicksDisplay
+                  eventState={eventState}
+                  moveCard={moveCard}
+                  onSortEnd={onSortEnd}
+                />
+              }
+            </React.Fragment>
+          }
+
+          {// displays once the event is finished
+            eventState.finished &&
+            <React.Fragment>
+              <MUITypography variant="body1">
+                <CSVLink
+                  className={classes.downloadLink}
+                  data={eventState.chaff.concat(eventState.mainboard).concat(eventState.sideboard).reduce(function (a, c) {
+                    return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
+                  }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
+                  filename={`${eventState.name} - ${playerUsername}.csv`}
+                  target="_blank"
+                >
+                  Download your card pool in CSV format for MTGO play!
+                </CSVLink>
+              </MUITypography>
+              {eventState.other_players_card_pools.map(function (plr) {
+                return (
+                  <MUITypography variant="body1">
+                    <CSVLink
+                      className={classes.downloadLink}
+                      data={plr.card_pool.reduce(function (a, c) {
+                        return a + " ,1," + c + ", , , , \n";
+                      }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
+                      filename={`${eventState.name} - ${plr.account.name}.csv`}
+                      key={plr.account._id}
+                      target="_blank"
+                    >
+                      Download {plr.account.name}'s card pool in CSV format for MTGO play!
+                    </CSVLink>
+                  </MUITypography>
+                );
+              })}
+
+              <PicksDisplay
+                eventState={eventState}
+                moveCard={moveCard}
+                onSortEnd={onSortEnd}
+              />
+            </React.Fragment>
+          }
+
           {errorMessage &&
             <MUITypography variant="body1">{errorMessage}</MUITypography>
           }
-        </div>
+        </React.Fragment>
       }
     </React.Fragment>
   );

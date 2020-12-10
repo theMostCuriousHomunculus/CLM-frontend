@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
+import MUIPaper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core';
 
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
@@ -18,8 +17,11 @@ import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
   hoverPreviewArea: {
-    marginBottom: 172,
+    marginBottom: 190,
     marginTop: -8
+  },
+  paper: {
+    margin: '0 8px 8px 8px'
   }
 });
 
@@ -28,13 +30,10 @@ const Cube = () => {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
-  const [loading, setLoading] = React.useState(true);
   const [cubeState, dispatch] = useCube(true);
+  const [loading, setLoading] = React.useState(true);
   const { sendRequest } = useRequest();
 
-  const [creator, setCreator] = React.useState({
-    _id: undefined
-  });
   const [preview, setPreview] = React.useState({
     back_image: null,
     container_display: "none",
@@ -49,8 +48,7 @@ const Cube = () => {
     const fetchCube = async function () {
       try {
         const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, 'GET', null, {});
-        dispatch('UPDATE_CUBE', cubeData.cube);
-        setCreator(cubeData.creator);
+        dispatch('UPDATE_CUBE', cubeData);
       } catch (error) {
         console.log(error);
       }
@@ -138,22 +136,20 @@ const Cube = () => {
         <LoadingSpinner /> :
         <React.Fragment>
 
-          {creator &&
-            <CubeInfo creator={creator} />
-          }
+          <CubeInfo creator={cubeState.cube.creator} />
 
           <ComponentInfo />
-          {authentication.userId === creator._id &&
-            <MUICard>
-              <MUICardContent>
-                <ScryfallRequest
-                  buttonText="Add it!"
-                  labelText={`Add a card to ${cubeState.active_component_name}`}
-                  onSubmit={addCard}
-                />
-              </MUICardContent>
-            </MUICard>
+
+          {authentication.userId === cubeState.cube.creator._id &&
+            <MUIPaper className={classes.paper}>
+              <ScryfallRequest
+                buttonText="Add it!"
+                labelText={`Add a card to ${cubeState.active_component_name}`}
+                onSubmit={addCard}
+              />
+            </MUIPaper>
           }
+
           <div className={classes.hoverPreviewArea} onMouseMove={movePreview}>
             <HoverPreview {...preview} />
             {cubeState.view_mode === 'Curve' &&

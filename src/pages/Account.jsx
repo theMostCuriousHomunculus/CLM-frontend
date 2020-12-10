@@ -12,7 +12,6 @@ import MUITypography from '@material-ui/core/Typography';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import { makeStyles } from '@material-ui/core/styles';
 
-import alphabeticalSort from '../functions/alphabetical-sort';
 import BudRequests from '../components/Account Page/BudRequests';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -36,6 +35,10 @@ const useStyles = makeStyles({
   cardActions: {
     justifyContent: 'flex-end'
   },
+  cardHeader: {
+    alignItems: 'stretch',
+    display: 'flex'
+  },
   flexGrow: {
     flexGrow: 1
   },
@@ -46,7 +49,7 @@ const useStyles = makeStyles({
     minWidth: 350
   },
   tableContainer: {
-    maxHeight: '40vh'
+    height: '40vh'
   },
   warningButton: {
     backgroundColor: theme.palette.warning.main,
@@ -69,9 +72,9 @@ const Account = () => {
     events: [],
     user: {
       _id: accountId,
-      avatar: "",
+      avatar: '',
       buds: [],
-      name: "",
+      name: '',
       received_bud_requests: [],
       sent_bud_requests: []
     }
@@ -158,11 +161,11 @@ const Account = () => {
               avatar={account.user.avatar &&
                 <MUIAvatar alt={account.user.name} className={classes.avatarLarge} src={account.user.avatar} />
               }
+              className={classes.cardHeader}
               disableTypography={true}
-              title={<MUITypography variant="subtitle1">{account.user.name}</MUITypography>}
-              subheader={accountId === authentication.userId ?
-                <MUITypography color="textSecondary" variant="subtitle2">{account.user.email}</MUITypography> :
-                null
+              title={<MUITypography variant="h4">{account.user.name}</MUITypography>}
+              subheader={accountId === authentication.userId &&
+                <MUITypography color="textSecondary" variant="subtitle2">{account.user.email}</MUITypography>
               }
             />
             {accountId === authentication.userId &&
@@ -215,11 +218,11 @@ const Account = () => {
               <MUICard>
                 <MUICardHeader
                   disableTypography={true}
-                  title={<MUITypography variant="subtitle1">Buds</MUITypography>}
+                  title={<MUITypography variant="h5">Buds</MUITypography>}
                 />
                 <MUIList>
                   {account.user.buds &&
-                    alphabeticalSort(account.user.buds).map(function (bud) {
+                    account.user.buds.map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
                           {bud.avatar &&

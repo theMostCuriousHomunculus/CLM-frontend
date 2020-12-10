@@ -17,6 +17,10 @@ const useStyles = makeStyles({
   avatarLarge: {
     height: "150px",
     width: "150px"
+  },
+  cardHeader: {
+    alignItems: 'stretch',
+    display: 'flex'
   }
 });
 
@@ -49,12 +53,13 @@ const CubeInfo = (props) => {
   }
 
   return (
-    <MUICard>
+    <MUICard style={{ marginBottom: 0 }}>
 
       <MUICardHeader
         avatar={props.creator.avatar &&
           <MUIAvatar alt={props.creator.name} className={classes.avatarLarge} src={props.creator.avatar} />
         }
+        className={classes.cardHeader}
         disableTypography={true}
         title={authentication.userId === props.creator._id ?
           <MUITextField

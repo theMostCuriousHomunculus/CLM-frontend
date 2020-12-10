@@ -11,7 +11,6 @@ import { AuthenticationContext } from './contexts/authentication-context';
 import { useRequest } from './hooks/request-hook';
 
 const Account = React.lazy(() => import('./pages/Account'));
-const Authenticate = React.lazy(() => import('./pages/Authenticate'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Cube = React.lazy(() => import('./pages/Cube'));
@@ -103,9 +102,6 @@ function App() {
             <Switch>
               <Route path='/' exact>
                 <Home />
-              </Route>
-              <Route path='/account/authenticate' exact>
-                <Authenticate />
               </Route>
               <Route path='/account/:accountId'>
                 <Account />

@@ -43,6 +43,7 @@ const ScryfallRequest = (props) => {
           if (matches.data) {
             setCardSearchResults(matches.data.map(function (match) {
               let loyalty, mana_cost, power, toughness, type_line;
+              // this should be changed...  look at card_faces property since transform doesn't capture modal_dfc or split
               if (match.layout === "transform") {
                 if (match.card_faces[0].loyalty) {
                   loyalty = match.card_faces[0].loyalty;

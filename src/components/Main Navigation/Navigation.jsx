@@ -7,6 +7,7 @@ import MUIMenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
 
+import AuthenticateForm from './AuthenticateForm';
 import NavigationLinks from './NavigationLinks';
 import theme from '../../theme';
 import UserSearchBar from './UserSearchBar';
@@ -45,6 +46,7 @@ const useStyles = makeStyles({
 
 function Navigation (props) {
 
+  const [authenticateFormDisplayed, setAuthenticateFormDisplayed] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const classes = useStyles();
   const { history } = props;
@@ -57,27 +59,57 @@ function Navigation (props) {
   };
 
   return (
-    <MUIAppBar className={classes.appBar} position="static">
-      <MUIToolbar className={classes.toolbar}>
-        <MUIMenuIcon className={classes.menuIcon} color="secondary" onClick={toggleDrawer(true)} />
-        <div className={classes.headlineContainer}>
-          <MUITypography color="secondary" variant="h1">Cube Level Midnight</MUITypography>
-        </div>
-        <div className={classes.topBarContainer}>
-          <UserSearchBar history={history} orientation="top" setDrawerOpen={setDrawerOpen} />
-        </div>
-      </MUIToolbar>
-      <MUIDrawer
-        anchor="left"
-        className={classes.drawer}
-        id="side-navigation"
-        onClose={toggleDrawer(false)}
-        open={drawerOpen}
+    <React.Fragment>
+      <AuthenticateForm
+        open={authenticateFormDisplayed}
+        toggleOpen={() => setAuthenticateFormDisplayed(false)}
+      />
+      <MUIAppBar
+        className={classes.appBar}
+        position="static"
       >
-        <UserSearchBar history={history} orientation="side" setDrawerOpen={setDrawerOpen} />
-        <NavigationLinks history={history} toggleDrawer={toggleDrawer} />
-      </MUIDrawer>
-    </MUIAppBar>
+        <MUIToolbar className={classes.toolbar}>
+          <MUIMenuIcon
+            className={classes.menuIcon}
+            color="secondary"
+            onClick={toggleDrawer(true)}
+          />
+          <div className={classes.headlineContainer}>
+            <MUITypography
+              color="secondary"
+              variant="h2"
+            >
+              Cube Level Midnight
+            </MUITypography>
+          </div>
+          <div className={classes.topBarContainer}>
+            <UserSearchBar
+              history={history}
+              orientation="top"
+              setDrawerOpen={setDrawerOpen}
+            />
+          </div>
+        </MUIToolbar>
+        <MUIDrawer
+          anchor="left"
+          className={classes.drawer}
+          id="side-navigation"
+          onClose={toggleDrawer(false)}
+          open={drawerOpen}
+        >
+          <UserSearchBar
+            history={history}
+            orientation="side"
+            setDrawerOpen={setDrawerOpen}
+          />
+          <NavigationLinks
+            history={history}
+            setAuthenticateFormDisplayed={setAuthenticateFormDisplayed}
+            toggleDrawer={toggleDrawer}
+          />
+        </MUIDrawer>
+      </MUIAppBar>
+    </React.Fragment>
   );
 }
 

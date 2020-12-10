@@ -57,7 +57,7 @@ const UserCubeCard = (props) => {
     <MUICard>
       <MUICardHeader
         disableTypography={true}
-        title={<MUITypography variant="subtitle1">Cubes</MUITypography>}
+        title={<MUITypography variant="h5">Cubes</MUITypography>}
       />
       <MUICardContent>
         <MUITableContainer className={props.classes.tableContainer}>

@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   item: {
     color: theme.palette.secondary.main,
     '& span, & svg': {
-      fontSize: '2rem'
+      fontSize: '1.6rem'
     }
   },
   list: {
@@ -78,7 +78,7 @@ function NavigationLinks (props) {
     {
       icon: <MUIExitToAppIcon />,
       name: "Login / Register",
-      onClick: () => history.push('/account/authenticate')
+      onClick: () => props.setAuthenticateFormDisplayed(true)
     }
   ];
 

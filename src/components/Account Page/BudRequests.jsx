@@ -12,7 +12,6 @@ import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
-import alphabeticalSort from '../../functions/alphabetical-sort';
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useRequest } from '../../hooks/request-hook';
@@ -78,11 +77,11 @@ const BudRequests = (props) => {
         <MUICard>
           <MUICardHeader
             disableTypography={true}
-            title={<MUITypography variant="subtitle1">Aspiring Buds</MUITypography>}
+            title={<MUITypography variant="h5">Aspiring Buds</MUITypography>}
           />
           <MUIList>
             {props.user.received_bud_requests &&
-              alphabeticalSort(props.user.received_bud_requests).map(function (request) {
+              props.user.received_bud_requests.map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
                     {request.avatar &&
@@ -120,11 +119,11 @@ const BudRequests = (props) => {
         <MUICard>
           <MUICardHeader
             disableTypography={true}
-            title={<MUITypography variant="subtitle1">Pending Buds</MUITypography>}
+            title={<MUITypography variant="h5">Pending Buds</MUITypography>}
           />
           <MUIList>
             {props.user.sent_bud_requests &&
-              alphabeticalSort(props.user.sent_bud_requests).map(function (request) {
+              props.user.sent_bud_requests.map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
                     {request.avatar &&

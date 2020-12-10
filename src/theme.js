@@ -3,23 +3,15 @@ import deepPurple from '@material-ui/core/colors/deepPurple';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
 const defaultTheme = createMuiTheme();
-const { breakpoints } = defaultTheme;
 
 const theme = createMuiTheme({
   ...defaultTheme,
   overrides: {
-    MuiButton: {
-      root: {
-        fontSize: '1rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '0.7rem'
-        }
-      }
-    },
     MuiCard: {
       root: {
-        padding: 0,
-        margin: 8
+        background: '#f7f7f7',
+        margin: 8,
+        padding: 0
       }
     },
     MuiCardActions: {
@@ -71,80 +63,14 @@ const theme = createMuiTheme({
       }
     },
     MuiTableCell: {
-      body: {
-        fontSize: '1.5rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '0.85rem'
-        }
-      },
       head: {
         color: lightGreen['A400'],
-        fontSize: '2rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1rem'
-        }
       },
       root: {
         padding: '4px 8px 4px 8px'
       },
       stickyHeader: {
         backgroundColor: deepPurple[400]
-      }
-    },
-    MuiTypography: {
-      h1: {
-        fontSize: '4rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '2rem'
-        }
-      },
-      h2: {
-        fontSize: '3.5rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.75rem'
-        }
-      },
-      h3: {
-        fontSize: '3rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.5rem'
-        }
-      },
-      h4: {
-        fontSize: '2.5rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1.25rem'
-        }
-      },
-      h5: {
-        fontSize: '2rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1rem'
-        }
-      },
-      body1: {
-        fontSize: '1.5rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '0.85rem'
-        }
-      },
-      body2: {
-        fontSize: '1rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '0.7rem'
-        }
-      },
-      subtitle1: {
-        fontSize: '2rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '1rem'
-        }
-      },
-      subtitle2: {
-        fontSize: '1.5rem',
-        [breakpoints.down('sm')]: {
-          fontSize: '0.85rem'
-        }
       }
     }
   },
