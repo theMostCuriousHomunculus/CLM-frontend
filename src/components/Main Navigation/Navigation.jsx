@@ -77,7 +77,7 @@ function Navigation (props) {
           <div className={classes.headlineContainer}>
             <MUITypography
               color="secondary"
-              variant="h2"
+              variant="h3"
             >
               Cube Level Midnight
             </MUITypography>

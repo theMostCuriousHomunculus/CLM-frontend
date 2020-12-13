@@ -12,7 +12,7 @@ import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core';
 
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import theme from '../theme';
+import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
@@ -30,14 +30,7 @@ const useStyles = makeStyles({
   },
   spaceBetween: {
     justifyContent: 'space-between'
-  },
-  warningButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: theme.palette.warning.dark
-    }
-  },
+  }
 });
 
 const Blog = () => {
@@ -116,14 +109,12 @@ const Blog = () => {
                   />
                   <MUICardActions className={blogPost.author === authentication.userId ? classes.spaceBetween : null}>
                     {blogPost.author === authentication.userId &&
-                      <MUIButton
-                        className={classes.warningButton}
+                      <WarningButton
                         onClick={() => deleteBlogPost(blogPost._id)}
                         startIcon={<MUIDeleteForeverIcon />}
-                        variant="contained"
                       >
                         Delete
-                      </MUIButton>
+                      </WarningButton>
                     }
                     <MUIButton
                       color="primary"

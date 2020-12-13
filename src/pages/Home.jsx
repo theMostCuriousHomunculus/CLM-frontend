@@ -55,12 +55,12 @@ const Home = () => {
           <MUITypography variant="body1"><MUIPaletteIcon /> Diverse Play Experiences</MUITypography>
           <MUITypography variant="body1"><MUITimerIcon /> Draft in Real Time with Your Buds</MUITypography>
           <MUITypography variant="body1"><MUIComputerIcon /> Export Draft Picks to CSV Files for Quick and Easy MTGO Play</MUITypography>
-          <MUICardActions style={{ justifyContent: 'flex-end' }}>
-            <MUIButton color="primary" onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')} variant="contained">
-              Check Out Casey's MTGO Cube!
-            </MUIButton>
-          </MUICardActions>
         </MUICardContent>
+        <MUICardActions>
+          <MUIButton color="primary" onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')} variant="contained">
+            Check Out Casey's MTGO Cube!
+          </MUIButton>
+        </MUICardActions>
       </MUICard>
 
       {/*<MUIGrid container>

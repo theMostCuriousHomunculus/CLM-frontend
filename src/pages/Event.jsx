@@ -1,7 +1,6 @@
 import React from 'react';
 import arrayMove from 'array-move';
 import io from 'socket.io-client';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
@@ -18,10 +17,11 @@ import { useParams } from 'react-router-dom';
 
 import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
+import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import SortableList from '../components/Event Page/SortableList';
+import theme from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
-import theme from '../theme';
 
 const eventReducer = (state, action) => {
   switch (action.type) {
@@ -36,11 +36,6 @@ const eventReducer = (state, action) => {
 };
 
 const useStyles = makeStyles({
-  avatarSmall: {
-    height: '75px',
-    marginRight: '16px',
-    width: '75px'
-  },
   downloadLink: {
     marginLeft: 8
   },
@@ -169,7 +164,7 @@ const Event = () => {
           <MUICard>
             <MUICardHeader
               disableTypography={true}
-              title={<MUITypography variant="h4">{eventState.name}</MUITypography>}
+              title={<MUITypography variant="h5">{eventState.name}</MUITypography>}
             />
             <MUICardContent>
               <MUIGrid container justify="space-around" spacing={2}>
@@ -188,9 +183,8 @@ const Event = () => {
                     >
                       <MUITooltip title={player.account.name}>
                         <Link to={`/account/${player.account._id}`}>
-                          <MUIAvatar
+                          <SmallAvatar
                             alt={player.account.name}
-                            className={classes.avatarSmall}
                             src={player.account.avatar}
                           />
                         </Link>

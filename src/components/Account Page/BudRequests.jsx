@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardHeader from '@material-ui/core/CardHeader';
@@ -12,25 +11,14 @@ import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
-import theme from '../../theme';
+import SmallAvatar from '../miscellaneous/SmallAvatar';
+import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
-  avatarSmall: {
-    height: '75px',
-    marginRight: '16px',
-    width: '75px'
-  },
   flexGrow: {
     flexGrow: 1
-  },
-  warningButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: '#ffffff',
-    '&:hover': {
-      backgroundColor: theme.palette.warning.dark
-    }
   }
 });
 
@@ -40,10 +28,10 @@ const BudRequests = (props) => {
   const classes = useStyles();
   const { sendRequest } = useRequest();
 
-  async function acceptBudRequest (event) {
+  async function acceptBudRequest (otherUserId) {
     let formData = {
       action: 'accept',
-      other_user_id: event.currentTarget.getAttribute('data-id')
+      other_user_id: otherUserId
     };
 
     await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
@@ -56,10 +44,10 @@ const BudRequests = (props) => {
     props.fetchAccount();
   }
 
-  async function rejectBudRequest (event) {
+  async function rejectBudRequest (otherUserId) {
     let formData = {
       action: 'reject',
-      other_user_id: event.currentTarget.getAttribute('data-id')
+      other_user_id: otherUserId
     };
     await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
     'PATCH',
@@ -85,24 +73,21 @@ const BudRequests = (props) => {
                 return (
                   <MUIListItem key={request._id}>
                     {request.avatar &&
-                      <MUIAvatar alt={request.name} className={classes.avatarSmall} src={request.avatar} />
+                      <SmallAvatar alt={request.name} src={request.avatar} />
                     }
                     <MUITypography className={classes.flexGrow} variant="body1">
                       <Link to={`/account/${request._id}`}>{request.name}</Link>
                     </MUITypography>
-                    <MUIButton
-                      className={classes.warningButton}
-                      data-id={request._id}
-                      onClick={rejectBudRequest}
-                      variant="contained"
+                    <WarningButton
+                      onClick={() => rejectBudRequest(request._id)}
                     >
                       <MUINotInterestedIcon />
-                    </MUIButton>
+                    </WarningButton>
+
                     <MUIButton
                       color="primary"
-                      data-id={request._id}
-                      onClick={acceptBudRequest}
-                      style={{ marginLeft: '1rem' }}
+                      onClick={() => acceptBudRequest(request._id)}
+                      style={{ marginLeft: '8px' }}
                       variant="contained"
                     >
                       <MUIPersonAddIcon />
@@ -126,9 +111,7 @@ const BudRequests = (props) => {
               props.user.sent_bud_requests.map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
-                    {request.avatar &&
-                      <MUIAvatar alt={request.name} className={classes.avatarSmall} src={request.avatar} />
-                    }
+                    <SmallAvatar alt={request.name} src={request.avatar} />
                     <MUITypography variant="body1">
                       <Link to={`/account/${request._id}`}>{request.name}</Link>
                     </MUITypography>

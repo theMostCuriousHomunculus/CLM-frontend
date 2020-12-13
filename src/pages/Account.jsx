@@ -15,9 +15,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import BudRequests from '../components/Account Page/BudRequests';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
-import theme from '../theme';
+import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import UserCubeCard from '../components/Account Page/UserCubeCard';
 import UserEventCard from '../components/Account Page/UserEventCard';
+import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
 
@@ -26,14 +27,6 @@ const useStyles = makeStyles({
   avatarLarge: {
     height: '150px',
     width: '150px'
-  },
-  avatarSmall: {
-    height: '75px',
-    marginRight: '16px',
-    width: '75px'
-  },
-  cardActions: {
-    justifyContent: 'flex-end'
   },
   cardHeader: {
     alignItems: 'stretch',
@@ -50,13 +43,6 @@ const useStyles = makeStyles({
   },
   tableContainer: {
     height: '40vh'
-  },
-  warningButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: '#ffffff',
-    '&:hover': {
-      backgroundColor: theme.palette.warning.dark
-    }
   }
 });
 
@@ -116,10 +102,10 @@ const Account = () => {
     }
   }
 
-  async function deleteBud (event) {
+  async function deleteBud (otherUserId) {
     let formData = {
       action: 'remove',
-      other_user_id: event.currentTarget.getAttribute('data-id')
+      other_user_id: otherUserId
     };
 
     await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
@@ -156,16 +142,16 @@ const Account = () => {
         <LoadingSpinner /> :
         <React.Fragment>
 
-          <MUICard>
+          <MUICard style={{ marginBottom: 0 }}>
             <MUICardHeader
               avatar={account.user.avatar &&
                 <MUIAvatar alt={account.user.name} className={classes.avatarLarge} src={account.user.avatar} />
               }
               className={classes.cardHeader}
               disableTypography={true}
-              title={<MUITypography variant="h4">{account.user.name}</MUITypography>}
+              title={<MUITypography variant="h5">{account.user.name}</MUITypography>}
               subheader={accountId === authentication.userId &&
-                <MUITypography color="textSecondary" variant="subtitle2">{account.user.email}</MUITypography>
+                <MUITypography color="textSecondary" variant="subtitle1">{account.user.email}</MUITypography>
               }
             />
             {accountId === authentication.userId &&
@@ -189,7 +175,7 @@ const Account = () => {
                 return request._id === authentication.userId;
               }).length === 0 &&
               // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
-              <MUICardActions className={classes.cardActions}>
+              <MUICardActions>
                 <MUIButton
                   color="primary"
                   onClick={sendBudRequest}
@@ -204,11 +190,19 @@ const Account = () => {
           <MUIGrid container spacing={2}>
 
             <MUIGrid item xs={12} lg={6}>
-              <UserCubeCard classes={classes} cubes={account.cubes} />
+              <UserCubeCard
+                cubes={account.cubes}
+                pageClasses={classes}
+              />
             </MUIGrid>
 
             <MUIGrid item xs={12} lg={6}>
-              <UserEventCard buds={account.user.buds} classes={classes} cubes={account.cubes} events={account.events} />
+              <UserEventCard
+                buds={account.user.buds}
+                cubes={account.cubes}
+                events={account.events}
+                pageClasses={classes}
+              />
             </MUIGrid>
 
           </MUIGrid>
@@ -225,21 +219,16 @@ const Account = () => {
                     account.user.buds.map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
-                          {bud.avatar &&
-                            <MUIAvatar alt={bud.name} className={classes.avatarSmall} src={bud.avatar} />
-                          }
+                          <SmallAvatar alt={bud.name} src={bud.avatar} />
                           <MUITypography className={classes.flexGrow} variant="body1">
                             <Link to={`/account/${bud._id}`}>{bud.name}</Link>
                           </MUITypography>
                           {accountId === authentication.userId &&
-                            <MUIButton
-                              className={classes.warningButton}
-                              data-id={bud._id}
-                              onClick={deleteBud}
-                              variant="contained"
+                            <WarningButton
+                              onClick={() => deleteBud(bud._id)}
                             >
                               Delete Bud
-                            </MUIButton>
+                            </WarningButton>
                           }
                         </MUIListItem>
                       );

@@ -3,13 +3,13 @@ import MUIButton from '@material-ui/core/Button';
 import MUIDialog from '@material-ui/core/Dialog';
 import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogContentText from '@material-ui/core/DialogContentText'
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUITextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
+import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import theme from '../../theme';
+import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useRequest } from '../../hooks/request-hook';
 
@@ -19,13 +19,6 @@ const useStyles = makeStyles({
     display: 'flex',
     height: 300,
     width: 300
-  },
-  warningButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: '#ffffff',
-    '&:hover': {
-      backgroundColor: theme.palette.warning.dark
-    }
   }
 });
 
@@ -109,18 +102,10 @@ export default function (props) {
 
   return (
     <React.Fragment>
-      <MUIDialog
-        open={!!errorMessage}
-        onClose={clearError}
-      >
-        <MUIDialogTitle>Error</MUIDialogTitle>
-        <MUIDialogContent>
-          <MUIDialogContentText>{errorMessage}</MUIDialogContentText>
-        </MUIDialogContent>
-        <MUIDialogActions>
-          <MUIButton color="primary" onClick={clearError} variant="contained">Try Again</MUIButton>
-        </MUIDialogActions>
-      </MUIDialog>
+      <ErrorDialog
+        clearError={clearError}
+        errorMessage={errorMessage}
+      />
 
       <MUIDialog
         open={open}
@@ -174,13 +159,11 @@ export default function (props) {
               />
             </MUIDialogContent>
             <MUIDialogActions>
-              <MUIButton
-                className={classes.warningButton}
+              <WarningButton
                 onClick={() => toggleMode(mode)}
-                variant="contained"
               >
                 {mode === 'Login' ? "Don't have an account yet?" : 'Already have an account?'}
-              </MUIButton>
+              </WarningButton>
               <MUIButton
                 color="primary"
                 type="submit"

@@ -46,8 +46,9 @@ const theme = createMuiTheme({
     },
     MuiGrid: {
       container: {
-        margin: 0,
-        padding: 8
+        margin: '0 !important',
+        padding: '0 !important',
+        width: '100% !important'
       },
       item: {
         margin: 0,
@@ -55,11 +56,6 @@ const theme = createMuiTheme({
         '& .MuiCard-root': {
           margin: 0
         }
-      },
-      "spacing-xs-2": {
-        margin: 0,
-        padding: 0,
-        width: '100%'
       }
     },
     MuiTableCell: {

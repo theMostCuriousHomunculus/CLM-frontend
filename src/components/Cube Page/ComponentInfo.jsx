@@ -19,7 +19,7 @@ import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
-import theme from '../../theme';
+import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
@@ -68,13 +68,6 @@ const useStyles = makeStyles({
   rotationSizeField: {
     margin: '0 8px 0 8px',
     width: '33%'
-  },
-  warningButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: '#ffffff',
-    '&:hover': {
-      backgroundColor: theme.palette.warning.dark
-    }
   }
 });
 
@@ -354,14 +347,12 @@ const ComponentInfo = React.memo(() => {
 
         {authentication.userId === cubeState.cube.creatorId &&
           cubeState.active_component_type !== 'builtIn' &&
-          <MUIButton
-            className={classes.warningButton}
+          <WarningButton
             onClick={deleteComponent}
             startIcon={<MUIDeleteForeverIcon />}
-            variant="contained"
           >
-            Delete this {cubeState.active_component_type === 'module' ? 'Module' : 'Rotation'}
-          </MUIButton>
+          Delete this {cubeState.active_component_type === 'module' ? 'Module' : 'Rotation'}
+          </WarningButton>
         }
       </MUICardContent>
 

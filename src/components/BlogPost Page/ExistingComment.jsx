@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
@@ -12,23 +11,13 @@ import MUIThumbUpIcon from '@material-ui/icons/ThumbUp';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import SmallAvatar from '../miscellaneous/SmallAvatar';
 import theme from '../../theme';
+import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
-  avatarSmall: {
-    height: '75px',
-    marginRight: '16px',
-    width: '75px'
-  },
-  warningButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: theme.palette.primary.main,
-    '&:hover': {
-      backgroundColor: theme.palette.warning.dark
-    }
-  },
   likeButton: {
     color: theme.palette.primary.main
   }
@@ -60,7 +49,7 @@ const ExistingComment = (props) => {
   return (
     <MUICard>
       <MUICardHeader
-        avatar={<MUIAvatar alt={author.name} className={classes.avatarSmall} src={author.avatar}/>}
+        avatar={<SmallAvatar alt={author.name} src={author.avatar}/>}
         disableTypography={true}
         title={<MUITypography color="textPrimary" variant="body1">
           <Link to={`/account/${author._id}`}>{author.name}</Link>
@@ -72,14 +61,12 @@ const ExistingComment = (props) => {
       </MUICardContent>
       <MUICardActions>
         {author._id === authentication.userId ?
-          <MUIButton
-            className={classes.warningButton}
+          <WarningButton
             onClick={deleteComment}
             startIcon={<MUIDeleteForeverIcon />}
-            variant="contained"
           >
             Delete
-          </MUIButton> :
+          </WarningButton> :
           <React.Fragment>
             <MUITypography variant="body2">These buttons don't actually do anything yet but feel free to press them anyway!</MUITypography>
             <MUIButton className={classes.warningButton} variant="contained">
