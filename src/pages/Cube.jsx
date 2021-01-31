@@ -21,7 +21,8 @@ const useStyles = makeStyles({
     marginTop: -8
   },
   paper: {
-    margin: '0 8px 8px 8px'
+    margin: '0 8px 8px 8px',
+    padding: 8
   }
 });
 

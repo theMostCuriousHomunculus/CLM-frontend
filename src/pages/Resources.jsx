@@ -7,9 +7,9 @@ import { CardHeader as MUICardHeader } from '@material-ui/core';
 import { Grid as MUIGrid } from '@material-ui/core';
 import { Typography as MUITypography } from '@material-ui/core';
 
-const Resources = () => {
+export default function () {
 
-  const resources = [
+  const resourcesArray = [
     {
       description: 'MTG Cube draft strategy and theory for players and curators.',
       link: 'https://www.youtube.com/channel/UC-6jOdvL1awVWd-ME7QAV8Q',
@@ -22,12 +22,12 @@ const Resources = () => {
       name: 'Path to Cube',
       platform: 'Podcast'
     }
-  ]
-
+  ];
+  
   return (
     <MUIGrid container spacing={2}>
       {
-        resources.map(function (resource, index) {
+        resourcesArray.map(function (resource, index) {
           return (
             <MUIGrid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
               <MUICard>
@@ -49,6 +49,4 @@ const Resources = () => {
       }
     </MUIGrid>
   );
-}
-
-export default Resources;
+};

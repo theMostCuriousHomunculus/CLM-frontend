@@ -13,8 +13,6 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import SmallAvatar from '../miscellaneous/SmallAvatar';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   flexGrow: {
@@ -24,40 +22,7 @@ const useStyles = makeStyles({
 
 const BudRequests = (props) => {
 
-  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { sendRequest } = useRequest();
-
-  async function acceptBudRequest (otherUserId) {
-    let formData = {
-      action: 'accept',
-      other_user_id: otherUserId
-    };
-
-    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
-      'PATCH',
-      JSON.stringify(formData),
-      {
-      Authorization: 'Bearer ' + authentication.token,
-      'Content-Type': 'application/json'
-    });
-    props.fetchAccount();
-  }
-
-  async function rejectBudRequest (otherUserId) {
-    let formData = {
-      action: 'reject',
-      other_user_id: otherUserId
-    };
-    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
-    'PATCH',
-    JSON.stringify(formData),
-    {
-      Authorization: 'Bearer ' + authentication.token,
-      'Content-Type': 'application/json'
-    });
-    props.fetchAccount();
-  }
 
   return (
     <React.Fragment>
@@ -68,8 +33,8 @@ const BudRequests = (props) => {
             title={<MUITypography variant="h5">Aspiring Buds</MUITypography>}
           />
           <MUIList>
-            {props.user.received_bud_requests &&
-              props.user.received_bud_requests.map(function (request) {
+            {props.received_bud_requests &&
+              props.received_bud_requests.map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
                     {request.avatar &&
@@ -79,14 +44,14 @@ const BudRequests = (props) => {
                       <Link to={`/account/${request._id}`}>{request.name}</Link>
                     </MUITypography>
                     <WarningButton
-                      onClick={() => rejectBudRequest(request._id)}
+                      onClick={() => props.manageBuds('reject', request._id)}
                     >
                       <MUINotInterestedIcon />
                     </WarningButton>
 
                     <MUIButton
                       color="primary"
-                      onClick={() => acceptBudRequest(request._id)}
+                      onClick={() => props.manageBuds('accept', request._id)}
                       style={{ marginLeft: '8px' }}
                       variant="contained"
                     >
@@ -107,8 +72,8 @@ const BudRequests = (props) => {
             title={<MUITypography variant="h5">Pending Buds</MUITypography>}
           />
           <MUIList>
-            {props.user.sent_bud_requests &&
-              props.user.sent_bud_requests.map(function (request) {
+            {props.sent_bud_requests &&
+              props.sent_bud_requests.map(function (request) {
                 return (
                   <MUIListItem key={request._id}>
                     <SmallAvatar alt={request.name} src={request.avatar} />

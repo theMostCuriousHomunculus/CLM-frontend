@@ -173,7 +173,7 @@ const ComponentInfo = React.memo(() => {
       <MUICardHeader
         className={classes.cardHeader}
         disableTypography={true}
-        title={(authentication.userId === cubeState.cube.creatorId &&
+        title={(authentication.userId === cubeState.cube.creator._id &&
           cubeState.active_component_type !== 'builtIn') ?
           <MUITextField
             autoComplete="off"
@@ -265,7 +265,7 @@ const ComponentInfo = React.memo(() => {
       />
 
       <MUICardContent className={classes.cardContent}>
-        {authentication.userId === cubeState.cube.creatorId &&
+        {authentication.userId === cubeState.cube.creator._id &&
           <React.Fragment>
             <MUIButton
               color="primary"
@@ -331,7 +331,7 @@ const ComponentInfo = React.memo(() => {
         }
 
         {cubeState.active_component_type === 'rotation' &&
-          (authentication.userId === cubeState.cube.creatorId ?
+          (authentication.userId === cubeState.cube.creator._id ?
           <MUITextField
             className={classes.rotationSizeField}
             label="Size"
@@ -345,7 +345,7 @@ const ComponentInfo = React.memo(() => {
           <MUITypography variant="subtitle1">Rotation Size: {cubeState.active_rotation_size}</MUITypography>)
         }
 
-        {authentication.userId === cubeState.cube.creatorId &&
+        {authentication.userId === cubeState.cube.creator._id &&
           cubeState.active_component_type !== 'builtIn' &&
           <WarningButton
             onClick={deleteComponent}

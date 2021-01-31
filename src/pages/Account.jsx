@@ -102,38 +102,22 @@ const Account = () => {
     }
   }
 
-  async function deleteBud (otherUserId) {
-    let formData = {
-      action: 'remove',
-      other_user_id: otherUserId
-    };
-
-    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
-      'PATCH',
-      JSON.stringify(formData),
-      {
+  async function manageBuds (response, otherUserId) {
+    try {
+      await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
+        'PATCH',
+        JSON.stringify({
+          action: response,
+          other_user_id: otherUserId
+        }),
+        {
         Authorization: 'Bearer ' + authentication.token,
         'Content-Type': 'application/json'
-      }
-    );
-    fetchAccount();
-  }
-
-  async function sendBudRequest () {
-    let formData = {
-      action: 'send',
-      other_user_id: accountId
-    };
-
-    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
-      'PATCH',
-      JSON.stringify(formData),
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    fetchAccount();
+      });
+      fetchAccount();
+    } catch (error) {
+      console.log({ 'Error': error.message });
+    }
   }
 
   return (
@@ -178,7 +162,7 @@ const Account = () => {
               <MUICardActions>
                 <MUIButton
                   color="primary"
-                  onClick={sendBudRequest}
+                  onClick={() => manageBuds('send', accountId)}
                   variant="contained"
                 >
                   <MUIPersonAddIcon />
@@ -225,7 +209,7 @@ const Account = () => {
                           </MUITypography>
                           {accountId === authentication.userId &&
                             <WarningButton
-                              onClick={() => deleteBud(bud._id)}
+                              onClick={() => manageBuds('remove', bud._id)}
                             >
                               Delete Bud
                             </WarningButton>
@@ -240,7 +224,11 @@ const Account = () => {
 
             {accountId === authentication.userId &&
               // passing fetchAccount as a prop so that the page reloads when a user responds to a request...  there is probably a better way to do this
-              <BudRequests user={account.user} fetchAccount={fetchAccount} />
+              <BudRequests
+                manageBuds={manageBuds}
+                received_bud_requests={account.user.received_bud_requests}
+                sent_bud_requests={account.user.sent_bud_requests}
+              />
             }
           </MUIGrid>
         </React.Fragment>
