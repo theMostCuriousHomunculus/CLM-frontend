@@ -6,7 +6,7 @@ import MUIDialogContent from '@material-ui/core/DialogContent';
 import MUIDialogContentText from '@material-ui/core/DialogContentText';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 
-export default function (props) {
+const ErrorDialog = function (props) {
 
   const { clearError, errorMessage } = props;
 
@@ -25,3 +25,5 @@ export default function (props) {
     </MUIDialog>
   );
 };
+
+export default ErrorDialog;

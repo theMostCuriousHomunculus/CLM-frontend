@@ -44,32 +44,51 @@ const ScryfallRequest = (props) => {
             setCardSearchResults(matches.data.map(function (match) {
               let loyalty, mana_cost, power, toughness, type_line;
               // this should be changed...  look at card_faces property since transform doesn't capture modal_dfc or split
-              if (match.layout === "transform") {
-                if (match.card_faces[0].loyalty) {
-                  loyalty = match.card_faces[0].loyalty;
-                } else if (match.card_faces[1].loyalty) {
-                  // think baby jace
-                  loyalty = match.card_faces[1].loyalty;
-                }
-                mana_cost = match.card_faces[0].mana_cost;
-                if (match.card_faces[0].power) {
-                  power = match.card_faces[0].power;
-                } else if (match.card_faces[1].power) {
-                  // think elbrus, the binding blade
-                  power = match.card_faces[1].power;
-                }
-                if (match.card_faces[0].toughness) {
-                  toughness = match.card_faces[0].toughness;
-                } else if (match.card_faces[1].toughness) {
-                  toughness = match.card_faces[1].toughness;
-                }
-                type_line = match.card_faces[0].type_line + " / " + match.card_faces[1].type_line;
-              } else {
-                loyalty = match.loyalty;
-                mana_cost = match.mana_cost;
-                power = match.power;
-                toughness = match.toughness;
-                type_line = match.type_line;
+              switch(match.layout) {
+                case 'split':
+                  mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
+                  type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
+                  break;
+                case 'flip':
+                  break;
+                case 'transform':
+                  if (match.card_faces[0].loyalty) {
+                    loyalty = match.card_faces[0].loyalty;
+                  } else if (match.card_faces[1].loyalty) {
+                    // think baby jace
+                    loyalty = match.card_faces[1].loyalty;
+                  }
+                  mana_cost = match.card_faces[0].mana_cost;
+                  if (match.card_faces[0].power) {
+                    power = match.card_faces[0].power;
+                  } else if (match.card_faces[1].power) {
+                    // think elbrus, the binding blade
+                    power = match.card_faces[1].power;
+                  }
+                  if (match.card_faces[0].toughness) {
+                    toughness = match.card_faces[0].toughness;
+                  } else if (match.card_faces[1].toughness) {
+                    toughness = match.card_faces[1].toughness;
+                  }
+                  type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
+                  break;
+                case 'modal_dfc':
+                  break;
+                case 'meld':
+                  break;
+                case 'leveler':
+                  break;
+                case 'saga':
+                  break;
+                case 'adventure':
+                  break;
+                default:
+                  // 'normal'
+                  loyalty = match.loyalty;
+                  mana_cost = match.mana_cost;
+                  power = match.power;
+                  toughness = match.toughness;
+                  type_line = match.type_line;
               }
 
               return (

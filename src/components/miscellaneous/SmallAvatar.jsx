@@ -4,13 +4,13 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   smallAvatar: {
-    height: '75px',
+    height: '50px',
     marginRight: '16px',
-    width: '75px'
+    width: '50px'
   }
 });
 
-export default function (props) {
+const SmallAvatar = function (props) {
 
   const { alt, src } = props;
 
@@ -20,3 +20,5 @@ export default function (props) {
     <MUIAvatar alt={alt} className={classes.smallAvatar} src={src} />
   );
 };
+
+export default SmallAvatar;

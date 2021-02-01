@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function (props) {
+const AuthenticateForm = function (props) {
 
   const { open, toggleOpen } = props;
 
@@ -178,3 +178,5 @@ export default function (props) {
     </React.Fragment>
   );
 }
+
+export default AuthenticateForm;

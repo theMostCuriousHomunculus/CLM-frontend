@@ -25,8 +25,8 @@ import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
   avatarLarge: {
-    height: '150px',
-    width: '150px'
+    height: '75px',
+    width: '75px'
   },
   cardHeader: {
     alignItems: 'stretch',

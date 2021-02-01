@@ -14,7 +14,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function (props) {
+const WarningButton = function (props) {
 
   const { children, onClick, startIcon } = props;
 
@@ -29,3 +29,5 @@ export default function (props) {
     </MUIButton>
   );
 };
+
+export default WarningButton;

@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function (props) {
+const PicksDisplay = function (props) {
 
   const classes = useStyles();
   const { eventState, moveCard, onSortEnd } = props;
@@ -77,4 +77,6 @@ export default function (props) {
       </MUICard>
     </React.Fragment>
   );
-}
+};
+
+export default PicksDisplay;

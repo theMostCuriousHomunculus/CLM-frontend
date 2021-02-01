@@ -7,7 +7,7 @@ import { CardHeader as MUICardHeader } from '@material-ui/core';
 import { Grid as MUIGrid } from '@material-ui/core';
 import { Typography as MUITypography } from '@material-ui/core';
 
-export default function () {
+const Resources = function () {
 
   const resourcesArray = [
     {
@@ -50,3 +50,5 @@ export default function () {
     </MUIGrid>
   );
 };
+
+export default Resources;

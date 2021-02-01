@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function (props) {
+const CreateCubeForm = function (props) {
 
   const { open, toggleOpen } = props;
 
@@ -119,3 +119,5 @@ export default function (props) {
     </React.Fragment>
   );
 };
+
+export default CreateCubeForm;
