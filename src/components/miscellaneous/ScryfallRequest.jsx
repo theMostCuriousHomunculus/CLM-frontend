@@ -42,14 +42,28 @@ const ScryfallRequest = (props) => {
           let matches = await sendRequest(`https://api.scryfall.com/cards/search?q=${cardSearchInputValue}` , 'GET', null, {});
           if (matches.data) {
             setCardSearchResults(matches.data.map(function (match) {
-              let loyalty, mana_cost, power, toughness, type_line;
+              let chapters, loyalty, mana_cost, power, toughness, type_line;
               // this should be changed...  look at card_faces property since transform doesn't capture modal_dfc or split
               switch(match.layout) {
                 case 'split':
+                  // split cards are always instants and/or sorceries
                   mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
                   type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
                   break;
                 case 'flip':
+                  // flip was only in Kamigawa block (plus an "Un" card and a couple of reprints), which was before planeswalkers existed.  unlikely they ever bring this layout back, and if they do, no idea how they would fit a planeswalker onto one side.  all flip cards are creatures on one end and either a creature or an enchantment on the other
+                  mana_cost = match.card_faces[0].mana_cost;
+                  if (match.card_faces[0].power) {
+                    power = match.card_faces[0].power;
+                  } else if (match.card_faces[1].power) {
+                    power = match.card_faces[1].power;
+                  }
+                  if (match.card_faces[0].toughness) {
+                    toughness = match.card_faces[0].toughness;
+                  } else if (match.card_faces[1].toughness) {
+                    toughness = match.card_faces[1].toughness;
+                  }
+                  type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
                   break;
                 case 'transform':
                   if (match.card_faces[0].loyalty) {
@@ -73,17 +87,59 @@ const ScryfallRequest = (props) => {
                   type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
                   break;
                 case 'modal_dfc':
+                  if (match.card_faces[0].loyalty) {
+                    loyalty = match.card_faces[0].loyalty;
+                  } else if (match.card_faces[1].loyalty) {
+                    // think valki, god of lies
+                    loyalty = match.card_faces[1].loyalty;
+                  }
+                  mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
+                  if (match.card_faces[0].power) {
+                    power = match.card_faces[0].power;
+                  } else if (match.card_faces[1].power) {
+                    power = match.card_faces[1].power;
+                  }
+                  if (match.card_faces[0].toughness) {
+                    toughness = match.card_faces[0].toughness;
+                  } else if (match.card_faces[1].toughness) {
+                    toughness = match.card_faces[1].toughness;
+                  }
+                  type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
                   break;
                 case 'meld':
+                  // meld only appeared in Eldritch Moon and probably won't ever come back.  no planeswalkers; only creatures and a single land
+                  mana_cost = match.mana_cost;
+                  power = match.power;
+                  toughness = match.toughness;
+                  type_line = match.type_line;
                   break;
                 case 'leveler':
+                  // all level up cards have been creatures.  this is a mechanic that has so far only appeared in Rise of the Eldrazi and a single card in Modern Horizons.  i don't expect the mechanic to return, but the printing of Hexdrinker in MH1 suggests it may
+                  mana_cost = match.mana_cost;
+                  power = match.power;
+                  toughness = match.toughness;
+                  type_line = match.type_line;
                   break;
                 case 'saga':
+                  // saga's have no other faces; they simply have their own layout type becuase of the fact that the art is on the right side of the card rather than the top of the card.  all sagas printed so far (through Kaldheim) have only 3 or 4 chapters
+                  if (match.oracle_text.includes('Sacrifice after III')) {
+                    chapters = 3;
+                  }
+                  if (match.oracle_text.includes('Sacrifice after IV')) {
+                    chapters = 4;
+                  }
+                  mana_cost = match.mana_cost;
+                  type_line = match.type_line;
                   break;
                 case 'adventure':
+                  // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
+                  mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
+                  power = match.card_faces[0].power;
+                  toughness = match.card_faces[0].toughness;
+                  type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
                   break;
                 default:
-                  // 'normal'
+                  // 'normal' layout
                   loyalty = match.loyalty;
                   mana_cost = match.mana_cost;
                   power = match.power;
@@ -93,6 +149,7 @@ const ScryfallRequest = (props) => {
 
               return (
                 {
+                  chapters,
                   cmc: match.cmc,
                   color_identity: match.color_identity,
                   keywords: match.keywords,
@@ -130,15 +187,33 @@ const ScryfallRequest = (props) => {
   async function scryfallPrintSearch (prints_search_uri, cardDetails) {
     try {
       let printings = await sendRequest(prints_search_uri);
-      printings = printings.data.map(function(print) {
+      printings = printings.data.map(async function(print) {
         let art_crop, back_image, image;
-        if (print.layout === "transform") {
-          art_crop = print.card_faces[0].image_uris.art_crop;
-          back_image = print.card_faces[1].image_uris.large;
-          image = print.card_faces[0].image_uris.large;
-        } else {
-          art_crop = print.image_uris.art_crop;
-          image = print.image_uris.large;
+        switch (print.layout) {
+          // just using the front image for the art crop (used for blog images and profile avatars)
+          case 'transform':
+            art_crop = print.card_faces[0].image_uris.art_crop;
+            back_image = print.card_faces[1].image_uris.large;
+            image = print.card_faces[0].image_uris.large;
+            break;
+          case 'modal_dfc':
+            art_crop = print.card_faces[0].image_uris.art_crop;
+            back_image = print.card_faces[1].image_uris.large;
+            image = print.card_faces[0].image_uris.large;
+            break;
+          case 'meld':
+            art_crop = print.image_uris.art_crop;
+            const meldResultPart = print.all_parts.find(function (part) {
+              return part.component === 'meld_result';
+            });
+            const meldResult = await sendRequest(meldResultPart.uri, 'GET', null, {});
+            back_image = meldResult.image_uris.large;
+            image = print.image_uris.large;
+            break;
+          default:
+            // split, flip, leveler, saga, adventure and normal layout cards
+            art_crop = print.image_uris.art_crop;
+            image = print.image_uris.large;
         }
         return (
           {
