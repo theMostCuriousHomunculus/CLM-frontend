@@ -13,6 +13,7 @@ import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import { makeStyles } from '@material-ui/core/styles';
 
 import BudRequests from '../components/Account Page/BudRequests';
+import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import SmallAvatar from '../components/miscellaneous/SmallAvatar';
@@ -21,7 +22,6 @@ import UserEventCard from '../components/Account Page/UserEventCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { useRequest } from '../hooks/request-hook';
-
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -140,11 +140,13 @@ const Account = () => {
             />
             {accountId === authentication.userId &&
               <MUICardActions>
-                <ScryfallRequest
-                  buttonText="Change Avatar"
-                  labelText="Change your avatar"
-                  onSubmit={changeAvatar}
-                />
+                <HoverPreview>
+                  <ScryfallRequest
+                    buttonText="Change Avatar"
+                    labelText="Change your avatar"
+                    onSubmit={changeAvatar}
+                  />
+                </HoverPreview>
               </MUICardActions>
             }
             {authentication.isLoggedIn &&

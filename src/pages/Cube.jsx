@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
-import HoverPreview from '../components/Cube Page/HoverPreview';
+import HoverPreview from '../components/miscellaneous/HoverPreview';
 import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -16,12 +16,8 @@ import { useCube } from '../hooks/cube-hook';
 import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
-  hoverPreviewArea: {
-    marginBottom: 190,
-    marginTop: -8
-  },
   paper: {
-    margin: '0 8px 8px 8px',
+    margin: '0 8px 0 8px',
     padding: 8
   }
 });
@@ -34,16 +30,6 @@ const Cube = () => {
   const [cubeState, dispatch] = useCube(true);
   const [loading, setLoading] = React.useState(true);
   const { sendRequest } = useRequest();
-
-  const [preview, setPreview] = React.useState({
-    back_image: null,
-    container_display: "none",
-    image: null,
-    image_display: "none",
-    left: 0,
-    right: undefined,
-    top: 0
-  });
 
   React.useEffect(() => {
     const fetchCube = async function () {
@@ -83,53 +69,18 @@ const Cube = () => {
     }
   }
 
-  const hidePreview = React.useCallback(function () {
-    setPreview(function (currentPreviewState) {
-      return ({
-        ...currentPreviewState,
-        back_image: null,
-        container_display: "none",
-        image: null,
-        image_display: "none"
-      });
-    });
-  }, []);
-
-  const movePreview = React.useCallback(function (event) {
-    event.persist();
-    const hpcWidth = document.getElementById('hover-preview-container').offsetWidth;
-    const windowWidth = window.screen.width;
-    let left, right;
-    if (event.pageX < windowWidth / 2) {
-      left = event.pageX - (hpcWidth * event.pageX / windowWidth) + 'px';
-      right = undefined;
-    } else {
-      left = undefined;
-      right = windowWidth - event.pageX - hpcWidth + (hpcWidth * event.pageX / windowWidth) + 'px';
-    }
-
-    setPreview(function (currentPreviewState) {
-      return ({
-        ...currentPreviewState,
-        left,
-        right,
-        top: event.pageY + 12 + "px"
-      });
-    });
-  }, [])
-
-  const showPreview = React.useCallback(function (event) {
-    event.persist();
-    setPreview(function (currentPreviewState) {
-      return ({
-        ...currentPreviewState,
-        back_image: event.target.getAttribute('back_image'),
-        container_display: "block",
-        image: event.target.getAttribute('image'),
-        image_display: "inline"
-      });
-    });
-  }, []);
+  const ScryfallRequestHackyWorkAround = (props) => {
+    return (
+      <MUIPaper className={classes.paper}>
+        <ScryfallRequest
+          buttonText="Add it!"
+          labelText={`Add a card to ${cubeState.active_component_name}`}
+          onSubmit={addCard}
+          {...props}
+        />
+      </MUIPaper>
+    );
+  }
 
   return (
     <React.Fragment>
@@ -141,37 +92,23 @@ const Cube = () => {
 
           <ComponentInfo />
 
-          {authentication.userId === cubeState.cube.creator._id &&
-            <MUIPaper className={classes.paper}>
-              <ScryfallRequest
-                buttonText="Add it!"
-                labelText={`Add a card to ${cubeState.active_component_name}`}
-                onSubmit={addCard}
-              />
-            </MUIPaper>
-          }
+          <HoverPreview marginBottom={190}>
 
-          <div className={classes.hoverPreviewArea} onMouseMove={movePreview}>
-            <HoverPreview {...preview} />
+            {authentication.userId === cubeState.cube.creator._id &&
+              <ScryfallRequestHackyWorkAround />
+            }
+
             {cubeState.view_mode === 'Curve' &&
-              <CurveView
-                hidePreview={hidePreview}
-                showPreview={showPreview}
-              />
+              <CurveView />
             }
             {cubeState.view_mode === 'List' &&
-              <ListView
-                hidePreview={hidePreview}
-                showPreview={showPreview}
-              />
+              <ListView />
             }
             {cubeState.view_mode === 'Table' &&
-              <TableView
-                hidePreview={hidePreview}
-                showPreview={showPreview}
-              />
+              <TableView />
             }
-          </div>
+
+          </HoverPreview>
         </React.Fragment>
       }
     </React.Fragment>

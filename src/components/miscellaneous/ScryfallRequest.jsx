@@ -187,7 +187,7 @@ const ScryfallRequest = (props) => {
   async function scryfallPrintSearch (prints_search_uri, cardDetails) {
     try {
       let printings = await sendRequest(prints_search_uri);
-      printings = printings.data.map(async function(print) {
+      printings = await Promise.all(printings.data.map(async function(print) {
         let art_crop, back_image, image;
         switch (print.layout) {
           // just using the front image for the art crop (used for blog images and profile avatars)
@@ -225,7 +225,7 @@ const ScryfallRequest = (props) => {
             purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
           }
         );
-      })
+      }));
       setAvailablePrintings(printings);
       setChosenCard({ ...chosenCard, ...cardDetails, ...printings[0] });
     } catch (error) {
@@ -315,6 +315,10 @@ const ScryfallRequest = (props) => {
         >
           {availablePrintings.map((option, index) => (
             <MUIMenuItem
+              back_image={option.back_image}
+              image={option.image}
+              onMouseOut={props.hidePreview}
+              onMouseOver={props.showPreview}
               key={`printing-${index}`}
               selected={index === selectedPrintIndex}
               onClick={() => handleMenuItemClick(index)}
