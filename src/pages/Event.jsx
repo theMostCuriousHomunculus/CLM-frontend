@@ -118,6 +118,13 @@ const Event = () => {
     }
   }, [authentication.userId, eventId, socket]);
 
+  const usedCardsString = eventState.mainboard.reduce(function (a, c) {
+    return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
+  }, "");
+  const unUsedCardsString = eventState.chaff.concat(eventState.sideboard).reduce(function (a, c) {
+    return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
+  }, "");
+
   function moveCard (cardId, fromCards, toCards) {
     const fromCardsClone = [...eventState[fromCards]];
     const indexOfCard = fromCardsClone.findIndex(function (card) {
@@ -270,9 +277,7 @@ const Event = () => {
               <MUITypography variant="body1">
                 <CSVLink
                   className={classes.downloadLink}
-                  data={eventState.chaff.concat(eventState.mainboard).concat(eventState.sideboard).reduce(function (a, c) {
-                    return c && c.mtgo_id ? a + " ,1," + c.mtgo_id + ", , , , \n" : a;
-                  }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
+                  data={`Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n${usedCardsString}${unUsedCardsString}`}
                   filename={`${eventState.name} - ${playerUsername}.csv`}
                   target="_blank"
                 >
@@ -285,8 +290,8 @@ const Event = () => {
                     <CSVLink
                       className={classes.downloadLink}
                       data={plr.card_pool.reduce(function (a, c) {
-                        return a + " ,1," + c + ", , , , \n";
-                      }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium\n")}
+                        return a + " ,1," + c + ", , , , ,No,0\n";
+                      }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n")}
                       filename={`${eventState.name} - ${plr.account.name}.csv`}
                       key={plr.account._id}
                       target="_blank"

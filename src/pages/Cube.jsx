@@ -53,7 +53,7 @@ const Cube = () => {
         component: cubeState.active_component_id
       });
 
-      const updatedCube = await sendRequest(
+      const newCardId = await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
         'PATCH',
         cardData,
@@ -62,7 +62,7 @@ const Cube = () => {
           'Content-Type': 'application/json'
         }
       );
-      dispatch('UPDATE_CUBE', updatedCube);
+      dispatch('ADD_CARD', { ...chosenCard, _id: newCardId });
 
     } catch (error) {
       console.log({ 'Error': error.message });

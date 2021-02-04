@@ -109,26 +109,31 @@ const ListView = (props) => {
     }
   }
 
-  async function moveDeleteCard (cardId, destinationComponentId) {
+  async function moveDeleteCard (cardId, destination) {
     setActiveMenu({ card_id: null, menu: null });
     const action = 'move_or_delete_card';
-    const destination = destinationComponentId;
-    const moveInfo = JSON.stringify({
-      action,
-      card_id: cardId,
-      component: cubeState.active_component_id,
-      destination
-    });
-    const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-      'PATCH',
-      moveInfo,
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    dispatch('UPDATE_CUBE', updatedCube);
+    try {
+      const moveInfo = JSON.stringify({
+        action,
+        cardId,
+        component: cubeState.active_component_id,
+        destination: destination
+      });
+
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
+        'PATCH',
+        moveInfo,
+        {
+          Authorization: 'Bearer ' + authentication.token,
+          'Content-Type': 'application/json'
+        }
+      );
+
+      dispatch('MOVE_OR_DELETE_CARD', { cardId, destination });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function submitCardChange (cardId, changes) {

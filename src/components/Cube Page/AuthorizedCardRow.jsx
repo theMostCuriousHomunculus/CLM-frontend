@@ -138,7 +138,7 @@ const AuthorizedCardRow = (props) => {
           }
           <MUIMenuItem
             onClick={function () {
-              moveDeleteCard(_id, 'delete');
+              moveDeleteCard(_id);
             }}
           >
             Delete from Cube

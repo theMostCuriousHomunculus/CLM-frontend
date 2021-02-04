@@ -21,7 +21,13 @@ export const useRequest = () => {
         signal: abortController.signal
       });
 
-      const responseData = await response.json();
+      let responseData;
+
+      if (response.status === 204) {
+        responseData = {};
+      } else {
+        responseData = await response.json();
+      }
 
       activeRequests.current = activeRequests.current.filter(
         abrtCntrlr => abrtCntrlr !== abortController

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import returnComponent from '../functions/return-component';
 
 let cubeState = {
   active_component_cards: [],
@@ -18,6 +19,76 @@ let cubeState = {
 let listeners = [];
 
 let actions = {
+  ADD_CARD: function (newCard) {
+    if (cubeState.active_component_id === 'mainboard') {
+      const newMainboardCardList = cubeState.cube.mainboard.concat([newCard]);
+      return {
+        ...cubeState,
+        active_component_cards: newMainboardCardList,
+        cube: {
+          ...cubeState.cube,
+          mainboard: newMainboardCardList
+        },
+        displayed_cards: filterCards(newMainboardCardList, cubeState.filter)
+      };
+    } else if (cubeState.active_component_id === 'sideboard') {
+      const newSideboardCardList = cubeState.cube.sideboard.concat([newCard]);
+      return {
+        ...cubeState,
+        active_component_cards: newSideboardCardList,
+        cube: {
+          ...cubeState.cube,
+          sideboard: newSideboardCardList
+        },
+        displayed_cards: filterCards(newSideboardCardList, cubeState.filter)
+      };
+    } else if (cubeState.active_component_type === 'module') {
+      const newModuleCardList = cubeState.active_component_cards.concat([newCard]);
+      const moduleIndex = cubeState.cube.modules.findIndex(function (module) {
+        return module._id === cubeState.active_component_id;
+      });
+      const moduleCopy = { ...cubeState.cube.modules[moduleIndex] };
+      const moduleWithNewCard = {
+        ...moduleCopy,
+        cards: newModuleCardList
+      };
+      return {
+        ...cubeState,
+        active_component_cards: newModuleCardList,
+        cube: {
+          ...cubeState.cube,
+          modules: cubeState.cube.modules.slice(0, moduleIndex)
+            .concat([moduleWithNewCard])
+            .concat(cubeState.cube.modules.slice(moduleIndex + 1))
+        },
+        displayed_cards: filterCards(newModuleCardList, cubeState.filter)
+      };
+    } else if (cubeState.active_component_type === 'rotation') {
+      const newRotationCardList = cubeState.active_component_cards.concat([newCard]);
+      const rotationIndex = cubeState.cube.rotations.findIndex(function (rotation) {
+        return rotation._id === cubeState.active_component_id;
+      });
+      const rotationCopy = { ...cubeState.cube.rotations[rotationIndex] };
+      const rotationWithNewCard = {
+        ...rotationCopy,
+        cards: newRotationCardList
+      };
+      return {
+        ...cubeState,
+        active_component_cards: newRotationCardList,
+        cube: {
+          ...cubeState.cube,
+          rotations: cubeState.cube.rotations.slice(0, rotationIndex)
+            .concat([rotationWithNewCard])
+            .concat(cubeState.cube.rotations.slice(rotationIndex + 1))
+        },
+        displayed_cards: filterCards(newRotationCardList, cubeState.filter)
+      };
+    } else {
+      // this should never happen
+      return cubeState;
+    }
+  },
   CHANGE_COMPONENT_NAME: function (newName) {
     return {
       ...cubeState,
@@ -36,6 +107,76 @@ let actions = {
       displayed_cards: filterCards(cubeState.active_component_cards, newTextFilter),
       filter: newTextFilter
     };
+  },
+  MOVE_OR_DELETE_CARD: function ({ cardId, destination }) {
+    const activeComponentCardsArray = returnComponent(cubeState.cube, cubeState.active_component_id);
+    const cardToMoveIndex = activeComponentCardsArray.findIndex(function (card) {
+      return card._id === cardId;
+    });
+    const copyOfCardToMove = { ...activeComponentCardsArray[cardToMoveIndex] };
+    const copyOfCubeState = { ...cubeState };
+    const destinationCardsArray = returnComponent(cubeState.cube, destination);
+    const newActiveComponentCardsArray = activeComponentCardsArray.slice(0, cardToMoveIndex)
+      .concat(activeComponentCardsArray.slice(cardToMoveIndex + 1));
+    let newDestinationCardsArray;
+
+    if (destinationCardsArray) {
+      newDestinationCardsArray = destinationCardsArray.concat([copyOfCardToMove]);
+    }
+
+    const destinationModule = cubeState.cube.modules.find(function (mdl) {
+      return mdl._id === destination;
+    });
+    const destinationRotation = cubeState.cube.rotations.find(function (rtn) {
+      return rtn._id === destination;
+    });
+    const originModule = cubeState.cube.modules.find(function (mdl) {
+      return mdl._id === cubeState.active_component_id;
+    });
+    const originRotation = cubeState.cube.rotations.find(function (rtn) {
+      return rtn._id === cubeState.active_component_id;
+    });
+
+    copyOfCubeState.active_component_cards = newActiveComponentCardsArray;
+    copyOfCubeState.displayed_cards = filterCards(newActiveComponentCardsArray, cubeState.filter);
+
+    if (destination === 'mainboard') {
+      copyOfCubeState.cube.mainboard = newDestinationCardsArray;
+    } else if (destination === 'sideboard') {
+      copyOfCubeState.cube.sideboard = newDestinationCardsArray;
+    } else if (destinationModule) {
+      const moduleIndex = cubeState.cube.modules.findIndex(function (module) {
+        return module._id === destination;
+      });
+      copyOfCubeState.cube.modules[moduleIndex].cards = newDestinationCardsArray;
+    } else if (destinationRotation) {
+      const rotationIndex = cubeState.cube.rotations.findIndex(function (rotation) {
+        return rotation._id === destination;
+      });
+      copyOfCubeState.cube.rotations[rotationIndex].cards = newDestinationCardsArray;
+    } else {
+      // the card was deleted from the cube
+    }
+
+    if (cubeState.active_component_id === 'mainboard') {
+      copyOfCubeState.cube.mainboard = newActiveComponentCardsArray;
+    } else if (cubeState.active_component_id === 'sideboard') {
+      copyOfCubeState.cube.sideboard = newActiveComponentCardsArray;
+    } else if (originModule) {
+      const moduleIndex = cubeState.cube.modules.findIndex(function (module) {
+        return module._id === cubeState.active_component_id;
+      });
+      copyOfCubeState.cube.modules[moduleIndex].cards = newActiveComponentCardsArray;
+    } else if (originRotation) {
+      const rotationIndex = cubeState.cube.rotations.findIndex(function (rotation) {
+        return rotation._id === cubeState.active_component_id;
+      });
+      copyOfCubeState.cube.rotations[rotationIndex].cards = newActiveComponentCardsArray;
+    } else {
+      // should never reach this block
+    }
+
+    return copyOfCubeState;
   },
   SWITCH_COMPONENT: function (componentId) {
     const module = cubeState.cube.modules.find(function (mdl) {
@@ -97,7 +238,7 @@ let actions = {
     };
   },
   UPDATE_CUBE: function (updatedCube) {
-    const differentCube = cubeState.cube._id !== updatedCube._id ? true : false;
+    const differentCube = cubeState.cube._id !== updatedCube._id;
 
     if (differentCube ||
       cubeState.active_component_id === 'mainboard' ||

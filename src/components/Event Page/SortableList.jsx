@@ -8,6 +8,7 @@ import SortableCard from './SortableCard';
 const useStyles = makeStyles({
   cardContent: {
     display: 'flex',
+    flexWrap: 'wrap',
     padding: 4
   }
 });
