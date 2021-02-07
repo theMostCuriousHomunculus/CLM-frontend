@@ -1,8 +1,10 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import MUIPaper from '@material-ui/core/Paper';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
+import { useParams } from 'react-router-dom';
 
+import { actionCreators } from '../store/actions/cube-actions';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
@@ -12,7 +14,6 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { useCube } from '../hooks/cube-hook';
 import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
@@ -22,12 +23,19 @@ const useStyles = makeStyles({
   }
 });
 
-const Cube = () => {
+const Cube = (props) => {
 
+  const {
+    activeComponentId,
+    activeComponentName,
+    creator,
+    dispatchAddCard,
+    dispatchInitializeCube,
+    viewMode
+  } = props;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
-  const [cubeState, dispatch] = useCube(true);
   const [loading, setLoading] = React.useState(true);
   const { sendRequest } = useRequest();
 
@@ -35,14 +43,14 @@ const Cube = () => {
     const fetchCube = async function () {
       try {
         const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, 'GET', null, {});
-        dispatch('UPDATE_CUBE', cubeData);
+        dispatchInitializeCube(cubeData);
       } catch (error) {
         console.log(error);
       }
       setLoading(false);
     };
     fetchCube();
-  }, [cubeId, dispatch, sendRequest]);
+  }, [cubeId, dispatchInitializeCube, sendRequest]);
 
   async function addCard (chosenCard) {
     delete chosenCard.art_crop;
@@ -50,7 +58,7 @@ const Cube = () => {
       const cardData = JSON.stringify({
         ...chosenCard,
         action: 'add_card',
-        component: cubeState.active_component_id
+        component: activeComponentId
       });
 
       const newCardId = await sendRequest(
@@ -62,21 +70,21 @@ const Cube = () => {
           'Content-Type': 'application/json'
         }
       );
-      dispatch('ADD_CARD', { ...chosenCard, _id: newCardId });
+      dispatchAddCard({ ...chosenCard, _id: newCardId });
 
     } catch (error) {
       console.log({ 'Error': error.message });
     }
   }
 
-  const ScryfallRequestHackyWorkAround = (props) => {
+  const ScryfallRequestHackyWorkAround = (props2) => {
     return (
       <MUIPaper className={classes.paper}>
         <ScryfallRequest
           buttonText="Add it!"
-          labelText={`Add a card to ${cubeState.active_component_name}`}
+          labelText={`Add a card to ${activeComponentName}`}
           onSubmit={addCard}
-          {...props}
+          {...props2}
         />
       </MUIPaper>
     );
@@ -87,24 +95,23 @@ const Cube = () => {
       {loading ?
         <LoadingSpinner /> :
         <React.Fragment>
-
-          <CubeInfo creator={cubeState.cube.creator} />
+          <CubeInfo />
 
           <ComponentInfo />
 
           <HoverPreview marginBottom={190}>
 
-            {authentication.userId === cubeState.cube.creator._id &&
+            {authentication.userId === creator._id &&
               <ScryfallRequestHackyWorkAround />
             }
 
-            {cubeState.view_mode === 'Curve' &&
+            {viewMode === 'Curve' &&
               <CurveView />
             }
-            {cubeState.view_mode === 'List' &&
+            {viewMode === 'List' &&
               <ListView />
             }
-            {cubeState.view_mode === 'Table' &&
+            {viewMode === 'Table' &&
               <TableView />
             }
 
@@ -115,4 +122,20 @@ const Cube = () => {
   );
 }
 
-export default Cube;
+function mapStateToProps (state) {
+  return {
+    activeComponentId: state.active_component_id,
+    activeComponentName: state.active_component_name,
+    creator: state.cube.creator,
+    viewMode: state.view_mode
+  };
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    dispatchAddCard: (payload) => dispatch(actionCreators.add_card(payload)),
+    dispatchInitializeCube: (payload) => dispatch(actionCreators.initialize_cube(payload))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cube);

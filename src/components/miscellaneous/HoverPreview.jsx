@@ -8,6 +8,7 @@ const useStyles = makeStyles({
     zIndex: 1301
   },
   hoverPreviewImage: {
+    borderRadius: 8,
     height: 300
   }
 });

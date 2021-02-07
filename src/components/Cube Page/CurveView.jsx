@@ -3,12 +3,12 @@ import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import alphabeticalSort from '../../functions/alphabetical-sort';
 import cardType from '../../functions/card-type';
 import { monoColors, multiColors } from '../../constants/color-objects';
-import { useCube } from '../../hooks/cube-hook';
 
 const black = monoColors.find((color) => color.name === "Black").hex;
 const blue = monoColors.find((color) => color.name === "Blue").hex;
@@ -84,13 +84,12 @@ const useStyles = makeStyles({
 
 const CurveView = (props) => {
 
-  const cubeState = useCube(true)[0];
   const classes = useStyles();
 
   return (
     <div className={classes.curveViewMainContainer}>
       {[...monoColors, ...multiColors].map(function (color) {
-        const cards_color = cubeState.displayed_cards.filter(function (card) {
+        const cards_color = props.displayedCards.filter(function (card) {
           return card.color_identity.toString() === color.color_identity;
         });
         return (
@@ -145,4 +144,10 @@ const CurveView = (props) => {
   );
 }
 
-export default React.memo(CurveView);
+function mapStateToProps (state) {
+  return {
+    displayedCards: state.displayed_cards
+  };
+}
+
+export default connect(mapStateToProps)(React.memo(CurveView));

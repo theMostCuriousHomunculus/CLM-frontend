@@ -6,11 +6,12 @@ import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ColorCheckboxes from './ColorCheckboxes';
+import { actionCreators } from '../../store/actions/cube-actions';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
-import { useCube } from '../../hooks/cube-hook';
 
 const useStyles = makeStyles({
   tableCell: {
@@ -23,6 +24,8 @@ const useStyles = makeStyles({
 const AuthorizedCardRow = (props) => {
 
   const {
+    activeComponentId,
+    activeComponentName,
     activeMenu,
     anchorEl,
     availablePrintings,
@@ -39,10 +42,13 @@ const AuthorizedCardRow = (props) => {
       type_line
     },
     columnWidths,
+    dispatchEditCard,
     enablePrintChange,
     hidePreview,
     loading,
+    modules,
     moveDeleteCard,
+    rotations,
     selectedPrintIndex,
     setActiveMenu,
     setAnchorEl,
@@ -50,7 +56,6 @@ const AuthorizedCardRow = (props) => {
     submitCardChange
   } = props;
   const classes = useStyles();
-  const cubeState = useCube(true)[0];
 
   return (
     <React.Fragment>
@@ -74,9 +79,16 @@ const AuthorizedCardRow = (props) => {
       <div className={classes.tableCell} style={{ width: columnWidths[2] }}>
         <MUITextField
           defaultValue={cmc}
-          inputProps={{ max: 16, min: 0, step: 1 }}
+          inputProps={{
+            max: 16,
+            min: 0,
+            onBlur: (event) => {
+              submitCardChange(_id, { cmc: parseInt(event.target.value) });
+              dispatchEditCard({ cardId: _id, cmc: parseInt(event.target.value) })
+            },
+            step: 1
+          }}
           margin="dense"
-          onBlur={(event) => submitCardChange(_id, { cmc: event.target.value })}
           type="number"
           variant="outlined"
         />
@@ -85,8 +97,13 @@ const AuthorizedCardRow = (props) => {
         <MUITextField
           autoComplete="off"
           defaultValue={type_line}
+          inputProps={{
+            onBlur: (event) => {
+              submitCardChange(_id, { type_line: event.target.value });
+              dispatchEditCard({ cardId: _id, type_line: event.target.value });
+            }
+          }}
           margin="dense"
-          onBlur={(event) => submitCardChange(_id, { type_line: event.target.value })}
           type="text"
           variant="outlined"
         />
@@ -104,7 +121,7 @@ const AuthorizedCardRow = (props) => {
           >
             <MUIListItemText
               // primary="Move to"
-              secondary={cubeState.active_component_name}
+              secondary={activeComponentName}
             />
           </MUIListItem>
         </MUIList>
@@ -119,18 +136,14 @@ const AuthorizedCardRow = (props) => {
         >
           {[{ name: 'Mainboard', _id: 'mainboard' },
             { name: 'Sideboard', _id: 'sideboard' },
-            ...cubeState.cube.modules.map(function (module) {
-              return { name: module.name, _id: module._id };
-            }),
-            ...cubeState.cube.rotations.map(function (rotation) {
-              return { name: rotation.name, _id: rotation._id };
-            })].map((component) => (
+            ...modules,
+            ...rotations].map((component) => (
               <MUIMenuItem
                 key={`${_id}-${component._id}`}
                 onClick={function () {
                   moveDeleteCard(_id, component._id);
                 }}
-                selected={component.active_component_id === component._id}
+                selected={activeComponentId === component._id}
               >
                 {component.name}
               </MUIMenuItem>
@@ -187,6 +200,14 @@ const AuthorizedCardRow = (props) => {
                     printing: availablePrintings[index].printing,
                     purchase_link: availablePrintings[index].purchase_link
                   });
+                  dispatchEditCard({
+                    cardId: _id,
+                    back_image: availablePrintings[index].back_image,
+                    image: availablePrintings[index].image,
+                    mtgo_id: availablePrintings[index].mtgo_id,
+                    printing: availablePrintings[index].printing,
+                    purchase_link: availablePrintings[index].purchase_link
+                  });
                 }}
               >
                 {option.printing}
@@ -204,4 +225,20 @@ const AuthorizedCardRow = (props) => {
   );
 }
 
-export default React.memo(AuthorizedCardRow);
+function mapStateToProps (state, ownProps) {
+  return {
+    activeComponentId: state.active_component_id,
+    activeComponentName: state.active_component_name,
+    card: state.displayed_cards[ownProps.index],
+    modules: state.cube.modules.map(module => ({ _id: module._id, name: module.name})),
+    rotations: state.cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))
+  };
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(AuthorizedCardRow));

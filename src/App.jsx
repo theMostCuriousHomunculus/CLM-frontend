@@ -1,12 +1,15 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import thunk from 'redux-thunk';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { applyMiddleware, compose, createStore } from 'redux';
 import { makeStyles } from '@material-ui/core/styles';
+import { Provider } from 'react-redux';
 
+import cubeReducer from './store/reducers/cube-reducer';
 import Footer from './components/miscellaneous/Footer';
 import LoadingSpinner from './components/miscellaneous/LoadingSpinner';
 import Navigation from './components/Main Navigation/Navigation';
-
 import { AuthenticationContext } from './contexts/authentication-context';
 import { useRequest } from './hooks/request-hook';
 
@@ -17,6 +20,10 @@ const Cube = React.lazy(() => import('./pages/Cube'));
 const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
 const Resources = React.lazy(() => import('./pages/Resources'));
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const cubeStore = createStore(cubeReducer, composeEnhancers(applyMiddleware(thunk)));
 
 const useStyles = makeStyles({
   main: {
@@ -113,7 +120,9 @@ function App() {
                 <Blog />
               </Route>
               <Route path='/cube/:cubeId'>
-                <Cube />
+                <Provider store={cubeStore}>
+                  <Cube />
+                </Provider>
               </Route>
               <Route path='/event/:eventId'>
                 <Event />

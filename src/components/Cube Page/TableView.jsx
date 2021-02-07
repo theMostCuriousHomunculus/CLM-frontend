@@ -3,13 +3,13 @@ import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import alphabeticalSort from '../../functions/alphabetical-sort';
 import cardType from '../../functions/card-type';
 import theme from '../../theme';
 import { monoColors, multiColors } from '../../constants/color-objects';
-import { useCube } from '../../hooks/cube-hook';
 
 const useStyles = makeStyles({
   basicCard: {
@@ -74,14 +74,13 @@ const useStyles = makeStyles({
 const TableView = (props) => {
 
   const classes = useStyles();
-  const cubeState = useCube(true)[0];
   const costs = [0, 1, 2, 3, 4, 5, 6, 7];
 
   return (
     <div className={classes.tableViewMainContainer}>
       <React.Fragment>
         {monoColors.map(function (color) {
-          const cards_color = cubeState.displayed_cards.filter(function (card) {
+          const cards_color = props.displayedCards.filter(function (card) {
             return card.color_identity.toString() === color.color_identity;
           });
           return (
@@ -150,14 +149,14 @@ const TableView = (props) => {
           disableTypography={true}
           title={<MUITypography variant="subtitle1">Multicolor</MUITypography>}
           subheader={<MUITypography variant="subtitle1">
-            ({cubeState.displayed_cards.filter(function (card) {
+            ({props.displayedCards.filter(function (card) {
               return card.color_identity.length > 1;
             }).length})
           </MUITypography>}
         />
         <MUICardContent>
           {multiColors.map(function (color) {
-            const cards_color = cubeState.displayed_cards.filter(function (card) {
+            const cards_color = props.displayedCards.filter(function (card) {
               return card.color_identity.toString() === color.color_identity;
             });
             return (
@@ -220,4 +219,10 @@ const TableView = (props) => {
   );
 }
 
-export default React.memo(TableView);
+function mapStateToProps (state) {
+  return {
+    displayedCards: state.displayed_cards
+  };
+}
+
+export default connect(mapStateToProps)(React.memo(TableView));

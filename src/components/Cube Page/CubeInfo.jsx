@@ -1,16 +1,17 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import MUIAvatar from '@material-ui/core/Avatar';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import { useParams } from 'react-router-dom';
 
+import { actionCreators } from '../../store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
@@ -28,72 +29,79 @@ const CubeInfo = (props) => {
 
   const cubeId = useParams().cubeId;
   const authentication = React.useContext(AuthenticationContext);
-  const descriptionInput = React.useRef(null);
-  const nameInput = React.useRef(null);
+  const descriptionRef = React.useRef();
+  const nameRef = React.useRef();
   const classes = useStyles();
-  const [cubeState, dispatch] = useCube(true);
   const { sendRequest } = useRequest();
 
   async function submitCubeChanges () {
-    const cubeChanges = JSON.stringify({
-      action: 'edit_cube_info',
-      description: descriptionInput.current.value,
-      name: nameInput.current.value
-    });
-    const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-      'PATCH',
-      cubeChanges,
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    dispatch('UPDATE_CUBE', updatedCube);
+    try {
+      const cubeChanges = JSON.stringify({
+        action: 'edit_cube_info',
+        description: descriptionRef.current.value,
+        name: nameRef.current.value
+      });
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
+        'PATCH',
+        cubeChanges,
+        {
+          Authorization: 'Bearer ' + authentication.token,
+          'Content-Type': 'application/json'
+        }
+      );
+      props.dispatchUpdateCubeInfo({ description: descriptionRef.current.value, name: nameRef.current.value });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
     <MUICard style={{ marginBottom: 0 }}>
 
       <MUICardHeader
-        avatar={props.creator.avatar &&
-          <MUIAvatar alt={props.creator.name} className={classes.avatarLarge} src={props.creator.avatar} />
+        avatar={props.cube.creator.avatar &&
+          <MUIAvatar alt={props.cube.creator.name} className={classes.avatarLarge} src={props.cube.creator.avatar} />
         }
         className={classes.cardHeader}
         disableTypography={true}
-        title={authentication.userId === props.creator._id ?
+        title={authentication.userId === props.cube.creator._id ?
           <MUITextField
-            defaultValue={cubeState.cube.name}
-            inputRef={nameInput}
+            inputProps={{
+              defaultValue: props.cube.name,
+              onBlur: submitCubeChanges
+            }}
+            inputRef={nameRef}
             label="Cube Name"
-            onBlur={submitCubeChanges}
             type="text"
             variant="outlined"
           /> :
-          <MUITypography variant="subtitle1">{cubeState.cube.name}</MUITypography>
+          <MUITypography variant="subtitle1">{props.cube.name}</MUITypography>
         }
         subheader={
           <MUITypography color="textSecondary" variant="subtitle2">
-            Designed by: <Link to={`/account/${props.creator._id}`}>{props.creator.name}</Link>
+            Designed by: <Link to={`/account/${props.cube.creator._id}`}>{props.cube.creator.name}</Link>
           </MUITypography>
         }
       />
 
       <MUICardContent>
-        {authentication.userId === props.creator._id ?
+        {authentication.userId === props.cube.creator._id ?
           <MUITextField
-            defaultValue={cubeState.cube.description}
             fullWidth={true}
-            inputRef={descriptionInput}
+            inputProps={{
+              defaultValue: props.cube.description,
+              onBlur: submitCubeChanges
+            }}
+            inputRef={descriptionRef}
             label="Cube Description"
             multiline
-            onBlur={submitCubeChanges}
             rows={3}
             variant="outlined"
           /> :
           <React.Fragment>
             <MUITypography variant="subtitle1">Description:</MUITypography>
-            <MUITypography variant="body1">{cubeState.cube.description}</MUITypography>
+            <MUITypography variant="body1">{props.cube.description}</MUITypography>
           </React.Fragment>
         }        
       </MUICardContent>
@@ -102,4 +110,16 @@ const CubeInfo = (props) => {
   );
 }
 
-export default CubeInfo;
+function mapStateToProps (state) {
+  return {
+    cube: state.cube
+  };
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    dispatchUpdateCubeInfo: (payload) => dispatch(actionCreators.update_cube_info(payload))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CubeInfo);

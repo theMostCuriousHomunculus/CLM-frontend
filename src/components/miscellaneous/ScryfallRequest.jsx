@@ -43,7 +43,6 @@ const ScryfallRequest = (props) => {
           if (matches.data) {
             setCardSearchResults(matches.data.map(function (match) {
               let chapters, loyalty, mana_cost, power, toughness, type_line;
-              // this should be changed...  look at card_faces property since transform doesn't capture modal_dfc or split
               switch(match.layout) {
                 case 'split':
                   // split cards are always instants and/or sorceries

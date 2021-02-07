@@ -1,40 +1,43 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import MUICard from '@material-ui/core/Card';
+import MUIPaper from '@material-ui/core/Paper';
+import RVAutoSizer from 'react-virtualized-auto-sizer';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-  AutoSizer as RVAutoSizer,
-  CellMeasurer as RVCellMeasurer,
-  CellMeasurerCache as RVCellMeasurerCache,
-  Table as RVTable
-} from 'react-virtualized';
+import { useParams } from 'react-router-dom';
 
-import alphabeticalSort from '../../functions/alphabetical-sort';
+import AuthorizedCardRow from './AuthorizedCardRow';
+import cumulativePercent from '../../functions/cumulative-percent';
+import ReactWindowStickyHeaderList from '../miscellaneous/ReactWindowStickyHeaderList';
+import theme from '../../theme';
+import UnauthorizedCardRow from './UnauthorizedCardRow';
+import { actionCreators } from '../../store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { monoColors } from '../../constants/color-objects';
-import { useCube } from '../../hooks/cube-hook';
 import { useRequest } from '../../hooks/request-hook';
-import AuthorizedCardRow from './AuthorizedCardRow';
-import UnauthorizedCardRow from './UnauthorizedCardRow';
-import theme from '../../theme';
 
 const useStyles = makeStyles({
   headerCell: {
     background: "inherit",
-    padding: "8px 0"
+    padding: "0 8px",
+    position: "absolute",
+    top: "50%",
+    transform: "translate(0%, -50%)"
   },
   headerRow: {
     background: theme.palette.primary.main,
+    borderRadius: "4px 0 0 0",
     color: theme.palette.secondary.main,
-    display: "flex",
-    flexGrow: 1,
+    // display: "flex",
+    // flexGrow: 1,
     fontFamily: "Ubuntu, Roboto, Arial, sans-serif",
     fontSize: "2rem",
+    height: 80,
     minWidth: 1200,
-    padding: "0 8px"
+    position: "relative"
   },
   tableContainer: {
     height: "80vh",
+    margin: 8,
     padding: 0
   },
   tableRow: {
@@ -49,34 +52,44 @@ const useStyles = makeStyles({
 
 const ListView = (props) => {
 
+  const {
+    activeComponentId,
+    creator,
+    dispatchMoveOrDeleteCard,
+    displayedCardsLength,
+    hidePreview,
+    showPreview
+  } = props;
   const [activeMenu, setActiveMenu] = React.useState({ card_id: null, menu: null });
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
   const authentication = React.useContext(AuthenticationContext);
-  const cache = React.useRef(new RVCellMeasurerCache({
-    fixedWidth: true,
-    defaultHeight: 96
-  }));
   const classes = useStyles();
   const cubeId = useParams().cubeId;
-  const [cubeState, dispatch] = useCube(true);
-  const columnWidths = cubeState.cube.creator._id === authentication.userId ?
+  const columnWidths = React.useRef(creator._id === authentication.userId ?
     ["20%", "17.5%", "7.5%", "15%", "17.5%", "12.5%", "10%"] :
-    ["25%", "20%", "10%", "17.5%", "0%", "15%", "12.5%"];
-  const headerColumns = [
-    <div className={classes.headerCell} key="header0" style={{ width: columnWidths[0] }}>Card Name</div>,
-    <div className={classes.headerCell} key="header1" style={{ width: columnWidths[1] }}>Color Identity</div>,
-    <div className={classes.headerCell} key="header2" style={{ width: columnWidths[2] }}>CMC</div>,
-    <div className={classes.headerCell} key="header3" style={{ width: columnWidths[3] }}>Card Type</div>,
-    cubeState.cube.creator._id === authentication.userId && <div className={classes.headerCell} key="header4" style={{ width: columnWidths[4] }}>Move / Delete</div>,
-    <div className={classes.headerCell} key="header5" style={{ width: columnWidths[5] }}>Printing</div>,
-    <div className={classes.headerCell} key="header6" style={{ width: columnWidths[6] }}>Purchase</div>
-  ];
+    ["25%", "20%", "10%", "17.5%", "0%", "15%", "12.5%"]);
+  const columnNames = React.useRef(creator._id === authentication.userId ?
+    ["Card Name", "Color Identity", "CMC", "Card Type", "Move / Delete", "Printing", "Purchase"] :
+    ["Card Name", "Color Identity", "CMC", "Card Type", "Printing", "Purchase"]);
+  const headerColumns = columnNames.current.map(function (column, index) {
+    return (
+      <div
+        className={classes.headerCell}
+        key={`header${index}`}
+        style={{
+          left: cumulativePercent(columnWidths.current, index),
+          width: columnWidths.current[index]
+        }}
+      >
+        {column}
+      </div>
+    );
+  });
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
-  const sortedCards = alphabeticalSort(cubeState.displayed_cards);
   const { loading, sendRequest } = useRequest();
 
-  async function enablePrintChange (cardId, event, oracleId, printing) {
+  const enablePrintChange = React.useCallback(async function (cardId, event, oracleId, printing) {
     setActiveMenu({ card_id: cardId, menu: 'print' });
     setAnchorEl(event.currentTarget);
 
@@ -107,16 +120,16 @@ const ListView = (props) => {
     } catch (error) {
       console.log(error);
     }
-  }
+  }, [sendRequest]);
 
-  async function moveDeleteCard (cardId, destination) {
+  const moveDeleteCard = React.useCallback(async function (cardId, destination) {
     setActiveMenu({ card_id: null, menu: null });
     const action = 'move_or_delete_card';
     try {
       const moveInfo = JSON.stringify({
         action,
         cardId,
-        component: cubeState.active_component_id,
+        component: activeComponentId,
         destination: destination
       });
 
@@ -130,98 +143,97 @@ const ListView = (props) => {
         }
       );
 
-      dispatch('MOVE_OR_DELETE_CARD', { cardId, destination });
+      dispatchMoveOrDeleteCard({ cardId, destination });
     } catch (error) {
       console.log(error);
     }
-  }
+  }, [activeComponentId, authentication.token, cubeId, dispatchMoveOrDeleteCard, sendRequest])
 
-  async function submitCardChange (cardId, changes) {
-    const updatedCube = await sendRequest(
-      `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-      'PATCH',
-      JSON.stringify({
-        action: 'edit_card',
-        card_id: cardId,
-        component: cubeState.active_component_id,
-        ...changes
-      }),
-      {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
-      }
-    );
-    dispatch('UPDATE_CUBE', updatedCube);
-  }
+  const submitCardChange = React.useCallback(async function (cardId, changes) {
+    try {
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
+        'PATCH',
+        JSON.stringify({
+          action: 'edit_card',
+          cardId,
+          component: activeComponentId,
+          ...changes
+        }),
+        {
+          Authorization: 'Bearer ' + authentication.token,
+          'Content-Type': 'application/json'
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }, [activeComponentId, authentication.token, cubeId, sendRequest]);
 
   return (
-    <MUICard className={classes.tableContainer}>
+    <MUIPaper className={classes.tableContainer}>
       <RVAutoSizer>
-        {function ({width, height}) {
-          return (
-            <RVTable
-              deferredMeasurementCache={cache.current}
-              headerHeight={52.8}
-              headerRowRenderer={function ({style}) {
-                return (
-                  <div className={classes.headerRow} style={style}>
-                    {headerColumns}
-                  </div>
-                );
-              }}
-              height={height}
-              rowCount={sortedCards.length}
-              rowGetter={function ({index}) {
-                return sortedCards[index];
-              }}
-              rowHeight={cache.current.rowHeight}
-              rowRenderer={function ({index, key, parent, style}) {
-                const card = sortedCards[index];
-                return (
-                  <RVCellMeasurer
-                    cache={cache.current}
-                    columnIndex={0}
-                    key={key}
-                    parent={parent}
-                    rowIndex={index}
-                  >
-                    <div className={classes.tableRow} style={style}>
-                      {cubeState.cube.creator._id === authentication.userId ?
-                        <AuthorizedCardRow
-                          activeMenu={activeMenu}
-                          anchorEl={anchorEl}
-                          availablePrintings={availablePrintings}
-                          card={card}
-                          columnWidths={columnWidths}
-                          enablePrintChange={enablePrintChange}
-                          hidePreview={props.hidePreview}
-                          loading={loading}
-                          moveDeleteCard={moveDeleteCard}
-                          selectedPrintIndex={selectedPrintIndex}
-                          setActiveMenu={setActiveMenu}
-                          setAnchorEl={setAnchorEl}
-                          showPreview={props.showPreview}
-                          submitCardChange={submitCardChange}
-                        /> :
-                        <UnauthorizedCardRow
-                          card={card}
-                          columnWidths={columnWidths}
-                          hidePreview={props.hidePreview}
-                          showPreview={props.showPreview}
-                        />
-                      }
-                    </div>
-                  </RVCellMeasurer>
-                );
-              }}
-              width={width}
-            >
-            </RVTable>
-          );
-        }}
+        {({ height, width }) =>(
+          <ReactWindowStickyHeaderList
+            headerRow={
+              <div className={classes.headerRow}>
+                {headerColumns}
+              </div>
+            }
+            height={height}
+            itemCount={displayedCardsLength}
+            itemSize={80}
+            width={width}
+          >
+            {({ index, style }) => (
+              // having some performance issues here; i don't want all rows to get re-rendered when one card is edited.  i will come back to this later.  maybe related to passing moveDeleteCard down from this component to children?
+              <div className={classes.tableRow} style={style}>
+                {creator._id === authentication.userId ?
+                  <AuthorizedCardRow
+                    activeMenu={activeMenu}
+                    anchorEl={anchorEl}
+                    availablePrintings={availablePrintings}
+                    columnWidths={columnWidths.current}
+                    enablePrintChange={enablePrintChange}
+                    hidePreview={hidePreview}
+                    index={index - 1}
+                    loading={loading}
+                    moveDeleteCard={moveDeleteCard}
+                    selectedPrintIndex={selectedPrintIndex}
+                    setActiveMenu={setActiveMenu}
+                    setAnchorEl={setAnchorEl}
+                    showPreview={showPreview}
+                    submitCardChange={submitCardChange}
+                  />
+                  :
+                  <UnauthorizedCardRow
+                    columnWidths={columnWidths.current}
+                    hidePreview={hidePreview}
+                    index={index}
+                    showPreview={showPreview}
+                  />
+                }
+              </div>
+            )}
+          </ReactWindowStickyHeaderList>
+        )}
       </RVAutoSizer>
-    </MUICard>
+    </MUIPaper>
   );
 }
 
-export default React.memo(ListView);
+function mapStateToProps (state) {
+  return {
+    activeComponentId: state.active_component_id,
+    creator: state.cube.creator,
+    displayedCardsLength: state.displayed_cards.length
+  };
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListView);

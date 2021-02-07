@@ -1,8 +1,10 @@
 import React from 'react';
 import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIGrid from '@material-ui/core/Grid';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { actionCreators } from '../../store/actions/cube-actions';
 import { monoColors } from '../../constants/color-objects';
 import { ReactComponent as WhiteManaSymbol } from '../../images/white-mana-symbol.svg';
 import { ReactComponent as BlueManaSymbol } from '../../images/blue-mana-symbol.svg';
@@ -77,6 +79,7 @@ const ColorCheckboxes = (props) => {
       if (key !== color && value.checked) color_identity.push(key);
     }
 
+    props.dispatchEditCard({ cardId: props.card_id, color_identity: color_identity.sort() })
     props.submitCardChange(props.card_id, { color_identity: color_identity.sort() });
   }
   
@@ -99,4 +102,10 @@ const ColorCheckboxes = (props) => {
   );
 }
 
-export default React.memo(ColorCheckboxes);
+function mapDispatchToProps (dispatch) {
+  return {
+    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload))
+  };
+}
+
+export default connect(null, mapDispatchToProps)(ColorCheckboxes);
