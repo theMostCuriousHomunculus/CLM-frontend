@@ -8,10 +8,13 @@ import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
+import { useParams } from 'react-router-dom';
 
 import ColorCheckboxes from './ColorCheckboxes';
 import { actionCreators } from '../../store/actions/cube-actions';
+import { AuthenticationContext } from '../../contexts/authentication-context';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
+import { useRequest } from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   tableCell: {
@@ -26,9 +29,6 @@ const AuthorizedCardRow = (props) => {
   const {
     activeComponentId,
     activeComponentName,
-    activeMenu,
-    anchorEl,
-    availablePrintings,
     card: {
       _id,
       back_image,
@@ -43,20 +43,82 @@ const AuthorizedCardRow = (props) => {
     },
     columnWidths,
     dispatchEditCard,
-    enablePrintChange,
+    dispatchMoveOrDeleteCard,
     hidePreview,
-    loading,
     modules,
-    moveDeleteCard,
     rotations,
-    selectedPrintIndex,
-    setActiveMenu,
-    setAnchorEl,
     showPreview,
     submitCardChange
   } = props;
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
+  const cubeId = useParams().cubeId;
+  const [activeMenu, setActiveMenu] = React.useState();
+  const [anchorEl, setAnchorEl] = React.useState();
+  const [availablePrintings, setAvailablePrintings] = React.useState([]);
+  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
+  const { loading, sendRequest } = useRequest();
 
+  async function enablePrintChange (event) {
+    setActiveMenu('print');
+    setAnchorEl(event.currentTarget);
+
+    try {
+      let printings = await sendRequest(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracle_id}&unique=prints`);
+      printings = printings.data.map(function(print) {
+        let back_image, image;
+        if (print.layout === "transform") {
+          back_image = print.card_faces[1].image_uris.large;
+          image = print.card_faces[0].image_uris.large;
+        } else {
+          image = print.image_uris.large;
+        }
+        return (
+          {
+            back_image,
+            image,
+            mtgo_id: print.mtgo_id,
+            printing: print.set_name + " - " + print.collector_number,
+            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
+          }
+        );
+      });
+      setAvailablePrintings(printings);
+      setSelectedPrintIndex(printings.findIndex(function (print) {
+        return print.printing === printing;
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function moveDeleteCard (destination) {
+    setActiveMenu(null);
+    const action = 'move_or_delete_card';
+    try {
+      const moveInfo = JSON.stringify({
+        action,
+        cardId: _id,
+        component: activeComponentId,
+        destination: destination
+      });
+
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
+        'PATCH',
+        moveInfo,
+        {
+          Authorization: 'Bearer ' + authentication.token,
+          'Content-Type': 'application/json'
+        }
+      );
+
+      dispatchMoveOrDeleteCard({ cardId: _id, destination });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+console.log('balls');
   return (
     <React.Fragment>
       <div
@@ -115,7 +177,7 @@ const AuthorizedCardRow = (props) => {
             aria-haspopup="true"
             aria-controls="lock-menu"
             onClick={function (event) {
-              setActiveMenu({ card_id: _id, menu: 'component' });
+              setActiveMenu('component');
               setAnchorEl(event.currentTarget);
             }}
           >
@@ -128,9 +190,9 @@ const AuthorizedCardRow = (props) => {
         <MUIMenu
           anchorEl={anchorEl}
           keepMounted
-          open={activeMenu.card_id === _id && activeMenu.menu === 'component'}
+          open={activeMenu === 'component'}
           onClose={function () {
-            setActiveMenu({ card_id: null, menu: null });
+            setActiveMenu(null);
             setAnchorEl(null);
           }}
         >
@@ -164,9 +226,7 @@ const AuthorizedCardRow = (props) => {
             button
             aria-haspopup="true"
             aria-controls="lock-menu"
-            onClick={function (event) {
-              enablePrintChange(_id, event, oracle_id, printing);
-            }}
+            onClick={enablePrintChange}
           >
             <MUIListItemText
               // primary="Selected Printing"
@@ -178,9 +238,9 @@ const AuthorizedCardRow = (props) => {
           id="printing"
           anchorEl={anchorEl}
           keepMounted
-          open={activeMenu.card_id === _id && activeMenu.menu === 'print'}
+          open={activeMenu === 'print'}
           onClose={function () {
-            setActiveMenu({ card_id: null, menu: null });
+            setActiveMenu(null);
             setAnchorEl(null);
           }}
         >
@@ -191,7 +251,7 @@ const AuthorizedCardRow = (props) => {
                 key={`${_id}-printing-${index}`}
                 selected={index === selectedPrintIndex}
                 onClick={function () {
-                  setActiveMenu({ card_id: null, menu: null });
+                  setActiveMenu(null);
                   setAnchorEl(null);
                   submitCardChange(_id, {
                     back_image: availablePrintings[index].back_image,
@@ -237,7 +297,8 @@ function mapStateToProps (state, ownProps) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload))
+    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload)),
+    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
   };
 }
 

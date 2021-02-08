@@ -1,5 +1,6 @@
 import React from 'react';
 import MUIPaper from '@material-ui/core/Paper';
+import MUITypography from '@material-ui/core/Typography';
 import RVAutoSizer from 'react-virtualized-auto-sizer';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,7 +11,6 @@ import cumulativePercent from '../../functions/cumulative-percent';
 import ReactWindowStickyHeaderList from '../miscellaneous/ReactWindowStickyHeaderList';
 import theme from '../../theme';
 import UnauthorizedCardRow from './UnauthorizedCardRow';
-import { actionCreators } from '../../store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { monoColors } from '../../constants/color-objects';
 import { useRequest } from '../../hooks/request-hook';
@@ -27,10 +27,6 @@ const useStyles = makeStyles({
     background: theme.palette.primary.main,
     borderRadius: "4px 0 0 0",
     color: theme.palette.secondary.main,
-    // display: "flex",
-    // flexGrow: 1,
-    fontFamily: "Ubuntu, Roboto, Arial, sans-serif",
-    fontSize: "2rem",
     height: 80,
     minWidth: 1200,
     position: "relative"
@@ -55,20 +51,16 @@ const ListView = (props) => {
   const {
     activeComponentId,
     creator,
-    dispatchMoveOrDeleteCard,
     displayedCardsLength,
     hidePreview,
     showPreview
   } = props;
-  const [activeMenu, setActiveMenu] = React.useState({ card_id: null, menu: null });
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [availablePrintings, setAvailablePrintings] = React.useState([]);
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
   const columnWidths = React.useRef(creator._id === authentication.userId ?
-    ["20%", "17.5%", "7.5%", "15%", "17.5%", "12.5%", "10%"] :
-    ["25%", "20%", "10%", "17.5%", "0%", "15%", "12.5%"]);
+    ["20%", "17.5%", "7.5%", "15%", "15%", "12.5%", "12.5%"] :
+    ["22.5%", "20%", "10%", "17.5%", "0%", "15%", "15%"]);
   const columnNames = React.useRef(creator._id === authentication.userId ?
     ["Card Name", "Color Identity", "CMC", "Card Type", "Move / Delete", "Printing", "Purchase"] :
     ["Card Name", "Color Identity", "CMC", "Card Type", "Printing", "Purchase"]);
@@ -82,72 +74,16 @@ const ListView = (props) => {
           width: columnWidths.current[index]
         }}
       >
-        {column}
+        <MUITypography
+          variant="h5"
+        >
+          {column}
+        </MUITypography>
       </div>
     );
   });
-  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
-  const { loading, sendRequest } = useRequest();
 
-  const enablePrintChange = React.useCallback(async function (cardId, event, oracleId, printing) {
-    setActiveMenu({ card_id: cardId, menu: 'print' });
-    setAnchorEl(event.currentTarget);
-
-    try {
-      let printings = await sendRequest(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleId}&unique=prints`);
-      printings = printings.data.map(function(print) {
-        let back_image, image;
-        if (print.layout === "transform") {
-          back_image = print.card_faces[1].image_uris.large;
-          image = print.card_faces[0].image_uris.large;
-        } else {
-          image = print.image_uris.large;
-        }
-        return (
-          {
-            back_image,
-            image,
-            mtgo_id: print.mtgo_id,
-            printing: print.set_name + " - " + print.collector_number,
-            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
-          }
-        );
-      });
-      setAvailablePrintings(printings);
-      setSelectedPrintIndex(printings.findIndex(function (print) {
-        return print.printing === printing;
-      }));
-    } catch (error) {
-      console.log(error);
-    }
-  }, [sendRequest]);
-
-  const moveDeleteCard = React.useCallback(async function (cardId, destination) {
-    setActiveMenu({ card_id: null, menu: null });
-    const action = 'move_or_delete_card';
-    try {
-      const moveInfo = JSON.stringify({
-        action,
-        cardId,
-        component: activeComponentId,
-        destination: destination
-      });
-
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-        'PATCH',
-        moveInfo,
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-
-      dispatchMoveOrDeleteCard({ cardId, destination });
-    } catch (error) {
-      console.log(error);
-    }
-  }, [activeComponentId, authentication.token, cubeId, dispatchMoveOrDeleteCard, sendRequest])
+  const { sendRequest } = useRequest();
 
   const submitCardChange = React.useCallback(async function (cardId, changes) {
     try {
@@ -186,22 +122,13 @@ const ListView = (props) => {
             width={width}
           >
             {({ index, style }) => (
-              // having some performance issues here; i don't want all rows to get re-rendered when one card is edited.  i will come back to this later.  maybe related to passing moveDeleteCard down from this component to children?
+              // having some performance issues here; i don't want all rows to get re-rendered when one card is edited.
               <div className={classes.tableRow} style={style}>
                 {creator._id === authentication.userId ?
                   <AuthorizedCardRow
-                    activeMenu={activeMenu}
-                    anchorEl={anchorEl}
-                    availablePrintings={availablePrintings}
                     columnWidths={columnWidths.current}
-                    enablePrintChange={enablePrintChange}
                     hidePreview={hidePreview}
-                    index={index - 1}
-                    loading={loading}
-                    moveDeleteCard={moveDeleteCard}
-                    selectedPrintIndex={selectedPrintIndex}
-                    setActiveMenu={setActiveMenu}
-                    setAnchorEl={setAnchorEl}
+                    index={index}
                     showPreview={showPreview}
                     submitCardChange={submitCardChange}
                   />
@@ -230,10 +157,4 @@ function mapStateToProps (state) {
   };
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListView);
+export default connect(mapStateToProps)(ListView);

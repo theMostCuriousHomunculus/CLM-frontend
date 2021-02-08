@@ -15,10 +15,10 @@ const useStyles = makeStyles({
 
 const ItemWrapper = ({ data, index, style }) => {
   const { ItemRenderer } = data;
-  if (index === 0) {
-    return null;
-  }
-  return <ItemRenderer index={index} style={style} />;
+  // if (index === 0) {
+  //   return null;
+  // }
+  return <ItemRenderer index={index} style={{ ...style, top: `${(index + 1) * 80}px` }} />;
 }
 
 const ReactWindowStickyHeaderList = ({ children, itemSize, headerRow, ...rest }) => {
