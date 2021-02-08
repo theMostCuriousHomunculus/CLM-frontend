@@ -100,7 +100,7 @@ const AuthorizedCardRow = (props) => {
         action,
         cardId: _id,
         component: activeComponentId,
-        destination: destination
+        destination
       });
 
       await sendRequest(
@@ -203,7 +203,7 @@ console.log('balls');
               <MUIMenuItem
                 key={`${_id}-${component._id}`}
                 onClick={function () {
-                  moveDeleteCard(_id, component._id);
+                  moveDeleteCard(component._id);
                 }}
                 selected={activeComponentId === component._id}
               >
@@ -213,7 +213,7 @@ console.log('balls');
           }
           <MUIMenuItem
             onClick={function () {
-              moveDeleteCard(_id);
+              moveDeleteCard(null);
             }}
           >
             Delete from Cube
