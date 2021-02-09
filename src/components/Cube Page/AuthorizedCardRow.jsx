@@ -278,7 +278,7 @@ console.log('balls');
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[6] }}>
         <a href={purchase_link}>
-          <TCGPlayerLogo style={{ width: "100%" }} />
+          <TCGPlayerLogo style={{ width: "75%" }} />
         </a>
       </div>
     </React.Fragment>

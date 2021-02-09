@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { monoColors, multiColors } from '../../constants/color-objects';
@@ -8,7 +9,6 @@ const useStyles = makeStyles({
   tableCell: {
     alignItems: "center",
     display: "flex",
-    height: 96,
     padding: "0 8px"
   }
 });
@@ -55,17 +55,26 @@ const UnauthorizedCardRow = (props) => {
       <div className={classes.tableCell} style={{ width: columnWidths[3] }}>
         {type_line}
       </div>
-      {/*not displaying column at index 4 since user is not the cube creator*/}
-      <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
+      <div className={classes.tableCell} style={{ width: columnWidths[4] }}>
         {printing}
       </div>
-      <div className={classes.tableCell} style={{ width: columnWidths[6] }}>
+      <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
         <a href={purchase_link}>
-          <TCGPlayerLogo style={{ width: "100%" }} />
+          <TCGPlayerLogo style={{ width: "75%" }} />
         </a>
       </div>
     </React.Fragment>
   );
 }
 
-export default UnauthorizedCardRow;
+function mapStateToProps (state, ownProps) {
+  return {
+    activeComponentId: state.active_component_id,
+    activeComponentName: state.active_component_name,
+    card: state.displayed_cards[ownProps.index],
+    modules: state.cube.modules.map(module => ({ _id: module._id, name: module.name})),
+    rotations: state.cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))
+  };
+}
+
+export default connect(mapStateToProps)(UnauthorizedCardRow);

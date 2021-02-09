@@ -27,7 +27,6 @@ const useStyles = makeStyles({
     background: theme.palette.primary.main,
     borderRadius: "4px 0 0 0",
     color: theme.palette.secondary.main,
-    height: 80,
     minWidth: 1200,
     position: "relative"
   },
@@ -58,20 +57,20 @@ const ListView = (props) => {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
-  const columnWidths = React.useRef(creator._id === authentication.userId ?
+  const columnWidths = creator._id === authentication.userId ?
     ["20%", "17.5%", "7.5%", "15%", "15%", "12.5%", "12.5%"] :
-    ["22.5%", "20%", "10%", "17.5%", "0%", "15%", "15%"]);
-  const columnNames = React.useRef(creator._id === authentication.userId ?
+    ["22.5%", "20%", "10%", "17.5%", "15%", "15%"];
+  const columnNames = creator._id === authentication.userId ?
     ["Card Name", "Color Identity", "CMC", "Card Type", "Move / Delete", "Printing", "Purchase"] :
-    ["Card Name", "Color Identity", "CMC", "Card Type", "Printing", "Purchase"]);
-  const headerColumns = columnNames.current.map(function (column, index) {
+    ["Card Name", "Color Identity", "CMC", "Card Type", "Printing", "Purchase"];
+  const headerColumns = columnNames.map(function (column, index) {
     return (
       <div
         className={classes.headerCell}
         key={`header${index}`}
         style={{
-          left: cumulativePercent(columnWidths.current, index),
-          width: columnWidths.current[index]
+          left: cumulativePercent(columnWidths, index),
+          width: columnWidths[index]
         }}
       >
         <MUITypography
@@ -82,6 +81,7 @@ const ListView = (props) => {
       </div>
     );
   });
+  const headerRowSize = 60;
 
   const { sendRequest } = useRequest();
 
@@ -112,10 +112,11 @@ const ListView = (props) => {
         {({ height, width }) =>(
           <ReactWindowStickyHeaderList
             headerRow={
-              <div className={classes.headerRow}>
+              <div className={classes.headerRow} style={{ height: headerRowSize }}>
                 {headerColumns}
               </div>
             }
+            headerRowSize={headerRowSize}
             height={height}
             itemCount={displayedCardsLength}
             itemSize={80}
@@ -126,7 +127,7 @@ const ListView = (props) => {
               <div className={classes.tableRow} style={style}>
                 {creator._id === authentication.userId ?
                   <AuthorizedCardRow
-                    columnWidths={columnWidths.current}
+                    columnWidths={columnWidths}
                     hidePreview={hidePreview}
                     index={index}
                     showPreview={showPreview}
@@ -134,7 +135,7 @@ const ListView = (props) => {
                   />
                   :
                   <UnauthorizedCardRow
-                    columnWidths={columnWidths.current}
+                    columnWidths={columnWidths}
                     hidePreview={hidePreview}
                     index={index}
                     showPreview={showPreview}

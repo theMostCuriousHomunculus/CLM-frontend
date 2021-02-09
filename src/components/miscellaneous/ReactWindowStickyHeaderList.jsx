@@ -13,15 +13,7 @@ const useStyles = makeStyles({
   }
 });
 
-const ItemWrapper = ({ data, index, style }) => {
-  const { ItemRenderer } = data;
-  // if (index === 0) {
-  //   return null;
-  // }
-  return <ItemRenderer index={index} style={{ ...style, top: `${(index + 1) * 80}px` }} />;
-}
-
-const ReactWindowStickyHeaderList = ({ children, itemSize, headerRow, ...rest }) => {
+const ReactWindowStickyHeaderList = ({ children, itemSize, headerRow, headerRowSize, ...rest }) => {
 
   const classes = useStyles();
   
@@ -30,13 +22,18 @@ const ReactWindowStickyHeaderList = ({ children, itemSize, headerRow, ...rest })
       {headerRow}
     </div>
   );
+
+  const ItemWrapper = ({ data, index, style }) => {
+    const { ItemRenderer } = data;
+    return <ItemRenderer index={index} style={{ ...style, top: `${(index * itemSize) + headerRowSize}px` }} />;
+  }
   
   const innerElementType = React.forwardRef(({ children, ...rest }, ref) => (
     <StickyListContext.Consumer>
       {() => (
         <div ref={ref} {...rest}>
           <HeaderRow
-            style={{ top: 0, left: 0, height: itemSize }}
+            style={{ top: 0, left: 0, height: headerRowSize }}
           />
           {children}
         </div>
