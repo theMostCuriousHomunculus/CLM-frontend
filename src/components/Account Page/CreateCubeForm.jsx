@@ -6,6 +6,7 @@ import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUITextField from '@material-ui/core/TextField';
+import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ErrorDialog from '../miscellaneous/ErrorDialog';
@@ -32,6 +33,7 @@ const CreateCubeForm = function (props) {
   const history = useHistory();
   const { loading, errorMessage, sendRequest, clearError } = useRequest();
 
+  const cobraId = React.useRef();
   const cubeDescription = React.useRef();
   const cubeName = React.useRef();
 
@@ -39,6 +41,7 @@ const CreateCubeForm = function (props) {
     event.preventDefault();
 
     const formInputs = {
+      cobraId: cobraId.current.value,
       description: cubeDescription.current.value,
       name: cubeName.current.value
     };
@@ -73,7 +76,7 @@ const CreateCubeForm = function (props) {
             <LoadingSpinner />
           </MUIDialogContent> :
           <form onSubmit={submitForm}>
-            <MUIDialogContent>
+            <MUIDialogContent style={{ height: 'max-content' }}>
               <MUITextField
                 autoComplete="off"
                 autoFocus
@@ -92,8 +95,23 @@ const CreateCubeForm = function (props) {
                 label="Description"
                 multiline
                 required={false}
-                rows={3}
-                style={{ marginTop: '16px' }}
+                rows={2}
+                style={{ marginBottom: '12px', marginTop: '16px' }}
+                type="text"
+                variant="outlined"
+              />
+
+              <MUITypography variant="body1">
+                Have an existing cube on CubeCobra?
+              </MUITypography>
+
+              <MUITextField
+                autoComplete="off"
+                fullWidth
+                inputRef={cobraId}
+                label="24 character ID from cubecobra URL"
+                required={false}
+                style={{ marginTop: '8px' }}
                 type="text"
                 variant="outlined"
               />
