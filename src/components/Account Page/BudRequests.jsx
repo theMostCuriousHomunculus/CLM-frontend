@@ -22,6 +22,7 @@ const useStyles = makeStyles({
 
 const BudRequests = (props) => {
 
+  const { manageBuds, received_bud_requests, sent_bud_requests } = props;
   const classes = useStyles();
 
   return (
@@ -33,34 +34,32 @@ const BudRequests = (props) => {
             title={<MUITypography variant="h5">Aspiring Buds</MUITypography>}
           />
           <MUIList>
-            {props.received_bud_requests &&
-              props.received_bud_requests.map(function (request) {
-                return (
-                  <MUIListItem key={request._id}>
-                    {request.avatar &&
-                      <SmallAvatar alt={request.name} src={request.avatar} />
-                    }
-                    <MUITypography className={classes.flexGrow} variant="body1">
-                      <Link to={`/account/${request._id}`}>{request.name}</Link>
-                    </MUITypography>
-                    <WarningButton
-                      onClick={() => props.manageBuds('reject', request._id)}
-                    >
-                      <MUINotInterestedIcon />
-                    </WarningButton>
+            {received_bud_requests.map(function (request) {
+              return (
+                <MUIListItem key={request._id}>
+                  {request.avatar &&
+                    <SmallAvatar alt={request.name} src={request.avatar} />
+                  }
+                  <MUITypography className={classes.flexGrow} variant="body1">
+                    <Link to={`/account/${request._id}`}>{request.name}</Link>
+                  </MUITypography>
+                  <WarningButton
+                    onClick={() => manageBuds({ action: 'reject', other_user_id: request._id })}
+                  >
+                    <MUINotInterestedIcon />
+                  </WarningButton>
 
-                    <MUIButton
-                      color="primary"
-                      onClick={() => props.manageBuds('accept', request._id)}
-                      style={{ marginLeft: '8px' }}
-                      variant="contained"
-                    >
-                      <MUIPersonAddIcon />
-                    </MUIButton>
-                  </MUIListItem>
-                );
-              })
-            }
+                  <MUIButton
+                    color="primary"
+                    onClick={() => manageBuds({ action: 'accept', other_user_id: request._id })}
+                    style={{ marginLeft: '8px' }}
+                    variant="contained"
+                  >
+                    <MUIPersonAddIcon />
+                  </MUIButton>
+                </MUIListItem>
+              );
+            })}
           </MUIList>
         </MUICard>
       </MUIGrid>
@@ -72,18 +71,16 @@ const BudRequests = (props) => {
             title={<MUITypography variant="h5">Pending Buds</MUITypography>}
           />
           <MUIList>
-            {props.sent_bud_requests &&
-              props.sent_bud_requests.map(function (request) {
-                return (
-                  <MUIListItem key={request._id}>
-                    <SmallAvatar alt={request.name} src={request.avatar} />
-                    <MUITypography variant="body1">
-                      <Link to={`/account/${request._id}`}>{request.name}</Link>
-                    </MUITypography>
-                  </MUIListItem>
-                );
-              })
-            }
+            {sent_bud_requests.map(function (request) {
+              return (
+                <MUIListItem key={request._id}>
+                  <SmallAvatar alt={request.name} src={request.avatar} />
+                  <MUITypography variant="body1">
+                    <Link to={`/account/${request._id}`}>{request.name}</Link>
+                  </MUITypography>
+                </MUIListItem>
+              );
+            })}
           </MUIList>
         </MUICard>
       </MUIGrid>

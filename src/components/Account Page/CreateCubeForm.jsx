@@ -30,8 +30,9 @@ const CreateCubeForm = function (props) {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
+  const [errorMessage, setErrorMessage] = React.useState();
   const history = useHistory();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
   const cobraId = React.useRef();
   const cubeDescription = React.useRef();
@@ -58,17 +59,16 @@ const CreateCubeForm = function (props) {
       );
       history.push(`/cube/${responseData._id}`);
     } catch (error) {
-      console.log({ 'Error': error.message });
+      setErrorMessage(error.message);
     }
   }
 
   return (
     <React.Fragment>
       <ErrorDialog
-        clearError={clearError}
-        errorMessage={errorMessage}
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
       />
-
       <MUIDialog open={open} onClose={toggleOpen}>
         <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
         {loading ?

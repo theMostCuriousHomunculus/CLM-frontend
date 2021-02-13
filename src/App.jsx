@@ -11,7 +11,7 @@ import Footer from './components/miscellaneous/Footer';
 import LoadingSpinner from './components/miscellaneous/LoadingSpinner';
 import Navigation from './components/Main Navigation/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
-import { useRequest } from './hooks/request-hook';
+import { logout as logoutRequest } from './requests/account-requests';
 
 const Account = React.lazy(() => import('./pages/Account'));
 const Blog = React.lazy(() => import('./pages/Blog'));
@@ -39,8 +39,6 @@ const useStyles = makeStyles({
 function App() {
 
   const classes = useStyles();
-  const { sendRequest } = useRequest();
-
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [token, setToken] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
@@ -55,32 +53,15 @@ function App() {
   }, []);
 
   const logout = React.useCallback(() => {
-    // removeTokensOnServer();
-    sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/logoutAll`,
-      'PATCH',
-      null,
-      {
-        Authorization: 'Bearer ' + Cookies.get('authentication_token')
-      }
-    );
+    // not awaiting for this response because it can only cause problems.  if the user's token was deleted on the server already, this request will throw an error, preventing this function from then removing cookies and updating context, which I don't want.
+    logoutRequest(Cookies.get('authentication_token'));
     setIsAdmin(false);
     Cookies.remove('is_admin');
     setToken(null);
     Cookies.remove('authentication_token');
     setUserId(null);
     Cookies.remove('user_id');
-  }, [sendRequest]);
-
-  // function removeTokensOnServer () {
-  //   sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/logoutAll`,
-  //     'PATCH',
-  //     null,
-  //     {
-  //       Authorization: 'Bearer ' + Cookies.get('authentication_token'),
-  //       'Content-Type': 'application/json'
-  //     }
-  //   );
-  // }
+  }, []);
 
   React.useEffect(() => {
     if (Cookies.get('user_id') && Cookies.get('authentication_token')) {
@@ -102,7 +83,6 @@ function App() {
       <BrowserRouter>
         <Navigation />
         <main className={classes.main}>
-        
           <React.Suspense 
             fallback={<LoadingSpinner />}
           >

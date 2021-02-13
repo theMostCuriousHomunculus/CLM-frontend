@@ -8,11 +8,14 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIGrid from '@material-ui/core/Grid';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
-import MUITypography from '@material-ui/core/Typography';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
+import MUITextField from '@material-ui/core/TextField';
+import MUITypography from '@material-ui/core/Typography';
+import { cloneDeep } from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
 
 import BudRequests from '../components/Account Page/BudRequests';
+import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -21,7 +24,7 @@ import UserCubeCard from '../components/Account Page/UserCubeCard';
 import UserEventCard from '../components/Account Page/UserEventCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { useRequest } from '../hooks/request-hook';
+import { editAccount, fetchAccountById } from '../requests/account-requests';
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -51,7 +54,6 @@ const Account = () => {
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { loading, sendRequest } = useRequest();
 
   const [account, setAccount] = React.useState({
     cubes: [],
@@ -65,58 +67,72 @@ const Account = () => {
       sent_bud_requests: []
     }
   });
+  const [errorMessage, setErrorMessage] = React.useState();
+  const [loading, setLoading] = React.useState(false);
 
   const fetchAccount = React.useCallback(async function() {
     try {
-      const headers = authentication.token ? { Authorization: 'Bearer ' + authentication.token } : {};
-      const accountData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/${accountId}`, 'GET', null, headers);
-      setAccount(accountData);
+      setLoading(true);
+      const response = await fetchAccountById(accountId, authentication.token);
+      setAccount(response);
     } catch (error) {
-      console.log('Error: ' + error.message);
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
-  }, [accountId, authentication.token, sendRequest]);
+  }, [accountId, authentication.token, setErrorMessage]);
 
   React.useEffect(() => {
     fetchAccount();
   }, [fetchAccount]);
 
-  async function changeAvatar (chosenCard) {
+  async function submitChanges (changes) {
     try {
-      const accountChanges = JSON.stringify({
-        avatar: chosenCard.art_crop
-      });
+      await editAccount(changes, authentication.token);
 
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/account/`,
-        'PATCH',
-        accountChanges,
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
+      if (changes.action) {
+        const budsCopy = cloneDeep(account.user.buds);
+        const receivedBudRequestsCopy = cloneDeep(account.user.received_bud_requests);
+
+        changes.buds = budsCopy;
+        changes.received_bud_requests = receivedBudRequestsCopy;
+
+        switch (changes.action) {
+          case 'accept':
+            const acceptedIndex = receivedBudRequestsCopy.findIndex((request) => request._id === changes.other_user_id);
+            const newBud = receivedBudRequestsCopy.splice(acceptedIndex, 1);
+            budsCopy.push(newBud[0]);
+            break;
+          case 'reject':
+            const rejectedIndex = receivedBudRequestsCopy.findIndex((request) => request._id === changes.other_user_id);
+            receivedBudRequestsCopy.splice(rejectedIndex, 1);
+            break;
+          case 'remove':
+            const removedIndex = budsCopy.findIndex((bud) => bud._id === changes.other_user_id);
+            budsCopy.splice(removedIndex, 1);
+            break;
+          case 'send':
+            receivedBudRequestsCopy.push({ _id: authentication.userId });
+            break;
+          default:
+            // should never happen
         }
-      );
-      fetchAccount();
 
-    } catch (error) {
-      console.log({ 'Error': error.message });
-    }
-  }
+        delete changes.action;
+        delete changes.other_user_id;
+      }
 
-  async function manageBuds (response, otherUserId) {
-    try {
-      await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
-        'PATCH',
-        JSON.stringify({
-          action: response,
-          other_user_id: otherUserId
-        }),
-        {
-        Authorization: 'Bearer ' + authentication.token,
-        'Content-Type': 'application/json'
+      setAccount((prevState) => {
+        return {
+          ...prevState,
+          user: {
+            ...prevState.user,
+            ...changes
+          }
+        };
       });
-      fetchAccount();
     } catch (error) {
-      console.log({ 'Error': error.message });
+      setErrorMessage(error.message);
     }
   }
 
@@ -126,6 +142,11 @@ const Account = () => {
         <LoadingSpinner /> :
         <React.Fragment>
 
+          <ErrorDialog
+            clear={() => setErrorMessage(null)}
+            message={errorMessage}
+          />
+
           <MUICard style={{ marginBottom: 0 }}>
             <MUICardHeader
               avatar={account.user.avatar &&
@@ -133,9 +154,28 @@ const Account = () => {
               }
               className={classes.cardHeader}
               disableTypography={true}
-              title={<MUITypography variant="h5">{account.user.name}</MUITypography>}
+              title={accountId === authentication.userId ?
+                <MUITextField
+                  autoComplete="off"
+                  defaultValue={account.user.name}
+                  inputProps={{
+                    onBlur: (event) => submitChanges({ name: event.target.value })
+                  }}
+                  label="Account Name"
+                  style={{
+                    width: 300
+                  }}
+                  type="text"
+                  variant="outlined"
+                />
+                : <MUITypography variant="h5">
+                  {account.user.name}
+                </MUITypography>
+              }
               subheader={accountId === authentication.userId &&
-                <MUITypography color="textSecondary" variant="subtitle1">{account.user.email}</MUITypography>
+                <MUITypography color="textSecondary" variant="subtitle1">
+                  {account.user.email}
+                </MUITypography>
               }
             />
             {accountId === authentication.userId &&
@@ -144,7 +184,7 @@ const Account = () => {
                   <ScryfallRequest
                     buttonText="Change Avatar"
                     labelText="Change your avatar"
-                    onSubmit={changeAvatar}
+                    onSubmit={(chosenCard) => submitChanges({ avatar: chosenCard.art_crop })}
                   />
                 </HoverPreview>
               </MUICardActions>
@@ -164,7 +204,7 @@ const Account = () => {
               <MUICardActions>
                 <MUIButton
                   color="primary"
-                  onClick={() => manageBuds('send', accountId)}
+                  onClick={() => submitChanges({ action: 'send', other_user_id: accountId })}
                   variant="contained"
                 >
                   <MUIPersonAddIcon />
@@ -174,7 +214,6 @@ const Account = () => {
           </MUICard>
 
           <MUIGrid container spacing={2}>
-
             <MUIGrid item xs={12} lg={6}>
               <UserCubeCard
                 cubes={account.cubes}
@@ -190,7 +229,6 @@ const Account = () => {
                 pageClasses={classes}
               />
             </MUIGrid>
-
           </MUIGrid>
 
           <MUIGrid container spacing={2}>
@@ -211,7 +249,7 @@ const Account = () => {
                           </MUITypography>
                           {accountId === authentication.userId &&
                             <WarningButton
-                              onClick={() => manageBuds('remove', bud._id)}
+                              onClick={() => submitChanges({ action: 'remove', other_user_id: bud._id })}
                             >
                               Delete Bud
                             </WarningButton>
@@ -225,9 +263,8 @@ const Account = () => {
             </MUIGrid>
 
             {accountId === authentication.userId &&
-              // passing fetchAccount as a prop so that the page reloads when a user responds to a request...  there is probably a better way to do this
               <BudRequests
-                manageBuds={manageBuds}
+                manageBuds={submitChanges}
                 received_bud_requests={account.user.received_bud_requests}
                 sent_bud_requests={account.user.sent_bud_requests}
               />

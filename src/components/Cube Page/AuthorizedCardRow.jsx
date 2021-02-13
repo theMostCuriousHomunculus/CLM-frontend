@@ -92,6 +92,26 @@ const AuthorizedCardRow = (props) => {
     }
   }
 
+  function selectPrinting (index) {
+    setActiveMenu(null);
+    setAnchorEl(null);
+    submitCardChange(_id, {
+      back_image: availablePrintings[index].back_image,
+      image: availablePrintings[index].image,
+      mtgo_id: availablePrintings[index].mtgo_id,
+      printing: availablePrintings[index].printing,
+      purchase_link: availablePrintings[index].purchase_link
+    });
+    dispatchEditCard({
+      cardId: _id,
+      back_image: availablePrintings[index].back_image,
+      image: availablePrintings[index].image,
+      mtgo_id: availablePrintings[index].mtgo_id,
+      printing: availablePrintings[index].printing,
+      purchase_link: availablePrintings[index].purchase_link
+    });
+  };
+
   async function moveDeleteCard (destination) {
     setActiveMenu(null);
     const action = 'move_or_delete_card';
@@ -248,27 +268,13 @@ console.log('balls');
             <MUICircularProgress color="primary" size={20} /> :
             availablePrintings.map((option, index) => (
               <MUIMenuItem
+                back_image={option.back_image}
+                image={option.image}
                 key={`${_id}-printing-${index}`}
+                onMouseOut={hidePreview}
+                onMouseOver={showPreview}
                 selected={index === selectedPrintIndex}
-                onClick={function () {
-                  setActiveMenu(null);
-                  setAnchorEl(null);
-                  submitCardChange(_id, {
-                    back_image: availablePrintings[index].back_image,
-                    image: availablePrintings[index].image,
-                    mtgo_id: availablePrintings[index].mtgo_id,
-                    printing: availablePrintings[index].printing,
-                    purchase_link: availablePrintings[index].purchase_link
-                  });
-                  dispatchEditCard({
-                    cardId: _id,
-                    back_image: availablePrintings[index].back_image,
-                    image: availablePrintings[index].image,
-                    mtgo_id: availablePrintings[index].mtgo_id,
-                    printing: availablePrintings[index].printing,
-                    purchase_link: availablePrintings[index].purchase_link
-                  });
-                }}
+                onClick={() => selectPrinting(index)}
               >
                 {option.printing}
               </MUIMenuItem>

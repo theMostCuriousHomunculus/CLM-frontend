@@ -316,11 +316,11 @@ const ScryfallRequest = (props) => {
             <MUIMenuItem
               back_image={option.back_image}
               image={option.image}
+              key={`printing-${index}`}
+              onClick={() => handleMenuItemClick(index)}
               onMouseOut={props.hidePreview}
               onMouseOver={props.showPreview}
-              key={`printing-${index}`}
               selected={index === selectedPrintIndex}
-              onClick={() => handleMenuItemClick(index)}
             >
               {option.printing}
             </MUIMenuItem>

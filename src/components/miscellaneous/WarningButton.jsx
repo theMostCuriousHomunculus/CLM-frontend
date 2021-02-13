@@ -7,7 +7,7 @@ import theme from '../../theme';
 const useStyles = makeStyles({
   warningButton: {
     backgroundColor: theme.palette.warning.main,
-    color: '#ffffff',
+    color: '#111111',
     '&:hover': {
       backgroundColor: theme.palette.warning.dark
     }

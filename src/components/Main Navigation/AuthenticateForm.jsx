@@ -11,7 +11,7 @@ import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
+import { login as loginRequest, register as registerRequest } from '../../requests/account-requests';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {
@@ -28,57 +28,40 @@ const AuthenticateForm = function (props) {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [email, setEmail] = React.useState('');
+  const emailInput = React.useRef();
+  const [errorMessage, setErrorMessage] = React.useState();
+  const [loading, setLoading] = React.useState(false);
   const [mode, setMode] = React.useState('Login');
-  const [name, setName] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const nameInput = React.useRef();
+  const passwordInput = React.useRef();
 
   async function login () {
     try {
-      const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account/login`,
-        'PATCH',
-        JSON.stringify({
-          email,
-          password
-        }),
-        {
-          'Content-Type': 'application/json'
-        }
-      );
+      setLoading(true);
+
+      const response = await loginRequest(emailInput.current.value, passwordInput.current.value);
 
       authentication.login(response.isAdmin, response.token, response.userId);
       toggleOpen();
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function register () {
     try {
-      const randomCard = await sendRequest('https://api.scryfall.com/cards/random', 'GET', null, {});
-      const randomCardPrintings = await sendRequest(randomCard.prints_search_uri, 'GET', null, {});
-      const randomIndex = Math.floor(Math.random() * randomCardPrintings.data.length);
-      const avatar = randomCardPrintings.data[randomIndex].image_uris.art_crop;
+      setLoading(true);
 
-      const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account`,
-        'POST',
-        JSON.stringify({
-          avatar,
-          email,
-          name,
-          password
-        }),
-        {
-          'Content-Type': 'application/json'
-        }
-      );
+      const response = await registerRequest(emailInput.current.value, nameInput.current.value, passwordInput.current.value);
         
       authentication.login(false, response.token, response.userId);
       toggleOpen();
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -102,9 +85,10 @@ const AuthenticateForm = function (props) {
 
   return (
     <React.Fragment>
+
       <ErrorDialog
-        clearError={clearError}
-        errorMessage={errorMessage}
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
       />
 
       <MUIDialog
@@ -124,11 +108,10 @@ const AuthenticateForm = function (props) {
                 autoComplete="off"
                 autoFocus
                 fullWidth
+                inputRef={emailInput}
                 label="Email Address"
-                onChange={(event) => setEmail(event.target.value)}
                 required={true}
                 type="email"
-                value={email}
                 variant="outlined"
               />
 
@@ -136,12 +119,11 @@ const AuthenticateForm = function (props) {
                 <MUITextField
                   autoComplete="off"
                   fullWidth
+                  inputRef={nameInput}
                   label="Account Name"
-                  onChange={(event) => setName(event.target.value)}
                   required={true}
                   style={{ marginTop: 16 }}
                   type="text"
-                  value={name}
                   variant="outlined"
                 />
               }
@@ -149,12 +131,11 @@ const AuthenticateForm = function (props) {
               <MUITextField
                 autoComplete="off"
                 fullWidth
+                inputRef={passwordInput}
                 label="Password"
-                onChange={(event) => setPassword(event.target.value)}
                 required={true}
                 style={{ marginTop: 16 }}
                 type="password"
-                value={password}
                 variant="outlined"
               />
             </MUIDialogContent>
@@ -175,6 +156,7 @@ const AuthenticateForm = function (props) {
           </form>
         }
       </MUIDialog>
+      
     </React.Fragment>
   );
 }

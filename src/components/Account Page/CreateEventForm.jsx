@@ -54,11 +54,12 @@ const CreateEventForm = (props) => {
 
   const classes = useStyles();
   const history = useHistory();
-  const { loading, errorMessage, sendRequest, clearError } = useRequest();
+  const { loading, sendRequest } = useRequest();
 
   const authentication = React.useContext(AuthenticationContext);
   const [cardsPerPack, setCardsPerPack] = React.useState(1);
   const [cubeAnchorEl, setCubeAnchorEl] = React.useState(null);
+  const [errorMessage, setErrorMessage] = React.useState();
   const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
   const eventName = React.useRef();
   const [eventType, setEventType] = React.useState('draft');
@@ -124,15 +125,16 @@ const CreateEventForm = (props) => {
       );
       history.push(`/event/${responseData._id}`);
     } catch (error) {
-      console.log({ 'Error': error.message });
+      setErrorMessage(error.message);
     }
   }
 
   return (
     <React.Fragment>
+
       <ErrorDialog
-        clearError={clearError}
-        errorMessage={errorMessage}
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
       />
 
       <MUIDialog open={open} onClose={toggleOpen}>
@@ -351,6 +353,7 @@ const CreateEventForm = (props) => {
           </form>
         }
       </MUIDialog>
+
     </React.Fragment>
   );
 }

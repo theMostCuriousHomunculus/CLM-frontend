@@ -1,6 +1,7 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import deepPurple from '@material-ui/core/colors/deepPurple';
-import lightGreen from '@material-ui/core/colors/lightGreen';
+import orange from '@material-ui/core/colors/orange';
+import yellow from '@material-ui/core/colors/yellow';
 
 const defaultTheme = createMuiTheme();
 
@@ -60,27 +61,23 @@ const theme = createMuiTheme({
     },
     MuiTableCell: {
       head: {
-        color: lightGreen['A400'],
+        color: orange[500],
       },
       root: {
         padding: '4px 8px 4px 8px'
       },
       stickyHeader: {
-        backgroundColor: deepPurple[400]
+        backgroundColor: deepPurple[500]
       }
     }
   },
   palette: {
-    primary: {
-      main: deepPurple[400]
-    },
-    secondary: {
-      main: lightGreen['A400']
-    },
+    primary: deepPurple,
+    secondary: orange,
     warning: {
-      dark: '#df5f00',
-      light: '#ff9f3f',
-      main: '#ff7f1f'
+      dark: '#b2a429',
+      light: 'ffef62',
+      main: yellow['A400']
     }
   },
   typography: {

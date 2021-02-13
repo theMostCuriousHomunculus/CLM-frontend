@@ -5,22 +5,28 @@ import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
 import MUIDialogContentText from '@material-ui/core/DialogContentText';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
+import MUIWarningRoundedIcon from '@material-ui/icons/WarningRounded';
+
+import theme from '../../theme';
 
 const ErrorDialog = function (props) {
 
-  const { clearError, errorMessage } = props;
+  const { clear, message } = props;
 
   return (
     <MUIDialog
-      open={!!errorMessage}
-      onClose={clearError}
+      open={!!message}
+      onClose={clear}
     >
-      <MUIDialogTitle>Error</MUIDialogTitle>
+      <MUIDialogTitle>
+        <MUIWarningRoundedIcon style={{ color: theme.palette.warning.main, fontSize: 40 }} />
+        <span>Error</span>
+      </MUIDialogTitle>
       <MUIDialogContent>
-        <MUIDialogContentText>{errorMessage}</MUIDialogContentText>
+        <MUIDialogContentText>{message}</MUIDialogContentText>
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton color="primary" onClick={clearError} variant="contained">Try Again</MUIButton>
+        <MUIButton color="primary" onClick={clear} variant="contained">Dismiss</MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );
