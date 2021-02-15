@@ -127,6 +127,7 @@ function UserSearchBar (props) {
             className={classes.input}
             color="secondary"
             label="Search for Other Users!"
+            margin="dense"
             onKeyUp={searchForUsers}
             variant="outlined"
             InputProps={{

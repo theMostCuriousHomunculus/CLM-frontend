@@ -52,6 +52,7 @@ const BudRequests = (props) => {
                   <MUIButton
                     color="primary"
                     onClick={() => manageBuds({ action: 'accept', other_user_id: request._id })}
+                    size="small"
                     style={{ marginLeft: '8px' }}
                     variant="contained"
                   >

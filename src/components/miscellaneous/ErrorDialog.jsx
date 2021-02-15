@@ -37,7 +37,7 @@ const ErrorDialog = function (props) {
         <MUIDialogContentText>{message}</MUIDialogContentText>
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton color="primary" onClick={clear} variant="contained">Dismiss</MUIButton>
+        <MUIButton color="primary" onClick={clear} size="small" variant="contained">Dismiss</MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );

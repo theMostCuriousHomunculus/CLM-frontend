@@ -26,9 +26,6 @@ const useStyles = makeStyles({
       flexGrow: 1
     }
   },
-  iconButton: {
-    height: 40
-  },
   spaceBetween: {
     justifyContent: 'space-between'
   }
@@ -94,9 +91,11 @@ const Blog = () => {
                   className={classes.iconButton}
                   color="primary"
                   onClick={() => history.push('/blog/new-post')}
+                  size="small"
+                  startIcon={<MUICreateIcon />}
                   variant="contained"
                 >
-                  <MUICreateIcon />
+                  Wright
                 </MUIButton>
               </MUICardActions>
             </MUICard>
@@ -125,6 +124,7 @@ const Blog = () => {
                   <MUIButton
                     color="primary"
                     onClick={() => history.push(`/blog/${blogPost._id}`)}
+                    size="small"
                     variant="contained"
                   >
                     Read

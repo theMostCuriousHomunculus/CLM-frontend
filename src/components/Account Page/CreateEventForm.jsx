@@ -152,6 +152,7 @@ const CreateEventForm = (props) => {
                 fullWidth
                 inputRef={eventName}
                 label="Event Name"
+                margin="dense"
                 required={true}
                 type="text"
                 variant="outlined"
@@ -297,6 +298,7 @@ const CreateEventForm = (props) => {
                     fullWidth
                     InputProps={{ inputProps: { min: 1 } }}
                     label="Cards per Pack"
+                    margin="dense"
                     onBlur={() => {
                       if (cardsPerPack === '') {
                         setCardsPerPack(1);
@@ -320,6 +322,7 @@ const CreateEventForm = (props) => {
                     fullWidth
                     InputProps={{ inputProps: { min: 1 } }}
                     label="Packs per Player"
+                    margin="dense"
                     onBlur={() => {
                       if (packsPerPlayer === '') {
                         setPacksPerPlayer(1);
@@ -344,6 +347,7 @@ const CreateEventForm = (props) => {
 
               <MUIButton
                 color="primary"
+                size="small"
                 type="submit"
                 variant="contained"
               >

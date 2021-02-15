@@ -274,6 +274,7 @@ const ScryfallRequest = (props) => {
               {...params}
               inputRef={cardSearchInput}
               label={props.labelText}
+              margin="dense"
               onChange={(event) => setCardSearchInputValue(event.target.value)}
               value={cardSearchInputValue}
               variant="outlined"
@@ -329,7 +330,9 @@ const ScryfallRequest = (props) => {
       </MUIGrid>
 
       <MUIGrid item xs={12} lg={2} style={{ textAlign: "right" }}>
-        <MUIButton color="primary" onClick={submitForm} variant="contained">{props.buttonText}</MUIButton>
+        <MUIButton color="primary" onClick={submitForm} size="small" variant="contained">
+          {props.buttonText}
+        </MUIButton>
       </MUIGrid>
 
     </MUIGrid>

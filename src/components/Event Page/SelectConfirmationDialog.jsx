@@ -33,7 +33,7 @@ const SelectConfirmationDialogue = (props) => {
         }
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton onClick={props.toggleOpen} color="primary" variant="contained">
+        <MUIButton onClick={props.toggleOpen} color="primary" size="small" variant="contained">
           No
         </MUIButton>
         <MUIButton
@@ -43,6 +43,7 @@ const SelectConfirmationDialogue = (props) => {
             props.toggleOpen();
             props.selectCardHandler(props.card ? props.card._id : null);
           }}
+          size="small"
           variant="contained"
         >
           Yes

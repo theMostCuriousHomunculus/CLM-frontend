@@ -162,6 +162,7 @@ const Account = () => {
                     onBlur: (event) => submitChanges({ name: event.target.value })
                   }}
                   label="Account Name"
+                  margin="dense"
                   style={{
                     width: 300
                   }}
@@ -205,6 +206,7 @@ const Account = () => {
                 <MUIButton
                   color="primary"
                   onClick={() => submitChanges({ action: 'send', other_user_id: accountId })}
+                  size="small"
                   variant="contained"
                 >
                   <MUIPersonAddIcon />

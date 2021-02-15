@@ -22,6 +22,7 @@ const WarningButton = function (props) {
     <MUIButton
       className={useStyles().warningButton}
       onClick={onClick}
+      size="small"
       startIcon={startIcon}
       variant="contained"
     >

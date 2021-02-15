@@ -215,6 +215,7 @@ function BlogPost () {
               fullWidth
               inputRef={titleInput}
               label="Title"
+              margin="dense"
               type="text"
               variant="outlined"
             /> :
@@ -229,6 +230,7 @@ function BlogPost () {
                     fullWidth
                     inputRef={subtitleInput}
                     label="Subtitle"
+                    margin="dense"
                     style={{ marginTop: 16 }}
                     type="text"
                     variant="outlined"
@@ -238,6 +240,7 @@ function BlogPost () {
                     fullWidth
                     inputRef={imageInput}
                     label="Image"
+                    margin="dense"
                     style={{ marginTop: 16 }}
                     type="text"
                     variant="outlined"
@@ -265,6 +268,7 @@ function BlogPost () {
             <MUIButton
               color="secondary"
               onClick={toggleViewMode}
+              size="small"
               variant="contained"
             >
               {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
@@ -276,13 +280,14 @@ function BlogPost () {
             <MUITextField
               fullWidth
               label="Body"
+              margin="dense"
+              multiline
               onChange={(event) => setBlogPostState((prevState) => {
                 return {
                   ...prevState,
                   body: event.target.value
                 }
               })}
-              multiline
               rows={20}
               type="text"
               value={blogPostState.body}
@@ -298,6 +303,7 @@ function BlogPost () {
             <MUIButton
               color="primary"
               onClick={submitPost}
+              size="small"
               variant="contained"
             >
               {blogPostId === 'new-post' ? 'Publish' : <MUISyncIcon />}

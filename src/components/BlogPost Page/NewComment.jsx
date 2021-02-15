@@ -56,7 +56,7 @@ const NewComment = (props) => {
         />
       </MUICardContent>
       <MUICardActions>
-        <MUIButton color="primary" onClick={submitComment} variant="contained">Preach!</MUIButton>
+        <MUIButton color="primary" onClick={submitComment} size="small" variant="contained">Preach!</MUIButton>
       </MUICardActions>
     </MUICard>
   );

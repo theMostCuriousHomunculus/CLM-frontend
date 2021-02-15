@@ -76,6 +76,7 @@ function CubeInfo (props) {
               }}
               inputRef={nameRef}
               label="Cube Name"
+              margin="dense"
               type="text"
               variant="outlined"
             /> :
@@ -98,6 +99,7 @@ function CubeInfo (props) {
               }}
               inputRef={descriptionRef}
               label="Cube Description"
+              margin="dense"
               multiline
               rows={3}
               variant="outlined"

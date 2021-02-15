@@ -68,6 +68,7 @@ const UserCubeCard = (props) => {
             <MUIButton
               color="primary"
               onClick={() => setShowCubeForm(true)}
+              size="small"
               variant="contained"
             >
               Create a Cube

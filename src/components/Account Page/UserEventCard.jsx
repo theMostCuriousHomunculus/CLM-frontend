@@ -81,6 +81,7 @@ const UserEventCard = (props) => {
               color="primary"
               disabled={cubes.length === 0}
               onClick={() => setShowEventForm(true)}
+              size="small"
               variant="contained"
             >
               {cubes.length === 0 ? 'You must create a cube before hosting an event!' : 'Host an Event'}

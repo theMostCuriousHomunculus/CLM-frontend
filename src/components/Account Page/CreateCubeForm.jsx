@@ -13,7 +13,7 @@ import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
+import { createCube } from '../../requests/cube-requests';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {
@@ -30,35 +30,29 @@ const CreateCubeForm = function (props) {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [errorMessage, setErrorMessage] = React.useState();
-  const history = useHistory();
-  const { loading, sendRequest } = useRequest();
-
   const cobraId = React.useRef();
   const cubeDescription = React.useRef();
   const cubeName = React.useRef();
+  const [errorMessage, setErrorMessage] = React.useState();
+  const history = useHistory();
+  const [loading, setLoading] = React.useState(false);
 
   async function submitForm (event) {
     event.preventDefault();
 
-    const formInputs = {
+    const cubeDetails = {
       cobraId: cobraId.current.value,
       description: cubeDescription.current.value,
       name: cubeName.current.value
     };
 
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube`,
-        'POST',
-        JSON.stringify(formInputs),
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
+      setLoading(true);
+      const responseData = await createCube(cubeDetails, authentication.token);
+      setLoading(false);
       history.push(`/cube/${responseData._id}`);
     } catch (error) {
+      setLoading(false);
       setErrorMessage(error.message);
     }
   }
@@ -83,6 +77,7 @@ const CreateCubeForm = function (props) {
                 fullWidth
                 inputRef={cubeName}
                 label="Cube Name"
+                margin="dense"
                 required={true}
                 type="text"
                 variant="outlined"
@@ -93,6 +88,7 @@ const CreateCubeForm = function (props) {
                 fullWidth
                 inputRef={cubeDescription}
                 label="Description"
+                margin="dense"
                 multiline
                 required={false}
                 rows={2}
@@ -110,6 +106,7 @@ const CreateCubeForm = function (props) {
                 fullWidth
                 inputRef={cobraId}
                 label="24 character ID from cubecobra URL"
+                margin="dense"
                 required={false}
                 style={{ marginTop: '8px' }}
                 type="text"
@@ -125,6 +122,7 @@ const CreateCubeForm = function (props) {
 
               <MUIButton
                 color="primary"
+                size="small"
                 type="submit"
                 variant="contained"
               >

@@ -25,7 +25,6 @@ const useStyles = makeStyles({
 const AuthenticateForm = function (props) {
 
   const { open, toggleOpen } = props;
-
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const emailInput = React.useRef();
@@ -110,6 +109,7 @@ const AuthenticateForm = function (props) {
                 fullWidth
                 inputRef={emailInput}
                 label="Email Address"
+                margin="dense"
                 required={true}
                 type="email"
                 variant="outlined"
@@ -121,6 +121,7 @@ const AuthenticateForm = function (props) {
                   fullWidth
                   inputRef={nameInput}
                   label="Account Name"
+                  margin="dense"
                   required={true}
                   style={{ marginTop: 16 }}
                   type="text"
@@ -133,13 +134,14 @@ const AuthenticateForm = function (props) {
                 fullWidth
                 inputRef={passwordInput}
                 label="Password"
+                margin="dense"
                 required={true}
                 style={{ marginTop: 16 }}
                 type="password"
                 variant="outlined"
               />
             </MUIDialogContent>
-            <MUIDialogActions>
+            <MUIDialogActions style={{ justifyContent: 'space-between' }}>
               <WarningButton
                 onClick={() => toggleMode(mode)}
               >
@@ -147,6 +149,7 @@ const AuthenticateForm = function (props) {
               </WarningButton>
               <MUIButton
                 color="primary"
+                size="small"
                 type="submit"
                 variant="contained"
               >

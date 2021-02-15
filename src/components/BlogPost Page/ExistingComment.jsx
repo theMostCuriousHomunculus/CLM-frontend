@@ -9,25 +9,16 @@ import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MUIThumbDownIcon from '@material-ui/icons/ThumbDown';
 import MUIThumbUpIcon from '@material-ui/icons/ThumbUp';
 import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 
 import SmallAvatar from '../miscellaneous/SmallAvatar';
-import theme from '../../theme';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { useRequest } from '../../hooks/request-hook';
-
-const useStyles = makeStyles({
-  likeButton: {
-    color: theme.palette.primary.main
-  }
-});
 
 const ExistingComment = (props) => {
 
   const authentication = React.useContext(AuthenticationContext);
   const blogPostId = useParams().blogPostId;
-  const classes = useStyles();
   const { author } = props.comment;
   const { sendRequest } = useRequest();
 
@@ -69,11 +60,11 @@ const ExistingComment = (props) => {
           </WarningButton> :
           <React.Fragment>
             <MUITypography variant="body2">These buttons don't actually do anything yet but feel free to press them anyway!</MUITypography>
-            <MUIButton className={classes.warningButton} variant="contained">
-              <MUIThumbDownIcon />
-            </MUIButton>
-            <MUIButton className={classes.likeButton} color="secondary" variant="contained">
-              <MUIThumbUpIcon />
+            <WarningButton startIcon={<MUIThumbDownIcon />}>
+              
+            </WarningButton>
+            <MUIButton color="primary" size="small" startIcon={<MUIThumbUpIcon />} variant="contained">
+
             </MUIButton>
           </React.Fragment>
         }

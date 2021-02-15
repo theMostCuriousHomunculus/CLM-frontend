@@ -40,7 +40,9 @@ const Resources = function () {
                   <MUITypography variant="body1">{resource.description}</MUITypography>
                 </MUICardContent>
                 <MUICardActions>
-                  <MUIButton color="primary" href={resource.link} variant="contained">Learn More</MUIButton>
+                  <MUIButton color="primary" href={resource.link} size="small" variant="contained">
+                    Learn More
+                  </MUIButton>
                 </MUICardActions>
               </MUICard>
             </MUIGrid>

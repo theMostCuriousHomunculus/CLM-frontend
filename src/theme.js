@@ -17,7 +17,7 @@ const theme = createMuiTheme({
     },
     MuiCardActions: {
       root: {
-        display: 'flex',
+        // display: 'flex',
         justifyContent: 'flex-end',
         padding: 8
       }
@@ -32,7 +32,7 @@ const theme = createMuiTheme({
     },
     MuiCardHeader: {
       content: {
-        width: 'calc(100% - 166px)',
+        // width: 'calc(100% - 166px)',
         wordBreak: 'break-word'
       },
       root: {
