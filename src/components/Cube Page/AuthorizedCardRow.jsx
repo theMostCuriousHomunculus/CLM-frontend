@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import MUICircularProgress from '@material-ui/core/CircularProgress';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
@@ -11,10 +12,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import ColorCheckboxes from './ColorCheckboxes';
+import ErrorDialog from '../miscellaneous/ErrorDialog';
 import { actionCreators } from '../../store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
-import { useRequest } from '../../hooks/request-hook';
+import { deleteCard } from '../../requests/cube-requests';
 
 const useStyles = makeStyles({
   tableCell: {
@@ -56,16 +58,18 @@ const AuthorizedCardRow = (props) => {
   const [activeMenu, setActiveMenu] = React.useState();
   const [anchorEl, setAnchorEl] = React.useState();
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
+  const [errorMessage, setErrorMessage] = React.useState();
+  const [loading, setLoading] = React.useState(false);
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
-  const { loading, sendRequest } = useRequest();
 
   async function enablePrintChange (event) {
     setActiveMenu('print');
     setAnchorEl(event.currentTarget);
 
     try {
-      let printings = await sendRequest(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracle_id}&unique=prints`);
-      printings = printings.data.map(function(print) {
+      setLoading(true);
+      let printings = await axios.get(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracle_id}&unique=prints`);
+      printings = printings.data.data.map(function(print) {
         let back_image, image;
         if (print.layout === "transform") {
           back_image = print.card_faces[1].image_uris.large;
@@ -88,7 +92,9 @@ const AuthorizedCardRow = (props) => {
         return print.printing === printing;
       }));
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -114,33 +120,22 @@ const AuthorizedCardRow = (props) => {
 
   async function moveDeleteCard (destination) {
     setActiveMenu(null);
-    const action = 'move_or_delete_card';
     try {
-      const moveInfo = JSON.stringify({
-        action,
-        cardId: _id,
-        component: activeComponentId,
-        destination
-      });
-
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-        'PATCH',
-        moveInfo,
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-
+      await deleteCard(_id, activeComponentId, cubeId, authentication.token, destination);
       dispatchMoveOrDeleteCard({ cardId: _id, destination });
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error.message);
     }
   }
-console.log('balls');
+
   return (
     <React.Fragment>
+
+      <ErrorDialog
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
+      />
+
       <div
         back_image={back_image}
         className={classes.tableCell}

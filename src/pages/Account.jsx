@@ -80,7 +80,7 @@ const Account = () => {
     } finally {
       setLoading(false);
     }
-  }, [accountId, authentication.token, setErrorMessage]);
+  }, [accountId, authentication.token]);
 
   React.useEffect(() => {
     fetchAccount();

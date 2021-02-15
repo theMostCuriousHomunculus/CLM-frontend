@@ -4,17 +4,18 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 
-import { actionCreators } from '../store/actions/cube-actions';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
+import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import HoverPreview from '../components/miscellaneous/HoverPreview';
 import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
+import { actionCreators } from '../store/actions/cube-actions';
+import { addCard as addCardRequest, fetchCubeById } from '../requests/cube-requests';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { useRequest } from '../hooks/request-hook';
 
 const useStyles = makeStyles({
   paper: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Cube = (props) => {
+function Cube (props) {
 
   const {
     activeComponentId,
@@ -36,44 +37,32 @@ const Cube = (props) => {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
+  const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(true);
-  const { sendRequest } = useRequest();
+
+  const initializeCube = React.useCallback(async function () {
+    try {
+      setLoading(true);
+      const response = await fetchCubeById(cubeId);
+      dispatchInitializeCube(response);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [cubeId, dispatchInitializeCube]);
 
   React.useEffect(() => {
-    const fetchCube = async function () {
-      try {
-        const cubeData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, 'GET', null, {});
-        dispatchInitializeCube(cubeData);
-      } catch (error) {
-        console.log(error);
-      }
-      setLoading(false);
-    };
-    fetchCube();
-  }, [cubeId, dispatchInitializeCube, sendRequest]);
+    initializeCube();
+  }, [initializeCube]);
 
   async function addCard (chosenCard) {
     delete chosenCard.art_crop;
     try {
-      const cardData = JSON.stringify({
-        ...chosenCard,
-        action: 'add_card',
-        component: activeComponentId
-      });
-
-      const newCardId = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-        'PATCH',
-        cardData,
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-      dispatchAddCard({ ...chosenCard, _id: newCardId });
-
+      const newCardId = await addCardRequest(chosenCard, activeComponentId, cubeId, authentication.token);
+      dispatchAddCard({ ...chosenCard, _id: newCardId._id });
     } catch (error) {
-      console.log({ 'Error': error.message });
+      setErrorMessage(error.message);
     }
   }
 
@@ -95,6 +84,12 @@ const Cube = (props) => {
       {loading ?
         <LoadingSpinner /> :
         <React.Fragment>
+
+          <ErrorDialog
+            clear={() => setErrorMessage(null)}
+            message={errorMessage}
+          />
+
           <CubeInfo />
 
           <ComponentInfo />
@@ -116,6 +111,7 @@ const Cube = (props) => {
             }
 
           </HoverPreview>
+
         </React.Fragment>
       }
     </React.Fragment>

@@ -12,8 +12,9 @@ import ReactWindowStickyHeaderList from '../miscellaneous/ReactWindowStickyHeade
 import theme from '../../theme';
 import UnauthorizedCardRow from './UnauthorizedCardRow';
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { editCard } from '../../requests/cube-requests';
 import { monoColors } from '../../constants/color-objects';
-import { useRequest } from '../../hooks/request-hook';
+import ErrorDialog from '../miscellaneous/ErrorDialog';
 
 const useStyles = makeStyles({
   headerCell: {
@@ -63,6 +64,7 @@ const ListView = (props) => {
   const columnNames = creator._id === authentication.userId ?
     ["Card Name", "Color Identity", "CMC", "Card Type", "Move / Delete", "Printing", "Purchase"] :
     ["Card Name", "Color Identity", "CMC", "Card Type", "Printing", "Purchase"];
+  const [errorMessage, setErrorMessage] = React.useState();
   const headerColumns = columnNames.map(function (column, index) {
     return (
       <div
@@ -83,70 +85,64 @@ const ListView = (props) => {
   });
   const headerRowSize = 60;
 
-  const { sendRequest } = useRequest();
-
   const submitCardChange = React.useCallback(async function (cardId, changes) {
     try {
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-        'PATCH',
-        JSON.stringify({
-          action: 'edit_card',
-          cardId,
-          component: activeComponentId,
-          ...changes
-        }),
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
+      await editCard(changes, cardId, activeComponentId, cubeId, authentication.token);
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error.message);
     }
-  }, [activeComponentId, authentication.token, cubeId, sendRequest]);
+  }, [activeComponentId, authentication.token, cubeId]);
 
   return (
-    <MUIPaper className={classes.tableContainer}>
-      <RVAutoSizer>
-        {({ height, width }) =>(
-          <ReactWindowStickyHeaderList
-            headerRow={
-              <div className={classes.headerRow} style={{ height: headerRowSize }}>
-                {headerColumns}
-              </div>
-            }
-            headerRowSize={headerRowSize}
-            height={height}
-            itemCount={displayedCardsLength}
-            itemSize={80}
-            width={width}
-          >
-            {({ index, style }) => (
-              // having some performance issues here; i don't want all rows to get re-rendered when one card is edited.
-              <div className={classes.tableRow} style={style}>
-                {creator._id === authentication.userId ?
-                  <AuthorizedCardRow
-                    columnWidths={columnWidths}
-                    hidePreview={hidePreview}
-                    index={index}
-                    showPreview={showPreview}
-                    submitCardChange={submitCardChange}
-                  />
-                  :
-                  <UnauthorizedCardRow
-                    columnWidths={columnWidths}
-                    hidePreview={hidePreview}
-                    index={index}
-                    showPreview={showPreview}
-                  />
-                }
-              </div>
-            )}
-          </ReactWindowStickyHeaderList>
-        )}
-      </RVAutoSizer>
-    </MUIPaper>
+    <React.Fragment>
+
+      <ErrorDialog
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
+      />
+
+      <MUIPaper className={classes.tableContainer}>
+        <RVAutoSizer>
+          {({ height, width }) =>(
+            <ReactWindowStickyHeaderList
+              headerRow={
+                <div className={classes.headerRow} style={{ height: headerRowSize }}>
+                  {headerColumns}
+                </div>
+              }
+              headerRowSize={headerRowSize}
+              height={height}
+              itemCount={displayedCardsLength}
+              itemSize={80}
+              width={width}
+            >
+              {({ index, style }) => (
+                // having some performance issues here; i don't want all rows to get re-rendered when one card is edited.
+                <div className={classes.tableRow} style={style}>
+                  {creator._id === authentication.userId ?
+                    <AuthorizedCardRow
+                      columnWidths={columnWidths}
+                      hidePreview={hidePreview}
+                      index={index}
+                      showPreview={showPreview}
+                      submitCardChange={submitCardChange}
+                    />
+                    :
+                    <UnauthorizedCardRow
+                      columnWidths={columnWidths}
+                      hidePreview={hidePreview}
+                      index={index}
+                      showPreview={showPreview}
+                    />
+                  }
+                </div>
+              )}
+            </ReactWindowStickyHeaderList>
+          )}
+        </RVAutoSizer>
+      </MUIPaper>
+
+    </React.Fragment>
   );
 }
 

@@ -46,28 +46,34 @@ const useStyles = makeStyles({
 
 const ColorCheckboxes = (props) => {
 
+  const {
+    card_id,
+    color_identity,
+    dispatchEditCard,
+    submitCardChange
+  } = props;
   const classes = useStyles();
 
   const colorObj = {
     "W": {
       "icon": <WhiteManaSymbol className={classes.manaSymbol} />,
-      "checked": props.color_identity.includes("W")
+      "checked": color_identity.includes("W")
     },
     "U": {
       "icon": <BlueManaSymbol className={classes.manaSymbol} />,
-      "checked": props.color_identity.includes("U")
+      "checked": color_identity.includes("U")
     },
     "B": {
       "icon": <BlackManaSymbol className={classes.manaSymbol} />,
-      "checked": props.color_identity.includes("B")
+      "checked": color_identity.includes("B")
     },
     "R": {
       "icon": <RedManaSymbol className={classes.manaSymbol} />,
-      "checked": props.color_identity.includes("R")
+      "checked": color_identity.includes("R")
     },
     "G": {
       "icon": <GreenManaSymbol className={classes.manaSymbol} />,
-      "checked": props.color_identity.includes("G")
+      "checked": color_identity.includes("G")
     }
   };
 
@@ -79,15 +85,15 @@ const ColorCheckboxes = (props) => {
       if (key !== color && value.checked) color_identity.push(key);
     }
 
-    props.dispatchEditCard({ cardId: props.card_id, color_identity: color_identity.sort() })
-    props.submitCardChange(props.card_id, { color_identity: color_identity.sort() });
+    dispatchEditCard({ cardId: card_id, color_identity: color_identity.sort() })
+    submitCardChange(card_id, { color_identity: color_identity.sort() });
   }
   
   return (
     <MUIGrid container justify="space-around">
       {Array.from(Object.keys(colorObj)).map(function (color) {
         return (
-          <MUIGrid className={classes.colorCheckboxContainer} item key={`${color}-${props.card_id}`} xs={4}>
+          <MUIGrid className={classes.colorCheckboxContainer} item key={`${color}-${card_id}`} xs={4}>
             <MUICheckbox
               checked={colorObj[color]['checked']}
               checkedIcon={colorObj[color]['icon']}

@@ -10,9 +10,10 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
+import ErrorDialog from '../miscellaneous/ErrorDialog';
 import { actionCreators } from '../../store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
+import { editCube } from '../../requests/cube-requests';
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -25,88 +26,92 @@ const useStyles = makeStyles({
   }
 });
 
-const CubeInfo = (props) => {
+function CubeInfo (props) {
 
-  const cubeId = useParams().cubeId;
+  const {
+    cube,
+    dispatchUpdateCubeInfo
+  } = props;
   const authentication = React.useContext(AuthenticationContext);
   const descriptionRef = React.useRef();
-  const nameRef = React.useRef();
   const classes = useStyles();
-  const { sendRequest } = useRequest();
+  const cubeId = useParams().cubeId;
+  const [errorMessage, setErrorMessage] = React.useState();
+  const nameRef = React.useRef();
 
   async function submitCubeChanges () {
     try {
-      const cubeChanges = JSON.stringify({
-        action: 'edit_cube_info',
+      const cubeChanges = {
         description: descriptionRef.current.value,
         name: nameRef.current.value
-      });
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`,
-        'PATCH',
-        cubeChanges,
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-      props.dispatchUpdateCubeInfo({ description: descriptionRef.current.value, name: nameRef.current.value });
+      };
+      await editCube(cubeChanges, cubeId, authentication.token);
+      dispatchUpdateCubeInfo({ description: descriptionRef.current.value, name: nameRef.current.value });
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error.message);
     }
   }
 
   return (
-    <MUICard style={{ marginBottom: 0 }}>
-
-      <MUICardHeader
-        avatar={props.cube.creator.avatar &&
-          <MUIAvatar alt={props.cube.creator.name} className={classes.avatarLarge} src={props.cube.creator.avatar} />
-        }
-        className={classes.cardHeader}
-        disableTypography={true}
-        title={authentication.userId === props.cube.creator._id ?
-          <MUITextField
-            inputProps={{
-              defaultValue: props.cube.name,
-              onBlur: submitCubeChanges
-            }}
-            inputRef={nameRef}
-            label="Cube Name"
-            type="text"
-            variant="outlined"
-          /> :
-          <MUITypography variant="subtitle1">{props.cube.name}</MUITypography>
-        }
-        subheader={
-          <MUITypography color="textSecondary" variant="subtitle2">
-            Designed by: <Link to={`/account/${props.cube.creator._id}`}>{props.cube.creator.name}</Link>
-          </MUITypography>
-        }
+    <React.Fragment>
+    
+      <ErrorDialog
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
       />
+    
+      <MUICard style={{ marginBottom: 0 }}>
 
-      <MUICardContent>
-        {authentication.userId === props.cube.creator._id ?
-          <MUITextField
-            fullWidth={true}
-            inputProps={{
-              defaultValue: props.cube.description,
-              onBlur: submitCubeChanges
-            }}
-            inputRef={descriptionRef}
-            label="Cube Description"
-            multiline
-            rows={3}
-            variant="outlined"
-          /> :
-          <React.Fragment>
-            <MUITypography variant="subtitle1">Description:</MUITypography>
-            <MUITypography variant="body1">{props.cube.description}</MUITypography>
-          </React.Fragment>
-        }        
-      </MUICardContent>
+        <MUICardHeader
+          avatar={cube.creator.avatar &&
+            <MUIAvatar alt={cube.creator.name} className={classes.avatarLarge} src={cube.creator.avatar} />
+          }
+          className={classes.cardHeader}
+          disableTypography={true}
+          title={authentication.userId === cube.creator._id ?
+            <MUITextField
+              inputProps={{
+                defaultValue: cube.name,
+                onBlur: submitCubeChanges
+              }}
+              inputRef={nameRef}
+              label="Cube Name"
+              type="text"
+              variant="outlined"
+            /> :
+            <MUITypography variant="subtitle1">{cube.name}</MUITypography>
+          }
+          subheader={
+            <MUITypography color="textSecondary" variant="subtitle2">
+              Designed by: <Link to={`/account/${cube.creator._id}`}>{cube.creator.name}</Link>
+            </MUITypography>
+          }
+        />
 
-    </MUICard>
+        <MUICardContent>
+          {authentication.userId === cube.creator._id ?
+            <MUITextField
+              fullWidth={true}
+              inputProps={{
+                defaultValue: cube.description,
+                onBlur: submitCubeChanges
+              }}
+              inputRef={descriptionRef}
+              label="Cube Description"
+              multiline
+              rows={3}
+              variant="outlined"
+            /> :
+            <React.Fragment>
+              <MUITypography variant="subtitle1">Description:</MUITypography>
+              <MUITypography variant="body1">{cube.description}</MUITypography>
+            </React.Fragment>
+          }        
+        </MUICardContent>
+
+      </MUICard>
+    
+    </React.Fragment>
   );
 }
 
