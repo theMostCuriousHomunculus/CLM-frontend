@@ -136,6 +136,15 @@ const Account = () => {
     }
   }
 
+  function updateCubeList (cubeId) {
+    setAccount((prevState) => {
+      return {
+        ...prevState,
+        cubes: prevState.cubes.filter((cube) => cube._id !== cubeId)
+      };
+    });
+  }
+
   return (
     <React.Fragment>
       {loading ?
@@ -220,6 +229,7 @@ const Account = () => {
               <UserCubeCard
                 cubes={account.cubes}
                 pageClasses={classes}
+                updateCubeList={updateCubeList}
               />
             </MUIGrid>
 

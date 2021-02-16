@@ -16,7 +16,7 @@ import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import ExistingComment from '../components/BlogPost Page/ExistingComment';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import NewComment from '../components/BlogPost Page/NewComment';
-import theme from '../theme';
+import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { fetchAccountById } from '../requests/account-requests';
 import { editBlogPost, fetchBlogPostById, publish } from '../requests/blog-requests';
@@ -43,7 +43,7 @@ const useStyles = makeStyles({
       top: 0,
       left: '50%',
       transform: 'translate(-50%, -65%)',
-      background: '#f7f7f7',
+      background: backgroundColor,
       width: 48,
       height: 32,
       fontFamily: 'sans-serif',

@@ -4,13 +4,14 @@ import orange from '@material-ui/core/colors/orange';
 import yellow from '@material-ui/core/colors/yellow';
 
 const defaultTheme = createMuiTheme();
+const backgroundColor = `#f7f7f7`;
 
 const theme = createMuiTheme({
   ...defaultTheme,
   overrides: {
     MuiCard: {
       root: {
-        background: '#f7f7f7',
+        background: backgroundColor,
         margin: 8,
         padding: 0
       }
@@ -90,4 +91,7 @@ const theme = createMuiTheme({
   }
 })
 
-export default theme;
+export {
+  backgroundColor,
+  theme as default
+};

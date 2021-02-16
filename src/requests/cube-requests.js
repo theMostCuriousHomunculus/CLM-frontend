@@ -59,13 +59,15 @@ async function deleteComponent (type, componentId, cubeId, token) {
   }
 }
 
-// async function deleteCube () {
-//   try {
-    
-//   } catch (error) {
-//     throw new Error(error.response.data.message);
-//   }
-// }
+async function deleteCube (cubeId, token) {
+  try {
+    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}
 
 async function editCard (changes, cardId, componentId, cubeId, token) {
   try {
@@ -120,7 +122,7 @@ export {
   createCube,
   deleteCard,
   deleteComponent,
-  // deleteCube,
+  deleteCube,
   editCard,
   editComponent,
   editCube,

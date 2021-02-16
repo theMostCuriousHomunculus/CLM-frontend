@@ -5,6 +5,8 @@ import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import MUIIconButton from '@material-ui/core/IconButton';
 import MUITable from '@material-ui/core/Table';
 import MUITableBody from '@material-ui/core/TableBody';
 import MUITableCell from '@material-ui/core/TableCell';
@@ -12,21 +14,52 @@ import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
 import MUITypography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
 
 import CreateCubeForm from './CreateCubeForm';
+import ErrorDialog from '../miscellaneous/ErrorDialog';
+import theme, { backgroundColor } from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { deleteCube as deleteCubeRequest } from '../../requests/cube-requests';
+
+const useStyles = makeStyles({
+  iconButton: {
+    background: theme.palette.secondary.main,
+    color: backgroundColor,
+    '&:hover': {
+      background: theme.palette.secondary.dark,
+      // padding: 18
+    }
+  }
+});
 
 const UserCubeCard = (props) => {
 
-  const { cubes, pageClasses } = props;
+  const { cubes, pageClasses, updateCubeList } = props;
 
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
-
+  const classes = useStyles();
+  const [errorMessage, setErrorMessage] = React.useState();
   const [showCubeForm, setShowCubeForm] = React.useState(false);
+
+  async function deleteCube (cubeId) {
+    try {
+      await deleteCubeRequest(cubeId, authentication.token);
+      updateCubeList(cubeId);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
 
   return (
     <React.Fragment>
+
+      <ErrorDialog
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
+      />
+
       <CreateCubeForm
         open={showCubeForm}
         toggleOpen={() => setShowCubeForm(prevState => !prevState)}
@@ -44,6 +77,7 @@ const UserCubeCard = (props) => {
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Description</MUITableCell>
+                  <MUITableCell>Delete</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
@@ -55,6 +89,16 @@ const UserCubeCard = (props) => {
                       </MUITableCell>
                       <MUITableCell>
                         {cube.description}
+                      </MUITableCell>
+                      <MUITableCell>
+                        <MUIIconButton
+                          className={classes.iconButton}
+                          // color="secondary"
+                          onClick={() => deleteCube(cube._id)}
+                          size="small"
+                        >
+                          <MUIDeleteForeverIcon />
+                        </MUIIconButton>
                       </MUITableCell>
                     </MUITableRow>
                   );
