@@ -95,7 +95,7 @@ const Blog = () => {
                   startIcon={<MUICreateIcon />}
                   variant="contained"
                 >
-                  Wright
+                  Write
                 </MUIButton>
               </MUICardActions>
             </MUICard>

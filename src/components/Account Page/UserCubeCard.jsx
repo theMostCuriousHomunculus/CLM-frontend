@@ -16,6 +16,7 @@ import MUITableRow from '@material-ui/core/TableRow';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import ConfirmationDialogue from '../miscellaneous/ConfirmationDialog';
 import CreateCubeForm from './CreateCubeForm';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 import theme, { backgroundColor } from '../../theme';
@@ -40,6 +41,7 @@ const UserCubeCard = (props) => {
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
+  const [dialogInfo, setDialogInfo] = React.useState({});
   const [errorMessage, setErrorMessage] = React.useState();
   const [showCubeForm, setShowCubeForm] = React.useState(false);
 
@@ -58,6 +60,12 @@ const UserCubeCard = (props) => {
       <ErrorDialog
         clear={() => setErrorMessage(null)}
         message={errorMessage}
+      />
+
+      <ConfirmationDialogue
+        confirmHandler={deleteCube}
+        dialogInfo={dialogInfo}
+        toggleOpen={() => setDialogInfo({})}
       />
 
       <CreateCubeForm
@@ -94,7 +102,13 @@ const UserCubeCard = (props) => {
                         <MUIIconButton
                           className={classes.iconButton}
                           // color="secondary"
-                          onClick={() => deleteCube(cube._id)}
+                          onClick={() => setDialogInfo({
+                            data: cube._id,
+                            content: <MUITypography variant="body1">
+                              This action cannot be undone.  You may want to export your list first.
+                            </MUITypography>,
+                            title: `Are you sure you want to delete "${cube.name}?`
+                          })}
                           size="small"
                         >
                           <MUIDeleteForeverIcon />

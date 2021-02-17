@@ -292,7 +292,7 @@ function filterCards (activeComponentCards, filterText) {
         );
       })
     );
-  }));
+  }), 'name');
 }
 
 export default cubeReducer;

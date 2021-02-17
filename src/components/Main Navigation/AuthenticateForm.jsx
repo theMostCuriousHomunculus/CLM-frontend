@@ -11,7 +11,11 @@ import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { login as loginRequest, register as registerRequest } from '../../requests/account-requests';
+import {
+  login as loginRequest,
+  register as registerRequest,
+  requestPasswordReset as requestPasswordResetRequest
+} from '../../requests/account-requests';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {
@@ -64,23 +68,37 @@ const AuthenticateForm = function (props) {
     }
   }
 
+  async function requestPasswordReset () {
+    try {
+      setLoading(true);
+      await requestPasswordResetRequest(emailInput.current.value);
+      setErrorMessage(`A link to reset your password has been sent.  Please check your email inbox and your spam folder.`);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function submitForm (event) {
     event.preventDefault();
 
     if (mode === 'Login') {
       login();
-    } else {
+    } else if (mode === 'Register') {
       register();
+    } else {
+      requestPasswordReset();
     }
   }
 
-  function toggleMode (prevState) {
-    if (prevState === 'Login') {
-      setMode('Register');
-    } else {
-      setMode('Login');
-    }
-  }
+  // function toggleMode (prevState) {
+  //   if (prevState === 'Login') {
+  //     setMode('Register');
+  //   } else {
+  //     setMode('Login');
+  //   }
+  // }
 
   return (
     <React.Fragment>
@@ -129,24 +147,38 @@ const AuthenticateForm = function (props) {
                 />
               }
 
-              <MUITextField
-                autoComplete="off"
-                fullWidth
-                inputRef={passwordInput}
-                label="Password"
-                margin="dense"
-                required={true}
-                style={{ marginTop: 16 }}
-                type="password"
-                variant="outlined"
-              />
+              {mode !== 'Reset Password' &&
+                <MUITextField
+                  autoComplete="off"
+                  fullWidth
+                  inputRef={passwordInput}
+                  label="Password"
+                  margin="dense"
+                  required={true}
+                  style={{ marginTop: 16 }}
+                  type="password"
+                  variant="outlined"
+                />
+              }
             </MUIDialogContent>
             <MUIDialogActions style={{ justifyContent: 'space-between' }}>
               <WarningButton
-                onClick={() => toggleMode(mode)}
+                onClick={() => setMode((prevState) => {
+                  return prevState === 'Register' ? 'Login' : 'Register';
+                })}
               >
-                {mode === 'Login' ? "Don't have an account yet?" : 'Already have an account?'}
+                {mode === 'Register' ? 'Already have an account?' : "Don't have an account yet?"}
               </WarningButton>
+              {mode === 'Login' &&
+                <MUIButton
+                  color="secondary"
+                  onClick={() => setMode('Reset Password')}
+                  size="small"
+                  variant="contained"
+                >
+                  Forgot Your Password?
+                </MUIButton>
+              }
               <MUIButton
                 color="primary"
                 size="small"

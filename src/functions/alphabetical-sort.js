@@ -1,8 +1,8 @@
-export default function alphabeticalSort (objectsWithNameProperty) {
+export default function alphabeticalSort (objectsToSort, propertyToAlphabetizeBy) {
 
-  objectsWithNameProperty.sort(function (a, b) {
-    return a['name'].localeCompare(b['name']);
+  objectsToSort.sort(function (a, b) {
+    return a[propertyToAlphabetizeBy].localeCompare(b[propertyToAlphabetizeBy]);
   });
 
-  return objectsWithNameProperty;
+  return objectsToSort;
 }

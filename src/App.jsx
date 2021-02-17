@@ -19,6 +19,7 @@ const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Cube = React.lazy(() => import('./pages/Cube'));
 const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
+const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -106,6 +107,9 @@ function App() {
               </Route>
               <Route path='/event/:eventId'>
                 <Event />
+              </Route>
+              <Route path='/reset/:resetToken'>
+                <PasswordReset />
               </Route>
               <Route path='/resources' exact>
                 <Resources />

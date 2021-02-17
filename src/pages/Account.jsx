@@ -14,7 +14,9 @@ import MUITypography from '@material-ui/core/Typography';
 import { cloneDeep } from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
 
+import alphabeticalSort from '../functions/alphabetical-sort';
 import BudRequests from '../components/Account Page/BudRequests';
+import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -67,6 +69,7 @@ const Account = () => {
       sent_bud_requests: []
     }
   });
+  const [dialogInfo, setDialogInfo] = React.useState({});
   const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(false);
 
@@ -154,6 +157,12 @@ const Account = () => {
           <ErrorDialog
             clear={() => setErrorMessage(null)}
             message={errorMessage}
+          />
+
+          <ConfirmationDialog
+            confirmHandler={submitChanges}
+            dialogInfo={dialogInfo}
+            toggleOpen={() => setDialogInfo({})}
           />
 
           <MUICard style={{ marginBottom: 0 }}>
@@ -252,7 +261,7 @@ const Account = () => {
                 />
                 <MUIList>
                   {account.user.buds &&
-                    account.user.buds.map(function (bud) {
+                    alphabeticalSort(account.user.buds, 'name').map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
                           <SmallAvatar alt={bud.name} src={bud.avatar} />
@@ -261,9 +270,13 @@ const Account = () => {
                           </MUITypography>
                           {accountId === authentication.userId &&
                             <WarningButton
-                              onClick={() => submitChanges({ action: 'remove', other_user_id: bud._id })}
+                              onClick={() => setDialogInfo({
+                                data: { action: 'remove', other_user_id: bud._id },
+                                content: <MUITypography variant="body1">Think of all the good times you've had.</MUITypography>,
+                                title: `Are you sure you want to un-bud ${bud.name}?`
+                              })}
                             >
-                              Delete Bud
+                              Un-Bud
                             </WarningButton>
                           }
                         </MUIListItem>

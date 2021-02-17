@@ -52,10 +52,32 @@ async function register (email, name, password) {
   }
 }
 
+async function requestPasswordReset (email) {
+  try {
+    await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/account/reset`, { email });
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}
+
+async function submitPasswordReset (email, newPassword, resetToken) {
+  try {
+    const credentials = await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/account/reset/${resetToken}`, {
+      email,
+      password: newPassword
+    });
+    return credentials.data;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+}
+
 export {
   editAccount,
   fetchAccountById,
   login,
   logout,
-  register
+  register,
+  requestPasswordReset,
+  submitPasswordReset
 };
