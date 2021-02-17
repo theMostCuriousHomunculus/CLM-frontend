@@ -112,7 +112,7 @@ const TableView = (props) => {
                                 <React.Fragment key={cost}>
                                   {cards_color_type_cost.length > 0 &&
                                     <div>
-                                      {alphabeticalSort(cards_color_type_cost).map(function (card) {
+                                      {alphabeticalSort(cards_color_type_cost, 'name').map(function (card) {
                                         return (
                                           <MUITypography
                                             back_image={card.back_image}
