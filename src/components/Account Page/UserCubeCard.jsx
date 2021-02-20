@@ -85,7 +85,9 @@ const UserCubeCard = (props) => {
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Description</MUITableCell>
-                  <MUITableCell>Delete</MUITableCell>
+                  {accountId === authentication.userId &&
+                    <MUITableCell>Delete</MUITableCell>
+                  }
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
@@ -98,22 +100,24 @@ const UserCubeCard = (props) => {
                       <MUITableCell>
                         {cube.description}
                       </MUITableCell>
-                      <MUITableCell>
-                        <MUIIconButton
-                          className={classes.iconButton}
-                          // color="secondary"
-                          onClick={() => setDialogInfo({
-                            data: cube._id,
-                            content: <MUITypography variant="body1">
-                              This action cannot be undone.  You may want to export your list first.
-                            </MUITypography>,
-                            title: `Are you sure you want to delete "${cube.name}?`
-                          })}
-                          size="small"
-                        >
-                          <MUIDeleteForeverIcon />
-                        </MUIIconButton>
-                      </MUITableCell>
+                      {accountId === authentication.userId &&
+                        <MUITableCell>
+                          <MUIIconButton
+                            className={classes.iconButton}
+                            // color="secondary"
+                            onClick={() => setDialogInfo({
+                              data: cube._id,
+                              content: <MUITypography variant="body1">
+                                This action cannot be undone.  You may want to export your list first.
+                              </MUITypography>,
+                              title: `Are you sure you want to delete "${cube.name}?`
+                            })}
+                            size="small"
+                          >
+                            <MUIDeleteForeverIcon />
+                          </MUIIconButton>
+                        </MUITableCell>
+                      }
                     </MUITableRow>
                   );
                 })}

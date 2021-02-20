@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 
-import alphabeticalSort from '../../functions/alphabetical-sort';
+import customSort from '../../functions/custom-sort';
 import returnComponent from '../../functions/return-component';
 import { actionTypes } from '../actions/cube-actions';
 
@@ -184,19 +184,26 @@ function cubeReducer (cubeState = initialCubeState, action) {
       }
     case actionTypes.MOVE_OR_DELETE_CARD:
       try {
-        const { cardId, destination } = payload;
-        const originCardsArray = returnComponent(copyOfCubeState.cube, copyOfCubeState.active_component_id);
+        const { cardId, destination, origin } = payload;
+        const originCardsArray = returnComponent(copyOfCubeState.cube, origin);
         const indexOfCardToMove = originCardsArray.findIndex(function (card) {
           return card._id === cardId;
         });
         const cardToMove = originCardsArray.splice(indexOfCardToMove, 1);
-        let destinationCardsArray = returnComponent(copyOfCubeState.cube, destination);
+        const destinationCardsArray = returnComponent(copyOfCubeState.cube, destination);
   
         if (destinationCardsArray) {
           destinationCardsArray.push(cardToMove[0]);
         }
   
-        copyOfCubeState.active_component_cards = cloneDeep(originCardsArray);
+        if (copyOfCubeState.active_component_id === origin) {
+          copyOfCubeState.active_component_cards = cloneDeep(originCardsArray);
+        }
+
+        if (copyOfCubeState.active_component_id === destination) {
+          copyOfCubeState.active_component_cards = cloneDeep(destinationCardsArray);
+        }
+
         copyOfCubeState.displayed_cards = filterCards(copyOfCubeState.active_component_cards, copyOfCubeState.filter);
   
         return copyOfCubeState;
@@ -281,7 +288,7 @@ function cubeReducer (cubeState = initialCubeState, action) {
 }
 
 function filterCards (activeComponentCards, filterText) {
-  return alphabeticalSort(activeComponentCards.filter(function (card) {
+  return customSort(activeComponentCards.filter(function (card) {
     const wordArray = filterText.split(" ");
     return (
       wordArray.every(function (word) {
@@ -292,7 +299,7 @@ function filterCards (activeComponentCards, filterText) {
         );
       })
     );
-  }), 'name');
+  }), ['name']);
 }
 
 export default cubeReducer;

@@ -14,7 +14,7 @@ import MUITypography from '@material-ui/core/Typography';
 import { cloneDeep } from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
 
-import alphabeticalSort from '../functions/alphabetical-sort';
+import customSort from '../functions/custom-sort';
 import BudRequests from '../components/Account Page/BudRequests';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
@@ -261,7 +261,7 @@ const Account = () => {
                 />
                 <MUIList>
                   {account.user.buds &&
-                    alphabeticalSort(account.user.buds, 'name').map(function (bud) {
+                    customSort(account.user.buds, ['name']).map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
                           <SmallAvatar alt={bud.name} src={bud.avatar} />

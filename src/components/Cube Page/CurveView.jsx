@@ -6,8 +6,8 @@ import MUITypography from '@material-ui/core/Typography';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
-import alphabeticalSort from '../../functions/alphabetical-sort';
-import cardType from '../../functions/card-type';
+import customSort from '../../functions/custom-sort';
+import cardType from '../../functions/specific-card-type';
 import { monoColors, multiColors } from '../../constants/color-objects';
 
 const black = monoColors.find((color) => color.name === "Black").hex;
@@ -114,7 +114,7 @@ const CurveView = (props) => {
                         return (
                           <div key={cost}>
                             <MUITypography variant="subtitle2">{cost} CMC</MUITypography>
-                            {alphabeticalSort(cards_color_isCreature_cost).map(function (card) {
+                            {customSort(cards_color_isCreature_cost, ['name']).map(function (card) {
                               return (
                                 <MUITypography
                                   back_image={card.back_image}

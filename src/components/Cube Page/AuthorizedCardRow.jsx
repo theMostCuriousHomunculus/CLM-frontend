@@ -9,14 +9,12 @@ import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
 
 import ColorCheckboxes from './ColorCheckboxes';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 import { actionCreators } from '../../store/actions/cube-actions';
-import { AuthenticationContext } from '../../contexts/authentication-context';
 import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
-import { deleteCard } from '../../requests/cube-requests';
+import MoveDeleteMenu from './MoveDeleteMenu';
 
 const useStyles = makeStyles({
   tableCell: {
@@ -29,8 +27,6 @@ const useStyles = makeStyles({
 const AuthorizedCardRow = (props) => {
 
   const {
-    activeComponentId,
-    activeComponentName,
     card: {
       _id,
       back_image,
@@ -45,16 +41,11 @@ const AuthorizedCardRow = (props) => {
     },
     columnWidths,
     dispatchEditCard,
-    dispatchMoveOrDeleteCard,
     hidePreview,
-    modules,
-    rotations,
     showPreview,
     submitCardChange
   } = props;
-  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const cubeId = useParams().cubeId;
   const [activeMenu, setActiveMenu] = React.useState();
   const [anchorEl, setAnchorEl] = React.useState();
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
@@ -118,16 +109,6 @@ const AuthorizedCardRow = (props) => {
     });
   };
 
-  async function moveDeleteCard (destination) {
-    setActiveMenu(null);
-    try {
-      await deleteCard(_id, activeComponentId, cubeId, authentication.token, destination);
-      dispatchMoveOrDeleteCard({ cardId: _id, destination });
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
-  }
-
   return (
     <React.Fragment>
 
@@ -186,54 +167,9 @@ const AuthorizedCardRow = (props) => {
         />
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[4] }}>
-        <MUIList component="nav">
-          <MUIListItem
-            button
-            aria-haspopup="true"
-            aria-controls="lock-menu"
-            onClick={function (event) {
-              setActiveMenu('component');
-              setAnchorEl(event.currentTarget);
-            }}
-          >
-            <MUIListItemText
-              // primary="Move to"
-              secondary={activeComponentName}
-            />
-          </MUIListItem>
-        </MUIList>
-        <MUIMenu
-          anchorEl={anchorEl}
-          keepMounted
-          open={activeMenu === 'component'}
-          onClose={function () {
-            setActiveMenu(null);
-            setAnchorEl(null);
-          }}
-        >
-          {[{ name: 'Mainboard', _id: 'mainboard' },
-            { name: 'Sideboard', _id: 'sideboard' },
-            ...modules,
-            ...rotations].map((component) => (
-              <MUIMenuItem
-                key={`${_id}-${component._id}`}
-                onClick={function () {
-                  moveDeleteCard(component._id);
-                }}
-                selected={activeComponentId === component._id}
-              >
-                {component.name}
-              </MUIMenuItem>
-            ))
-          }
-          <MUIMenuItem
-            onClick={function () {
-              moveDeleteCard(null);
-            }}
-          >
-            Delete from Cube
-          </MUIMenuItem>
-        </MUIMenu>
+        <MoveDeleteMenu
+          cardId={_id}
+        />
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
         <MUIList component="nav">
@@ -288,18 +224,13 @@ const AuthorizedCardRow = (props) => {
 
 function mapStateToProps (state, ownProps) {
   return {
-    activeComponentId: state.active_component_id,
-    activeComponentName: state.active_component_name,
-    card: state.displayed_cards[ownProps.index],
-    modules: state.cube.modules.map(module => ({ _id: module._id, name: module.name})),
-    rotations: state.cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))
+    card: state.displayed_cards[ownProps.index]
   };
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload)),
-    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
+    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload))
   };
 }
 

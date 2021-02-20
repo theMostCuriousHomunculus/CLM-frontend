@@ -6,10 +6,12 @@ import MUITypography from '@material-ui/core/Typography';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
-import alphabeticalSort from '../../functions/alphabetical-sort';
-import cardType from '../../functions/card-type';
+import customSort from '../../functions/custom-sort';
+import generalCardType from '../../functions/general-card-type';
+import specificCardType from '../../functions/specific-card-type';
 import theme from '../../theme';
 import { monoColors, multiColors } from '../../constants/color-objects';
+import EditCardModal from './EditCardModal';
 
 const useStyles = makeStyles({
   basicCard: {
@@ -33,10 +35,20 @@ const useStyles = makeStyles({
   blue: {
     backgroundColor: monoColors.find((color) => color.name === "Blue").hex
   },
+  cardContent: {
+    paddingTop: 2
+  },
   cardHeader: {
+    paddingBottom: 2,
     textAlign: 'center',
     '& *': {
-      lineHeight: 1
+      fontWeight: 'bold',
+      lineHeight: 1.1
+    }
+  },
+  cmcBlock: {
+    '& div:not(:last-child)': {
+      borderBottom: '1px solid black'
     }
   },
   colorComboText: {
@@ -63,8 +75,8 @@ const useStyles = makeStyles({
     padding: 4
   },
   typeText: {
-    borderTop: '1px solid black',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   white: {
     backgroundColor: monoColors.find((color) => color.name === "White").hex
@@ -73,149 +85,150 @@ const useStyles = makeStyles({
 
 const TableView = (props) => {
 
+  const {
+    displayedCards,
+    hidePreview,
+    showPreview
+  } = props;
   const classes = useStyles();
   const costs = [0, 1, 2, 3, 4, 5, 6, 7];
+  const [editableCard, setEditableCard] = React.useState({});
 
   return (
-    <div className={classes.tableViewMainContainer}>
-      <React.Fragment>
-        {monoColors.map(function (color) {
-          const cards_color = props.displayedCards.filter(function (card) {
-            return card.color_identity.toString() === color.color_identity;
-          });
-          return (
-            <MUICard className={classes[`${color.name.toLowerCase()}`] + ' ' + classes.basicCard} key={`table-${color.name}`}>
-              <MUICardHeader
-                disableTypography={true}
-                className={classes.cardHeader}
-                title={<MUITypography variant="subtitle1">{color.name}</MUITypography>}
-                subheader={<MUITypography variant="subtitle1">({cards_color.length})</MUITypography>}
-              />
-              <MUICardContent>
-                {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
-                  const cards_color_type = cards_color.filter(function (card) {
-                    return cardType(card.type_line) === type;
-                  });
-                  return (
-                    <React.Fragment key={type}>
-                      {cards_color_type.length > 0 &&
-                        <React.Fragment>
-                          <MUITypography className={classes.typeText} variant="subtitle2">
-                            {`${type} (${cards_color_type.length})`}
-                          </MUITypography>
-                          <React.Fragment>
-                            {costs.map(function (cost) {
-                              const cards_color_type_cost = cards_color_type.filter(function (card) {
-                                return card.cmc === cost || (cost === 7 && card.cmc > cost);
-                              });
-                              return (
-                                <React.Fragment key={cost}>
-                                  {cards_color_type_cost.length > 0 &&
-                                    <div>
-                                      {alphabeticalSort(cards_color_type_cost, 'name').map(function (card) {
-                                        return (
-                                          <MUITypography
-                                            back_image={card.back_image}
-                                            image={card.image}
-                                            key={card._id}
-                                            onMouseOut={props.hidePreview}
-                                            onMouseOver={props.showPreview}
-                                            style={{ cursor: 'default' }}
-                                            variant="body1"
-                                          >
-                                            {card.name}
-                                          </MUITypography>
-                                        );
-                                      })}
-                                    </div>
-                                  }
-                                </React.Fragment>
-                              );
-                            })}
-                          </React.Fragment>
-                        </React.Fragment>
-                      }
-                    </React.Fragment>
-                  );
-                })}
-              </MUICardContent>
-            </MUICard>
-          );
-        })}
-      </React.Fragment>
-      <MUICard className={classes.multicolor + ' ' + classes.basicCard}>
-        <MUICardHeader
-          className={classes.cardHeader}
-          disableTypography={true}
-          title={<MUITypography variant="subtitle1">Multicolor</MUITypography>}
-          subheader={<MUITypography variant="subtitle1">
-            ({props.displayedCards.filter(function (card) {
-              return card.color_identity.length > 1;
-            }).length})
-          </MUITypography>}
-        />
-        <MUICardContent>
-          {multiColors.map(function (color) {
-            const cards_color = props.displayedCards.filter(function (card) {
+    <React.Fragment>
+
+      <EditCardModal
+        card={editableCard}
+        clear={() => setEditableCard({})}
+      />
+
+      <div className={classes.tableViewMainContainer}>
+        <React.Fragment>
+          {monoColors.map(function (color) {
+            const cards_color = displayedCards.filter(function (card) {
               return card.color_identity.toString() === color.color_identity;
             });
             return (
-              <React.Fragment key={color.name}>
-                {cards_color.length > 0 &&
-                  <div>
-                    <MUITypography className={classes.colorComboText} variant="subtitle2">
-                      {`${color.name} (${cards_color.length})`}
-                    </MUITypography>
-                    <React.Fragment>
-                      {[true, false].map(function (isCreature) {
-                        const cards_color_isCreature = cards_color.filter(function (card) {
-                          return isCreature ? cardType(card.type_line) === "Creature" : cardType(card.type_line) !== "Creature";
-                        });
-                        return (
-                          <div key={isCreature ? "a" : "b"}>
-                            <MUITypography style={{ fontStyle: 'italic' }} variant="subtitle2">
-                              {isCreature ? "Creature" : "Non-Creature"}
+              <MUICard className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`} key={`table-${color.name}`}>
+                <MUICardHeader
+                  disableTypography={true}
+                  className={classes.cardHeader}
+                  title={<MUITypography variant="h6">{color.name}</MUITypography>}
+                  subheader={<MUITypography variant="h6">({cards_color.length})</MUITypography>}
+                />
+                <MUICardContent className={classes.cardContent}>
+                  {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
+                    const cards_color_type = cards_color.filter(function (card) {
+                      return specificCardType(card.type_line) === type;
+                    });
+                    return (
+                      <React.Fragment key={type}>
+                        {cards_color_type.length > 0 &&
+                          <React.Fragment>
+                            <MUITypography className={classes.typeText} variant="subtitle1">
+                              {`${type} (${cards_color_type.length})`}
                             </MUITypography>
-                            <React.Fragment>
+                            <div className={classes.cmcBlock}>
                               {costs.map(function (cost) {
-                                const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
+                                const cards_color_type_cost = cards_color_type.filter(function (card) {
                                   return card.cmc === cost || (cost === 7 && card.cmc > cost);
                                 });
                                 return (
                                   <React.Fragment key={cost}>
-                                    {cards_color_isCreature_cost.length > 0 &&
-                                      alphabeticalSort(cards_color_isCreature_cost, 'name').map(function (card) {
-                                        return (
-                                          <MUITypography
-                                            back_image={card.back_image}
-                                            image={card.image}
-                                            key={card._id}
-                                            onMouseOut={props.hidePreview}
-                                            onMouseOver={props.showPreview}
-                                            style={{ cursor: 'default' }}
-                                            variant="body1"
-                                          >
-                                            {card.name}
-                                          </MUITypography>
-                                        );
-                                      })
+                                    {cards_color_type_cost.length > 0 &&
+                                      <div>
+                                        {customSort(cards_color_type_cost, ['name']).map(function (card, index) {
+                                          return (
+                                            <MUITypography
+                                              back_image={card.back_image}
+                                              image={card.image}
+                                              key={card._id}
+                                              onDoubleClick={() => setEditableCard(card)}
+                                              onMouseOut={hidePreview}
+                                              onMouseOver={showPreview}
+                                              style={{ cursor: 'pointer', userSelect: 'none' }}
+                                              variant="body1"
+                                            >
+                                              {index + 1}) {card.name}
+                                            </MUITypography>
+                                          );
+                                        })}
+                                      </div>
                                     }
                                   </React.Fragment>
                                 );
                               })}
-                            </React.Fragment>
+                            </div>
+                          </React.Fragment>
+                        }
+                      </React.Fragment>
+                    );
+                  })}
+                </MUICardContent>
+              </MUICard>
+            );
+          })}
+        </React.Fragment>
+        <MUICard className={classes.multicolor + ' ' + classes.basicCard}>
+          <MUICardHeader
+            className={classes.cardHeader}
+            disableTypography={true}
+            title={<MUITypography variant="h6">Multicolor</MUITypography>}
+            subheader={<MUITypography variant="h6">
+              ({displayedCards.filter(function (card) {
+                return card.color_identity.length > 1;
+              }).length})
+            </MUITypography>}
+          />
+          <MUICardContent className={classes.cardContent}>
+            {multiColors.map(function (color) {
+              const cards_color = displayedCards.filter(function (card) {
+                return card.color_identity.toString() === color.color_identity;
+              });
+              return (
+                <React.Fragment key={color.name}>
+                  {cards_color.length > 0 &&
+                    <div>
+                      <MUITypography className={classes.colorComboText} variant="subtitle1">
+                        {`${color.name} (${cards_color.length})`}
+                      </MUITypography>
+                      {["Creature", "Non-Creature", "Land"].map(function (value) {
+                        const cards_color_type = cards_color.filter(function (card) {
+                          return value === generalCardType(card.type_line);
+                        });
+                        return (
+                          <div key={`${color.name}-${value}`}>
+                            <MUITypography style={{ fontStyle: 'italic', textAlign: 'center' }} variant="subtitle1">
+                              {value}
+                            </MUITypography>
+                            {customSort(cards_color_type, ['cmc']).map(function (card, index) {
+                              return (
+                                <MUITypography
+                                  back_image={card.back_image}
+                                  image={card.image}
+                                  key={card._id}
+                                  onMouseOut={hidePreview}
+                                  onMouseOver={showPreview}
+                                  style={{ cursor: 'default' }}
+                                  variant="body1"
+                                >
+                                  {index + 1}) {card.name}
+                                </MUITypography>
+                              );
+                            })}
                           </div>
                         );
                       })}
-                    </React.Fragment>
-                  </div>
-                }
-              </React.Fragment>
-            );
-          })}
-        </MUICardContent>
-      </MUICard>
-    </div>
+                    </div>
+                  }
+                </React.Fragment>
+              );
+            })}
+          </MUICardContent>
+        </MUICard>
+      </div>
+
+    </React.Fragment>
   );
 }
 
