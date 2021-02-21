@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemText from '@material-ui/core/ListItemText';
@@ -8,17 +7,13 @@ import MUIMenuItem from '@material-ui/core/MenuItem';
 import { connect } from 'react-redux';
 
 import ErrorDialog from '../miscellaneous/ErrorDialog';
-import { actionCreators } from '../../store/actions/cube-actions';
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { deleteCard } from '../../requests/cube-requests';
 
 function MoveDeleteMenu (props) {
 
   const {
     activeComponentId,
     activeComponentName,
-    cardId,
-    dispatchMoveOrDeleteCard,
+    handleMoveDelete,
     listItemPrimaryText,
     modules,
     rotations
@@ -30,27 +25,16 @@ function MoveDeleteMenu (props) {
     ...rotations
   ];
   const [anchorEl, setAnchorEl] = React.useState();
-  const authentication = React.useContext(AuthenticationContext);
-  const cubeId = useParams().cubeId;
   const [errorMessage, setErrorMessage] = React.useState();
   const [selectedComponent, setSelectedComponent] = React.useState({
-    _id: null,
-    name: null
+    _id: activeComponentId,
+    name: activeComponentName
   });
 
-  React.useEffect(() => {
-    setSelectedComponent({ _id: activeComponentId, name: activeComponentName });
-  }, [activeComponentId, activeComponentName]);
-
-  async function moveDeleteCard (destination) {
+  function handleMenuItemClick (destination) {
     setAnchorEl(null);
-    try {
-      await deleteCard(cardId, selectedComponent._id, cubeId, authentication.token, destination);
-      dispatchMoveOrDeleteCard({ cardId, destination, origin: selectedComponent._id });
-      setSelectedComponent(allComponents.find((component) => component._id === destination));
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
+    setSelectedComponent(destination);
+    handleMoveDelete(destination._id);
   }
 
   return (
@@ -84,14 +68,14 @@ function MoveDeleteMenu (props) {
         {allComponents.map((component) => (
             <MUIMenuItem
               key={component._id}
-              onClick={() => moveDeleteCard(component._id)}
+              onClick={() => handleMenuItemClick({ _id: component._id, name: component.name })}
               selected={selectedComponent._id === component._id}
             >
               {component.name}
             </MUIMenuItem>
           ))
         }
-        <MUIMenuItem onClick={() => moveDeleteCard(null)}>
+        <MUIMenuItem onClick={() => handleMenuItemClick({ _id: null, name: null })}>
           Delete from Cube
         </MUIMenuItem>
       </MUIMenu>
@@ -109,10 +93,4 @@ function mapStateToProps (state) {
   };
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(MoveDeleteMenu);
+export default connect(mapStateToProps, null)(MoveDeleteMenu);

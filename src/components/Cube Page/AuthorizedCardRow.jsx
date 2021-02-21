@@ -1,20 +1,18 @@
 import React from 'react';
-import axios from 'axios';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
+import { useParams } from 'react-router-dom';
 import MUITextField from '@material-ui/core/TextField';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
+import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
-import { actionCreators } from '../../store/actions/cube-actions';
-import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
 import MoveDeleteMenu from './MoveDeleteMenu';
+import { actionCreators } from '../../store/actions/cube-actions';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { deleteCard } from '../../requests/cube-requests';
+import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
+
 
 const useStyles = makeStyles({
   tableCell: {
@@ -27,6 +25,7 @@ const useStyles = makeStyles({
 const AuthorizedCardRow = (props) => {
 
   const {
+    activeComponentId,
     card: {
       _id,
       back_image,
@@ -41,73 +40,24 @@ const AuthorizedCardRow = (props) => {
     },
     columnWidths,
     dispatchEditCard,
+    dispatchMoveOrDeleteCard,
     hidePreview,
     showPreview,
     submitCardChange
   } = props;
+  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [activeMenu, setActiveMenu] = React.useState();
-  const [anchorEl, setAnchorEl] = React.useState();
-  const [availablePrintings, setAvailablePrintings] = React.useState([]);
+  const cubeId = useParams().cubeId;
   const [errorMessage, setErrorMessage] = React.useState();
-  const [loading, setLoading] = React.useState(false);
-  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
 
-  async function enablePrintChange (event) {
-    setActiveMenu('print');
-    setAnchorEl(event.currentTarget);
-
+  async function moveDeleteCard (destination) {
     try {
-      setLoading(true);
-      let printings = await axios.get(`https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracle_id}&unique=prints`);
-      printings = printings.data.data.map(function(print) {
-        let back_image, image;
-        if (print.layout === "transform") {
-          back_image = print.card_faces[1].image_uris.large;
-          image = print.card_faces[0].image_uris.large;
-        } else {
-          image = print.image_uris.large;
-        }
-        return (
-          {
-            back_image,
-            image,
-            mtgo_id: print.mtgo_id,
-            printing: print.set_name + " - " + print.collector_number,
-            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
-          }
-        );
-      });
-      setAvailablePrintings(printings);
-      setSelectedPrintIndex(printings.findIndex(function (print) {
-        return print.printing === printing;
-      }));
+      await deleteCard(_id, activeComponentId, cubeId, authentication.token, destination);
+      dispatchMoveOrDeleteCard({ cardId: _id, destination });
     } catch (error) {
-      setErrorMessage(error.response.data.message);
-    } finally {
-      setLoading(false);
+      setErrorMessage(error.message);
     }
   }
-
-  function selectPrinting (index) {
-    setActiveMenu(null);
-    setAnchorEl(null);
-    submitCardChange(_id, {
-      back_image: availablePrintings[index].back_image,
-      image: availablePrintings[index].image,
-      mtgo_id: availablePrintings[index].mtgo_id,
-      printing: availablePrintings[index].printing,
-      purchase_link: availablePrintings[index].purchase_link
-    });
-    dispatchEditCard({
-      cardId: _id,
-      back_image: availablePrintings[index].back_image,
-      image: availablePrintings[index].image,
-      mtgo_id: availablePrintings[index].mtgo_id,
-      printing: availablePrintings[index].printing,
-      purchase_link: availablePrintings[index].purchase_link
-    });
-  };
 
   return (
     <React.Fragment>
@@ -130,8 +80,10 @@ const AuthorizedCardRow = (props) => {
       <div className={classes.tableCell} style={{ width: columnWidths[1] }}>
         <ColorCheckboxes
           color_identity={color_identity}
-          card_id={_id}
-          submitCardChange={submitCardChange}
+          handleColorIdentityChange={(details) => {
+            submitCardChange(_id, details);
+            dispatchEditCard({ cardId: _id, ...details });
+          }}
         />
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[2] }}>
@@ -168,50 +120,20 @@ const AuthorizedCardRow = (props) => {
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[4] }}>
         <MoveDeleteMenu
-          cardId={_id}
+          handleMoveDelete={(destination) => moveDeleteCard(destination)}
         />
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
-        <MUIList component="nav">
-          <MUIListItem
-            button
-            aria-haspopup="true"
-            aria-controls="lock-menu"
-            onClick={enablePrintChange}
-          >
-            <MUIListItemText
-              // primary="Selected Printing"
-              secondary={printing}
-            />
-          </MUIListItem>
-        </MUIList>
-        <MUIMenu
-          id="printing"
-          anchorEl={anchorEl}
-          keepMounted
-          open={activeMenu === 'print'}
-          onClose={function () {
-            setActiveMenu(null);
-            setAnchorEl(null);
+        <ChangePrintMenu
+          handlePrintingChange={(details) => {
+            submitCardChange(_id, details);
+            dispatchEditCard({ cardId: _id, ...details });
           }}
-        >
-          {loading ?
-            <MUICircularProgress color="primary" size={20} /> :
-            availablePrintings.map((option, index) => (
-              <MUIMenuItem
-                back_image={option.back_image}
-                image={option.image}
-                key={`${_id}-printing-${index}`}
-                onMouseOut={hidePreview}
-                onMouseOver={showPreview}
-                selected={index === selectedPrintIndex}
-                onClick={() => selectPrinting(index)}
-              >
-                {option.printing}
-              </MUIMenuItem>
-            ))
-          }
-        </MUIMenu>
+          hidePreview={hidePreview}
+          oracle_id={oracle_id}
+          printing={printing}
+          showPreview={showPreview}
+        />
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[6] }}>
         <a href={purchase_link}>
@@ -224,13 +146,15 @@ const AuthorizedCardRow = (props) => {
 
 function mapStateToProps (state, ownProps) {
   return {
+    activeComponentId: state.active_component_id,
     card: state.displayed_cards[ownProps.index]
   };
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload))
+    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload)),
+    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
   };
 }
 

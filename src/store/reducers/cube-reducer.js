@@ -184,26 +184,19 @@ function cubeReducer (cubeState = initialCubeState, action) {
       }
     case actionTypes.MOVE_OR_DELETE_CARD:
       try {
-        const { cardId, destination, origin } = payload;
-        const originCardsArray = returnComponent(copyOfCubeState.cube, origin);
+        const { cardId, destination } = payload;
+        const originCardsArray = returnComponent(copyOfCubeState.cube, copyOfCubeState.active_component_id);
         const indexOfCardToMove = originCardsArray.findIndex(function (card) {
           return card._id === cardId;
         });
         const cardToMove = originCardsArray.splice(indexOfCardToMove, 1);
-        const destinationCardsArray = returnComponent(copyOfCubeState.cube, destination);
+        let destinationCardsArray = returnComponent(copyOfCubeState.cube, destination);
   
         if (destinationCardsArray) {
           destinationCardsArray.push(cardToMove[0]);
         }
   
-        if (copyOfCubeState.active_component_id === origin) {
-          copyOfCubeState.active_component_cards = cloneDeep(originCardsArray);
-        }
-
-        if (copyOfCubeState.active_component_id === destination) {
-          copyOfCubeState.active_component_cards = cloneDeep(destinationCardsArray);
-        }
-
+        copyOfCubeState.active_component_cards = cloneDeep(originCardsArray);
         copyOfCubeState.displayed_cards = filterCards(copyOfCubeState.active_component_cards, copyOfCubeState.filter);
   
         return copyOfCubeState;

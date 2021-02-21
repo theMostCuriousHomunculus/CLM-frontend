@@ -1,10 +1,8 @@
 import React from 'react';
 import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIGrid from '@material-ui/core/Grid';
-import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { actionCreators } from '../../store/actions/cube-actions';
 import { monoColors } from '../../constants/color-objects';
 import { ReactComponent as WhiteManaSymbol } from '../../images/white-mana-symbol.svg';
 import { ReactComponent as BlueManaSymbol } from '../../images/blue-mana-symbol.svg';
@@ -47,10 +45,8 @@ const useStyles = makeStyles({
 const ColorCheckboxes = (props) => {
 
   const {
-    card_id,
     color_identity,
-    dispatchEditCard,
-    submitCardChange
+    handleColorIdentityChange
   } = props;
   const classes = useStyles();
 
@@ -77,29 +73,28 @@ const ColorCheckboxes = (props) => {
     }
   };
 
-  function submitColorIdentityChange (color) {
-    let color_identity = [];
+  function handleColorCheckboxClick (color) {
+    const colors = [];
 
     for (let [key, value] of Object.entries(colorObj)) {
-      if (key === color && !value.checked) color_identity.push(key);
-      if (key !== color && value.checked) color_identity.push(key);
+      if (key === color && !value.checked) colors.push(key);
+      if (key !== color && value.checked) colors.push(key);
     }
 
-    dispatchEditCard({ cardId: card_id, color_identity: color_identity.sort() })
-    submitCardChange(card_id, { color_identity: color_identity.sort() });
+    handleColorIdentityChange({ color_identity: colors.sort() });
   }
   
   return (
     <MUIGrid container justify="space-around">
       {Array.from(Object.keys(colorObj)).map(function (color) {
         return (
-          <MUIGrid className={classes.colorCheckboxContainer} item key={`${color}-${card_id}`} xs={4}>
+          <MUIGrid className={classes.colorCheckboxContainer} item key={color} xs={4}>
             <MUICheckbox
               checked={colorObj[color]['checked']}
               checkedIcon={colorObj[color]['icon']}
               className={`${classes.colorCheckbox} ${classes[color]}`}
               color="primary"
-              onChange={() => submitColorIdentityChange(color)}
+              onChange={() => handleColorCheckboxClick(color)}
             />
           </MUIGrid>
         );
@@ -108,10 +103,4 @@ const ColorCheckboxes = (props) => {
   );
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload))
-  };
-}
-
-export default connect(null, mapDispatchToProps)(ColorCheckboxes);
+export default ColorCheckboxes;

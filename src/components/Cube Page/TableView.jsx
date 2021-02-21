@@ -100,6 +100,8 @@ const TableView = (props) => {
       <EditCardModal
         card={editableCard}
         clear={() => setEditableCard({})}
+        hidePreview={hidePreview}
+        showPreview={showPreview}
       />
 
       <div className={classes.tableViewMainContainer}>
@@ -207,9 +209,10 @@ const TableView = (props) => {
                                   back_image={card.back_image}
                                   image={card.image}
                                   key={card._id}
+                                  onDoubleClick={() => setEditableCard(card)}
                                   onMouseOut={hidePreview}
                                   onMouseOver={showPreview}
-                                  style={{ cursor: 'default' }}
+                                  style={{ cursor: 'pointer', userSelect: 'none' }}
                                   variant="body1"
                                 >
                                   {index + 1}) {card.name}
