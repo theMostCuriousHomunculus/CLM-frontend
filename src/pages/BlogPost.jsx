@@ -282,12 +282,15 @@ function BlogPost () {
               label="Body"
               margin="dense"
               multiline
-              onChange={(event) => setBlogPostState((prevState) => {
-                return {
-                  ...prevState,
-                  body: event.target.value
-                }
-              })}
+              onChange={(event) => {
+                event.persist();
+                setBlogPostState((prevState) => {
+                  return {
+                    ...prevState,
+                    body: event.target.value
+                  }
+                });
+              }}
               rows={20}
               type="text"
               value={blogPostState.body}
