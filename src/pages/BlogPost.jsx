@@ -96,13 +96,9 @@ const useStyles = makeStyles({
 
 function BlogPost () {
   const authentication = React.useContext(AuthenticationContext);
-  const bodyInput = React.useRef();
   const classes = useStyles();
   const [errorMessage, setErrorMessage] = React.useState();
-  const imageInput = React.useRef();
   const [loading, setLoading] = React.useState(false);
-  const subtitleInput = React.useRef();
-  const titleInput = React.useRef();
   const [viewMode, setViewMode] = React.useState('Live');
   const [blogPostState, setBlogPostState] = React.useState({
     _id: null,
@@ -171,10 +167,10 @@ function BlogPost () {
 
   async function submitPost () {
     const details = {
-      body: bodyInput.current.value,
-      image: imageInput.current.value,
-      subtitle: subtitleInput.current.value,
-      title: titleInput.current.value
+      body: blogPostState.body,
+      image: blogPostState.image,
+      subtitle: blogPostState.subtitle,
+      title: blogPostState.title
     };
 
     try {
@@ -213,10 +209,19 @@ function BlogPost () {
             <MUITextField
               defaultValue={blogPostState.title}
               fullWidth
-              inputRef={titleInput}
               label="Title"
               margin="dense"
+              onChange={(event) => {
+                event.persist();
+                setBlogPostState((prevState) => {
+                  return {
+                    ...prevState,
+                    title: event.target.value
+                  }
+                });
+              }}
               type="text"
+              value={blogPostState.title}
               variant="outlined"
             /> :
             <MUITypography variant="subtitle1">{blogPostState.title}</MUITypography>
@@ -228,21 +233,39 @@ function BlogPost () {
                   <MUITextField
                     defaultValue={blogPostState.subtitle}
                     fullWidth
-                    inputRef={subtitleInput}
                     label="Subtitle"
                     margin="dense"
+                    onChange={(event) => {
+                      event.persist();
+                      setBlogPostState((prevState) => {
+                        return {
+                          ...prevState,
+                          subtitle: event.target.value
+                        }
+                      });
+                    }}
                     style={{ marginTop: 16 }}
                     type="text"
+                    value={blogPostState.subtitle}
                     variant="outlined"
                   />
                   <MUITextField
                     defaultValue={blogPostState.image}
                     fullWidth
-                    inputRef={imageInput}
                     label="Image"
                     margin="dense"
+                    onChange={(event) => {
+                      event.persist();
+                      setBlogPostState((prevState) => {
+                        return {
+                          ...prevState,
+                          image: event.target.value
+                        }
+                      });
+                    }}
                     style={{ marginTop: 16 }}
                     type="text"
+                    value={blogPostState.image}
                     variant="outlined"
                   />
                 </React.Fragment>  :
@@ -278,14 +301,22 @@ function BlogPost () {
           {blogPostState.author._id === authentication.userId &&
             viewMode === 'Edit' ?
             <MUITextField
-              defaultValue={blogPostState.body}
               fullWidth
-              inputRef={bodyInput}
               label="Body"
               margin="dense"
               multiline
+              onChange={(event) => {
+                event.persist();
+                setBlogPostState((prevState) => {
+                  return {
+                    ...prevState,
+                    body: event.target.value
+                  }
+                });
+              }}
               rows={20}
               type="text"
+              value={blogPostState.body}
               variant="outlined"
             /> :
             <article className={classes.article}>
