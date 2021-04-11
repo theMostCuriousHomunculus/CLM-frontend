@@ -252,7 +252,7 @@ function BlogPost () {
                 color="textSecondary"
                 variant="body2"
               >
-              A work of genius by {blogPostState.author.name}.
+                A work of genius by {blogPostState.author.name}.
               </MUITypography>
               {blogPostState.updatedAt &&
                 <MUITypography
@@ -278,22 +278,14 @@ function BlogPost () {
           {blogPostState.author._id === authentication.userId &&
             viewMode === 'Edit' ?
             <MUITextField
+              defaultValue={blogPostState.body}
               fullWidth
+              inputRef={bodyInput}
               label="Body"
               margin="dense"
               multiline
-              onChange={(event) => {
-                event.persist();
-                setBlogPostState((prevState) => {
-                  return {
-                    ...prevState,
-                    body: event.target.value
-                  }
-                });
-              }}
               rows={20}
               type="text"
-              value={blogPostState.body}
               variant="outlined"
             /> :
             <article className={classes.article}>
