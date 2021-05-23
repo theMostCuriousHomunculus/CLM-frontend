@@ -11,9 +11,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import ErrorDialog from '../miscellaneous/ErrorDialog';
-import { actionCreators } from '../../store/actions/cube-actions';
+import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { editCube } from '../../requests/cube-requests';
+import { editCube } from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
   avatarLarge: {

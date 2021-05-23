@@ -10,7 +10,7 @@ import MUITextField from '@material-ui/core/TextField';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { submitPasswordReset as submitPasswordResetRequest } from '../requests/account-requests';
+import { submitPasswordReset as submitPasswordResetRequest } from '../requests/GraphQL/account-requests';
 
 function PasswordReset () {
 

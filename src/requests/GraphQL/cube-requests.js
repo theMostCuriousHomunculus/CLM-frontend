@@ -2,7 +2,7 @@ import axios from 'axios';
 
 async function addCard (cardData, componentId, cubeId, token) {
   try {
-    const newCardId = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}/${componentId}`, cardData, {
+    const newCardId = await axios.post(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}/${componentId}`, cardData, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return newCardId.data;
@@ -13,7 +13,7 @@ async function addCard (cardData, componentId, cubeId, token) {
 
 async function createComponent (cubeId, details, token) {
   try {
-    const newComponentId = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, details, {
+    const newComponentId = await axios.post(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}`, details, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return newComponentId.data;
@@ -24,7 +24,7 @@ async function createComponent (cubeId, details, token) {
 
 async function createCube (cubeDetails, token) {
   try {
-    const newCube = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/cube`, cubeDetails, {
+    const newCube = await axios.post(`${process.env.REACT_APP_REST_URL}/cube`, cubeDetails, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return newCube.data;
@@ -35,7 +35,7 @@ async function createCube (cubeDetails, token) {
 
 async function deleteCard (cardId, componentId, cubeId, token, destination = null) {
   try {
-    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}/${componentId}/${cardId}`, {
+    await axios.delete(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}/${componentId}/${cardId}`, {
       data: {
         destination
       },
@@ -48,7 +48,7 @@ async function deleteCard (cardId, componentId, cubeId, token, destination = nul
 
 async function deleteComponent (type, componentId, cubeId, token) {
   try {
-    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}/${componentId}`, {
+    await axios.delete(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}/${componentId}`, {
       data: {
         type
       },
@@ -61,7 +61,7 @@ async function deleteComponent (type, componentId, cubeId, token) {
 
 async function deleteCube (cubeId, token) {
   try {
-    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, {
+    await axios.delete(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
   } catch (error) {
@@ -71,7 +71,7 @@ async function deleteCube (cubeId, token) {
 
 async function editCard (changes, cardId, componentId, cubeId, token) {
   try {
-    await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}/${componentId}/${cardId}`, changes, {
+    await axios.patch(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}/${componentId}/${cardId}`, changes, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {
@@ -81,7 +81,7 @@ async function editCard (changes, cardId, componentId, cubeId, token) {
 
 async function editComponent (changes, componentId, cubeId, token) {
   try {
-    await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}/${componentId}`, changes, {
+    await axios.patch(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}/${componentId}`, changes, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {
@@ -91,7 +91,7 @@ async function editComponent (changes, componentId, cubeId, token) {
 
 async function editCube (changes, cubeId, token) {
   try {
-    await axios.patch(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`, changes, {
+    await axios.patch(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}`, changes, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {
@@ -101,7 +101,7 @@ async function editCube (changes, cubeId, token) {
 
 async function fetchCubeById (cubeId) {
   try {
-    const cube = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/cube/${cubeId}`);
+    const cube = await axios.get(`${process.env.REACT_APP_REST_URL}/cube/${cubeId}`);
     return cube.data;
   } catch (error) {
     throw new Error(error.response.data.message);

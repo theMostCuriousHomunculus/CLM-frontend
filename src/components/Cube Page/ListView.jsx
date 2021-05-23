@@ -12,7 +12,7 @@ import ReactWindowStickyHeaderList from '../miscellaneous/ReactWindowStickyHeade
 import theme from '../../theme';
 import UnauthorizedCardRow from './UnauthorizedCardRow';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { editCard } from '../../requests/cube-requests';
+import { editCard } from '../../requests/REST/cube-requests';
 import { monoColors } from '../../constants/color-objects';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 

@@ -14,9 +14,9 @@ import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 import WarningButton from '../miscellaneous/WarningButton';
-import { actionCreators } from '../../store/actions/cube-actions';
+import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { deleteCard, editCard } from '../../requests/cube-requests';
+import { deleteCard, editCard } from '../../requests/REST/cube-requests';
 import MoveDeleteMenu from './MoveDeleteMenu';
 
 function EditCardModal (props) {

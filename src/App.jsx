@@ -6,12 +6,12 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 
-import cubeReducer from './store/reducers/cube-reducer';
+import cubeReducer from './redux-store/reducers/cube-reducer';
 import Footer from './components/miscellaneous/Footer';
 import LoadingSpinner from './components/miscellaneous/LoadingSpinner';
 import Navigation from './components/Main Navigation/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
-import { logout as logoutRequest } from './requests/account-requests';
+import { logout as logoutRequest } from './requests/REST/account-requests';
 
 const Account = React.lazy(() => import('./pages/Account'));
 const Blog = React.lazy(() => import('./pages/Blog'));
@@ -21,6 +21,7 @@ const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
+const Test = React.lazy(() => import('./pages/Test'));
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -113,6 +114,9 @@ function App() {
               </Route>
               <Route path='/resources' exact>
                 <Resources />
+              </Route>
+              <Route path='/test'>
+                <Test />
               </Route>
             </Switch>
           </React.Suspense>

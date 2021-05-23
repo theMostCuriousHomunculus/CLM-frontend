@@ -29,12 +29,14 @@ const UserEventCard = (props) => {
 
   return (
     <React.Fragment>
-      <CreateEventForm
-        buds={buds}
-        cubes={cubes}
-        open={showEventForm}
-        toggleOpen={() => setShowEventForm(prevState => !prevState)}
-      />
+      {accountId === authentication.userId &&
+        <CreateEventForm
+          buds={buds}
+          cubes={cubes}
+          open={showEventForm}
+          toggleOpen={() => setShowEventForm(prevState => !prevState)}
+        />
+      }
       
       <MUICard>
         <MUICardHeader

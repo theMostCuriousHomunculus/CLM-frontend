@@ -15,7 +15,7 @@ import {
   login as loginRequest,
   register as registerRequest,
   requestPasswordReset as requestPasswordResetRequest
-} from '../../requests/account-requests';
+} from '../../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {

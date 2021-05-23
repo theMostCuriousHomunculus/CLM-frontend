@@ -13,8 +13,8 @@ import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
-import { actionCreators } from '../store/actions/cube-actions';
-import { addCard as addCardRequest, fetchCubeById } from '../requests/cube-requests';
+import { actionCreators } from '../redux-store/actions/cube-actions';
+import { addCard as addCardRequest, fetchCubeById } from '../requests/REST/cube-requests';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 const useStyles = makeStyles({

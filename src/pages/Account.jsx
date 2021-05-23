@@ -26,7 +26,7 @@ import UserCubeCard from '../components/Account Page/UserCubeCard';
 import UserEventCard from '../components/Account Page/UserEventCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { editAccount, fetchAccountById } from '../requests/account-requests';
+import { editAccount, fetchAccountById } from '../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
   avatarLarge: {
@@ -58,16 +58,14 @@ const Account = () => {
   const classes = useStyles();
 
   const [account, setAccount] = React.useState({
+    _id: accountId,
+    avatar: '',
+    buds: [],
     cubes: [],
     events: [],
-    user: {
-      _id: accountId,
-      avatar: '',
-      buds: [],
-      name: '',
-      received_bud_requests: [],
-      sent_bud_requests: []
-    }
+    name: '',
+    received_bud_requests: [],
+    sent_bud_requests: []
   });
   const [dialogInfo, setDialogInfo] = React.useState({});
   const [errorMessage, setErrorMessage] = React.useState();
@@ -94,8 +92,8 @@ const Account = () => {
       await editAccount(changes, authentication.token);
 
       if (changes.action) {
-        const budsCopy = cloneDeep(account.user.buds);
-        const receivedBudRequestsCopy = cloneDeep(account.user.received_bud_requests);
+        const budsCopy = cloneDeep(account.buds);
+        const receivedBudRequestsCopy = cloneDeep(account.received_bud_requests);
 
         changes.buds = budsCopy;
         changes.received_bud_requests = receivedBudRequestsCopy;
@@ -128,10 +126,7 @@ const Account = () => {
       setAccount((prevState) => {
         return {
           ...prevState,
-          user: {
-            ...prevState.user,
-            ...changes
-          }
+          ...changes
         };
       });
     } catch (error) {
@@ -167,15 +162,15 @@ const Account = () => {
 
           <MUICard style={{ marginBottom: 0 }}>
             <MUICardHeader
-              avatar={account.user.avatar &&
-                <MUIAvatar alt={account.user.name} className={classes.avatarLarge} src={account.user.avatar} />
+              avatar={account.avatar &&
+                <MUIAvatar alt={account.name} className={classes.avatarLarge} src={account.avatar} />
               }
               className={classes.cardHeader}
               disableTypography={true}
               title={accountId === authentication.userId ?
                 <MUITextField
                   autoComplete="off"
-                  defaultValue={account.user.name}
+                  defaultValue={account.name}
                   inputProps={{
                     onBlur: (event) => submitChanges({ name: event.target.value })
                   }}
@@ -188,12 +183,12 @@ const Account = () => {
                   variant="outlined"
                 />
                 : <MUITypography variant="h5">
-                  {account.user.name}
+                  {account.name}
                 </MUITypography>
               }
               subheader={accountId === authentication.userId &&
                 <MUITypography color="textSecondary" variant="subtitle1">
-                  {account.user.email}
+                  {account.email}
                 </MUITypography>
               }
             />
@@ -210,13 +205,13 @@ const Account = () => {
             }
             {authentication.isLoggedIn &&
               accountId !== authentication.userId &&
-              account.user.buds.filter(function (bud) {
+              account.buds.filter(function (bud) {
                 return bud._id === authentication.userId;
               }).length === 0 &&
-              account.user.received_bud_requests.filter(function (request) {
+              account.received_bud_requests.filter(function (request) {
                 return request._id === authentication.userId;
               }).length === 0 &&
-              account.user.sent_bud_requests.filter(function (request) {
+              account.sent_bud_requests.filter(function (request) {
                 return request._id === authentication.userId;
               }).length === 0 &&
               // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
@@ -244,7 +239,7 @@ const Account = () => {
 
             <MUIGrid item xs={12} lg={6}>
               <UserEventCard
-                buds={account.user.buds}
+                buds={account.buds}
                 cubes={account.cubes}
                 events={account.events}
                 pageClasses={classes}
@@ -260,8 +255,8 @@ const Account = () => {
                   title={<MUITypography variant="h5">Buds</MUITypography>}
                 />
                 <MUIList>
-                  {account.user.buds &&
-                    customSort(account.user.buds, ['name']).map(function (bud) {
+                  {account.buds &&
+                    customSort(account.buds, ['name']).map(function (bud) {
                       return (
                         <MUIListItem key={bud._id}>
                           <SmallAvatar alt={bud.name} src={bud.avatar} />
@@ -290,8 +285,8 @@ const Account = () => {
             {accountId === authentication.userId &&
               <BudRequests
                 manageBuds={submitChanges}
-                received_bud_requests={account.user.received_bud_requests}
-                sent_bud_requests={account.user.sent_bud_requests}
+                received_bud_requests={account.received_bud_requests}
+                sent_bud_requests={account.sent_bud_requests}
               />
             }
           </MUIGrid>

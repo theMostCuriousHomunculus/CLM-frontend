@@ -15,9 +15,9 @@ import { useParams } from 'react-router-dom';
 
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 import WarningButton from '../miscellaneous/WarningButton';
-import { actionCreators } from '../../store/actions/cube-actions';
+import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { createComponent } from '../../requests/cube-requests';
+import { createComponent } from '../../requests/REST/cube-requests';
 
 function CreateComponentForm (props) {
 

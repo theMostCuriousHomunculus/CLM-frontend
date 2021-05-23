@@ -20,7 +20,7 @@ const NewComment = (props) => {
 
   async function submitComment () {
     try {
-      const refreshedArticle = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}`,
+      const refreshedArticle = await sendRequest(`${process.env.REACT_APP_REST_URL}/blog/${blogPostId}`,
         'POST',
         JSON.stringify({
           body: bodyInput.current.value

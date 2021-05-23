@@ -78,19 +78,19 @@ const Event = () => {
     async function fetchData () {
       try {
         const accountData = await sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/account/${authentication.userId}`,
+          `${process.env.REACT_APP_REST_URL}/account/${authentication.userId}`,
           'GET',
           null,
           { Authorization: 'Bearer ' + authentication.token }
         );
-        setPlayerUsername(accountData.user.name);
+        setPlayerUsername(accountData.name);
       } catch (error) {
         console.log(error);
       }
     }
     fetchData();
     setErrorMessage(null);
-    setSocket(io(`${process.env.REACT_APP_BACKEND_URL.replace('/api', '')}`,
+    setSocket(io(`${process.env.REACT_APP_REST_URL.replace('/rest', '')}`,
       { query: { eventId, userId: authentication.userId } }));
   }, [authentication.token, authentication.userId, eventId, sendRequest]);
 

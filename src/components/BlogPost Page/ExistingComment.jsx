@@ -24,7 +24,7 @@ const ExistingComment = (props) => {
 
   async function deleteComment () {
     try {
-      const updatedBlogPost = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/blog/${blogPostId}/${props.comment._id}`,
+      const updatedBlogPost = await sendRequest(`${process.env.REACT_APP_REST_URL}/blog/${blogPostId}/${props.comment._id}`,
         'DELETE',
         null,
         {

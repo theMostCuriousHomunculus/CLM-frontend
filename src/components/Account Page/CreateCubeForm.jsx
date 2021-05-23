@@ -13,7 +13,7 @@ import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { createCube } from '../../requests/cube-requests';
+import { createCube } from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {

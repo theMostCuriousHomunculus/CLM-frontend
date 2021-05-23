@@ -18,8 +18,8 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import NewComment from '../components/BlogPost Page/NewComment';
 import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { fetchAccountById } from '../requests/account-requests';
-import { editBlogPost, fetchBlogPostById, publish } from '../requests/blog-requests';
+import { fetchAccountById } from '../requests/REST/account-requests';
+import { editBlogPost, fetchBlogPostById, publish } from '../requests/REST/blog-requests';
 
 const useStyles = makeStyles({
   article: {

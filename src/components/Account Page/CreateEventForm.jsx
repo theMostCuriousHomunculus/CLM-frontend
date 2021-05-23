@@ -115,7 +115,7 @@ const CreateEventForm = (props) => {
 
     try {
       const responseData = await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/event`,
+        `${process.env.REACT_APP_REST_URL}/event`,
         'POST',
         JSON.stringify(formInputs),
         {

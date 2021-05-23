@@ -21,7 +21,7 @@ import CreateCubeForm from './CreateCubeForm';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 import theme, { backgroundColor } from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { deleteCube as deleteCubeRequest } from '../../requests/cube-requests';
+import { deleteCube as deleteCubeRequest } from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
   iconButton: {

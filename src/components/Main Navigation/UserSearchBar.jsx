@@ -1,12 +1,14 @@
 import React from 'react';
+import MUIAvatar from '@material-ui/core/Avatar';
 import MUICircularProgress from '@material-ui/core/CircularProgress';
-import MUITextField from '@material-ui/core/TextField';
 import MUISearchIcon from '@material-ui/icons/Search';
+import MUITextField from '@material-ui/core/TextField';
+import MUITypography from '@material-ui/core/Typography';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
 import theme from '../../theme';
-import { useRequest } from '../../hooks/request-hook';
+import { searchAccounts } from '../../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
   input: {
@@ -63,11 +65,11 @@ const useStyles = makeStyles({
 
 function UserSearchBar (props) {
 
+  const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
   const { history } = props;
-  const { loading, sendRequest } = useRequest();
 
   function goToUserProfilePage (user_id, props) {
     history.push(`/account/${user_id}`);
@@ -85,14 +87,13 @@ function UserSearchBar (props) {
   async function searchForUsers (event) {
     if (event.target.value.length > 2) {
       try {
-        const matchingUsers = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/account?name=${event.target.value}`,
-          'GET',
-          null,
-          {}
-        );
+        setLoading(true);
+        const matchingUsers = await searchAccounts(event.target.value);
         setUserSearchResults(matchingUsers);
       } catch (error) {
         console.log({ 'Error': error.message });
+      } finally {
+        setLoading(false);
       }
     } else {
       setUserSearchResults([]);
@@ -141,6 +142,14 @@ function UserSearchBar (props) {
             }}
           />
         )}
+        renderOption={(option) => {
+          return (
+            <div style={{ alignItems: "center", display: "flex", flexGrow: 1, justifyContent: "space-between" }}>
+              <MUIAvatar alt={option.name} src={option.avatar} />
+              <MUITypography variant="body1">{option.name}</MUITypography>
+            </div>
+          );
+        }}
       />
     </div>
   );

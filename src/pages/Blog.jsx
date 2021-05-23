@@ -15,7 +15,7 @@ import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { deleteBlogPost as deleteBlogPostRequest, fetchAllBlogPosts } from '../requests/blog-requests';
+import { deleteBlogPost as deleteBlogPostRequest, fetchAllBlogPosts } from '../requests/REST/blog-requests';
 
 const useStyles = makeStyles({
   fullHeight: {

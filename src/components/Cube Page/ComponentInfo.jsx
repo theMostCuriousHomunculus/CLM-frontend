@@ -19,12 +19,12 @@ import { useParams } from 'react-router-dom';
 import CreateComponentForm from './CreateComponentForm';
 import ErrorDialog from '../miscellaneous/ErrorDialog';
 import WarningButton from '../miscellaneous/WarningButton';
-import { actionCreators } from '../../store/actions/cube-actions';
+import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import {
   deleteComponent as deleteComponentRequest,
   editComponent
-} from '../../requests/cube-requests';
+} from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
   cardActions: {
