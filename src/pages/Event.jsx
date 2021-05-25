@@ -9,11 +9,12 @@ import MUITabs from '@material-ui/core/Tabs';
 import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
-import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
+import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
 import SmallAvatar from '../components/miscellaneous/SmallAvatar';
@@ -23,9 +24,6 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { fetchEventByID, moveCard, selectCard, sortCard } from '../requests/GraphQL/event-requests.js';
 
 const useStyles = makeStyles({
-  downloadLink: {
-    marginLeft: 8
-  },
   paper: {
     marginLeft: 8,
     marginRight: 8
@@ -47,19 +45,41 @@ const Event = () => {
     finished: false,
     host: {},
     name: '',
-    players: []
+    players: [{
+      account: {
+        _id: authentication.userId
+      },
+      chaff: [],
+      current_pack: null,
+      mainboard: [],
+      sideboard: []
+    }]
   });
+  const [loading, setLoading] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [tabNumber, setTabNumber] = React.useState(0);
 
   React.useEffect(function () {
+
+    async function initialize () {
+      try {
+        setLoading(true);
+        const eventData = await fetchEventByID(eventID, authentication.token);
+  
+        setEvent(eventData);
+        console.log(eventData);
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    initialize();
+
     const client = createClient({
       url: process.env.REACT_APP_GRAPHQL_WS_URL
     });
-
-    const eventData = fetchEventByID(eventID, authentication.token);
-
-    setEvent(eventData);
 
     async function subscribe () {
       function onNext(update) {
@@ -69,7 +89,7 @@ const Event = () => {
       await new Promise((resolve, reject) => {
         client.subscribe({
           query: `subscription {
-            joinEvent(${eventID}) {
+            joinEvent(_id: "${eventID}") {
               finished
               name
               players {
@@ -116,17 +136,9 @@ const Event = () => {
         });
       })
     }
+
     subscribe(result => console.log(result), error => console.log(error));
   }, [authentication.token, eventID]);
-
-  const me = event.players.find(plr => plr.account._id === authentication.userId);
-  const others = event.players.filter(plr => plr.account._id !== authentication.userId);
-  const usedCardsString = me.mainboard.reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
-  }, "");
-  const unUsedCardsString = me.chaff.concat(me.sideboard).reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
-  }, "");
 
   async function onMoveCard (cardID, destination, origin) {
     try {
@@ -158,7 +170,8 @@ const Event = () => {
     }
   }
 
-  return (
+  return (loading ?
+    <LoadingSpinner /> :
     <React.Fragment>
       <SelectConfirmationDialog
         card={selectedCard}
@@ -220,7 +233,7 @@ const Event = () => {
           </MUIPaper>
 
           {tabNumber === 0 &&
-            me.current_pack &&
+            event.players.some(plr => plr.current_pack) &&
             <MUICard>
               <MUICardHeader
                 disableTypography={true}
@@ -228,7 +241,7 @@ const Event = () => {
               />
               <SortableList
                 axis="xy"
-                cards={me.current_pack}
+                cards={event.players.find(plr => plr.account._id === authentication.userId).current_pack}
                 clickFunction={(cardData) => {
                   setSelectedCard(cardData);
                   setDialogDisplayed(true);
@@ -243,7 +256,7 @@ const Event = () => {
           }
 
           {tabNumber === 0 &&
-            !me.current_pack &&
+            !event.players.some(plr => plr.current_pack) &&
             <MUICard>
             <MUICardHeader
               disableTypography={true}
@@ -273,33 +286,7 @@ const Event = () => {
       {// displays once the event is finished
         event.finished &&
         <React.Fragment>
-          <MUITypography variant="body1">
-            <CSVLink
-              className={classes.downloadLink}
-              data={`Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n${usedCardsString}${unUsedCardsString}`}
-              filename={`${event.name} - ${me.account.name}.csv`}
-              target="_blank"
-            >
-              Download your card pool in CSV format for MTGO play!
-            </CSVLink>
-          </MUITypography>
-          {others.map(function (plr) {
-            return (
-              <MUITypography variant="body1">
-                <CSVLink
-                  className={classes.downloadLink}
-                  data={plr.card_pool.reduce(function (a, c) {
-                    return a + " ,1," + c + ", , , , ,No,0\n";
-                  }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n")}
-                  filename={`${event.name} - ${plr.account.name}.csv`}
-                  key={plr.account._id}
-                  target="_blank"
-                >
-                  Download {plr.account.name}'s card pool in CSV format for MTGO play!
-                </CSVLink>
-              </MUITypography>
-            );
-          })}
+          <CardPoolDownloadLinks players={event.players} />
 
           <PicksDisplay
             eventState={event}

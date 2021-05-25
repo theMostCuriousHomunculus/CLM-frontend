@@ -4,7 +4,7 @@ async function createEvent () {
   try {
     
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
@@ -25,11 +25,36 @@ async function fetchEventByID (eventId, token) {
                 avatar
                 name
               }
-              chaff
-              current_pack
-              mainboard
-              sideboard
+              chaff {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              current_pack {
+                _id
+                back_image
+                image
+                name
+              }
+              mainboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              sideboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
             }
+          }
+        }
       `
     };
     const eventData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
@@ -38,7 +63,7 @@ async function fetchEventByID (eventId, token) {
 
     return eventData.data.data.fetchEventByID;
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
@@ -64,7 +89,7 @@ async function moveCard (cardID, destination, eventID, origin, token) {
 
     return eventData.data.data.moveCard;
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
@@ -88,7 +113,7 @@ async function selectCard (cardID, eventID, token) {
 
     return eventData.data.data.selectCard;
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
@@ -114,7 +139,7 @@ async function sortCard (collection, eventID, newIndex, oldIndex, token) {
 
     return eventData.data.data.sortCard;
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
