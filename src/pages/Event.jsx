@@ -67,7 +67,6 @@ const Event = () => {
         const eventData = await fetchEventByID(eventID, authentication.token);
   
         setEvent(eventData);
-        console.log(eventData);
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -78,6 +77,10 @@ const Event = () => {
     initialize();
 
     const client = createClient({
+      connectionParams: {
+        authToken: authentication.token,
+        eventID
+      },
       url: process.env.REACT_APP_GRAPHQL_WS_URL
     });
 
@@ -142,31 +145,27 @@ const Event = () => {
 
   async function onMoveCard (cardID, destination, origin) {
     try {
-      const eventData = await moveCard(cardID, destination, eventID, origin, authentication.token);
-      
-      setEvent(eventData);
+      await moveCard(cardID, destination, eventID, origin, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
   }
 
-  async function onSelectCard (cardID) {
+  function onSelectCard (cardID) {
     try {
-      const eventData = await selectCard(cardID, eventID, authentication.token);
-
-      setEvent(eventData);
+      selectCard(cardID, eventID, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
   }
 
-  async function onSortEnd ({ collection, newIndex, oldIndex }) {
-    try {
-      const eventData = await sortCard(collection, eventID, newIndex, oldIndex, authentication.token);
-      
-      setEvent(eventData);
-    } catch (error) {
-      setErrorMessage(error.message);
+  function onSortEnd ({ collection, newIndex, oldIndex }) {
+    if (newIndex !== oldIndex) {
+      try {
+        sortCard(collection, eventID, newIndex, oldIndex, authentication.token);
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
     }
   }
 
@@ -275,9 +274,9 @@ const Event = () => {
 
           {tabNumber === 1 &&
             <PicksDisplay
-              eventState={event}
               moveCard={onMoveCard}
               onSortEnd={onSortEnd}
+              player={event.players.find(plr => plr.account._id === authentication.userId)}
             />
           }
         </React.Fragment>

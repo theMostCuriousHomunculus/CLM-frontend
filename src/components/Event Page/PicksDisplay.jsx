@@ -15,7 +15,7 @@ const useStyles = makeStyles({
 const PicksDisplay = function (props) {
 
   const classes = useStyles();
-  const { eventState, moveCard, onSortEnd } = props;
+  const { moveCard, onSortEnd, player } = props;
 
   return (
     <React.Fragment>
@@ -27,7 +27,7 @@ const PicksDisplay = function (props) {
         />
         <SortableList
           axis="xy"
-          cards={eventState.mainboard}
+          cards={player.mainboard}
           clickFunction={() => null}
           fromCollection={"mainboard"}
           moveCard={moveCard}
@@ -46,7 +46,7 @@ const PicksDisplay = function (props) {
         />
         <SortableList
           axis="xy"
-          cards={eventState.sideboard}
+          cards={player.sideboard}
           clickFunction={() => null}
           fromCollection={"sideboard"}
           moveCard={moveCard}
@@ -65,7 +65,7 @@ const PicksDisplay = function (props) {
         />
         <SortableList
           axis="xy"
-          cards={eventState.chaff}
+          cards={player.chaff}
           clickFunction={() => null}
           fromCollection={"chaff"}
           moveCard={moveCard}

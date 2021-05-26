@@ -74,12 +74,52 @@ async function moveCard (cardID, destination, eventID, origin, token) {
         mutation {
           moveCard(
             input: {
-              cardID: ${cardID}
+              cardID: "${cardID}"
               destination: ${destination}
-              eventID: ${eventID}
+              eventID: "${eventID}"
               origin: ${origin}
             }
-          )
+          ) {
+            finished
+            host {
+              _id
+            }
+            name
+            players {
+              account {
+                _id
+                avatar
+                name
+              }
+              chaff {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              current_pack {
+                _id
+                back_image
+                image
+                name
+              }
+              mainboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              sideboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+            }
+          }
         }
       `
     };
@@ -100,10 +140,50 @@ async function selectCard (cardID, eventID, token) {
         mutation {
           selectCard(
             input: {
-              cardID: ${cardID}
-              eventID: ${eventID}
+              cardID: "${cardID}"
+              eventID: "${eventID}"
             }
-          )
+          ) {
+            finished
+            host {
+              _id
+            }
+            name
+            players {
+              account {
+                _id
+                avatar
+                name
+              }
+              chaff {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              current_pack {
+                _id
+                back_image
+                image
+                name
+              }
+              mainboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              sideboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+            }
+          }
         }
       `
     };
@@ -125,11 +205,51 @@ async function sortCard (collection, eventID, newIndex, oldIndex, token) {
           sortCard(
             input: {
               collection: ${collection}
-              eventID: ${eventID}
+              eventID: "${eventID}"
               newIndex: ${newIndex}
               oldIndex: ${oldIndex}
             }
-          )
+          ) {
+            finished
+            host {
+              _id
+            }
+            name
+            players {
+              account {
+                _id
+                avatar
+                name
+              }
+              chaff {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              current_pack {
+                _id
+                back_image
+                image
+                name
+              }
+              mainboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+              sideboard {
+                _id
+                back_image
+                image
+                mtgo_id
+                name
+              }
+            }
+          }
         }
       `
     };

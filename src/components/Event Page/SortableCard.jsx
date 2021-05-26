@@ -34,7 +34,7 @@ export default SortableElement(({ card, clickFunction, fromCollection, moveCard,
         <MUITooltip title={`Move to ${toCollection1}`}>
           <MUIIconButton
             className={classes.iconButton}
-            onClick={() => moveCard(card._id, fromCollection, toCollection1)}
+            onClick={() => moveCard(card._id, toCollection1, fromCollection)}
             size="small"
           >
             {toCollection1[0].toUpperCase()}
@@ -46,7 +46,7 @@ export default SortableElement(({ card, clickFunction, fromCollection, moveCard,
         <MUITooltip title={`Move to ${toCollection2}`}>
           <MUIIconButton
             className={classes.iconButton}
-            onClick={() => moveCard(card._id, fromCollection, toCollection2)}
+            onClick={() => moveCard(card._id, toCollection2, fromCollection)}
             size="small"
           >
             {toCollection2[0].toUpperCase()}
