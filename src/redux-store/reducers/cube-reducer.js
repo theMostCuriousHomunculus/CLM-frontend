@@ -20,9 +20,9 @@ const initialCubeState = {
 };
 
 function cubeReducer (cubeState = initialCubeState, action) {
-  const { payload } = action;
+  const { payload, type } = action;
   const copyOfCubeState = cloneDeep(cubeState);
-  switch (action.type) {
+  switch (type) {
     case actionTypes.ADD_CARD:
       try {
         const newCardList = copyOfCubeState.active_component_cards.concat([payload]);

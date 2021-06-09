@@ -2,26 +2,30 @@ import React from 'react';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIGrid from '@material-ui/core/Grid';
 import MUIPaper from '@material-ui/core/Paper';
 import MUITab from '@material-ui/core/Tab';
 import MUITabs from '@material-ui/core/Tabs';
-import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
-import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
+import ErrorDialog from '../components/miscellaneous/ErrorDialog';
+import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
-import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import SortableList from '../components/Event Page/SortableList';
 import theme from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { fetchEventByID, moveCard, selectCard, sortCard } from '../requests/GraphQL/event-requests.js';
+import {
+  desiredEventInfo,
+  fetchEventByID,
+  moveCard,
+  selectCard,
+  sortCard
+} from '../requests/GraphQL/event-requests.js';
 
 const useStyles = makeStyles({
   paper: {
@@ -93,42 +97,7 @@ const Event = () => {
         client.subscribe({
           query: `subscription {
             joinEvent(_id: "${eventID}") {
-              finished
-              name
-              players {
-                account {
-                  _id
-                  avatar
-                  name
-                }
-                chaff {
-                  _id
-                  back_image
-                  image
-                  mtgo_id
-                  name
-                }
-                current_pack {
-                  _id
-                  back_image
-                  image
-                  name
-                }
-                mainboard {
-                  _id
-                  back_image
-                  image
-                  mtgo_id
-                  name
-                }
-                sideboard {
-                  _id
-                  back_image
-                  image
-                  mtgo_id
-                  name
-                }
-              }
+              ${desiredEventInfo}
             }
           }`
         },
@@ -151,18 +120,18 @@ const Event = () => {
     }
   }
 
-  function onSelectCard (cardID) {
+  async function onSelectCard (cardID) {
     try {
-      selectCard(cardID, eventID, authentication.token);
+      await selectCard(cardID, eventID, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
   }
 
-  function onSortEnd ({ collection, newIndex, oldIndex }) {
+  async function onSortEnd ({ collection, newIndex, oldIndex }) {
     if (newIndex !== oldIndex) {
       try {
-        sortCard(collection, eventID, newIndex, oldIndex, authentication.token);
+        await sortCard(collection, eventID, newIndex, oldIndex, authentication.token);
       } catch (error) {
         setErrorMessage(error.message);
       }
@@ -172,6 +141,11 @@ const Event = () => {
   return (loading ?
     <LoadingSpinner /> :
     <React.Fragment>
+      <ErrorDialog
+        clear={() => setErrorMessage(null)}
+        message={errorMessage}
+      />
+
       <SelectConfirmationDialog
         card={selectedCard}
         open={dialogDisplayed}
@@ -179,40 +153,7 @@ const Event = () => {
         toggleOpen={() => setDialogDisplayed(false)}
       />
 
-      <MUICard>
-        <MUICardHeader
-          disableTypography={true}
-          title={<MUITypography variant="h5">{event.name}</MUITypography>}
-        />
-        <MUICardContent>
-          <MUIGrid container justify="space-around" spacing={2}>
-            {event.players.map(function (player) {
-              return (
-                <MUIGrid
-                  container
-                  item
-                  justify="center"
-                  key={player.account._id}
-                  xs={6}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  xl={1}
-                >
-                  <MUITooltip title={player.account.name}>
-                    <Link to={`/account/${player.account._id}`}>
-                      <SmallAvatar
-                        alt={player.account.name}
-                        src={player.account.avatar}
-                      />
-                    </Link>
-                  </MUITooltip>
-                </MUIGrid>
-              );
-            })}
-          </MUIGrid>
-        </MUICardContent>
-      </MUICard>
+      <InfoSection event={event} />
 
       {// displays if the event is a draft and is not yet finished
         !event.finished &&
@@ -293,10 +234,6 @@ const Event = () => {
             onSortEnd={onSortEnd}
           />
         </React.Fragment>
-      }
-
-      {errorMessage &&
-        <MUITypography variant="body1">{errorMessage}</MUITypography>
       }
     </React.Fragment>
   );

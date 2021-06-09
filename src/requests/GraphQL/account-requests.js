@@ -23,7 +23,7 @@ async function editAccount (changes, token) {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 
@@ -95,7 +95,7 @@ async function fetchAccountById (accountId, token) {
 
     return accountData.data.data.fetchAccountByID;
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 
@@ -121,7 +121,7 @@ async function login (email, password) {
     console.log(credentials);
     return credentials.data.data.login;
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 
@@ -162,7 +162,7 @@ async function register (email, name, password) {
 
     return credentials.data.data.register;
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 
@@ -177,7 +177,7 @@ async function requestPasswordReset (email) {
     };
     await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 
@@ -197,7 +197,7 @@ async function searchAccounts (name) {
     const matchingUsers = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
     return matchingUsers.data.data.searchAccounts;
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 
@@ -223,7 +223,7 @@ async function submitPasswordReset (email, newPassword, resetToken) {
     const credentials = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
     return credentials.data.data.submitPasswordReset;
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    throw new Error(error.response.data.errors[0]);
   }
 }
 

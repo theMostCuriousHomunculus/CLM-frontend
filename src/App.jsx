@@ -19,6 +19,7 @@ const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Cube = React.lazy(() => import('./pages/Cube'));
 const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
+const Match = React.lazy(() => import('./pages/Match'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
 const Test = React.lazy(() => import('./pages/Test'));
@@ -108,6 +109,9 @@ function App() {
               </Route>
               <Route path='/event/:eventId'>
                 <Event />
+              </Route>
+              <Route path='/match/:matchId'>
+                <Match />
               </Route>
               <Route path='/reset/:resetToken'>
                 <PasswordReset />
