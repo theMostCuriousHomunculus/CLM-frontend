@@ -78,7 +78,6 @@ const Account = () => {
       setLoading(true);
       const response = await fetchAccountById(accountId, authentication.token);
       setAccount(response);
-      console.log(response);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {

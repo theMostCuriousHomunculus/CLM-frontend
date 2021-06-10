@@ -25,12 +25,12 @@ const useStyles = makeStyles({
   },
   paper: {
     backgroundSize: 'cover',
-    height: 300,
+    height: 200,
     margin: 4,
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: 36,
-    width: 215
+    width: 143
   }
 });
 
@@ -38,8 +38,7 @@ const MagicCard = (props) => {
 
   const classes = useStyles();
   const { cardData, children, clickFunction, cursor } = props;
-  const { back_image, image } = cardData;
-
+  const { back_image, image, tapped } = cardData;
   const [flipped, setFlipped] = React.useState(false);
 
   return (
@@ -48,10 +47,14 @@ const MagicCard = (props) => {
         className={classes.paper}
         key="front"
         onClick={() => clickFunction(cardData)}
-        style={{ backgroundImage: `url(${image})`, cursor }}
+        style={{
+          backgroundImage: `url(${image})`,
+          cursor,
+          transform: tapped ? 'rotate(90deg)' : ''
+        }}
       >
         <div className={classes.buttonBar}>
-          {children[0]}
+          {children && children[0]}
 
           {back_image &&
             <MUITooltip title="Flip to Back Face">
@@ -65,17 +68,21 @@ const MagicCard = (props) => {
             </MUITooltip>
           }
 
-          {children[1]}
+          {children && children[1]}
         </div>
       </MUIPaper>
       <MUIPaper
         className={classes.paper}
         key="back"
         onClick={clickFunction}
-        style={{ backgroundImage: `url(${back_image})`, cursor }}
+        style={{
+          backgroundImage: `url(${back_image})`,
+          cursor,
+          transform: tapped ? 'rotate(90deg)' : ''
+        }}
       >
         <div className={classes.buttonBar}>
-          {children[0]}
+          {children && children[0]}
 
           <MUITooltip title="Flip to Front Face">
             <MUIIconButton
@@ -87,7 +94,7 @@ const MagicCard = (props) => {
             </MUIIconButton>
           </MUITooltip>
           
-          {children[1]}
+          {children && children[1]}
         </div>
       </MUIPaper>
     </ReactCardFlip>

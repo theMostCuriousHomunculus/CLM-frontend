@@ -54,28 +54,26 @@ const UserEventCard = (props) => {
                 {matches.map(function (match) {
                   return (
                     <MUITableRow key={match._id}>
-                      <MUITableCell>
-                        <Link to={`/match/${match._id}`}>
-                          <MUITooltip
-                            title={
-                              `${match.players[0].account.name}  — VERSUS —  
-                              ${match.players[1] ? match.players[1].account.name : 'No One'}`
+                      <MUITooltip
+                        title={
+                          `${match.players[0].account.name}  — VERSUS —  
+                          ${match.players[1] ? match.players[1].account.name : 'No One'}`
+                        }
+                      >
+                        <MUITableCell>
+                          <Link to={`/match/${match._id}`} style={{ alignItems: 'center', display: 'flex' }}>
+                            <SmallAvatar
+                              alt={match.players[0].account.name}
+                              src={match.players[0].account.avatar}
+                            />
+                              — VERSUS — 
+                            {match.players[1] ?
+                              <SmallAvatar alt={match.players[1].account.name} src={match.players[1].account.avatar} /> :
+                              "No One"
                             }
-                          >
-                            <div style={{ alignItems: 'center', display: 'flex' }}>
-                              <SmallAvatar
-                                alt={match.players[0].account.name}
-                                src={match.players[0].account.avatar}
-                              />
-                               — VERSUS — 
-                              {match.players[1] ?
-                                <SmallAvatar alt={match.players[1].account.name} src={match.players[1].account.avatar} /> :
-                                "No One"
-                              }
-                            </div>
-                          </MUITooltip>
-                        </Link>
-                      </MUITableCell>
+                          </Link>
+                        </MUITableCell>
+                      </MUITooltip>
                       <MUITableCell>
                         <Link to ={`/event/${match.event._id}`}>
                           {match.event.name}

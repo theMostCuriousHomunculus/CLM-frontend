@@ -1,16 +1,24 @@
 import React from 'react';
 import { createClient } from 'graphql-ws';
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import MagicCard from '../components/Event Page/MagicCard';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { desiredMatchInfo, fetchMatchByID } from '../requests/GraphQL/match-requests.js';
+import { desiredMatchInfo, fetchMatchByID, tapUntapCard } from '../requests/GraphQL/match-requests.js';
+
+// const useStyles = makeStyles({
+//   tappedCard: {
+//     transform: 'rotate(90deg)'
+//   }
+// });
 
 const Match = () => {
 
   const authentication = React.useContext(AuthenticationContext);
+  // const classes = useStyles();
   const matchID = useParams().matchId;
   const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(false);
@@ -64,7 +72,6 @@ const Match = () => {
       try {
         setLoading(true);
         const matchData = await fetchMatchByID(matchID, authentication.token);
-  
         setMatch(matchData);
       } catch (error) {
         setErrorMessage(error.message);
@@ -107,6 +114,14 @@ const Match = () => {
     subscribe(result => console.log(result), error => console.log(error));
   }, [authentication.token, matchID]);
 
+  async function handleTapCard (card) {
+    try {
+      await tapUntapCard(card._id, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
   return (
     loading ?
     <LoadingSpinner /> :
@@ -115,6 +130,15 @@ const Match = () => {
         clear={() => setErrorMessage(null)}
         message={errorMessage}
       />
+      {match.players[0].mainboard.map(card => {
+        return (
+          <MagicCard
+            cardData={card}
+            clickFunction={handleTapCard}
+            key={card._id}
+          />
+        )
+      })}
     </React.Fragment>
   );
 };

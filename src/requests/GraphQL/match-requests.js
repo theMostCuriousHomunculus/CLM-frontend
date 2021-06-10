@@ -148,6 +148,7 @@ players {
     back_image
     image
     name
+    tapped
   }
   sideboard {
     _id
@@ -260,8 +261,39 @@ async function fetchMatchByID (matchId, token) {
   }
 }
 
+async function tapUntapCard (cardID, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          tapUntapCard(_id: "${cardID}") {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+        Authorization: `Bearer ${token}`,
+        MatchID: matchID
+      } });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.tapUntapCard;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0]);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
 export {
   desiredMatchInfo,
   createMatch,
-  fetchMatchByID
+  fetchMatchByID,
+  tapUntapCard
 };
