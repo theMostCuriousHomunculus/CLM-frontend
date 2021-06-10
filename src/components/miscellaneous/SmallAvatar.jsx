@@ -12,12 +12,10 @@ const useStyles = makeStyles({
 
 const SmallAvatar = function (props) {
 
-  const { alt, src } = props;
-
   const classes = useStyles();
 
   return (
-    <MUIAvatar alt={alt} className={classes.smallAvatar} src={src} />
+    <MUIAvatar className={classes.smallAvatar} {...props} />
   );
 };
 

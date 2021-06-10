@@ -24,6 +24,7 @@ import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import UserCubeCard from '../components/Account Page/UserCubeCard';
 import UserEventCard from '../components/Account Page/UserEventCard';
+import UserMatchCard from '../components/Account Page/UserMatchCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { editAccount, fetchAccountById } from '../requests/GraphQL/account-requests';
@@ -63,6 +64,7 @@ const Account = () => {
     buds: [],
     cubes: [],
     events: [],
+    matches: [],
     name: '',
     received_bud_requests: [],
     sent_bud_requests: []
@@ -76,6 +78,7 @@ const Account = () => {
       setLoading(true);
       const response = await fetchAccountById(accountId, authentication.token);
       setAccount(response);
+      console.log(response);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -227,6 +230,12 @@ const Account = () => {
               </MUICardActions>
             }
           </MUICard>
+
+          <UserMatchCard
+            events={account.events}
+            matches={account.matches}
+            pageClasses={classes}
+          />
 
           <MUIGrid container spacing={2}>
             <MUIGrid item xs={12} lg={6}>

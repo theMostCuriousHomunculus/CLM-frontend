@@ -201,6 +201,38 @@ stack {
   }
 }`;
 
+async function createMatch (eventId, playerIds, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          createMatch(
+            input: {
+              eventID: "${eventId}",
+              playerIDs: ${playerIds.map(plrID => '"' + plrID + '"')}
+            }
+          ) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: { Authorization: `Bearer ${token}` } });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.createMatch;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0]);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
 async function fetchMatchByID (matchId, token) {
   try {
     const graphqlQuery = {
@@ -230,5 +262,6 @@ async function fetchMatchByID (matchId, token) {
 
 export {
   desiredMatchInfo,
+  createMatch,
   fetchMatchByID
 };

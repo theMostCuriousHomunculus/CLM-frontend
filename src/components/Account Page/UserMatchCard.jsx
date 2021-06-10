@@ -14,61 +14,75 @@ import MUITableRow from '@material-ui/core/TableRow';
 import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 
-import CreateEventForm from './CreateEventForm';
+import CreateMatchForm from './CreateMatchForm';
 import SmallAvatar from '../miscellaneous/SmallAvatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const UserEventCard = (props) => {
 
-  const { buds, cubes, events, pageClasses } = props;
-
+  const { events, matches, pageClasses } = props;
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
-
-  const [showEventForm, setShowEventForm] = React.useState(false);
+  const [showMatchForm, setShowMatchForm] = React.useState(false);
 
   return (
     <React.Fragment>
       {accountId === authentication.userId &&
-        <CreateEventForm
-          buds={buds}
-          cubes={cubes}
-          open={showEventForm}
-          toggleOpen={() => setShowEventForm(prevState => !prevState)}
+        <CreateMatchForm
+          events={events}
+          open={showMatchForm}
+          toggleOpen={() => setShowMatchForm(prevState => !prevState)}
         />
       }
       
       <MUICard>
         <MUICardHeader
           disableTypography={true}
-          title={<MUITypography variant="h5">Events</MUITypography>}
+          title={<MUITypography variant="h5">Matches</MUITypography>}
         />
         <MUICardContent>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
-                  <MUITableCell>Name</MUITableCell>
-                  <MUITableCell>Host</MUITableCell>
+                  <MUITableCell>Players</MUITableCell>
+                  <MUITableCell>Event</MUITableCell>
                   <MUITableCell>Date</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
-                {events.map(function (event) {
+                {matches.map(function (match) {
                   return (
-                    <MUITableRow key={event._id}>
+                    <MUITableRow key={match._id}>
                       <MUITableCell>
-                        <Link to={`/event/${event._id}`}>{event.name}</Link>
+                        <Link to={`/match/${match._id}`}>
+                          <MUITooltip
+                            title={
+                              `${match.players[0].account.name}  — VERSUS —  
+                              ${match.players[1] ? match.players[1].account.name : 'No One'}`
+                            }
+                          >
+                            <div style={{ alignItems: 'center', display: 'flex' }}>
+                              <SmallAvatar
+                                alt={match.players[0].account.name}
+                                src={match.players[0].account.avatar}
+                              />
+                               — VERSUS — 
+                              {match.players[1] ?
+                                <SmallAvatar alt={match.players[1].account.name} src={match.players[1].account.avatar} /> :
+                                "No One"
+                              }
+                            </div>
+                          </MUITooltip>
+                        </Link>
                       </MUITableCell>
                       <MUITableCell>
-                        <MUITooltip title={event.host.name}>
-                          <Link to ={`/account/${event.host._id}`}>
-                            <SmallAvatar alt={event.host.name} src={event.host.avatar} />
-                          </Link>
-                        </MUITooltip>
+                        <Link to ={`/event/${match.event._id}`}>
+                          {match.event.name}
+                        </Link>
                       </MUITableCell>
                       <MUITableCell>
-                        {new Date(parseInt(event.createdAt)).toLocaleString()}
+                        {new Date(parseInt(match.event.createdAt)).toLocaleString()}
                       </MUITableCell>
                     </MUITableRow>
                   );
@@ -81,12 +95,12 @@ const UserEventCard = (props) => {
           <MUICardActions>
             <MUIButton
               color="primary"
-              disabled={cubes.length === 0}
-              onClick={() => setShowEventForm(true)}
+              disabled={events.length === 0}
+              onClick={() => setShowMatchForm(true)}
               size="small"
               variant="contained"
             >
-              {cubes.length === 0 ? 'You must create a cube before hosting an event!' : 'Host an Event'}
+              {events.length === 0 ? 'You must finish an event before creating a match!' : 'Create a Match'}
             </MUIButton>
           </MUICardActions>
         }

@@ -40,17 +40,6 @@ async function fetchAccountById (accountId, token) {
               avatar
               name
             }
-            name
-            sent_bud_requests {
-              _id
-              avatar
-              name
-            }
-            received_bud_requests {
-              _id
-              avatar
-              name
-            }
             cubes {
               _id
               description
@@ -85,6 +74,43 @@ async function fetchAccountById (accountId, token) {
                 avatar
                 name
               }
+              name
+              players {
+                account {
+                  _id
+                  avatar
+                  name
+                }
+              }
+            }
+            matches {
+              _id
+              cube {
+                _id
+                name
+              }
+              event {
+                _id
+                createdAt
+                name
+              }
+              players {
+                account {
+                  _id
+                  avatar
+                  name
+                }
+              }
+            }
+            name
+            received_bud_requests {
+              _id
+              avatar
+              name
+            }
+            sent_bud_requests {
+              _id
+              avatar
               name
             }
           }
