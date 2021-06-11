@@ -8,7 +8,14 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MagicCard from '../components/Event Page/MagicCard';
 import PlayerInfo from '../components/Match Page/PlayerInfo';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { desiredMatchInfo, fetchMatchByID, tapUntapCard } from '../requests/GraphQL/match-requests.js';
+import {
+  adjustEnergyCounters,
+  adjustLifeTotal,
+  adjustPoisonCounters,
+  desiredMatchInfo,
+  fetchMatchByID,
+  tapUntapCard
+} from '../requests/GraphQL/match-requests.js';
 
 // const useStyles = makeStyles({
 
@@ -120,6 +127,30 @@ const Match = () => {
     subscribe(result => console.log(result), error => console.log(error));
   }, [authentication.token, matchID]);
 
+  async function handleAdjustEnergyCounters (energy) {
+    try {
+      await adjustEnergyCounters(energy, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
+  async function handleAdjustLifeTotal (life) {
+    try {
+      await adjustLifeTotal(life, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
+  async function handleAdjustPoisonCounters (poison) {
+    try {
+      await adjustPoisonCounters(poison, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
   async function handleTapCard (card) {
     try {
       await tapUntapCard(card._id, matchID, authentication.token);
@@ -136,18 +167,33 @@ const Match = () => {
         clear={() => setErrorMessage(null)}
         message={errorMessage}
       />
+
       <div style={{ display: 'flex' }}>
-        {match.players[0].mainboard.map(card => {
-          return (
-            <MagicCard
-              cardData={card}
-              clickFunction={handleTapCard}
-              key={card._id}
-            />
-          )
-        })}
+        <div style={{ width: '85%' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {match.players[0].mainboard.map(card => {
+              return (
+                <MagicCard
+                  cardData={card}
+                  clickFunction={handleTapCard}
+                  key={card._id}
+                />
+              )
+            })}
+          </div>
+          <PlayerInfo
+            handleAdjustEnergyCounters={handleAdjustEnergyCounters}
+            handleAdjustLifeTotal={handleAdjustLifeTotal}
+            handleAdjustPoisonCounters={handleAdjustPoisonCounters}
+            player={me}
+          />
+        </div>
+
+        <div style={{ border: '1px solid black', borderRadius: 4, width: '15%' }}>
+          <h3 style={{ textDecoration: 'underline' }}>Match Log</h3>
+          {match.log.map((update, index) => <p key={`log-update-${index + 1}`}>{index + 1}) {update}</p>)}
+        </div>
       </div>
-      <PlayerInfo player={me} />
     </React.Fragment>
   );
 };

@@ -202,6 +202,99 @@ stack {
   }
 }`;
 
+async function adjustEnergyCounters (energy, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          adjustEnergyCounters(energy: ${energy}) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.adjustEnergyCounters;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
+async function adjustLifeTotal (life, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          adjustLifeTotal(life: ${life}) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.adjustLifeTotal;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
+async function adjustPoisonCounters (poison, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          adjustPoisonCounters(poison: ${poison}) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.adjustPoisonCounters;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
 async function createMatch (eventId, playerIds, token) {
   try {
     const graphqlQuery = {
@@ -298,6 +391,9 @@ async function tapUntapCard (cardID, matchID, token) {
 
 export {
   desiredMatchInfo,
+  adjustEnergyCounters,
+  adjustLifeTotal,
+  adjustPoisonCounters,
   createMatch,
   fetchMatchByID,
   tapUntapCard
