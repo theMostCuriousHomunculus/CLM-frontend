@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
@@ -19,6 +18,7 @@ import BudRequests from '../components/Account Page/BudRequests';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import HoverPreview from '../components/miscellaneous/HoverPreview';
+import LargeAvatar from '../components/miscellaneous/LargeAvatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import SmallAvatar from '../components/miscellaneous/SmallAvatar';
@@ -30,10 +30,6 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { editAccount, fetchAccountById } from '../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
-  avatarLarge: {
-    height: '75px',
-    width: '75px'
-  },
   cardHeader: {
     alignItems: 'stretch',
     display: 'flex'
@@ -165,7 +161,7 @@ const Account = () => {
           <MUICard style={{ marginBottom: 0 }}>
             <MUICardHeader
               avatar={account.avatar &&
-                <MUIAvatar alt={account.name} className={classes.avatarLarge} src={account.avatar} />
+                <LargeAvatar alt={account.name} src={account.avatar} />
               }
               className={classes.cardHeader}
               disableTypography={true}

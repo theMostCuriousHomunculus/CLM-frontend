@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useHistory, useParams } from 'react-router-dom';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
@@ -14,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import ExistingComment from '../components/BlogPost Page/ExistingComment';
+import LargeAvatar from '../components/miscellaneous/LargeAvatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import NewComment from '../components/BlogPost Page/NewComment';
 import theme, { backgroundColor } from '../theme';
@@ -81,10 +81,6 @@ const useStyles = makeStyles({
       textAlign: 'justify',
       textIndent: 24
     }
-  },
-  avatarLarge: {
-    height: '75px',
-    width: '75px'
   },
   cardHeader: {
     '& .MuiCardHeader-action': {
@@ -202,7 +198,7 @@ function BlogPost () {
 
       <MUICard>
         <MUICardHeader
-          avatar={<MUIAvatar alt={blogPostState.author.name} className={classes.avatarLarge} src={blogPostState.author.avatar} />}
+          avatar={<LargeAvatar alt={blogPostState.author.name} src={blogPostState.author.avatar} />}
           className={classes.cardHeader}
           disableTypography={true}
           title={blogPostState.author._id === authentication.userId ?

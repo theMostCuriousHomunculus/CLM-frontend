@@ -62,6 +62,8 @@ const Event = () => {
   const [loading, setLoading] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [tabNumber, setTabNumber] = React.useState(0);
+  const me = event.players.find(plr => plr.account._id === authentication.userId);
+  const others = event.players.filter(plr => plr.account._id !== authentication.userId);
 
   React.useEffect(function () {
 
@@ -69,7 +71,6 @@ const Event = () => {
       try {
         setLoading(true);
         const eventData = await fetchEventByID(eventID, authentication.token);
-  
         setEvent(eventData);
       } catch (error) {
         setErrorMessage(error.message);
@@ -96,7 +97,7 @@ const Event = () => {
       await new Promise((resolve, reject) => {
         client.subscribe({
           query: `subscription {
-            joinEvent(_id: "${eventID}") {
+            joinEvent {
               ${desiredEventInfo}
             }
           }`
@@ -217,7 +218,7 @@ const Event = () => {
             <PicksDisplay
               moveCard={onMoveCard}
               onSortEnd={onSortEnd}
-              player={event.players.find(plr => plr.account._id === authentication.userId)}
+              player={me}
             />
           }
         </React.Fragment>
@@ -226,12 +227,12 @@ const Event = () => {
       {// displays once the event is finished
         event.finished &&
         <React.Fragment>
-          <CardPoolDownloadLinks players={event.players} />
+          <CardPoolDownloadLinks me={me} others={others} />
 
           <PicksDisplay
-            eventState={event}
             moveCard={onMoveCard}
             onSortEnd={onSortEnd}
+            player={me}
           />
         </React.Fragment>
       }

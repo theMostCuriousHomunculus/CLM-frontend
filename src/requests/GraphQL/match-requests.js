@@ -227,19 +227,19 @@ async function createMatch (eventId, playerIds, token) {
     return matchData.data.data.createMatch;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }
   }
 }
 
-async function fetchMatchByID (matchId, token) {
+async function fetchMatchByID (matchID, token) {
   try {
     const graphqlQuery = {
       query: `
         query {
-          fetchMatchByID(_id: "${matchId}") {
+          fetchMatchByID {
             ${desiredMatchInfo}
           }
         }
@@ -247,14 +247,18 @@ async function fetchMatchByID (matchId, token) {
     };
     const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
       graphqlQuery,
-      { headers: { Authorization: `Bearer ${token}` } });
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
 
     if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
 
     return matchData.data.data.fetchMatchByID;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }
@@ -275,16 +279,17 @@ async function tapUntapCard (cardID, matchID, token) {
     const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
       graphqlQuery,
       { headers: {
-        Authorization: `Bearer ${token}`,
-        MatchID: matchID
-      } });
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
 
     if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
 
     return matchData.data.data.tapUntapCard;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }

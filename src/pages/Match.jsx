@@ -6,13 +6,12 @@ import { useParams } from 'react-router-dom';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MagicCard from '../components/Event Page/MagicCard';
+import PlayerInfo from '../components/Match Page/PlayerInfo';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { desiredMatchInfo, fetchMatchByID, tapUntapCard } from '../requests/GraphQL/match-requests.js';
 
 // const useStyles = makeStyles({
-//   tappedCard: {
-//     transform: 'rotate(90deg)'
-//   }
+
 // });
 
 const Match = () => {
@@ -65,6 +64,13 @@ const Match = () => {
     ],
     stack: []
   });
+  const participant = match.players.some(plr => plr.account._id === authentication.userId);
+  const me = participant ?
+    match.players.find(plr => plr.account._id === authentication.userId) :
+    match.players[0];
+  const opponent = participant ?
+    match.players.find(plr => plr.account._id !== authentication.userId) :
+    match.players[1];
 
   React.useEffect(function () {
 
@@ -98,7 +104,7 @@ const Match = () => {
       await new Promise((resolve, reject) => {
         client.subscribe({
           query: `subscription {
-            joinMatch(_id: "${matchID}") {
+            joinMatch {
               ${desiredMatchInfo}
             }
           }`
@@ -130,15 +136,18 @@ const Match = () => {
         clear={() => setErrorMessage(null)}
         message={errorMessage}
       />
-      {match.players[0].mainboard.map(card => {
-        return (
-          <MagicCard
-            cardData={card}
-            clickFunction={handleTapCard}
-            key={card._id}
-          />
-        )
-      })}
+      <div style={{ display: 'flex' }}>
+        {match.players[0].mainboard.map(card => {
+          return (
+            <MagicCard
+              cardData={card}
+              clickFunction={handleTapCard}
+              key={card._id}
+            />
+          )
+        })}
+      </div>
+      <PlayerInfo player={me} />
     </React.Fragment>
   );
 };

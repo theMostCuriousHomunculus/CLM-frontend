@@ -45,19 +45,19 @@ async function createEvent () {
     
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }
   }
 }
 
-async function fetchEventByID (eventId, token) {
+async function fetchEventByID (eventID, token) {
   try {
     const graphqlQuery = {
       query: `
         query {
-          fetchEventByID(_id: "${eventId}") {
+          fetchEventByID {
             ${desiredEventInfo}
           }
         }
@@ -65,14 +65,18 @@ async function fetchEventByID (eventId, token) {
     };
     const eventData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
       graphqlQuery,
-      { headers: { Authorization: `Bearer ${token}` } });
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          EventID: eventID
+        }
+      });
 
     if (eventData.data.errors) throw new Error(eventData.data.errors[0].message);
 
     return eventData.data.data.fetchEventByID;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }
@@ -88,7 +92,6 @@ async function moveCard (cardID, destination, eventID, origin, token) {
             input: {
               cardID: "${cardID}"
               destination: ${destination}
-              eventID: "${eventID}"
               origin: ${origin}
             }
           ) {
@@ -99,14 +102,18 @@ async function moveCard (cardID, destination, eventID, origin, token) {
     };
     const eventData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
       graphqlQuery,
-      { headers: { Authorization: `Bearer ${token}` } });
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          EventID: eventID
+        }
+      });
 
     if (eventData.data.errors) throw new Error(eventData.data.errors[0].message);
 
     return eventData.data.data.moveCard;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }
@@ -118,12 +125,7 @@ async function selectCard (cardID, eventID, token) {
     const graphqlQuery = {
       query: `
         mutation {
-          selectCard(
-            input: {
-              cardID: "${cardID}"
-              eventID: "${eventID}"
-            }
-          ) {
+          selectCard(_id: "${cardID}") {
             ${desiredEventInfo}
           }
         }
@@ -131,14 +133,18 @@ async function selectCard (cardID, eventID, token) {
     };
     const eventData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
       graphqlQuery,
-      { headers: { Authorization: `Bearer ${token}` } });
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          EventID: eventID
+        }
+      });
 
     if (eventData.data.errors) throw new Error(eventData.data.errors[0].message);
 
     return eventData.data.data.selectCard;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }
@@ -153,7 +159,6 @@ async function sortCard (collection, eventID, newIndex, oldIndex, token) {
           sortCard(
             input: {
               collection: ${collection}
-              eventID: "${eventID}"
               newIndex: ${newIndex}
               oldIndex: ${oldIndex}
             }
@@ -165,14 +170,18 @@ async function sortCard (collection, eventID, newIndex, oldIndex, token) {
     };
     const eventData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
       graphqlQuery,
-      { headers: { Authorization: `Bearer ${token}` } });
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          EventID: eventID
+        }
+      });
     
     if (eventData.data.errors) throw new Error(eventData.data.errors[0].message);
 
     return eventData.data.data.sortCard;
   } catch (error) {
     if (error.response) {
-      throw new Error(error.response.data.errors[0]);
+      throw new Error(error.response.data.errors[0].message);
     } else {
       throw new Error(error);
     }

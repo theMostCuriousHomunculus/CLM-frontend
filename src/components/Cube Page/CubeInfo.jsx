@@ -1,5 +1,4 @@
 import React from 'react';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
@@ -11,15 +10,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import ErrorDialog from '../miscellaneous/ErrorDialog';
+import LargeAvatar from '../miscellaneous/LargeAvatar';
 import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { editCube } from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
-  avatarLarge: {
-    height: "75px",
-    width: "75px"
-  },
   cardHeader: {
     alignItems: 'stretch',
     display: 'flex'
@@ -64,7 +60,7 @@ function CubeInfo (props) {
 
         <MUICardHeader
           avatar={cube.creator.avatar &&
-            <MUIAvatar alt={cube.creator.name} className={classes.avatarLarge} src={cube.creator.avatar} />
+            <LargeAvatar alt={cube.creator.name} src={cube.creator.avatar} />
           }
           className={classes.cardHeader}
           disableTypography={true}

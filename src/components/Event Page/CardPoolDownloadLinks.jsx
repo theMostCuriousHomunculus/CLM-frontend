@@ -3,8 +3,6 @@ import MUITypography from '@material-ui/core/Typography';
 import { CSVLink } from 'react-csv';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AuthenticationContext } from '../../contexts/authentication-context';
-
 const useStyles = makeStyles({
   downloadLink: {
     marginLeft: 8
@@ -13,12 +11,8 @@ const useStyles = makeStyles({
 
 const CardPoolDownloadLinks = (props) => {
 
-  const { players } = props;
-  const authentication = React.useContext(AuthenticationContext);
+  const { me, others } = props;
   const classes = useStyles();
-
-  const me = players.find(plr => plr.account._id === authentication.userId);
-  const others = players.filter(plr => plr.account._id !== authentication.userId);
 
   const usedCardsString = me.mainboard.reduce(function (a, c) {
     return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
