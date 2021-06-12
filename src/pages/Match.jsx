@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MagicCard from '../components/Event Page/MagicCard';
+import MatchLog from '../components/Match Page/MatchLog';
 import PlayerInfo from '../components/Match Page/PlayerInfo';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import {
@@ -13,6 +14,7 @@ import {
   adjustLifeTotal,
   adjustPoisonCounters,
   desiredMatchInfo,
+  dragCard,
   fetchMatchByID,
   tapUntapCard
 } from '../requests/GraphQL/match-requests.js';
@@ -27,6 +29,7 @@ const Match = () => {
   // const classes = useStyles();
   const matchID = useParams().matchId;
   const [errorMessage, setErrorMessage] = React.useState();
+  const [draggingCardID, setDraggingCardID] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const [match, setMatch] = React.useState({
     game_winners: [],
@@ -151,6 +154,14 @@ const Match = () => {
     }
   }
 
+  async function handleDragCard (cardID, xCoordinate, yCoordinate) {
+    try {
+      await dragCard(cardID, xCoordinate, yCoordinate, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
   async function handleTapCard (card) {
     try {
       await tapUntapCard(card._id, matchID, authentication.token);
@@ -169,14 +180,29 @@ const Match = () => {
       />
 
       <div style={{ display: 'flex' }}>
-        <div style={{ width: '85%' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ padding: 8, width: '85%' }}>
+          <div
+            onDragOver={event => event.preventDefault()}
+            onDrop={(event) => {
+              handleDragCard(draggingCardID, (event.nativeEvent.offsetX * 100 / event.currentTarget.offsetWidth), (event.nativeEvent.offsetY * 100 / event.currentTarget.offsetHeight));
+            }}
+            style={{ height: 400, position: 'relative' }}
+          >
             {match.players[0].mainboard.map(card => {
               return (
                 <MagicCard
                   cardData={card}
                   clickFunction={handleTapCard}
+                  cursor='move'
+                  draggable={true}
+                  dragStartFunction={() => setDraggingCardID(card._id)}
+                  dragEndFunction={() => setDraggingCardID(null)}
                   key={card._id}
+                  style={{
+                    left: `${card.x_coordinate}%`,
+                    position: 'absolute',
+                    top: `${card.y_coordinate}%`
+                  }}
                 />
               )
             })}
@@ -189,10 +215,11 @@ const Match = () => {
           />
         </div>
 
-        <div style={{ border: '1px solid black', borderRadius: 4, width: '15%' }}>
+        {/*<div style={{ border: '1px solid black', borderRadius: 4, width: '15%' }}>
           <h3 style={{ textDecoration: 'underline' }}>Match Log</h3>
           {match.log.map((update, index) => <p key={`log-update-${index + 1}`}>{index + 1}) {update}</p>)}
-        </div>
+          </div>*/}
+        <MatchLog log={match.log} />
       </div>
     </React.Fragment>
   );

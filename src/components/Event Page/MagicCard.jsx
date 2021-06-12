@@ -3,7 +3,7 @@ import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
 import MUIIconButton from '@material-ui/core/IconButton';
 import MUIPaper from '@material-ui/core/Paper';
 import MUITooltip from '@material-ui/core/Tooltip';
-import ReactCardFlip from 'react-card-flip';
+// import ReactCardFlip from 'react-card-flip';
 import { makeStyles } from '@material-ui/core/styles';
 
 import theme from '../../theme';
@@ -19,8 +19,7 @@ const useStyles = makeStyles({
     height: 30,
     width: 30,
     '&:hover': {
-      background: theme.palette.primary.dark,
-      padding: 18
+      background: theme.palette.primary.dark
     }
   },
   paper: {
@@ -37,30 +36,50 @@ const useStyles = makeStyles({
 const MagicCard = (props) => {
 
   const classes = useStyles();
-  const { cardData, children, clickFunction, cursor } = props;
-  const { back_image, image, tapped } = cardData;
-  const [flipped, setFlipped] = React.useState(false);
+  const { cardData, children, clickFunction, cursor, draggable, dragStartFunction, dragEndFunction, style } = props;
+  const { back_image, face_down_image, flipped, image, tapped } = cardData;
+  const [dragging, setDragging] = React.useState(false);
+  let displayedImage;
+  
+  if (image && !flipped) {
+    displayedImage = image;
+  } else if (back_image && flipped) {
+    displayedImage = back_image;
+  } else {
+    displayedImage = face_down_image;
+  }
 
   return (
-    <ReactCardFlip infinite={true} isFlipped={flipped}>
+    /*<ReactCardFlip infinite={true} isFlipped={flipped}>*/
       <MUIPaper
         className={classes.paper}
+        draggable={draggable}
         key="front"
         onClick={() => clickFunction(cardData)}
+        onDragEnd={(event) => {
+          dragEndFunction();
+          setDragging(false);
+        }}
+        onDragStart={() => {
+          dragStartFunction();
+          setTimeout(() => setDragging(true), 0);
+        }}
         style={{
-          backgroundImage: `url(${image})`,
+          backgroundImage: `url(${displayedImage})`,
           cursor,
-          transform: tapped ? 'rotate(90deg)' : ''
+          display: dragging ? 'none' : 'inherit',
+          transform: tapped ? 'rotate(90deg)' : '',
+          ...style
         }}
       >
         <div className={classes.buttonBar}>
           {children && children[0]}
 
           {back_image &&
-            <MUITooltip title="Flip to Back Face">
+            <MUITooltip title="Flip Card">
               <MUIIconButton
                 className={classes.iconButton}
-                onClick={() => setFlipped(true)}
+                // onClick={() => setFlipped(true)}
                 size="small"
               >
                 <MUIAutorenewIcon />
@@ -71,7 +90,7 @@ const MagicCard = (props) => {
           {children && children[1]}
         </div>
       </MUIPaper>
-      <MUIPaper
+      /*<MUIPaper
         className={classes.paper}
         key="back"
         onClick={clickFunction}
@@ -97,7 +116,7 @@ const MagicCard = (props) => {
           {children && children[1]}
         </div>
       </MUIPaper>
-    </ReactCardFlip>
+    </ReactCardFlip>*/
   );
 }
 

@@ -31,6 +31,7 @@ function ConfirmationDialogue (props) {
           inputRef={valueRef}
           label={inputName}
           margin="dense"
+          type="number"
           variant="outlined"
         />
       </MUIDialogContent>

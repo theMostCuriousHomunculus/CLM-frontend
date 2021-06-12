@@ -149,6 +149,8 @@ players {
     image
     name
     tapped
+    x_coordinate
+    y_coordinate
   }
   sideboard {
     _id
@@ -327,12 +329,18 @@ async function createMatch (eventId, playerIds, token) {
   }
 }
 
-async function fetchMatchByID (matchID, token) {
+async function dragCard (cardID, xCoordinate, yCoordinate, matchID, token) {
   try {
     const graphqlQuery = {
       query: `
-        query {
-          fetchMatchByID {
+        mutation {
+          dragCard(
+            input: {
+              cardID: "${cardID}",
+              xCoordinate: ${xCoordinate},
+              yCoordinate: ${yCoordinate}
+            }
+          ) {
             ${desiredMatchInfo}
           }
         }
@@ -345,6 +353,41 @@ async function fetchMatchByID (matchID, token) {
           MatchID: matchID
         }
       });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.dragCard;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
+async function fetchMatchByID (matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        query {
+          fetchMatchByID {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const headers = {
+      MatchID: matchID
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers });
 
     if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
 
@@ -395,6 +438,7 @@ export {
   adjustLifeTotal,
   adjustPoisonCounters,
   createMatch,
+  dragCard,
   fetchMatchByID,
   tapUntapCard
 };

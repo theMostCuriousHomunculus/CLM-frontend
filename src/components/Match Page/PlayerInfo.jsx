@@ -67,6 +67,7 @@ export default function PlayerInfo (props) {
         defaultValue={dialogInfo.defaultValue}
         updateFunction={dialogInfo.updateFunction}
       />
+      
       <div style={{ display: 'flex', flexGrow: 1, justifyContent: 'center' }}>
         <div>
         <MUITooltip title={player.account.name}>
