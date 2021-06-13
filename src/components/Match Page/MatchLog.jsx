@@ -19,13 +19,13 @@ export default function MatchLog (props) {
   const classes = useStyles();
 
   return (
-    <MUICard style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '15%' }}>
+    <MUICard style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 16px)', margin: 0, maxWidth: 200 }}>
       <MUICardHeader
         disableTypography={true}
         title={<MUITypography variant="h5">Match Log</MUITypography>}
       />
       <MUICardContent className={classes.cardContent} style={{ flexGrow: 1, overflowY: 'auto' }}>
-        {log.map((update, index) => <MUITypography key={`log-update-${index + 1}`} variant="body1">{index + 1}) {update}</MUITypography>)}
+        {log.map((update, index) => <MUITypography key={`log-update-${index + 1}`} variant="body2">{index + 1}) {update}</MUITypography>)}
       </MUICardContent>
     </MUICard>
   );

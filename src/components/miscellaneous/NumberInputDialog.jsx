@@ -5,9 +5,10 @@ import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUITextField from '@material-ui/core/TextField';
+
 import WarningButton from './WarningButton';
 
-function ConfirmationDialogue (props) {
+export default function NumberInputDialogue (props) {
 
   const {
     close,
@@ -54,6 +55,4 @@ function ConfirmationDialogue (props) {
       </MUIDialogActions>
     </MUIDialog>
   );
-}
-
-export default ConfirmationDialogue;
+};

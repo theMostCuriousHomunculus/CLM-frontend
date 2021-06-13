@@ -1,11 +1,13 @@
 import React from 'react';
+import MUISlider from '@material-ui/core/Slider';
+import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
 // import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import MagicCard from '../components/Event Page/MagicCard';
+import MagicCard from '../components/miscellaneous/MagicCard';
 import MatchLog from '../components/Match Page/MatchLog';
 import PlayerInfo from '../components/Match Page/PlayerInfo';
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -27,6 +29,7 @@ const Match = () => {
 
   const authentication = React.useContext(AuthenticationContext);
   const battlefieldRef = React.useRef();
+  const [cardSize, setCardSize] = React.useState(5544);
   // const classes = useStyles();
   const matchID = useParams().matchId;
   const [errorMessage, setErrorMessage] = React.useState();
@@ -181,8 +184,48 @@ const Match = () => {
         message={errorMessage}
       />
 
-      <div style={{ display: 'flex' }}>
-        <div style={{ padding: 8, width: '85%' }}>
+      <div style={{ margin: 8, display: 'flex' }}>
+        <div style={{ display: 'flex' }}>
+          <MUITypography style={{ transform: 'rotate(180deg)', writingMode: 'vertical-lr' }} variant='caption'>
+            Adjust Card Size
+          </MUITypography>
+          <MUISlider
+            aria-labelledby='vertical-slider'
+            max={63*88*4}
+            min={63*88}
+            onChange={(event, newValue) => setCardSize(newValue)}
+            orientation='vertical'
+            value={cardSize}
+          />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, margin: '0 8px' }}>
+          <div
+            style={{
+              borderRadius: 4,
+              border: '1px solid black',
+              flexGrow: 1,
+              overflow: 'hidden',
+              position: 'relative',
+              transform: 'rotate(180deg)'
+            }}
+          >
+            {match.players[0].battlefield.map(card => {
+              return (
+                <MagicCard
+                  absolute={true}
+                  cardData={card}
+                  key={`${card._id}-mirror`}
+                  style={{
+                    // magic card dimentions are 63mm x 88mm
+                    height: cardSize * (88 / (63 * 88)),
+                    transform: card.tapped ? 'rotate(90deg)' : '',
+                    width: cardSize * (63 / (63 * 88))
+                  }}
+                />
+              )
+            })}
+          </div>
           <div
             onDragOver={event => event.preventDefault()}
             onDrop={(event) => {
@@ -200,11 +243,12 @@ const Match = () => {
               }
             }}
             ref={battlefieldRef}
-            style={{ height: 400, position: 'relative' }}
+            style={{ borderRadius: 4, border: '1px solid black', flexGrow: 1, overflow: 'hidden', position: 'relative' }}
           >
-            {match.players[0].mainboard.map(card => {
+            {match.players[0].battlefield.map(card => {
               return (
                 <MagicCard
+                  absolute={true}
                   cardData={card}
                   clickFunction={handleTapCard}
                   draggable={true}
@@ -212,14 +256,17 @@ const Match = () => {
                   dragEndFunction={() => setDraggingCardID(null)}
                   key={card._id}
                   style={{
+                    // magic card dimentions are 63mm x 88mm
                     cursor: 'move',
-                    transform: card.tapped ? 'rotate(90deg)' : ''
+                    height: cardSize * (88 / (63 * 88)),
+                    transform: card.tapped ? 'rotate(90deg)' : '',
+                    width: cardSize * (63 / (63 * 88))
                   }}
-                  topZIndex={topZIndex}
                 />
               )
             })}
           </div>
+
           <PlayerInfo
             handleAdjustEnergyCounters={handleAdjustEnergyCounters}
             handleAdjustLifeTotal={handleAdjustLifeTotal}

@@ -4,7 +4,7 @@ import MUITooltip from '@material-ui/core/Tooltip';
 import { SortableElement } from 'react-sortable-hoc';
 import { makeStyles } from '@material-ui/core/styles';
 
-import MagicCard from './MagicCard';
+import MagicCard from '../miscellaneous/MagicCard';
 import theme from '../../theme';
 
 const useStyles = makeStyles({

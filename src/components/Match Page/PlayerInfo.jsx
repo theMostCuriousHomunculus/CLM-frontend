@@ -4,6 +4,7 @@ import MUIFavoriteIcon from '@material-ui/icons/Favorite';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITooltip from '@material-ui/core/Tooltip';
+import blue from '@material-ui/core/colors/blue';
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
@@ -11,7 +12,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import LargeAvatar from '../miscellaneous/LargeAvatar';
 import NumberInputDialog from '../miscellaneous/NumberInputDialog';
+import ZoneInspectionDialog from './ZoneInspectionDialog';
 import { ReactComponent as EnergySymbol } from '../../images/energy.svg';
+import { ReactComponent as LibrarySymbol } from '../../images/deck.svg';
 import { ReactComponent as PoisonSymbol } from '../../images/poison.svg';
 
 const useStyles = makeStyles({
@@ -20,19 +23,25 @@ const useStyles = makeStyles({
     width: 16
   },
   energyBadge: {
-    '& .MuiBadge-badge': {
+    '& > .MuiBadge-badge': {
       backgroundColor: yellow[500],
       color: 'black'
     }
   },
+  libraryBadge: {
+    '& > .MuiBadge-badge': {
+      backgroundColor: blue[500],
+      color: 'white'
+    }
+  },
   lifeBadge: {
-    '& .MuiBadge-badge': {
+    '& > .MuiBadge-badge': {
       backgroundColor: red[500],
       color: 'white'
     }
   },
   poisonBadge: {
-    '& .MuiBadge-badge': {
+    '& > .MuiBadge-badge': {
       backgroundColor: green[500],
       color: 'white'
     }
@@ -49,28 +58,35 @@ export default function PlayerInfo (props) {
   } = props;
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [dialogInfo, setDialogInfo] = React.useState({
+  const [numberInputDialogInfo, setNumberInputDialogInfo] = React.useState({
     defaultValue: null,
     inputName: null,
     updateFunction: null
   });
+  const [zoneName, setZoneName] = React.useState(null);
 
   return (
     <React.Fragment>
       <NumberInputDialog
-        close={() => setDialogInfo({
+        close={() => setNumberInputDialogInfo({
           defaultValue: null,
           inputName: null,
           updateFunction: null
         })}
-        inputName={dialogInfo.inputName}
-        defaultValue={dialogInfo.defaultValue}
-        updateFunction={dialogInfo.updateFunction}
+        inputName={numberInputDialogInfo.inputName}
+        defaultValue={numberInputDialogInfo.defaultValue}
+        updateFunction={numberInputDialogInfo.updateFunction}
+      />
+
+      <ZoneInspectionDialog
+        close={() => setZoneName(null)}
+        player={player}
+        zoneName={zoneName}
       />
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <MUITooltip title={player.account.name}>
-          <div style={{ zIndex: 2147483646 }}>
+          <div>
             <MUIBadge
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               badgeContent={<React.Fragment>
@@ -98,11 +114,21 @@ export default function PlayerInfo (props) {
                   overlap='circle'
                   showZero
                 >
-                  <LargeAvatar
-                    alt={player.account.name}
-                    onClick={(event) => setAnchorEl(event.currentTarget)}
-                    src={player.account.avatar}
-                  />
+                  <MUIBadge
+                    anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                    badgeContent={<React.Fragment>
+                      <LibrarySymbol className={classes.badgeIcon} /> : {player.library.length > 99 ? '99+' : player.library.length}
+                    </React.Fragment>}
+                    className={classes.libraryBadge}
+                    overlap='circle'
+                    showZero
+                  >
+                    <LargeAvatar
+                      alt={player.account.name}
+                      onClick={(event) => setAnchorEl(event.currentTarget)}
+                      src={player.account.avatar}
+                    />
+                  </MUIBadge>
                 </MUIBadge>
               </MUIBadge>
             </MUIBadge>
@@ -114,12 +140,11 @@ export default function PlayerInfo (props) {
           keepMounted
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
-          style={{ zIndex: 2147483647 }}
         >
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
-              setDialogInfo({
+              setNumberInputDialogInfo({
                 inputName: "Energy",
                 defaultValue: player.energy,
                 updateFunction: (updatedValue) => handleAdjustEnergyCounters(updatedValue)
@@ -131,7 +156,7 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
-              setDialogInfo({
+              setNumberInputDialogInfo({
                 inputName: "Life",
                 defaultValue: player.life,
                 updateFunction: (updatedValue) => handleAdjustLifeTotal(updatedValue)
@@ -143,7 +168,7 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
-              setDialogInfo({
+              setNumberInputDialogInfo({
                 inputName: "Poison",
                 defaultValue: player.poison,
                 updateFunction: (updatedValue) => handleAdjustPoisonCounters(updatedValue)
@@ -151,6 +176,46 @@ export default function PlayerInfo (props) {
             }}
           >
             Adjust Poison Counters
+          </MUIMenuItem>
+          <MUIMenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setZoneName('exile');
+            }}
+          >
+            Inspect Exile Zone
+          </MUIMenuItem>
+          <MUIMenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setZoneName('graveyard');
+            }}
+          >
+            Inspect Graveyard
+          </MUIMenuItem>
+          <MUIMenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setZoneName('hand');
+            }}
+          >
+            Inspect Hand
+          </MUIMenuItem>
+          <MUIMenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setZoneName('library');
+            }}
+          >
+            Inspect Library
+          </MUIMenuItem>
+          <MUIMenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setZoneName('sideboard');
+            }}
+          >
+            Inspect Sideboard
           </MUIMenuItem>
         </MUIMenu>
       </div>

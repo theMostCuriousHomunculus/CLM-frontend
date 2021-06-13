@@ -23,22 +23,23 @@ const useStyles = makeStyles({
   },
   paper: {
     backgroundSize: 'cover',
-    height: 200,
+    // height: 200,
     // margin: 4,
     margin: 0,
     // paddingLeft: 20,
     // paddingRight: 20,
     // paddingTop: 36,
     padding: 0,
-    width: 143
+    // width: 143
   }
 });
 
 const MagicCard = (props) => {
 
   const classes = useStyles();
-  const { cardData, children, clickFunction, draggable, dragStartFunction, dragEndFunction, style } = props;
+  const { absolute, cardData, children, clickFunction, draggable, dragStartFunction, dragEndFunction, style } = props;
   const { back_image, face_down_image, flipped, image, x_coordinate, y_coordinate, z_index } = cardData;
+  let display;
   let displayedImage;
   
   if (image && !flipped) {
@@ -49,35 +50,52 @@ const MagicCard = (props) => {
     displayedImage = face_down_image;
   }
 
+  if (absolute) {
+    display = {
+      left: `${x_coordinate}%`,
+      position: 'absolute',
+      top: `${y_coordinate}%`,
+      zIndex: z_index
+    };
+  } else {
+    display = {
+      // not specifying any styles for containing div
+    };
+  }
+
   return (
     <div
       draggable={draggable}
-      onDragEnd={(event) => {
-        event.persist();
-        dragEndFunction();
-        event.target.style.opacity = 1;
-      }}
-      onDragStart={(event) => {
-        event.persist();
-        dragStartFunction();
-        event.target.style.opacity = 0.3;
-      }}
-      style={{
-        left: `${x_coordinate}%`,
-        position: 'absolute',
-        top: `${y_coordinate}%`,
-        zIndex: z_index
-      }}
+      onDragEnd={draggable ?
+        (event) => {
+          event.persist();
+          dragEndFunction();
+          event.target.style.opacity = 1;
+        } :
+        () => null
+      }
+      onDragStart={draggable ?
+        (event) => {
+          event.persist();
+          dragStartFunction();
+          event.target.style.opacity = 0.3;
+        } :
+        () => null
+      }
+      style={display}
     >
       <MUIPaper
         className={classes.paper}
-        onClick={() => clickFunction(cardData)}
+        onClick={clickFunction ? () => clickFunction(cardData) : () => null}
         style={{
           backgroundImage: `url(${displayedImage})`,
+          // default dimensions
+          height: 264,
+          width: 189,
           ...style
         }}
       >
-        {children || back_image && <div className={classes.buttonBar}>
+        {(children || back_image) && <div className={classes.buttonBar}>
           {children && children[0]}
 
           {back_image &&
