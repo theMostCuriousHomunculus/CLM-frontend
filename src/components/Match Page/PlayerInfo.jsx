@@ -67,45 +67,46 @@ export default function PlayerInfo (props) {
         defaultValue={dialogInfo.defaultValue}
         updateFunction={dialogInfo.updateFunction}
       />
-      
-      <div style={{ display: 'flex', flexGrow: 1, justifyContent: 'center' }}>
-        <div>
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
         <MUITooltip title={player.account.name}>
-          <MUIBadge
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            badgeContent={<React.Fragment>
-              <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
-            </React.Fragment>}
-            className={classes.energyBadge}
-            overlap='circle'
-            showZero
-          >
+          <div style={{ zIndex: 2147483646 }}>
             <MUIBadge
-              anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               badgeContent={<React.Fragment>
-                <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
+                <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
               </React.Fragment>}
-              className={classes.lifeBadge}
+              className={classes.energyBadge}
               overlap='circle'
               showZero
             >
               <MUIBadge
-                anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
                 badgeContent={<React.Fragment>
-                  <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
+                  <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
                 </React.Fragment>}
-                className={classes.poisonBadge}
+                className={classes.lifeBadge}
                 overlap='circle'
                 showZero
               >
-                <LargeAvatar
-                  alt={player.account.name}
-                  onClick={(event) => setAnchorEl(event.currentTarget)}
-                  src={player.account.avatar}
-                />
+                <MUIBadge
+                  anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+                  badgeContent={<React.Fragment>
+                    <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
+                  </React.Fragment>}
+                  className={classes.poisonBadge}
+                  overlap='circle'
+                  showZero
+                >
+                  <LargeAvatar
+                    alt={player.account.name}
+                    onClick={(event) => setAnchorEl(event.currentTarget)}
+                    src={player.account.avatar}
+                  />
+                </MUIBadge>
               </MUIBadge>
             </MUIBadge>
-          </MUIBadge>
+          </div>
         </MUITooltip>
 
         <MUIMenu
@@ -113,6 +114,7 @@ export default function PlayerInfo (props) {
           keepMounted
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
+          style={{ zIndex: 2147483647 }}
         >
           <MUIMenuItem
             onClick={() => {
@@ -151,7 +153,6 @@ export default function PlayerInfo (props) {
             Adjust Poison Counters
           </MUIMenuItem>
         </MUIMenu>
-        </div>
       </div>
     </React.Fragment>
   );

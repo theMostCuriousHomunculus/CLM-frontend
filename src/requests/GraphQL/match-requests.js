@@ -43,6 +43,7 @@ players {
     }
     x_coordinate
     y_coordinate
+    z_index
   }
   energy
   exile {
@@ -151,6 +152,7 @@ players {
     tapped
     x_coordinate
     y_coordinate
+    z_index
   }
   sideboard {
     _id
@@ -329,7 +331,7 @@ async function createMatch (eventId, playerIds, token) {
   }
 }
 
-async function dragCard (cardID, xCoordinate, yCoordinate, matchID, token) {
+async function dragCard (cardID, xCoordinate, yCoordinate, zIndex, matchID, token) {
   try {
     const graphqlQuery = {
       query: `
@@ -338,7 +340,8 @@ async function dragCard (cardID, xCoordinate, yCoordinate, matchID, token) {
             input: {
               cardID: "${cardID}",
               xCoordinate: ${xCoordinate},
-              yCoordinate: ${yCoordinate}
+              yCoordinate: ${yCoordinate},
+              zIndex: ${zIndex}
             }
           ) {
             ${desiredMatchInfo}

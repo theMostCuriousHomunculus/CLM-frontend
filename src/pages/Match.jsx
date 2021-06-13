@@ -26,6 +26,7 @@ import {
 const Match = () => {
 
   const authentication = React.useContext(AuthenticationContext);
+  const battlefieldRef = React.useRef();
   // const classes = useStyles();
   const matchID = useParams().matchId;
   const [errorMessage, setErrorMessage] = React.useState();
@@ -81,6 +82,7 @@ const Match = () => {
   const opponent = participant ?
     match.players.find(plr => plr.account._id !== authentication.userId) :
     match.players[1];
+  const topZIndex = Math.max(...me.mainboard.map(crd => crd.z_index)) + 1;
 
   React.useEffect(function () {
 
@@ -156,7 +158,7 @@ const Match = () => {
 
   async function handleDragCard (cardID, xCoordinate, yCoordinate) {
     try {
-      await dragCard(cardID, xCoordinate, yCoordinate, matchID, authentication.token);
+      await dragCard(cardID, xCoordinate, yCoordinate, topZIndex, matchID, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -184,8 +186,20 @@ const Match = () => {
           <div
             onDragOver={event => event.preventDefault()}
             onDrop={(event) => {
-              handleDragCard(draggingCardID, (event.nativeEvent.offsetX * 100 / event.currentTarget.offsetWidth), (event.nativeEvent.offsetY * 100 / event.currentTarget.offsetHeight));
+              if (event.nativeEvent.path[0] === battlefieldRef.current) {
+                handleDragCard(draggingCardID,
+                  (event.nativeEvent.offsetX * 100 / battlefieldRef.current.offsetWidth),
+                  (event.nativeEvent.offsetY * 100 / battlefieldRef.current.offsetHeight));
+              } else {
+                // the user dropped the card on top of another card
+                handleDragCard(draggingCardID,
+                  ((parseFloat(event.nativeEvent.path[1].style.left) * battlefieldRef.current.offsetWidth)
+                  + (event.nativeEvent.offsetX * 100)) / battlefieldRef.current.offsetWidth,
+                  ((parseFloat(event.nativeEvent.path[1].style.top) * battlefieldRef.current.offsetHeight)
+                  + (event.nativeEvent.offsetY * 100)) / battlefieldRef.current.offsetHeight);
+              }
             }}
+            ref={battlefieldRef}
             style={{ height: 400, position: 'relative' }}
           >
             {match.players[0].mainboard.map(card => {
@@ -193,16 +207,15 @@ const Match = () => {
                 <MagicCard
                   cardData={card}
                   clickFunction={handleTapCard}
-                  cursor='move'
                   draggable={true}
                   dragStartFunction={() => setDraggingCardID(card._id)}
                   dragEndFunction={() => setDraggingCardID(null)}
                   key={card._id}
                   style={{
-                    left: `${card.x_coordinate}%`,
-                    position: 'absolute',
-                    top: `${card.y_coordinate}%`
+                    cursor: 'move',
+                    transform: card.tapped ? 'rotate(90deg)' : ''
                   }}
+                  topZIndex={topZIndex}
                 />
               )
             })}
@@ -215,10 +228,6 @@ const Match = () => {
           />
         </div>
 
-        {/*<div style={{ border: '1px solid black', borderRadius: 4, width: '15%' }}>
-          <h3 style={{ textDecoration: 'underline' }}>Match Log</h3>
-          {match.log.map((update, index) => <p key={`log-update-${index + 1}`}>{index + 1}) {update}</p>)}
-          </div>*/}
         <MatchLog log={match.log} />
       </div>
     </React.Fragment>
