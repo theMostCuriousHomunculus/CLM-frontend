@@ -9,11 +9,8 @@ import MagicCard from '../miscellaneous/MagicCard';
 
 export default function ZoneInspectionDialogue (props) {
 
-  const {
-    close,
-    player,
-    zoneName
-  } = props;
+  const { close, player, setRightClickedCardAnchorElement, setRightClickedCardData, zoneName } = props;
+  const validZones = ['battlefield', 'exile', 'graveyard', 'hand', 'library', 'stack', 'temporary'];
 
   return (
     <MUIDialog
@@ -28,6 +25,11 @@ export default function ZoneInspectionDialogue (props) {
               absolute={false}
               cardData={crd}
               key={crd._id}
+              rightClickFunction={(event) => {
+                event.preventDefault();
+                setRightClickedCardAnchorElement(event.currentTarget);
+                setRightClickedCardData(crd);
+              }}
             />
           );
         })}

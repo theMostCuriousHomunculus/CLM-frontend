@@ -23,21 +23,19 @@ const useStyles = makeStyles({
   },
   paper: {
     backgroundSize: 'cover',
-    // height: 200,
     // margin: 4,
     margin: 0,
     // paddingLeft: 20,
     // paddingRight: 20,
     // paddingTop: 36,
-    padding: 0,
-    // width: 143
+    padding: 0
   }
 });
 
 const MagicCard = (props) => {
 
   const classes = useStyles();
-  const { absolute, cardData, children, clickFunction, draggable, dragStartFunction, dragEndFunction, style } = props;
+  const { absolute, cardData, children, clickFunction, draggable, dragStartFunction, dragEndFunction, rightClickFunction, style } = props;
   const { back_image, face_down_image, flipped, image, x_coordinate, y_coordinate, z_index } = cardData;
   let display;
   let displayedImage;
@@ -47,7 +45,19 @@ const MagicCard = (props) => {
   } else if (back_image && flipped) {
     displayedImage = back_image;
   } else {
-    displayedImage = face_down_image;
+    switch(face_down_image) {
+      case 'foretell':
+        displayedImage = '"/images/Foretell.jpg"';
+        break;
+      case 'manifest':
+        displayedImage = '"/images/Manifest.jpg"';
+        break;
+      case 'morph':
+        displayedImage = '"/images/Morph.jpg"';
+        break;
+      default:
+        displayedImage = '"/images/MTG Card Back.jpg"';
+    }
   }
 
   if (absolute) {
@@ -87,6 +97,7 @@ const MagicCard = (props) => {
       <MUIPaper
         className={classes.paper}
         onClick={clickFunction ? () => clickFunction(cardData) : () => null}
+        onContextMenu={rightClickFunction}
         style={{
           backgroundImage: `url(${displayedImage})`,
           // default dimensions

@@ -11,7 +11,7 @@ import MoveDeleteMenu from './MoveDeleteMenu';
 import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { deleteCard } from '../../requests/REST/cube-requests';
-import { ReactComponent as TCGPlayerLogo } from '../../images/tcgplayer-logo-full-color.svg';
+import { ReactComponent as TCGPlayerLogo } from '../../svgs/tcgplayer-logo-full-color.svg';
 
 
 const useStyles = makeStyles({

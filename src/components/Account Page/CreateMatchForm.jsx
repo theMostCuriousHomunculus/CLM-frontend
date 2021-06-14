@@ -59,7 +59,6 @@ const CreateEventForm = (props) => {
       const responseData = await createMatch(selectedEvent._id,
         selectedOpponent ? [authentication.userId, selectedOpponent] : [authentication.userId],
         authentication.token);
-      console.log(responseData);
       setLoading(false);
       history.push(`/match/${responseData._id}`);
     } catch (error) {

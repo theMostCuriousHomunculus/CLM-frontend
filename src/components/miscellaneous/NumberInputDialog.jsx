@@ -7,30 +7,33 @@ import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUITextField from '@material-ui/core/TextField';
 
 import WarningButton from './WarningButton';
+import { isNumber } from 'lodash';
 
 export default function NumberInputDialogue (props) {
 
   const {
+    buttonText,
     close,
-    inputName,
     defaultValue,
+    inputLabel,
+    title,
     updateFunction
   } = props;
   const valueRef = React.useRef();
 
   return (
     <MUIDialog
-      open={!!inputName}
+      open={isNumber(defaultValue)}
       onClose={close}
     >
-      <MUIDialogTitle>Update Your {inputName}</MUIDialogTitle>
+      <MUIDialogTitle>{title}</MUIDialogTitle>
       <MUIDialogContent>
         <MUITextField
           autoFocus
           defaultValue={defaultValue}
           fullWidth
           inputRef={valueRef}
-          label={inputName}
+          label={inputLabel}
           margin="dense"
           type="number"
           variant="outlined"
@@ -50,7 +53,7 @@ export default function NumberInputDialogue (props) {
           size="small"
           variant="contained"
         >
-          Update
+          {buttonText}
         </MUIButton>
       </MUIDialogActions>
     </MUIDialog>

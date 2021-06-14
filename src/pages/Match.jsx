@@ -1,4 +1,6 @@
 import React from 'react';
+import MUIMenu from '@material-ui/core/Menu';
+import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUISlider from '@material-ui/core/Slider';
 import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
@@ -18,7 +20,9 @@ import {
   desiredMatchInfo,
   dragCard,
   fetchMatchByID,
-  tapUntapCard
+  rollDice,
+  tapUntapCard,
+  transferCard
 } from '../requests/GraphQL/match-requests.js';
 
 // const useStyles = makeStyles({
@@ -82,9 +86,19 @@ const Match = () => {
   const me = participant ?
     match.players.find(plr => plr.account._id === authentication.userId) :
     match.players[0];
-  const opponent = participant ?
-    match.players.find(plr => plr.account._id !== authentication.userId) :
-    match.players[1];
+  let opponent;
+  
+  if (participant && match.players.length === 2) {
+    opponent = match.players.find(plr => plr.account._id !== authentication.userId);
+  } else if (!participant && match.players.length === 2) {
+    opponent = match.players[1];
+  } else {
+    opponent = null;
+  }
+
+  const [originZone, setOriginZone] = React.useState(null);
+  const [rightClickedCardAnchorElement, setRightClickedCardAnchorElement] = React.useState(null);
+  const [rightClickedCardData, setRightClickedCardData] = React.useState(null);
   const topZIndex = Math.max(...me.mainboard.map(crd => crd.z_index)) + 1;
 
   React.useEffect(function () {
@@ -167,9 +181,32 @@ const Match = () => {
     }
   }
 
+  async function handleRollDice (sides) {
+    try {
+      await rollDice(sides, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
   async function handleTapCard (card) {
     try {
       await tapUntapCard(card._id, matchID, authentication.token);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  }
+
+  async function handleTransferCard (destinationZone, index, reveal, shuffle) {
+    try {
+      await transferCard(rightClickedCardData._id,
+        destinationZone,
+        index,
+        originZone,
+        reveal,
+        shuffle,
+        matchID,
+        authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -183,6 +220,38 @@ const Match = () => {
         clear={() => setErrorMessage(null)}
         message={errorMessage}
       />
+
+      <MUIMenu
+        anchorEl={rightClickedCardAnchorElement}
+        keepMounted
+        open={Boolean(rightClickedCardAnchorElement)}
+        onClose={() => setRightClickedCardAnchorElement(null)}
+      >
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('battlefield', null, false, false);
+          }}
+        >
+          Place Face Down on Battlefield
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('battlefield', null, true, false);
+          }}
+        >
+          Place Face Up on Battlefield
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('graveyard', null, true, false);
+          }}
+        >
+          Move to Graveyard
+        </MUIMenuItem>
+      </MUIMenu>
 
       <div style={{ margin: 8, display: 'flex' }}>
         <div style={{ display: 'flex' }}>
@@ -200,7 +269,7 @@ const Match = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, margin: '0 8px' }}>
-          <div
+          {opponent && <div
             style={{
               borderRadius: 4,
               border: '1px solid black',
@@ -210,12 +279,12 @@ const Match = () => {
               transform: 'rotate(180deg)'
             }}
           >
-            {match.players[0].battlefield.map(card => {
+            {opponent.battlefield.map(card => {
               return (
                 <MagicCard
                   absolute={true}
                   cardData={card}
-                  key={`${card._id}-mirror`}
+                  key={card._id}
                   style={{
                     // magic card dimentions are 63mm x 88mm
                     height: cardSize * (88 / (63 * 88)),
@@ -225,7 +294,7 @@ const Match = () => {
                 />
               )
             })}
-          </div>
+          </div>}
           <div
             onDragOver={event => event.preventDefault()}
             onDrop={(event) => {
@@ -255,6 +324,12 @@ const Match = () => {
                   dragStartFunction={() => setDraggingCardID(card._id)}
                   dragEndFunction={() => setDraggingCardID(null)}
                   key={card._id}
+                  rightClickFunction={(event) => {
+                    event.preventDefault();
+                    setOriginZone('battlefield');
+                    setRightClickedCardAnchorElement(event.currentTarget);
+                    setRightClickedCardData(card);
+                  }}
                   style={{
                     // magic card dimentions are 63mm x 88mm
                     cursor: 'move',
@@ -271,6 +346,10 @@ const Match = () => {
             handleAdjustEnergyCounters={handleAdjustEnergyCounters}
             handleAdjustLifeTotal={handleAdjustLifeTotal}
             handleAdjustPoisonCounters={handleAdjustPoisonCounters}
+            handleRollDice={handleRollDice}
+            setOriginZone={setOriginZone}
+            setRightClickedCardAnchorElement={setRightClickedCardAnchorElement}
+            setRightClickedCardData={setRightClickedCardData}
             player={me}
           />
         </div>

@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const desiredMatchInfo = `game_winners {
+const desiredMatchInfo = `
+_id
+game_winners {
   _id
   avatar
   name
@@ -404,6 +406,37 @@ async function fetchMatchByID (matchID, token) {
   }
 }
 
+async function rollDice (sides, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          rollDice(sides: ${sides}) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.rollDice;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
 async function tapUntapCard (cardID, matchID, token) {
   try {
     const graphqlQuery = {
@@ -435,6 +468,46 @@ async function tapUntapCard (cardID, matchID, token) {
   }
 }
 
+async function transferCard (cardID, destinationZone, index, originZone, reveal, shuffle, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          transferCard(
+            input: {
+              cardID: "${cardID}",
+              destinationZone: ${destinationZone},
+              index: ${index},
+              originZone: ${originZone},
+              reveal: ${reveal},
+              shuffle: ${shuffle}
+            }
+          ) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.transferCard;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
 export {
   desiredMatchInfo,
   adjustEnergyCounters,
@@ -443,5 +516,7 @@ export {
   createMatch,
   dragCard,
   fetchMatchByID,
-  tapUntapCard
+  rollDice,
+  tapUntapCard,
+  transferCard
 };

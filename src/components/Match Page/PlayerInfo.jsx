@@ -13,9 +13,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import LargeAvatar from '../miscellaneous/LargeAvatar';
 import NumberInputDialog from '../miscellaneous/NumberInputDialog';
 import ZoneInspectionDialog from './ZoneInspectionDialog';
-import { ReactComponent as EnergySymbol } from '../../images/energy.svg';
-import { ReactComponent as LibrarySymbol } from '../../images/deck.svg';
-import { ReactComponent as PoisonSymbol } from '../../images/poison.svg';
+import { ReactComponent as EnergySymbol } from '../../svgs/energy.svg';
+import { ReactComponent as LibrarySymbol } from '../../svgs/deck.svg';
+import { ReactComponent as PoisonSymbol } from '../../svgs/poison.svg';
 
 const useStyles = makeStyles({
   badgeIcon: {
@@ -54,13 +54,19 @@ export default function PlayerInfo (props) {
     handleAdjustEnergyCounters,
     handleAdjustLifeTotal,
     handleAdjustPoisonCounters,
+    handleRollDice,
+    setOriginZone,
+    setRightClickedCardAnchorElement,
+    setRightClickedCardData,
     player
   } = props;
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [numberInputDialogInfo, setNumberInputDialogInfo] = React.useState({
+    buttonText: null,
     defaultValue: null,
-    inputName: null,
+    inputLabel: null,
+    title: null,
     updateFunction: null
   });
   const [zoneName, setZoneName] = React.useState(null);
@@ -68,19 +74,25 @@ export default function PlayerInfo (props) {
   return (
     <React.Fragment>
       <NumberInputDialog
+        buttonText={numberInputDialogInfo.buttonText}
         close={() => setNumberInputDialogInfo({
+          buttonText: null,
           defaultValue: null,
-          inputName: null,
+          inputLabel: null,
+          title: null,
           updateFunction: null
         })}
-        inputName={numberInputDialogInfo.inputName}
         defaultValue={numberInputDialogInfo.defaultValue}
+        inputLabel={numberInputDialogInfo.inputLabel}
+        title={numberInputDialogInfo.title}
         updateFunction={numberInputDialogInfo.updateFunction}
       />
 
       <ZoneInspectionDialog
         close={() => setZoneName(null)}
         player={player}
+        setRightClickedCardAnchorElement={setRightClickedCardAnchorElement}
+        setRightClickedCardData={setRightClickedCardData}
         zoneName={zoneName}
       />
 
@@ -145,8 +157,10 @@ export default function PlayerInfo (props) {
             onClick={() => {
               setAnchorEl(null);
               setNumberInputDialogInfo({
-                inputName: "Energy",
+                buttonText: "Update",
                 defaultValue: player.energy,
+                inputLabel: "Energy",
+                title: "Update Your Energy Counters",
                 updateFunction: (updatedValue) => handleAdjustEnergyCounters(updatedValue)
               });
             }}
@@ -157,8 +171,10 @@ export default function PlayerInfo (props) {
             onClick={() => {
               setAnchorEl(null);
               setNumberInputDialogInfo({
-                inputName: "Life",
+                buttonText: "Update",
                 defaultValue: player.life,
+                inputLabel: "Life",
+                title: "Update Your Life Total",
                 updateFunction: (updatedValue) => handleAdjustLifeTotal(updatedValue)
               });
             }}
@@ -169,8 +185,10 @@ export default function PlayerInfo (props) {
             onClick={() => {
               setAnchorEl(null);
               setNumberInputDialogInfo({
-                inputName: "Poison",
+                buttonText: "Update",
                 defaultValue: player.poison,
+                inputLabel: "Poison",
+                title: "Update Your Poison Counters",
                 updateFunction: (updatedValue) => handleAdjustPoisonCounters(updatedValue)
               });
             }}
@@ -180,6 +198,7 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
+              setOriginZone('exile');
               setZoneName('exile');
             }}
           >
@@ -188,6 +207,7 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
+              setOriginZone('graveyard');
               setZoneName('graveyard');
             }}
           >
@@ -196,6 +216,7 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
+              setOriginZone('hand');
               setZoneName('hand');
             }}
           >
@@ -204,6 +225,7 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
+              setOriginZone('library');
               setZoneName('library');
             }}
           >
@@ -212,10 +234,25 @@ export default function PlayerInfo (props) {
           <MUIMenuItem
             onClick={() => {
               setAnchorEl(null);
+              setOriginZone('sideboard');
               setZoneName('sideboard');
             }}
           >
             Inspect Sideboard
+          </MUIMenuItem>
+          <MUIMenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              setNumberInputDialogInfo({
+                buttonText: "Roll",
+                defaultValue: 6,
+                inputLabel: "Number of Sides",
+                title: "Roll Dice",
+                updateFunction: (updatedValue) => handleRollDice(updatedValue)
+              });
+            }}
+          >
+            Roll Dice
           </MUIMenuItem>
         </MUIMenu>
       </div>
