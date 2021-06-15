@@ -32,7 +32,6 @@ import {
 const Match = () => {
 
   const authentication = React.useContext(AuthenticationContext);
-  const battlefieldRef = React.useRef();
   const [cardSize, setCardSize] = React.useState(5544);
   // const classes = useStyles();
   const matchID = useParams().matchId;
@@ -83,7 +82,7 @@ const Match = () => {
     stack: []
   });
   const participant = match.players.some(plr => plr.account._id === authentication.userId);
-  const me = participant ?
+  const player = participant ?
     match.players.find(plr => plr.account._id === authentication.userId) :
     match.players[0];
   let opponent;
@@ -98,8 +97,8 @@ const Match = () => {
 
   const [originZone, setOriginZone] = React.useState(null);
   const [rightClickedCardAnchorElement, setRightClickedCardAnchorElement] = React.useState(null);
-  const [rightClickedCardData, setRightClickedCardData] = React.useState(null);
-  const topZIndex = Math.max(...me.mainboard.map(crd => crd.z_index)) + 1;
+  const [rightClickedCardID, setRightClickedCardID] = React.useState(null);
+  const topZIndex = Math.max(...player.battlefield.map(crd => crd.z_index)) + 1;
 
   React.useEffect(function () {
 
@@ -173,9 +172,9 @@ const Match = () => {
     }
   }
 
-  async function handleDragCard (cardID, xCoordinate, yCoordinate) {
+  async function handleDragCard (xCoordinate, yCoordinate) {
     try {
-      await dragCard(cardID, xCoordinate, yCoordinate, topZIndex, matchID, authentication.token);
+      await dragCard(draggingCardID, xCoordinate, yCoordinate, topZIndex, matchID, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -189,9 +188,9 @@ const Match = () => {
     }
   }
 
-  async function handleTapCard (card) {
+  async function handleTapUntapCard (cardID) {
     try {
-      await tapUntapCard(card._id, matchID, authentication.token);
+      await tapUntapCard(cardID, matchID, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -199,7 +198,7 @@ const Match = () => {
 
   async function handleTransferCard (destinationZone, index, reveal, shuffle) {
     try {
-      await transferCard(rightClickedCardData._id,
+      await transferCard(rightClickedCardID,
         destinationZone,
         index,
         originZone,
@@ -221,6 +220,7 @@ const Match = () => {
         message={errorMessage}
       />
 
+      {/*perhaps this should be broken out into its own component*/}
       <MUIMenu
         anchorEl={rightClickedCardAnchorElement}
         keepMounted
@@ -246,15 +246,256 @@ const Match = () => {
         <MUIMenuItem
           onClick={() => {
             setRightClickedCardAnchorElement(null);
+            handleTransferCard('exile', null, false, false);
+          }}
+        >
+          Place Face Down in Exile
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('exile', null, true, false);
+          }}
+        >
+          Place Face Up in Exile
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
             handleTransferCard('graveyard', null, true, false);
           }}
         >
           Move to Graveyard
         </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('hand', null, true, false);
+          }}
+        >
+          Reveal and Put in Hand
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('hand', null, false, false);
+          }}
+        >
+          Put in Hand Without Revealing
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('library', null, true, true);
+          }}
+        >
+          Reveal and Shuffle into Library
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('library', null, false, true);
+          }}
+        >
+          Shuffle into Library Without Revealing
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('stack', null, false, false);
+          }}
+        >
+          Place Face Down on the Stack
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setRightClickedCardAnchorElement(null);
+            handleTransferCard('stack', null, true, false);
+          }}
+        >
+          Place Face Up on the Stack
+        </MUIMenuItem>
       </MUIMenu>
 
-      <div style={{ margin: 8, display: 'flex' }}>
-        <div style={{ display: 'flex' }}>
+      {/*<MUIMenu
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setNumberInputDialogInfo({
+              buttonText: "Update",
+              defaultValue: player.energy,
+              inputLabel: "Energy",
+              title: "Update Your Energy Counters",
+              updateFunction: (updatedValue) => handleAdjustEnergyCounters(updatedValue)
+            });
+          }}
+        >
+          Adjust Energy Counters
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setNumberInputDialogInfo({
+              buttonText: "Update",
+              defaultValue: player.life,
+              inputLabel: "Life",
+              title: "Update Your Life Total",
+              updateFunction: (updatedValue) => handleAdjustLifeTotal(updatedValue)
+            });
+          }}
+        >
+          Adjust Life Total
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setNumberInputDialogInfo({
+              buttonText: "Update",
+              defaultValue: player.poison,
+              inputLabel: "Poison",
+              title: "Update Your Poison Counters",
+              updateFunction: (updatedValue) => handleAdjustPoisonCounters(updatedValue)
+            });
+          }}
+        >
+          Adjust Poison Counters
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setOriginZone('exile');
+            setExileDisplayed(prevState => !prevState);
+          }}
+        >
+          {exileDisplayed ? "Hide Exile Zone" : "Inspect Exile Zone"}
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setOriginZone('graveyard');
+            setGraveyardDisplayed(prevState => !prevState);
+          }}
+        >
+          {graveyardDisplayed ? "Hide Graveyard" : "Inspect Graveyard"}
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setOriginZone('library');
+            setLibraryDisplayed(prevState => !prevState);
+          }}
+        >
+          {libraryDisplayed ? "Hide Library" : "Inspect Library"}
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setOriginZone('sideboard');
+            setZoneName('sideboard');
+          }}
+        >
+          Inspect Sideboard
+        </MUIMenuItem>
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setNumberInputDialogInfo({
+              buttonText: "Roll",
+              defaultValue: 6,
+              inputLabel: "Number of Sides",
+              title: "Roll Dice",
+              updateFunction: (updatedValue) => handleRollDice(updatedValue)
+            });
+          }}
+        >
+          Roll Dice
+        </MUIMenuItem>
+      </MUIMenu>*/}
+
+      {/*
+        <NumberInputDialog
+          buttonText={numberInputDialogInfo.buttonText}
+          close={() => setNumberInputDialogInfo({
+            buttonText: null,
+            defaultValue: null,
+            inputLabel: null,
+            title: null,
+            updateFunction: null
+          })}
+          defaultValue={numberInputDialogInfo.defaultValue}
+          inputLabel={numberInputDialogInfo.inputLabel}
+          title={numberInputDialogInfo.title}
+          updateFunction={numberInputDialogInfo.updateFunction}
+        />
+
+        <ZoneInspectionDialog
+          close={() => setZoneName(null)}
+          player={player}
+          setRightClickedCardAnchorElement={setRightClickedCardAnchorElement}
+          setRightClickedCardID={setRightClickedCardID}
+          zoneName={zoneName}
+        />
+      */}
+
+      {/*
+        <MUITooltip title={player.account.name}>
+          <div>
+            <MUIBadge
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              badgeContent={<React.Fragment>
+                <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
+              </React.Fragment>}
+              className={classes.energyBadge}
+              overlap='circle'
+              showZero
+            >
+              <MUIBadge
+                anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                badgeContent={<React.Fragment>
+                  <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
+                </React.Fragment>}
+                className={classes.lifeBadge}
+                overlap='circle'
+                showZero
+              >
+                <MUIBadge
+                  anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+                  badgeContent={<React.Fragment>
+                    <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
+                  </React.Fragment>}
+                  className={classes.poisonBadge}
+                  overlap='circle'
+                  showZero
+                >
+                  <MUIBadge
+                    anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                    badgeContent={<React.Fragment>
+                      <LibrarySymbol className={classes.badgeIcon} /> : {player.library.length > 99 ? '99+' : player.library.length}
+                    </React.Fragment>}
+                    className={classes.libraryBadge}
+                    overlap='circle'
+                    showZero
+                  >
+                    <LargeAvatar
+                      alt={player.account.name}
+                      onClick={(event) => setAnchorEl(event.currentTarget)}
+                      src={player.account.avatar}
+                    />
+                  </MUIBadge>
+                </MUIBadge>
+              </MUIBadge>
+            </MUIBadge>
+          </div>
+        </MUITooltip>
+      */}
+
+      <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', flexShrink: 0 }}>
           <MUITypography style={{ transform: 'rotate(180deg)', writingMode: 'vertical-lr' }} variant='caption'>
             Adjust Card Size
           </MUITypography>
@@ -268,89 +509,108 @@ const Match = () => {
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, margin: '0 8px' }}>
-          {opponent && <div
-            style={{
-              borderRadius: 4,
-              border: '1px solid black',
-              flexGrow: 1,
-              overflow: 'hidden',
-              position: 'relative',
-              transform: 'rotate(180deg)'
-            }}
-          >
-            {opponent.battlefield.map(card => {
-              return (
-                <MagicCard
-                  absolute={true}
-                  cardData={card}
-                  key={card._id}
+        <div style={{ display: 'flex', flex: '1 1 0', flexDirection: 'column', minWidth: 0 }}>
+          {/*opponent &&
+            // opponent's zones
+            <div style={{ display: 'flex' }}>
+              {opponentGraveyardDisplayed &&
+                <div
                   style={{
-                    // magic card dimentions are 63mm x 88mm
-                    height: cardSize * (88 / (63 * 88)),
-                    transform: card.tapped ? 'rotate(90deg)' : '',
-                    width: cardSize * (63 / (63 * 88))
+                    borderRadius: 4,
+                    border: '1px solid black',
+                    maxHeight: 'calc(50vh - 24px)',
+                    overflowY: 'auto'
                   }}
-                />
-              )
-            })}
-          </div>}
-          <div
-            onDragOver={event => event.preventDefault()}
-            onDrop={(event) => {
-              if (event.nativeEvent.path[0] === battlefieldRef.current) {
-                handleDragCard(draggingCardID,
-                  (event.nativeEvent.offsetX * 100 / battlefieldRef.current.offsetWidth),
-                  (event.nativeEvent.offsetY * 100 / battlefieldRef.current.offsetHeight));
-              } else {
-                // the user dropped the card on top of another card
-                handleDragCard(draggingCardID,
-                  ((parseFloat(event.nativeEvent.path[1].style.left) * battlefieldRef.current.offsetWidth)
-                  + (event.nativeEvent.offsetX * 100)) / battlefieldRef.current.offsetWidth,
-                  ((parseFloat(event.nativeEvent.path[1].style.top) * battlefieldRef.current.offsetHeight)
-                  + (event.nativeEvent.offsetY * 100)) / battlefieldRef.current.offsetHeight);
+                >
+                  {opponent.graveyard.map(card => {
+                    return (
+                      <MagicCard
+                        cardData={card}
+                        key={card._id}
+                        style={{
+                          // magic card dimentions are 63mm x 88mm
+                          height: cardSize * (88 / (63 * 88)),
+                          width: cardSize * (63 / (63 * 88))
+                        }}
+                      />
+                    );
+                  })}
+                </div>
               }
-            }}
-            ref={battlefieldRef}
-            style={{ borderRadius: 4, border: '1px solid black', flexGrow: 1, overflow: 'hidden', position: 'relative' }}
-          >
-            {match.players[0].battlefield.map(card => {
-              return (
-                <MagicCard
-                  absolute={true}
-                  cardData={card}
-                  clickFunction={handleTapCard}
-                  draggable={true}
-                  dragStartFunction={() => setDraggingCardID(card._id)}
-                  dragEndFunction={() => setDraggingCardID(null)}
-                  key={card._id}
-                  rightClickFunction={(event) => {
-                    event.preventDefault();
-                    setOriginZone('battlefield');
-                    setRightClickedCardAnchorElement(event.currentTarget);
-                    setRightClickedCardData(card);
-                  }}
+              {opponentExileDisplayed &&
+                <div
                   style={{
-                    // magic card dimentions are 63mm x 88mm
-                    cursor: 'move',
-                    height: cardSize * (88 / (63 * 88)),
-                    transform: card.tapped ? 'rotate(90deg)' : '',
-                    width: cardSize * (63 / (63 * 88))
+                    borderRadius: 4,
+                    border: '1px solid black',
+                    maxHeight: 'calc(50vh - 24px)',
+                    overflowY: 'auto'
                   }}
-                />
-              )
-            })}
-          </div>
+                >
+                  {opponent.exile.map(card => {
+                    return (
+                      <MagicCard
+                        cardData={card}
+                        key={card._id}
+                        style={{
+                          // magic card dimentions are 63mm x 88mm
+                          height: cardSize * (88 / (63 * 88)),
+                          width: cardSize * (63 / (63 * 88))
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              }
+              <div
+                style={{
+                  borderRadius: 4,
+                  border: '1px solid black',
+                  flexGrow: 8,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  transform: 'rotate(180deg)'
+                }}
+              >
+                {opponent.battlefield.map(card => {
+                  return (
+                    <div
+                      key={card._id}
+                      style={{
+                        left: `${card.x_coordinate}%`,
+                        position: 'absolute',
+                        top: `${card.y_coordinate}%`,
+                        zIndex: card.z_index
+                      }}
+                    >
+                      <MagicCard
+                        cardData={card}
+                        style={{
+                          // magic card dimentions are 63mm x 88mm
+                          height: cardSize * (88 / (63 * 88)),
+                          transform: card.tapped ? 'rotate(90deg)' : '',
+                          width: cardSize * (63 / (63 * 88))
+                        }}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          */}
 
           <PlayerInfo
+            cardSize={cardSize}
             handleAdjustEnergyCounters={handleAdjustEnergyCounters}
             handleAdjustLifeTotal={handleAdjustLifeTotal}
             handleAdjustPoisonCounters={handleAdjustPoisonCounters}
+            handleDragCard={handleDragCard}
             handleRollDice={handleRollDice}
+            handleTapUntapCard={handleTapUntapCard}
+            setDraggingCardID={setDraggingCardID}
             setOriginZone={setOriginZone}
             setRightClickedCardAnchorElement={setRightClickedCardAnchorElement}
-            setRightClickedCardData={setRightClickedCardData}
-            player={me}
+            setRightClickedCardID={setRightClickedCardID}
+            player={player}
           />
         </div>
 

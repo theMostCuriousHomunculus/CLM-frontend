@@ -7,9 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   cardContent: {
-    // '& ::-webkit-scrollbar-track': {
-      // background: '#FF0000'
-    // }
+
   }
 });
 
@@ -19,7 +17,7 @@ export default function MatchLog (props) {
   const classes = useStyles();
 
   return (
-    <MUICard style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 16px)', margin: 0, maxWidth: 200 }}>
+    <MUICard style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, height: 'calc(100vh - 16px)', margin: 0, width: 200 }}>
       <MUICardHeader
         disableTypography={true}
         title={<MUITypography variant="h5">Match Log</MUITypography>}

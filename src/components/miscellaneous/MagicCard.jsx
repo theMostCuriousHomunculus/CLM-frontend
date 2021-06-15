@@ -35,9 +35,8 @@ const useStyles = makeStyles({
 const MagicCard = (props) => {
 
   const classes = useStyles();
-  const { absolute, cardData, children, clickFunction, draggable, dragStartFunction, dragEndFunction, rightClickFunction, style } = props;
-  const { back_image, face_down_image, flipped, image, x_coordinate, y_coordinate, z_index } = cardData;
-  let display;
+  const { cardData, children, clickFunction, rightClickFunction, style } = props;
+  const { back_image, face_down_image, flipped, image } = cardData;
   let displayedImage;
   
   if (image && !flipped) {
@@ -60,71 +59,37 @@ const MagicCard = (props) => {
     }
   }
 
-  if (absolute) {
-    display = {
-      left: `${x_coordinate}%`,
-      position: 'absolute',
-      top: `${y_coordinate}%`,
-      zIndex: z_index
-    };
-  } else {
-    display = {
-      // not specifying any styles for containing div
-    };
-  }
-
   return (
-    <div
-      draggable={draggable}
-      onDragEnd={draggable ?
-        (event) => {
-          event.persist();
-          dragEndFunction();
-          event.target.style.opacity = 1;
-        } :
-        () => null
-      }
-      onDragStart={draggable ?
-        (event) => {
-          event.persist();
-          dragStartFunction();
-          event.target.style.opacity = 0.3;
-        } :
-        () => null
-      }
-      style={display}
+    <MUIPaper
+      className={classes.paper}
+      onClick={clickFunction ? () => clickFunction() : () => null}
+      onContextMenu={rightClickFunction ? (event) => rightClickFunction(event) : () => null}
+      style={{
+        backgroundImage: `url(${displayedImage})`,
+        // default dimensions
+        height: 264,
+        width: 189,
+        ...style
+      }}
     >
-      <MUIPaper
-        className={classes.paper}
-        onClick={clickFunction ? () => clickFunction(cardData) : () => null}
-        onContextMenu={rightClickFunction}
-        style={{
-          backgroundImage: `url(${displayedImage})`,
-          // default dimensions
-          height: 264,
-          width: 189,
-          ...style
-        }}
-      >
-        {(children || back_image) && <div className={classes.buttonBar}>
-          {children && children[0]}
+      {(children || back_image) && <div className={classes.buttonBar}>
+        {children && children[0]}
 
-          {back_image &&
-            <MUITooltip title="Flip Card">
-              <MUIIconButton
-                className={classes.iconButton}
-                // onClick={() => setFlipped(true)}
-                size="small"
-              >
-                <MUIAutorenewIcon />
-              </MUIIconButton>
-            </MUITooltip>
-          }
+        {back_image &&
+          <MUITooltip title="Flip Card">
+            <MUIIconButton
+              className={classes.iconButton}
+              // onClick={() => setFlipped(true)}
+              size="small"
+            >
+              <MUIAutorenewIcon />
+            </MUIIconButton>
+          </MUITooltip>
+        }
 
-          {children && children[1]}
-        </div>}
-      </MUIPaper>
-    </div>
+        {children && children[1]}
+      </div>}
+    </MUIPaper>
   );
 }
 
