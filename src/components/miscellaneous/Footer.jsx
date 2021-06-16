@@ -27,7 +27,7 @@ const Footer = () => {
     const classes = useStyles();
 
     return (
-      <footer className={classes.footer}>
+      <footer className={classes.footer} id="footer">
         <MUITypography variant="body2">Magic: The Gathering is © Wizards of the Coast. Cube Level Midnight is not affiliated with, produced or endorsed by Wizards of the Coast.</MUITypography>
         <MUITypography variant="body2">All card images, mana symbols, expansions and art related to Magic the Gathering are the property of Wizards of the Coast and its parent company, Hasbro, Inc.</MUITypography>
         <MUITypography variant="body2">Cube Level Midnight uses <a href="https://scryfall.com/">Scryfall.com</a>'s API to search for and display Magic cards, but is not affiliated with, produced or endorsed by Scryfall LLC. This site endeavours to adhere to the Scryfall data guidelines.</MUITypography>

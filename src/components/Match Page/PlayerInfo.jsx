@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import LargeAvatar from '../miscellaneous/LargeAvatar';
 import MagicCard from '../miscellaneous/MagicCard';
 import NumberInputDialog from '../miscellaneous/NumberInputDialog';
-// import ZoneInspectionDialog from './ZoneInspectionDialog';
+import ZoneInspectionDialog from './ZoneInspectionDialog';
 import { ReactComponent as EnergySymbol } from '../../svgs/energy.svg';
 import { ReactComponent as LibrarySymbol } from '../../svgs/deck.svg';
 import { ReactComponent as PoisonSymbol } from '../../svgs/poison.svg';
@@ -28,6 +28,13 @@ const useStyles = makeStyles({
       backgroundColor: yellow[500],
       color: 'black'
     }
+  },
+  collapsableZoneContainer: {
+    border: '1px solid black',
+    borderRadius: 4,
+    display: 'flex',
+    flexDirection: 'column',
+    overflowY: 'auto'
   },
   libraryBadge: {
     '& > .MuiBadge-badge': {
@@ -49,22 +56,19 @@ const useStyles = makeStyles({
   }
 });
 
-export default function PlayerInfo (props) {
+export default function PlayerInfo ({
+  cardSize,
+  handleAdjustEnergyCounters,
+  handleAdjustLifeTotal,
+  handleAdjustPoisonCounters,
+  handleDragCard,
+  handleRollDice,
+  handleTapUntapCards,
+  setDraggingCardID,
+  setRightClickedCard,
+  player
+}) {
 
-  const {
-    cardSize,
-    handleAdjustEnergyCounters,
-    handleAdjustLifeTotal,
-    handleAdjustPoisonCounters,
-    handleDragCard,
-    handleRollDice,
-    handleTapUntapCard,
-    setDraggingCardID,
-    setOriginZone,
-    setRightClickedCardAnchorElement,
-    setRightClickedCardID,
-    player
-  } = props;
   const battlefieldRef = React.useRef();
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -78,7 +82,7 @@ export default function PlayerInfo (props) {
     title: null,
     updateFunction: null
   });
-  // const [zoneName, setZoneName] = React.useState(null);
+  const [zoneName, setZoneName] = React.useState(null);
 
   return (
     <React.Fragment>
@@ -97,13 +101,12 @@ export default function PlayerInfo (props) {
         updateFunction={numberInputDialogInfo.updateFunction}
       />
 
-      {/*<ZoneInspectionDialog
+      <ZoneInspectionDialog
         close={() => setZoneName(null)}
         player={player}
-        setRightClickedCardAnchorElement={setRightClickedCardAnchorElement}
-        setRightClickedCardID={setRightClickedCardID}
+        setRightClickedCard={setRightClickedCard}
         zoneName={zoneName}
-      />*/}
+      />
 
       <MUIMenu
         anchorEl={anchorEl}
@@ -153,10 +156,10 @@ export default function PlayerInfo (props) {
         >
           Adjust Poison Counters
         </MUIMenuItem>
+        <hr/>
         <MUIMenuItem
           onClick={() => {
             setAnchorEl(null);
-            setOriginZone('exile');
             setExileDisplayed(prevState => !prevState);
           }}
         >
@@ -165,7 +168,6 @@ export default function PlayerInfo (props) {
         <MUIMenuItem
           onClick={() => {
             setAnchorEl(null);
-            setOriginZone('graveyard');
             setGraveyardDisplayed(prevState => !prevState);
           }}
         >
@@ -174,21 +176,20 @@ export default function PlayerInfo (props) {
         <MUIMenuItem
           onClick={() => {
             setAnchorEl(null);
-            setOriginZone('library');
             setLibraryDisplayed(prevState => !prevState);
           }}
         >
           {libraryDisplayed ? "Hide Library" : "Inspect Library"}
         </MUIMenuItem>
-        {/*<MUIMenuItem
+        <MUIMenuItem
           onClick={() => {
             setAnchorEl(null);
-            setOriginZone('sideboard');
             setZoneName('sideboard');
           }}
         >
           Inspect Sideboard
-        </MUIMenuItem>*/}
+        </MUIMenuItem>
+        <hr/>
         <MUIMenuItem
           onClick={() => {
             setAnchorEl(null);
@@ -205,28 +206,25 @@ export default function PlayerInfo (props) {
         </MUIMenuItem>
       </MUIMenu>
 
-      <div style={{ display: 'flex', flexGrow: 1 }}>
+      <div style={{ display: 'flex', flex: '1 1 0', minHeight: 0 }}>
         {libraryDisplayed &&
-          <div
-            style={{
-              borderRadius: 4,
-              border: '1px solid black',
-              maxHeight: `calc(100vh - 16px - ${cardSize / 63}px)`,
-              overflowY: 'auto'
-            }}
-          >
-            {player.library.map(card => {
+          <div className={classes.collapsableZoneContainer}>
+            {player.library.map((val, index, array) => array[array.length - 1 - index]).map(card => {
               return (
                 <MagicCard
                   cardData={card}
                   key={card._id}
                   rightClickFunction={(event) => {
                     event.preventDefault();
-                    setOriginZone('library');
-                    setRightClickedCardAnchorElement(event.currentTarget);
-                    setRightClickedCardID(card._id);
+                    setRightClickedCard({
+                      _id: card._id,
+                      anchorElement: event.currentTarget,
+                      origin: 'library',
+                      visibility: card.visibility
+                    });
                   }}
                   style={{
+                    flexShrink: 0,
                     // magic card dimentions are 63mm x 88mm
                     height: cardSize / 63,
                     width: cardSize / 88
@@ -277,12 +275,15 @@ export default function PlayerInfo (props) {
               >
                 <MagicCard
                   cardData={card}
-                  clickFunction={() => handleTapUntapCard(card._id)}
+                  clickFunction={() => handleTapUntapCards([card._id])}
                   rightClickFunction={(event) => {
                     event.preventDefault();
-                    setOriginZone('battlefield');
-                    setRightClickedCardAnchorElement(event.currentTarget);
-                    setRightClickedCardID(card._id);
+                    setRightClickedCard({
+                      _id: card._id,
+                      anchorElement: event.currentTarget,
+                      origin: 'battlefield',
+                      visibility: card.visibility
+                    });
                   }}
                   style={{
                     // magic card dimentions are 63mm x 88mm
@@ -297,26 +298,23 @@ export default function PlayerInfo (props) {
           })}
         </div>
         {graveyardDisplayed &&
-          <div
-            style={{
-              borderRadius: 4,
-              border: '1px solid black',
-              maxHeight: `calc(100vh - 16px - ${cardSize / 63}px)`,
-              overflowY: 'auto'
-            }}
-          >
-            {player.graveyard.map(card => {
+          <div className={classes.collapsableZoneContainer}>
+            {player.graveyard.map((val, index, array) => array[array.length - 1 - index]).map(card => {
               return (
                 <MagicCard
                   cardData={card}
                   key={card._id}
                   rightClickFunction={(event) => {
                     event.preventDefault();
-                    setOriginZone('graveyard');
-                    setRightClickedCardAnchorElement(event.currentTarget);
-                    setRightClickedCardID(card._id);
+                    setRightClickedCard({
+                      _id: card._id,
+                      anchorElement: event.currentTarget,
+                      origin: 'graveyard',
+                      visibility: card.visibility
+                    });
                   }}
                   style={{
+                    flexShrink: 0,
                     // magic card dimentions are 63mm x 88mm
                     height: cardSize / 63,
                     width: cardSize / 88
@@ -327,26 +325,23 @@ export default function PlayerInfo (props) {
           </div>
         }
         {exileDisplayed &&
-          <div
-            style={{
-              borderRadius: 4,
-              border: '1px solid black',
-              maxHeight: `calc(100vh - 16px - ${cardSize / 63}px)`,
-              overflowY: 'auto'
-            }}
-          >
-            {player.exile.map(card => {
+          <div className={classes.collapsableZoneContainer}>
+            {player.exile.map((val, index, array) => array[array.length - 1 - index]).map(card => {
               return (
                 <MagicCard
                   cardData={card}
                   key={card._id}
                   rightClickFunction={(event) => {
                     event.preventDefault();
-                    setOriginZone('exile');
-                    setRightClickedCardAnchorElement(event.currentTarget);
-                    setRightClickedCardID(card._id);
+                    setRightClickedCard({
+                      _id: card._id,
+                      anchorElement: event.currentTarget,
+                      origin: 'exile',
+                      visibility: card.visibility
+                    });
                   }}
                   style={{
+                    flexShrink: 0,
                     // magic card dimentions are 63mm x 88mm
                     height: cardSize / 63,
                     width: cardSize /  88
@@ -358,87 +353,90 @@ export default function PlayerInfo (props) {
         }
       </div>
       
-      <div
-        style={{
-          border: '1px solid black',
-          borderRadius: 4,
-          display: 'flex',
-          flexGrow: 1,
-          overflowX: 'auto',
-          // whiteSpace: 'nowrap'
-        }}
-      >
-        {player.hand.map(card => {
-          return (
-            <MagicCard
-              cardData={card}
-              key={card._id}
-              rightClickFunction={(event) => {
-                event.preventDefault();
-                setOriginZone('hand');
-                setRightClickedCardAnchorElement(event.currentTarget);
-                setRightClickedCardID(card._id);
-              }}
-              style={{
-                flexShrink: 0,
-                // magic card dimentions are 63mm x 88mm
-                height: cardSize / 63,
-                width: cardSize / 88
-              }}
-            />
-          );
-        })}
-      </div>
-      
-      <MUITooltip title={player.account.name}>
-        <div>
-          <MUIBadge
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            badgeContent={<React.Fragment>
-              <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
-            </React.Fragment>}
-            className={classes.energyBadge}
-            overlap='circle'
-            showZero
-          >
+      <div style={{ display: 'flex' }}>
+        <MUITooltip title={player.account.name}>
+          <div style={{ margin: 'auto 16px' }}>
             <MUIBadge
-              anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               badgeContent={<React.Fragment>
-                <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
+                <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
               </React.Fragment>}
-              className={classes.lifeBadge}
+              className={classes.energyBadge}
               overlap='circle'
               showZero
             >
               <MUIBadge
-                anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
                 badgeContent={<React.Fragment>
-                  <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
+                  <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
                 </React.Fragment>}
-                className={classes.poisonBadge}
+                className={classes.lifeBadge}
                 overlap='circle'
                 showZero
               >
                 <MUIBadge
-                  anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                  anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
                   badgeContent={<React.Fragment>
-                    <LibrarySymbol className={classes.badgeIcon} /> : {player.library.length > 99 ? '99+' : player.library.length}
+                    <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
                   </React.Fragment>}
-                  className={classes.libraryBadge}
+                  className={classes.poisonBadge}
                   overlap='circle'
                   showZero
                 >
-                  <LargeAvatar
-                    alt={player.account.name}
-                    onClick={(event) => setAnchorEl(event.currentTarget)}
-                    src={player.account.avatar}
-                  />
+                  <MUIBadge
+                    anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                    badgeContent={<React.Fragment>
+                      <LibrarySymbol className={classes.badgeIcon} /> : {player.library.length > 99 ? '99+' : player.library.length}
+                    </React.Fragment>}
+                    className={classes.libraryBadge}
+                    overlap='circle'
+                    showZero
+                  >
+                    <LargeAvatar
+                      alt={player.account.name}
+                      onClick={(event) => setAnchorEl(event.currentTarget)}
+                      src={player.account.avatar}
+                    />
+                  </MUIBadge>
                 </MUIBadge>
               </MUIBadge>
             </MUIBadge>
-          </MUIBadge>
+          </div>
+        </MUITooltip>
+        <div
+          style={{
+            border: '1px solid black',
+            borderRadius: 4,
+            display: 'flex',
+            flexGrow: 1,
+            overflowX: 'auto'
+          }}
+        >
+          {player.hand.map(card => {
+            return (
+              <MagicCard
+                cardData={card}
+                key={card._id}
+                rightClickFunction={(event) => {
+                  event.preventDefault();
+                  setRightClickedCard({
+                    _id: card._id,
+                    anchorElement: event.currentTarget,
+                    origin: 'hand',
+                    visibility: card.visibility
+                  });
+                }}
+                style={{
+                  flexShrink: 0,
+                  // magic card dimentions are 63mm x 88mm
+                  height: cardSize / 63,
+                  width: cardSize / 88
+                }}
+              />
+            );
+          })}
         </div>
-      </MUITooltip>
+      </div>
     </React.Fragment>
   );
 }

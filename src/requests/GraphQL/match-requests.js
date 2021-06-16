@@ -371,6 +371,37 @@ async function dragCard (cardID, xCoordinate, yCoordinate, zIndex, matchID, toke
   }
 }
 
+async function drawCard (matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          drawCard {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.drawCard;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
 async function fetchMatchByID (matchID, token) {
   try {
     const graphqlQuery = {
@@ -437,12 +468,12 @@ async function rollDice (sides, matchID, token) {
   }
 }
 
-async function tapUntapCard (cardID, matchID, token) {
+async function shuffleLibrary (matchID, token) {
   try {
     const graphqlQuery = {
       query: `
         mutation {
-          tapUntapCard(_id: "${cardID}") {
+          shuffleLibrary {
             ${desiredMatchInfo}
           }
         }
@@ -458,7 +489,42 @@ async function tapUntapCard (cardID, matchID, token) {
 
     if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
 
-    return matchData.data.data.tapUntapCard;
+    return matchData.data.data.shuffleLibrary;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
+  }
+}
+
+async function tapUntapCards (cardIDs, matchID, token) {
+  try {
+    const graphqlQuery = {
+      query: `
+        mutation {
+          tapUntapCards(
+            input: {
+              cardIDs: [${cardIDs.map(id => '"' + id + '"')}]
+            }
+          ) {
+            ${desiredMatchInfo}
+          }
+        }
+      `
+    };
+    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          MatchID: matchID
+        }
+      });
+
+    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
+
+    return matchData.data.data.tapUntapCards;
   } catch (error) {
     if (error.response) {
       throw new Error(error.response.data.errors[0].message);
@@ -515,8 +581,10 @@ export {
   adjustPoisonCounters,
   createMatch,
   dragCard,
+  drawCard,
   fetchMatchByID,
   rollDice,
-  tapUntapCard,
+  shuffleLibrary,
+  tapUntapCards,
   transferCard
 };

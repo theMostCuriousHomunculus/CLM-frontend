@@ -7,10 +7,14 @@ import MUIDialogTitle from '@material-ui/core/DialogTitle';
 
 import MagicCard from '../miscellaneous/MagicCard';
 
-export default function ZoneInspectionDialogue (props) {
+export default function ZoneInspectionDialogue ({
+  close,
+  player,
+  setRightClickedCard,
+  zoneName
+}) {
 
-  const { close, player, setRightClickedCardAnchorElement, setRightClickedCardID, zoneName } = props;
-  const validZones = ['battlefield', 'exile', 'graveyard', 'hand', 'library', 'stack', 'temporary'];
+  // const validZones = ['battlefield', 'exile', 'graveyard', 'hand', 'library', 'stack', 'temporary'];
 
   return (
     <MUIDialog
@@ -19,15 +23,19 @@ export default function ZoneInspectionDialogue (props) {
     >
       <MUIDialogTitle>{player.account.name}'s {zoneName}</MUIDialogTitle>
       <MUIDialogContent style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {zoneName && player[zoneName].map(crd => {
+        {zoneName && player[zoneName].map(card => {
           return (
             <MagicCard
-              cardData={crd}
-              key={crd._id}
+              cardData={card}
+              key={card._id}
               rightClickFunction={(event) => {
                 event.preventDefault();
-                setRightClickedCardAnchorElement(event.currentTarget);
-                setRightClickedCardID(crd._id);
+                setRightClickedCard({
+                  _id: card._id,
+                  anchorElement: event.currentTarget,
+                  origin: zoneName,
+                  visibility: card.visibility
+                });
               }}
             />
           );

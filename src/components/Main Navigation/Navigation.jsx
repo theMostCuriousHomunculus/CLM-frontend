@@ -66,6 +66,7 @@ function Navigation (props) {
       />
       <MUIAppBar
         className={classes.appBar}
+        id="app-bar"
         position="static"
       >
         <MUIToolbar className={classes.toolbar}>
