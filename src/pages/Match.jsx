@@ -10,7 +10,7 @@ import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MatchLog from '../components/Match Page/MatchLog';
 import NumberInputDialog from '../components/miscellaneous/NumberInputDialog';
-import PlayerInfo from '../components/Match Page/PlayerInfo';
+import PlayZone from '../components/Match Page/PlayZone';
 import TheStack from '../components/Match Page/TheStack';
 import ZoneInspectionDialog from '../components/Match Page/ZoneInspectionDialog';
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -59,7 +59,6 @@ export default function Match () {
   });
   const matchID = useParams().matchId;
   const [errorMessage, setErrorMessage] = React.useState();
-  const [draggingCardID, setDraggingCardID] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const [match, setMatch] = React.useState({
     game_winners: [],
@@ -133,7 +132,6 @@ export default function Match () {
     owner: null,
     visibility: []
   });
-  const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
   const [zoneName, setZoneName] = React.useState(null);
 
   async function handleAdjustEnergyCounters (energy) {
@@ -160,13 +158,13 @@ export default function Match () {
     }
   }, [matchID, authentication.token]);
 
-  const handleDragCard = React.useCallback(async function (xCoordinate, yCoordinate) {
+  const handleDragCard = React.useCallback(async function (cardID, xCoordinate, yCoordinate, zIndex) {
     try {
-      await dragCard(draggingCardID, xCoordinate, yCoordinate, topZIndex, matchID, authentication.token);
+      await dragCard(cardID, xCoordinate, yCoordinate, zIndex, matchID, authentication.token);
     } catch (error) {
       setErrorMessage(error.message);
     }
-  }, [draggingCardID, topZIndex, matchID, authentication.token]);
+  }, [matchID, authentication.token]);
 
   const handleDrawCard = React.useCallback(async function () {
     try {
@@ -388,14 +386,13 @@ export default function Match () {
           />
         </div>
 
-        <PlayerInfo
+        <PlayZone
           bottomPlayer={bottomPlayer}
           cardSize={cardSize}
           displayedZones={displayedZones}
           handleDragCard={handleDragCard}
           handleTapUntapCards={handleTapUntapCards}
           setClickedPlayer={setClickedPlayer}
-          setDraggingCardID={setDraggingCardID}
           setRightClickedCard={setRightClickedCard}
           topPlayer={topPlayer}
         />

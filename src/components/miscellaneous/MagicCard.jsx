@@ -20,23 +20,32 @@ const useStyles = makeStyles({
     '&:hover': {
       background: theme.palette.primary.dark
     }
-  },
-  paper: {
-    backgroundSize: 'cover',
-    // margin: 4,
-    margin: 0,
-    // paddingLeft: 20,
-    // paddingRight: 20,
-    // paddingTop: 36,
-    padding: 0
   }
 });
 
-const MagicCard = (props) => {
+export default function MagicCard ({
+  cardData: {
+    _id,
+    back_image,
+    face_down_image,
+    flipped,
+    image,
+    tapped
+  },
+  children,
+  clickFunction,
+  customStyle,
+  rightClickFunction,
+  // for Draggable wrapped cards
+  style,
+  className,
+  onMouseDown,
+  onMouseUp,
+  onTouchStart,
+  onTouchEnd
+}) {
 
   const classes = useStyles();
-  const { cardData, children, clickFunction, rightClickFunction, style } = props;
-  const { _id, back_image, face_down_image, flipped, image } = cardData;
   let displayedImage;
   
   if (image && !flipped) {
@@ -61,17 +70,25 @@ const MagicCard = (props) => {
 
   return (
     <MUIPaper
-      className={classes.paper}
-      id={`d-${_id}`}
+      className={className}
+      id={`drag-${_id}`}
       onClick={clickFunction ? () => clickFunction() : () => null}
       onContextMenu={rightClickFunction ? (event) => rightClickFunction(event) : () => null}
       style={{
         backgroundImage: `url(${displayedImage})`,
-        // default dimensions
+        backgroundSize: 'cover',
         height: 264,
+        margin: 0,
+        padding: 0,
         width: 189,
-        ...style
+        ...customStyle,
+        ...style,
+        transform: `${style.transform ? style.transform : ''}${tapped ? ' rotate(90deg)' : ''}`
       }}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       {(children || back_image) && <div className={classes.buttonBar}>
         {children && children[0]}
@@ -92,6 +109,4 @@ const MagicCard = (props) => {
       </div>}
     </MUIPaper>
   );
-}
-
-export default MagicCard;
+};
