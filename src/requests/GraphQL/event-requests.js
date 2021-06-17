@@ -1,48 +1,78 @@
 import axios from 'axios';
 
-const desiredEventInfo = `finished
-host {
+const desiredEventInfo = `
   _id
-}
-name
-players {
-  account {
+  finished
+  host {
     _id
-    avatar
-    name
   }
-  chaff {
-    _id
-    back_image
-    image
-    mtgo_id
-    name
-  }
-  current_pack {
-    _id
-    back_image
-    image
-    name
-  }
-  mainboard {
-    _id
-    back_image
-    image
-    mtgo_id
-    name
-  }
-  sideboard {
-    _id
-    back_image
-    image
-    mtgo_id
-    name
-  }
-}`
+  name
+  players {
+    account {
+      _id
+      avatar
+      name
+    }
+    chaff {
+      _id
+      back_image
+      image
+      mtgo_id
+      name
+    }
+    current_pack {
+      _id
+      back_image
+      image
+      name
+    }
+    mainboard {
+      _id
+      back_image
+      image
+      mtgo_id
+      name
+    }
+    sideboard {
+      _id
+      back_image
+      image
+      mtgo_id
+      name
+    }
+  }`
 
-async function createEvent () {
+async function createEvent (cardsPerPack, eventType, modules, name, otherPlayers, packsPerPlayer, cubeID, token) {
   try {
-    
+    const graphqlQuery = {
+      query: `
+        mutation {
+          createEvent (
+            input: {
+              cards_per_pack: ${cardsPerPack},
+              event_type: ${eventType},
+              modules: [${modules.map(mdl => '"' + mdl + '"')}],
+              name: "${name}",
+              other_players: [${otherPlayers.map(plr => '"' + plr + '"')}],
+              packs_per_player: ${packsPerPlayer}
+            }
+          ) {
+            ${desiredEventInfo}
+          }
+        }
+      `
+    };
+    const eventData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      { headers: {
+          Authorization: `Bearer ${token}`,
+          CubeID: cubeID
+        }
+      });
+
+    if (eventData.data.errors) throw new Error(eventData.data.errors[0].message);
+
+    return eventData.data.data.createEvent;
   } catch (error) {
     if (error.response) {
       throw new Error(error.response.data.errors[0].message);

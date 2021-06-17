@@ -27,7 +27,7 @@ async function editAccount (changes, token) {
   }
 }
 
-async function fetchAccountById (accountId, token) {
+async function fetchAccountByID (accountId, token) {
   const headers = token ? { Authorization: `Bearer ${token}` } : null;
   try {
     const graphqlQuery = {
@@ -144,10 +144,10 @@ async function login (email, password) {
       `
     };
     const credentials = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
-    console.log(credentials);
+
     return credentials.data.data.login;
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
@@ -255,7 +255,7 @@ async function submitPasswordReset (email, newPassword, resetToken) {
 
 export {
   editAccount,
-  fetchAccountById,
+  fetchAccountByID,
   login,
   logout,
   register,

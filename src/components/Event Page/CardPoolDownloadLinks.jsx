@@ -9,9 +9,8 @@ const useStyles = makeStyles({
   }
 });
 
-const CardPoolDownloadLinks = (props) => {
+export default function CardPoolDownloadLinks ({ me, others }) {
 
-  const { me, others } = props;
   const classes = useStyles();
 
   const usedCardsString = me.mainboard.reduce(function (a, c) {
@@ -35,17 +34,22 @@ const CardPoolDownloadLinks = (props) => {
         </CSVLink>
       </MUITypography>
       {others.map(function (plr) {
-        const cardpool = [...plr.mainboard, ...plr.sideboard, ...plr.chaff];
+        const cardpool = [];
+
+        if (plr.mainboard) cardpool.push(...plr.mainboard);
+
+        if (plr.sideboard) cardpool.push(...plr.sideboard);
+
+        if (plr.chaff) cardpool.push(...plr.chaff);
 
         return (
-          <MUITypography variant="body1">
+          <MUITypography key={plr.account._id} variant="body1">
             <CSVLink
               className={classes.downloadLink}
               data={cardpool.reduce(function (a, c) {
                 return a + " ,1," + c + ", , , , ,No,0\n";
               }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n")}
               filename={`${plr.account.name}.csv`}
-              key={plr.account._id}
               target="_blank"
             >
               Download {plr.account.name}'s card pool in CSV format for MTGO play!
@@ -56,5 +60,3 @@ const CardPoolDownloadLinks = (props) => {
     </React.Fragment>
   );
 };
-
-export default CardPoolDownloadLinks;

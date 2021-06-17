@@ -26,7 +26,7 @@ import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import SmallAvatar from '../miscellaneous/SmallAvatar';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
+import { createEvent } from '../../requests/GraphQL/event-requests';
 
 const useStyles = makeStyles({
   budSwitch: {
@@ -48,84 +48,47 @@ const useStyles = makeStyles({
   }
 });
 
-const CreateEventForm = (props) => {
-
-  const { buds, cubes, open, toggleOpen } = props;
-
-  const classes = useStyles();
-  const history = useHistory();
-  const { loading, sendRequest } = useRequest();
+export default function CreateEventForm ({
+  buds,
+  cubes,
+  open,
+  toggleOpen
+}) {
 
   const authentication = React.useContext(AuthenticationContext);
+  const classes = useStyles();
+  const history = useHistory();
   const [cardsPerPack, setCardsPerPack] = React.useState(1);
   const [cubeAnchorEl, setCubeAnchorEl] = React.useState(null);
   const [errorMessage, setErrorMessage] = React.useState();
   const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
   const eventName = React.useRef();
   const [eventType, setEventType] = React.useState('draft');
+  const [includedModules, setIncludedModules] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [otherPlayers, setOtherPlayers] = React.useState([]);
   const [packsPerPlayer, setPacksPerPlayer] = React.useState(1);
-  const [selectedCube, setSelectedCube] = React.useState();
-
-  React.useEffect(function () {
-    setSelectedCube(cubes[0]);
-  }, [cubes]);
-
-  function handleCubeMenuItemClick (cube_id) {
-    const clickedCube = cubes.find(function (cube) {
-      return cube._id === cube_id;
-    });
-    setSelectedCube(clickedCube);
-    setCubeAnchorEl(null);
-  }
-
-  function handleEventMenuItemClick (event_type) {
-    setEventType(event_type);
-    setEventAnchorEl(null);
-  }
+  const [selectedCube, setSelectedCube] = React.useState(cubes[0]);
 
   async function submitForm (event) {
     event.preventDefault();
 
-    let formInputs = {};
-    formInputs.cards_per_pack = cardsPerPack;
-    formInputs.cube = selectedCube._id;
-    formInputs.event_type = eventType;
-    formInputs.name = eventName.current.value;
-    formInputs.packs_per_player = packsPerPlayer;
-
-    const otherPlayersElements = document.getElementsByClassName('other-players');
-    let otherPlayersIds = [];
-
-    for (let player of otherPlayersElements) {
-      if (player.checked) {
-        otherPlayersIds.push(player.value);
-      }
-    }
-    formInputs['other_players[]'] = otherPlayersIds;
-
-    const moduleElements = document.getElementsByClassName('modules');
-    let moduleIds = [];
-
-    for (let module of moduleElements) {
-      if (module.checked) {
-        moduleIds.push(module.value);
-      }
-    }
-    formInputs['modules[]'] = moduleIds;
-
     try {
-      const responseData = await sendRequest(
-        `${process.env.REACT_APP_REST_URL}/event`,
-        'POST',
-        JSON.stringify(formInputs),
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
-      history.push(`/event/${responseData._id}`);
+      setLoading(true);
+      const eventData = await createEvent(
+        cardsPerPack,
+        eventType,
+        includedModules,
+        eventName.current.value,
+        otherPlayers,
+        packsPerPlayer,
+        selectedCube._id,
+        authentication.token);
+      history.push(`/event/${eventData._id}`);
     } catch (error) {
       setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -167,12 +130,11 @@ const CreateEventForm = (props) => {
                 >
                   <MUIListItemText
                     primary="Cube to Use"
-                    secondary={selectedCube && selectedCube.name}
+                    secondary={selectedCube.name}
                   />
                 </MUIListItem>
               </MUIList>
               <MUIMenu
-                id="cube-to-use-selector"
                 anchorEl={cubeAnchorEl}
                 keepMounted
                 open={Boolean(cubeAnchorEl)}
@@ -182,8 +144,11 @@ const CreateEventForm = (props) => {
                   return (
                     <MUIMenuItem
                       key={cube._id}
-                      onClick={() => handleCubeMenuItemClick(cube._id)}
-                      selected={selectedCube && selectedCube._id === cube._id}
+                      onClick={() => {
+                        setCubeAnchorEl(null);
+                        setSelectedCube(cube);
+                      }}
+                      selected={selectedCube._id === cube._id}
                     >
                       {cube.name}
                     </MUIMenuItem>
@@ -205,21 +170,26 @@ const CreateEventForm = (props) => {
                 </MUIListItem>
               </MUIList>
               <MUIMenu
-                id="event-type-selector"
                 anchorEl={eventAnchorEl}
                 keepMounted
                 open={Boolean(eventAnchorEl)}
                 onClose={() => setEventAnchorEl(null)}
               >
                 <MUIMenuItem
-                  onClick={() => handleEventMenuItemClick('draft')}
+                  onClick={() => {
+                    setEventType('draft');
+                    setEventAnchorEl(null);
+                  }}
                   selected={eventType === 'draft'}
                 >
                   Draft
                 </MUIMenuItem>
 
                 <MUIMenuItem
-                  onClick={() => handleEventMenuItemClick('sealed')}
+                  onClick={() => {
+                    setEventType('sealed');
+                    setEventAnchorEl(null);
+                  }}
                   selected={eventType === 'sealed'}
                 >
                   Sealed
@@ -235,9 +205,11 @@ const CreateEventForm = (props) => {
                         className={classes.budSwitch}
                         control={
                           <MUISwitch
-                            inputRef={function (inputElement) {
-                              if (inputElement) {
-                                inputElement.classList.add('other-players');
+                            onChange={() => {
+                              if (otherPlayers.includes(bud._id)) {
+                                setOtherPlayers(prevState => prevState.filter(plr => plr!== bud._id));
+                              } else {
+                                setOtherPlayers(prevState => [...prevState, bud._id]);
                               }
                             }}
                             value={bud._id}
@@ -248,7 +220,6 @@ const CreateEventForm = (props) => {
                           <span className={classes.flex}>
                             <SmallAvatar
                               alt={bud.name}
-                              // component="span"
                               src={bud.avatar}
                             />
                             <MUITypography variant="subtitle1">{bud.name}</MUITypography>
@@ -268,9 +239,11 @@ const CreateEventForm = (props) => {
                       <MUIFormControlLabel
                         control={
                           <MUICheckbox
-                            inputRef={function (inputElement) {
-                              if (inputElement) {
-                                inputElement.classList.add('modules');
+                            onChange={() => {
+                              if (includedModules.includes(module._id)) {
+                                setIncludedModules(prevState => prevState.filter(mdl => mdl!== module._id));
+                              } else {
+                                setIncludedModules(prevState => [...prevState, module._id]);
                               }
                             }}
                             value={module._id}
@@ -339,9 +312,7 @@ const CreateEventForm = (props) => {
             </MUIDialogContent>
 
             <MUIDialogActions>
-              <WarningButton
-                onClick={toggleOpen}
-              >
+              <WarningButton onClick={toggleOpen}>
                 Cancel
               </WarningButton>
 
@@ -361,5 +332,3 @@ const CreateEventForm = (props) => {
     </React.Fragment>
   );
 }
-
-export default CreateEventForm;

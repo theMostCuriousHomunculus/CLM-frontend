@@ -38,7 +38,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Event = () => {
+export default function Event () {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
@@ -239,5 +239,3 @@ const Event = () => {
     </React.Fragment>
   );
 };
-
-export default Event;

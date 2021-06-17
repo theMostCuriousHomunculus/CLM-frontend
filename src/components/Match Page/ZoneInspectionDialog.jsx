@@ -14,14 +14,12 @@ export default function ZoneInspectionDialogue ({
   zoneName
 }) {
 
-  // const validZones = ['battlefield', 'exile', 'graveyard', 'hand', 'library', 'stack', 'temporary'];
-
   return (
     <MUIDialog
       open={!!zoneName}
       onClose={close}
     >
-      <MUIDialogTitle>{player.account.name}'s {zoneName}</MUIDialogTitle>
+      <MUIDialogTitle>{player.account.name}'s {zoneName + (zoneName === 'temporary' ? ' zone' : '')}</MUIDialogTitle>
       <MUIDialogContent style={{ display: 'flex', flexWrap: 'wrap' }}>
         {zoneName && player[zoneName].map(card => {
           return (
@@ -33,7 +31,9 @@ export default function ZoneInspectionDialogue ({
                 setRightClickedCard({
                   _id: card._id,
                   anchorElement: event.currentTarget,
+                  controller: card.controller._id,
                   origin: zoneName,
+                  owner: card.owner._id,
                   visibility: card.visibility
                 });
               }}

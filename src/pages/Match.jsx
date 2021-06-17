@@ -9,8 +9,10 @@ import CardMenu from '../components/Match Page/CardMenu';
 import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MatchLog from '../components/Match Page/MatchLog';
+import NumberInputDialog from '../components/miscellaneous/NumberInputDialog';
 import PlayerInfo from '../components/Match Page/PlayerInfo';
 import TheStack from '../components/Match Page/TheStack';
+import ZoneInspectionDialog from '../components/Match Page/ZoneInspectionDialog';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import {
   adjustEnergyCounters,
@@ -25,6 +27,7 @@ import {
   tapUntapCards,
   transferCard
 } from '../requests/GraphQL/match-requests.js';
+import PlayerMenu from '../components/Match Page/PlayerMenu';
 
 const useStyles = makeStyles({
   matchScreenFlexContainer: {
@@ -33,12 +36,6 @@ const useStyles = makeStyles({
     '& > *': {
       margin: 4
     }
-  },
-  playZoneContainer: {
-    display: 'flex',
-    flex: '1 1 0',
-    flexDirection: 'column',
-    minWidth: 0
   }
 });
 
@@ -47,6 +44,19 @@ export default function Match () {
   const authentication = React.useContext(AuthenticationContext);
   const [cardSize, setCardSize] = React.useState(63*88*2);
   const classes = useStyles();
+  const [clickedPlayer, setClickedPlayer] = React.useState({
+    _id: null,
+    anchorElement: null,
+    position: null
+  });
+  const [displayedZones, setDisplayedZones] = React.useState({
+    bottomExile: true,
+    bottomGraveyard: true,
+    bottomLibrary: true,
+    topExile: true,
+    topGraveyard: true,
+    topLibrary: true
+  });
   const matchID = useParams().matchId;
   const [errorMessage, setErrorMessage] = React.useState();
   const [draggingCardID, setDraggingCardID] = React.useState();
@@ -94,27 +104,37 @@ export default function Match () {
     ],
     stack: []
   });
+  const [numberInputDialogInfo, setNumberInputDialogInfo] = React.useState({
+    buttonText: null,
+    defaultValue: null,
+    inputLabel: null,
+    title: null,
+    updateFunction: null
+  });
   const participant = match.players.some(plr => plr.account._id === authentication.userId);
-  const player = participant ?
+  const bottomPlayer = participant ?
     match.players.find(plr => plr.account._id === authentication.userId) :
     match.players[0];
-  let opponent;
+  let topPlayer;
   
   if (participant && match.players.length === 2) {
-    opponent = match.players.find(plr => plr.account._id !== authentication.userId);
+    topPlayer = match.players.find(plr => plr.account._id !== authentication.userId);
   } else if (!participant && match.players.length === 2) {
-    opponent = match.players[1];
+    topPlayer = match.players[1];
   } else {
-    opponent = null;
+    topPlayer = null;
   }
 
   const [rightClickedCard, setRightClickedCard] = React.useState({
     _id: null,
     anchorElement: null,
+    controller: null,
     origin: null,
+    owner: null,
     visibility: []
   });
-  const topZIndex = Math.max(...player.battlefield.map(crd => crd.z_index)) + 1;
+  const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
+  const [zoneName, setZoneName] = React.useState(null);
 
   async function handleAdjustEnergyCounters (energy) {
     try {
@@ -261,19 +281,33 @@ export default function Match () {
         handleDrawCard();
       }
 
+      if (event.altKey && event.shiftKey && event.key === 'R') {
+        setNumberInputDialogInfo({
+          buttonText: "Roll",
+          defaultValue: 6,
+          inputLabel: "Number of Sides",
+          title: "Roll Dice",
+          updateFunction: (updatedValue) => handleRollDice(updatedValue)
+        });
+      }
+
       if (event.altKey && event.shiftKey && event.key === 'S') {
         handleShuffleLibrary();
       }
 
       if (event.altKey && event.shiftKey && event.key === 'U') {
-        handleTapUntapCards(player.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
+        handleTapUntapCards(bottomPlayer.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
       }
+
     }
 
-    document.addEventListener("keydown", handleHotKeys);
+    if (participant) {
+      document.addEventListener("keydown", handleHotKeys);
 
-    return () => document.removeEventListener("keydown", handleHotKeys);
-  }, [handleDrawCard, handleShuffleLibrary, handleTapUntapCards, player.battlefield])
+      return () => document.removeEventListener("keydown", handleHotKeys);
+    }
+
+  }, [handleDrawCard, handleRollDice, handleShuffleLibrary, handleTapUntapCards, participant, bottomPlayer.battlefield]);
 
   return (
     loading ?
@@ -284,10 +318,52 @@ export default function Match () {
         message={errorMessage}
       />
 
+      <NumberInputDialog
+        buttonText={numberInputDialogInfo.buttonText}
+        close={() => setNumberInputDialogInfo({
+          buttonText: null,
+          defaultValue: null,
+          inputLabel: null,
+          title: null,
+          updateFunction: null
+        })}
+        defaultValue={numberInputDialogInfo.defaultValue}
+        inputLabel={numberInputDialogInfo.inputLabel}
+        title={numberInputDialogInfo.title}
+        updateFunction={numberInputDialogInfo.updateFunction}
+      />
+
+      <ZoneInspectionDialog
+        close={() => {
+          setZoneName(null);
+          setClickedPlayer({
+            _id: null,
+            anchorElement: null,
+            position: null
+          });
+        }}
+        player={clickedPlayer.position === 'top' ? topPlayer : bottomPlayer}
+        setRightClickedCard={setRightClickedCard}
+        zoneName={zoneName}
+      />
+
       <CardMenu
         handleTransferCard={handleTransferCard}
         rightClickedCard={rightClickedCard}
         setRightClickedCard={setRightClickedCard}
+      />
+
+      <PlayerMenu
+        bottomPlayer={bottomPlayer}
+        clickedPlayer={clickedPlayer}
+        displayedZones={displayedZones}
+        handleAdjustEnergyCounters={handleAdjustEnergyCounters}
+        handleAdjustLifeTotal={handleAdjustLifeTotal}
+        handleAdjustPoisonCounters={handleAdjustPoisonCounters}
+        setClickedPlayer={setClickedPlayer}
+        setDisplayedZones={setDisplayedZones}
+        setNumberInputDialogInfo={setNumberInputDialogInfo}
+        setZoneName={setZoneName}
       />
 
       {match.stack.length > 0 &&
@@ -312,22 +388,17 @@ export default function Match () {
           />
         </div>
 
-        <div className={classes.playZoneContainer}>
-          {/*Opponent's zones*/}
-
-          <PlayerInfo
-            cardSize={cardSize}
-            handleAdjustEnergyCounters={handleAdjustEnergyCounters}
-            handleAdjustLifeTotal={handleAdjustLifeTotal}
-            handleAdjustPoisonCounters={handleAdjustPoisonCounters}
-            handleDragCard={handleDragCard}
-            handleRollDice={handleRollDice}
-            handleTapUntapCards={handleTapUntapCards}
-            setDraggingCardID={setDraggingCardID}
-            setRightClickedCard={setRightClickedCard}
-            player={player}
-          />
-        </div>
+        <PlayerInfo
+          bottomPlayer={bottomPlayer}
+          cardSize={cardSize}
+          displayedZones={displayedZones}
+          handleDragCard={handleDragCard}
+          handleTapUntapCards={handleTapUntapCards}
+          setClickedPlayer={setClickedPlayer}
+          setDraggingCardID={setDraggingCardID}
+          setRightClickedCard={setRightClickedCard}
+          topPlayer={topPlayer}
+        />
 
         <MatchLog log={match.log} />
       </div>

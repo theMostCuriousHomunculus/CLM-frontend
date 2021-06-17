@@ -27,7 +27,7 @@ import UserEventCard from '../components/Account Page/UserEventCard';
 import UserMatchCard from '../components/Account Page/UserMatchCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { editAccount, fetchAccountById } from '../requests/GraphQL/account-requests';
+import { editAccount, fetchAccountByID } from '../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -48,7 +48,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Account = () => {
+export default function Account () {
 
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
@@ -69,21 +69,22 @@ const Account = () => {
   const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(false);
 
-  const fetchAccount = React.useCallback(async function() {
-    try {
-      setLoading(true);
-      const response = await fetchAccountById(accountId, authentication.token);
-      setAccount(response);
-    } catch (error) {
-      setErrorMessage(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [accountId, authentication.token]);
-
   React.useEffect(() => {
+
+    async function fetchAccount () {
+      try {
+        setLoading(true);
+        const response = await fetchAccountByID(accountId, authentication.token);
+        setAccount(response);
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchAccount();
-  }, [fetchAccount]);
+  }, [accountId, authentication.token]);
 
   async function submitChanges (changes) {
     try {
@@ -298,6 +299,4 @@ const Account = () => {
       }
     </React.Fragment>
   );
-}
-
-export default Account;
+};

@@ -36,7 +36,7 @@ const MagicCard = (props) => {
 
   const classes = useStyles();
   const { cardData, children, clickFunction, rightClickFunction, style } = props;
-  const { back_image, face_down_image, flipped, image } = cardData;
+  const { _id, back_image, face_down_image, flipped, image } = cardData;
   let displayedImage;
   
   if (image && !flipped) {
@@ -62,6 +62,7 @@ const MagicCard = (props) => {
   return (
     <MUIPaper
       className={classes.paper}
+      id={`d-${_id}`}
       onClick={clickFunction ? () => clickFunction() : () => null}
       onContextMenu={rightClickFunction ? (event) => rightClickFunction(event) : () => null}
       style={{

@@ -151,17 +151,19 @@ players {
     back_image
     image
     name
-    tapped
-    x_coordinate
-    y_coordinate
-    z_index
   }
   sideboard {
     _id
     back_image
+    controller {
+      _id
+    }
     face_down_image
     image
     name
+    owner {
+      _id
+    }
     visibility {
       _id
     }
@@ -169,11 +171,17 @@ players {
   temporary {
     _id
     back_image
+    controller {
+      _id
+    }
     face_down_image
     image
     index
     isCopyToken
     name
+    owner {
+      _id
+    }
     visibility {
       _id
     }
@@ -309,7 +317,7 @@ async function createMatch (eventId, playerIds, token) {
           createMatch(
             input: {
               eventID: "${eventId}",
-              playerIDs: ${playerIds.map(plrID => '"' + plrID + '"')}
+              playerIDs: [${playerIds.map(plrID => '"' + plrID + '"')}]
             }
           ) {
             ${desiredMatchInfo}

@@ -29,7 +29,7 @@ const UserEventCard = (props) => {
 
   return (
     <React.Fragment>
-      {accountId === authentication.userId &&
+      {accountId === authentication.userId && cubes.length > 0 &&
         <CreateEventForm
           buds={buds}
           cubes={cubes}
