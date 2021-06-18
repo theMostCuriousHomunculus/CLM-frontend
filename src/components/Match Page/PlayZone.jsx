@@ -2,6 +2,7 @@ import React from 'react';
 import Draggable from 'react-draggable';
 import MUIBadge from '@material-ui/core/Badge';
 import MUIFavoriteIcon from '@material-ui/icons/Favorite';
+import MUISvgIcon from '@material-ui/core/SvgIcon';
 import MUITooltip from '@material-ui/core/Tooltip';
 import blue from '@material-ui/core/colors/blue';
 import green from '@material-ui/core/colors/green';
@@ -12,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import LargeAvatar from '../miscellaneous/LargeAvatar';
 import MagicCard from '../miscellaneous/MagicCard';
 import { ReactComponent as EnergySymbol } from '../../svgs/energy.svg';
+import { ReactComponent as GraveyardSymbol } from '../../svgs/graveyard.svg';
 import { ReactComponent as LibrarySymbol } from '../../svgs/deck.svg';
 import { ReactComponent as PoisonSymbol } from '../../svgs/poison.svg';
 
@@ -38,7 +40,9 @@ const useStyles = makeStyles({
     borderRadius: 4,
     display: 'flex',
     flexDirection: 'column',
-    overflowY: 'auto'
+    minWidth: 65,
+    overflowY: 'auto',
+    position: 'relative'
   },
   columnFlex: {
     display: 'flex',
@@ -80,6 +84,11 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1
+  },
+  zoneBadge: {
+    '& > .MuiBadge-badge': {
+      transform: 'translate(44px, -44px)'
+    }
   }
 });
 
@@ -164,7 +173,7 @@ export default function PlayZone ({
               })}
             </div>
             {displayedZones.topGraveyard &&
-              <div className={classes.collapsableZoneContainer}>
+              <div className={classes.collapsableZoneContainer} style={{ transform: 'rotate(180deg)' }}>
                 {topPlayer.graveyard.map((val, index, array) => array[array.length - 1 - index]).map(card => {
                   return (
                     <MagicCard
@@ -185,6 +194,15 @@ export default function PlayZone ({
                     />
                   );
                 })}
+                <div style={{ alignItems: 'flex-end', bottom: 0, display: 'flex', flexGrow: 1, position: 'sticky' }}>
+                  <MUITooltip title="Graveyard">
+                    <MUIBadge badgeContent={topPlayer.graveyard.length} className={classes.zoneBadge} color='primary' showZero>
+                      <MUISvgIcon style={{ backgroundColor: '#888', borderRadius: '100%', bottom: 4, height: 32, left: 4, padding: 4, position: 'absolute', width: 32 }}>
+                        <GraveyardSymbol />
+                      </MUISvgIcon>
+                    </MUIBadge>
+                  </MUITooltip>
+                </div>
               </div>
             }
             {displayedZones.topExile &&
@@ -398,6 +416,13 @@ export default function PlayZone ({
                   />
                 );
               })}
+              <div style={{ alignItems: 'flex-end', bottom: 0, display: 'flex', flexGrow: 1, position: 'sticky' }}>
+                <MUITooltip title="Graveyard">
+                  <MUISvgIcon style={{ backgroundColor: '#888', borderRadius: '100%', bottom: 4, height: 32, left: 4, padding: 4, position: 'absolute', width: 32 }}>
+                    <GraveyardSymbol />
+                  </MUISvgIcon>
+                </MUITooltip>
+              </div>
             </div>
           }
           {displayedZones.bottomExile &&
