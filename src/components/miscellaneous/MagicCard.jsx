@@ -83,7 +83,7 @@ export default function MagicCard ({
         width: 189,
         ...customStyle,
         ...style,
-        transform: `${style.transform ? style.transform : ''}${tapped ? ' rotate(90deg)' : ''}`
+        transform: `${ style && style.transform ? style.transform : ''}${tapped ? ' rotate(90deg)' : ''}`
       }}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}

@@ -29,10 +29,11 @@ export default function PlayerMenu ({
         anchorElement: null,
         position: null
       })}
+      style={{ zIndex: 2147483647 }}
     >
 
       {clickedPlayer._id === authentication.userId &&
-        <React.Fragment>
+        <div>
           <MUIMenuItem
             onClick={() => {
               setClickedPlayer({
@@ -89,7 +90,7 @@ export default function PlayerMenu ({
             Adjust Poison Counters
           </MUIMenuItem>
           <hr/>
-        </React.Fragment>
+        </div>
       }
 
       <MUIMenuItem
@@ -145,6 +146,33 @@ export default function PlayerMenu ({
       >
         {clickedPlayer.position === 'bottom' && (displayedZones.bottomGraveyard ? "Hide Graveyard" : "Inspect Graveyard")}
         {clickedPlayer.position === 'top' && (displayedZones.topGraveyard ? "Hide Graveyard" : "Inspect Graveyard")}
+      </MUIMenuItem>
+      <MUIMenuItem
+        onClick={() => {
+          
+          if (clickedPlayer.position === 'bottom') {
+            setDisplayedZones(prevState => ({
+              ...prevState,
+              bottomHand: !prevState.bottomHand
+            }));
+          }
+          
+          if (clickedPlayer.position === 'top') {
+            setDisplayedZones(prevState => ({
+              ...prevState,
+              topHand: !prevState.topHand
+            }));
+          }
+
+          setClickedPlayer({
+            _id: null,
+            anchorElement: null,
+            position: null
+          });
+        }}
+      >
+        {clickedPlayer.position === 'bottom' && (displayedZones.bottomHand ? "Hide Hand" : "Inspect Hand")}
+        {clickedPlayer.position === 'top' && (displayedZones.topHand ? "Hide Hand" : "Inspect Hand")}
       </MUIMenuItem>
       <MUIMenuItem
         onClick={() => {

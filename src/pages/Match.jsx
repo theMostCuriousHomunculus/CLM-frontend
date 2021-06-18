@@ -52,9 +52,11 @@ export default function Match () {
   const [displayedZones, setDisplayedZones] = React.useState({
     bottomExile: true,
     bottomGraveyard: true,
+    bottomHand: true,
     bottomLibrary: true,
     topExile: true,
     topGraveyard: true,
+    topHand: true,
     topLibrary: true
   });
   const matchID = useParams().matchId;

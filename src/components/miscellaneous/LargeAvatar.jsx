@@ -14,7 +14,7 @@ const LargeAvatar = function (props) {
   const classes = useStyles();
 
   return (
-    <MUIAvatar className={classes.largeAvatar} {...props} />
+    <MUIAvatar className={classes.largeAvatar} imgProps={{ draggable: false }} {...props} />
   );
 };
 
