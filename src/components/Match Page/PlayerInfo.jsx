@@ -55,6 +55,10 @@ export default function PlayerInfo ({
   return (
     <Draggable
       bounds={`#${position}-player`}
+      defaultPosition={{
+        x: 16,
+        y: 16
+      }}
       handle={`#${position}-avatar`}
       onDrag={(event, data) => {
         setDragging(true);

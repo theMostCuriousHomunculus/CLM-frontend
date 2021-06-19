@@ -24,9 +24,6 @@ const useStyles = makeStyles({
     '& .MuiCardHeader-root': {
       flexGrow: 1
     }
-  },
-  spaceBetween: {
-    justifyContent: 'space-between'
   }
 });
 
@@ -73,7 +70,11 @@ export default function Blog () {
             <MUICard className={classes.fullHeight}>
               <MUICardHeader
                 title={<MUITypography variant="subtitle1">New Article</MUITypography>}
-                subheader={<MUITypography color="textSecondary" variant="subtitle2">The world eagerly awaits your opinions on shit</MUITypography>}
+                subheader={
+                  <MUITypography color="textSecondary" variant="subtitle2">
+                    The world eagerly awaits your opinions on shit
+                  </MUITypography>
+                }
               />
               <MUICardMedia
                 image="https://c1.scryfall.com/file/scryfall-cards/art_crop/front/c/b/cb3b35b8-f321-46d8-a441-6b9a6efa9021.jpg?1562304347"
@@ -104,15 +105,7 @@ export default function Blog () {
                 <MUICardMedia
                   image={blogPost.image}
                 />
-                <MUICardActions className={blogPost.author === authentication.userId ? classes.spaceBetween : null}>
-                  {blogPost.author === authentication.userId &&
-                    <WarningButton
-                      onClick={() => deleteBlogPost(blogPost._id)}
-                      startIcon={<MUIDeleteForeverIcon />}
-                    >
-                      Delete
-                    </WarningButton>
-                  }
+                <MUICardActions>
                   <MUIButton
                     color="primary"
                     onClick={() => history.push(`/blog/${blogPost._id}`)}
@@ -121,6 +114,14 @@ export default function Blog () {
                   >
                     Read
                   </MUIButton>
+                  {blogPost.author === authentication.userId &&
+                    <WarningButton
+                      onClick={() => deleteBlogPost(blogPost._id)}
+                      startIcon={<MUIDeleteForeverIcon />}
+                    >
+                      Delete
+                    </WarningButton>
+                  }
                 </MUICardActions>
               </MUICard>
             </MUIGrid>

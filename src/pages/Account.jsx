@@ -124,11 +124,7 @@ export default function Account () {
       if (changes.includes('send')) {
         setAccount(prevState => ({
           ...prevState,
-          received_bud_requests: [...prevState.received_bud_requests, {
-            _id: authentication.userId,
-            avatar: authentication.avatar,
-            name: authentication.name
-          }]
+          received_bud_requests: [...prevState.received_bud_requests, { _id: authentication.userId }]
         }));
       } else {
         setAccount(response);

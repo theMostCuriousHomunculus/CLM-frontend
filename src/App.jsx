@@ -7,13 +7,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 
 import cubeReducer from './redux-store/reducers/cube-reducer';
+import useRequest from './hooks/request-hook';
 import ErrorDialog from './components/miscellaneous/ErrorDialog';
 import Footer from './components/miscellaneous/Footer';
 import LoadingSpinner from './components/miscellaneous/LoadingSpinner';
 import Navigation from './components/Main Navigation/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
 import { ErrorContext } from './contexts/error-context';
-import { logout } from './requests/GraphQL/account-requests';
 
 const Account = React.lazy(() => import('./pages/Account'));
 const Blog = React.lazy(() => import('./pages/Blog'));
@@ -44,20 +44,15 @@ const useStyles = makeStyles({
 export default function App() {
 
   const classes = useStyles();
-  const [avatar, setAvatar] = React.useState(null);
+  const { sendRequest } = useRequest();
   const [errorMessages, setErrorMessages] = React.useState([]);
   const [isAdmin, setIsAdmin] = React.useState(false);
-  const [name, setName] = React.useState(null);
   const [token, setToken] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
 
-  const login = React.useCallback((admin, avtr, nm, tkn, uid) => {
+  const login = React.useCallback((admin, tkn, uid) => {
     setIsAdmin(admin);
     Cookies.set('is_admin', admin);
-    setAvatar(avtr);
-    Cookies.set('avatar', avtr);
-    setName(nm);
-    Cookies.set('username', nm);
     setToken(tkn);
     Cookies.set('authentication_token', tkn);
     setUserId(uid);
@@ -66,24 +61,28 @@ export default function App() {
 
   const handleLogout = React.useCallback(() => {
     // not awaiting for this response because it can only cause problems.  if the user's token was deleted on the server already, this request will throw an error, preventing this function from then removing cookies and updating context, which I don't want.
-    logout(Cookies.get('authentication_token'));
+    const operation = 'logoutAllDevices';
+    sendRequest({
+      operation,
+      body: {
+        query: `
+          mutation {
+            ${operation}
+          }
+        `
+      }
+    });
     setIsAdmin(false);
     Cookies.remove('is_admin');
-    setAvatar(null);
-    Cookies.remove('avatar');
-    setName(null);
-    Cookies.remove('username');
     setToken(null);
     Cookies.remove('authentication_token');
     setUserId(null);
     Cookies.remove('user_id');
-  }, []);
+  }, [sendRequest]);
 
   React.useEffect(() => {
     if (Cookies.get('user_id') && Cookies.get('authentication_token')) {
       login(Cookies.get('is_admin') === 'true',
-        Cookies.get('avatar'),
-        Cookies.get('username'),
         Cookies.get('authentication_token'),
         Cookies.get('user_id'));
     }
@@ -92,12 +91,10 @@ export default function App() {
   return (
     <AuthenticationContext.Provider
       value={{
-        avatar,
         isAdmin,
         isLoggedIn: !!token,
         login,
         logout: handleLogout,
-        name,
         token,
         userId
       }}

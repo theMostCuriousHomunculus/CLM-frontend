@@ -7,7 +7,7 @@ import { CardHeader as MUICardHeader } from '@material-ui/core';
 import { Grid as MUIGrid } from '@material-ui/core';
 import { Typography as MUITypography } from '@material-ui/core';
 
-const Resources = function () {
+export default function Resources () {
 
   const resourcesArray = [
     {
@@ -26,31 +26,27 @@ const Resources = function () {
   
   return (
     <MUIGrid container spacing={2}>
-      {
-        resourcesArray.map(function (resource, index) {
-          return (
-            <MUIGrid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
-              <MUICard>
-                <MUICardHeader
-                  disableTypography={true}
-                  title={<MUITypography variant="subtitle1">{resource.name}</MUITypography>}
-                  subheader={<MUITypography color="textSecondary" variant="subtitle2">{resource.platform}</MUITypography>}
-                />
-                <MUICardContent>
-                  <MUITypography variant="body1">{resource.description}</MUITypography>
-                </MUICardContent>
-                <MUICardActions>
-                  <MUIButton color="primary" href={resource.link} size="small" variant="contained">
-                    Learn More
-                  </MUIButton>
-                </MUICardActions>
-              </MUICard>
-            </MUIGrid>
-          );
-        })
-      }
+      {resourcesArray.map(function (resource, index) {
+        return (
+          <MUIGrid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
+            <MUICard>
+              <MUICardHeader
+                disableTypography={true}
+                title={<MUITypography variant="subtitle1">{resource.name}</MUITypography>}
+                subheader={<MUITypography color="textSecondary" variant="subtitle2">{resource.platform}</MUITypography>}
+              />
+              <MUICardContent>
+                <MUITypography variant="body1">{resource.description}</MUITypography>
+              </MUICardContent>
+              <MUICardActions>
+                <MUIButton color="primary" href={resource.link} size="small" variant="contained">
+                  Learn More
+                </MUIButton>
+              </MUICardActions>
+            </MUICard>
+          </MUIGrid>
+        );
+      })}
     </MUIGrid>
   );
 };
-
-export default Resources;

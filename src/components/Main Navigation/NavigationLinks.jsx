@@ -25,11 +25,14 @@ const useStyles = makeStyles({
   }
 });
 
-function NavigationLinks (props) {
+export default function NavigationLinks ({
+  history,
+  setAuthenticateFormDisplayed,
+  toggleDrawer
+}) {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { history } = props;
 
   const loggedInPages = [
     {
@@ -40,7 +43,7 @@ function NavigationLinks (props) {
     {
       icon: <MUIAccountCircleIcon />,
       name: "My Profile",
-      onClick: () => history.push('/account/' + authentication.userId)
+      onClick: () => history.push(`/account/${authentication.userId}`)
     },
     {
       icon: <MUIChatOutlinedIcon />,
@@ -78,31 +81,22 @@ function NavigationLinks (props) {
     {
       icon: <MUIExitToAppIcon />,
       name: "Login / Register",
-      onClick: () => props.setAuthenticateFormDisplayed(true)
+      onClick: () => setAuthenticateFormDisplayed(true)
     }
   ];
 
   return (
-    <div
-      className={classes.list}
-      role="presentation"
-      onClick={props.toggleDrawer(false)}
-      onKeyDown={props.toggleDrawer(false)}
-    >
-      <MUIList>
-        {
-          (authentication.isLoggedIn ? loggedInPages : loggedOutPages).map(function (page) {
-            return (
-              <MUIListItem button key={page.name} onClick={page.onClick}>
-                <MUIListItemIcon className={classes.item}>{page.icon}</MUIListItemIcon>
-                <MUIListItemText className={classes.item} primary={page.name} />
-              </MUIListItem>
-            );
-          })
-        }
-      </MUIList>
-    </div>
+    <MUIList className={classes.list} onClick={toggleDrawer} onKeyDown={toggleDrawer}>
+      {
+        (authentication.isLoggedIn ? loggedInPages : loggedOutPages).map(function (page) {
+          return (
+            <MUIListItem button key={page.name} onClick={page.onClick}>
+              <MUIListItemIcon className={classes.item}>{page.icon}</MUIListItemIcon>
+              <MUIListItemText className={classes.item} primary={page.name} />
+            </MUIListItem>
+          );
+        })
+      }
+    </MUIList>
   );
-}
-
-export default NavigationLinks;
+};

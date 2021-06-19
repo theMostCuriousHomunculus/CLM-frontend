@@ -51,9 +51,7 @@ export default function AuthenticateForm ({
                   password: "${passwordInput}"
                 }
               ) {
-                avatar
                 isAdmin
-                name
                 token
                 userId
               }
@@ -62,7 +60,7 @@ export default function AuthenticateForm ({
         }
       });
       
-      login(response.isAdmin, response.avatar, response.name, response.token, response.userId);
+      login(response.isAdmin, response.token, response.userId);
       toggleOpen();
     } catch (error) {
 
@@ -105,7 +103,7 @@ export default function AuthenticateForm ({
         }
       });
 
-      login(false, avatar, nameInput, response.token, response.userId);
+      login(false, response.token, response.userId);
       toggleOpen();
     } catch (error) {
 

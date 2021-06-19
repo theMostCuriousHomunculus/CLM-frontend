@@ -15,14 +15,15 @@ const useStyles = makeStyles({
     width: 200
   },
   cardContent: {
+    display: 'flex',
+    flexDirection: 'column-reverse',
     flexGrow: 1,
     overflowY: 'auto'
   }
 });
 
-export default function MatchLog (props) {
+export default function MatchLog ({ log }) {
 
-  const { log } = props;
   const classes = useStyles();
 
   return (
@@ -32,7 +33,17 @@ export default function MatchLog (props) {
         title={<MUITypography variant="h5">Match Log</MUITypography>}
       />
       <MUICardContent className={classes.cardContent}>
-        {log.map((update, index) => <MUITypography key={`log-update-${index + 1}`} variant="body2">{index + 1}) {update}</MUITypography>)}
+        {/*some tricky css here for a nice auto scroll effect*/} 
+        {log.map((val, index, array) => array[array.length - 1 - index]).map((update, index, array) => {
+          return (
+            <MUITypography
+              key={`log-update-${array.length - index}`}
+              variant="body2"
+            >
+              {array.length - index}) {update}
+            </MUITypography>
+          );
+        })}
       </MUICardContent>
     </MUICard>
   );

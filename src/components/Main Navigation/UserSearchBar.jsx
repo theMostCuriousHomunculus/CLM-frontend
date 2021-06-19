@@ -1,5 +1,4 @@
 import React from 'react';
-import MUIAvatar from '@material-ui/core/Avatar';
 import MUICircularProgress from '@material-ui/core/CircularProgress';
 import MUISearchIcon from '@material-ui/icons/Search';
 import MUITextField from '@material-ui/core/TextField';
@@ -8,7 +7,8 @@ import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
 import theme from '../../theme';
-import { searchAccounts } from '../../requests/GraphQL/account-requests';
+import useRequest from '../../hooks/request-hook';
+import SmallAvatar from '../miscellaneous/SmallAvatar';
 
 const useStyles = makeStyles({
   input: {
@@ -19,6 +19,12 @@ const useStyles = makeStyles({
     '& .MuiInputBase-root': {
       padding: '8px 40px 8px 8px !important'
     }
+  },
+  option: {
+    alignItems: 'flex-end',
+    display: 'flex',
+    flexGrow: 1,
+    justifyContent: 'space-between'
   },
   search: {
     borderRadius: theme.shape.borderRadius,
@@ -63,37 +69,38 @@ const useStyles = makeStyles({
   }
 });
 
-function UserSearchBar (props) {
+export default function UserSearchBar ({
+  history,
+  orientation,
+  setDrawerOpen
+}) {
 
-  const [loading, setLoading] = React.useState(false);
+  const { loading, sendRequest } = useRequest();
   const [open, setOpen] = React.useState(false);
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
-  const { history } = props;
 
-  function goToUserProfilePage (user_id, props) {
-    history.push(`/account/${user_id}`);
-    setUserSearchResults([]);
-    if (props === 'side') {
-      props.setDrawerOpen(false);
-    } else {
-      // not a great way to clear the search text; using setTimeout because of asynchronous javascript
-      setTimeout(function () {
-        document.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
-      }, 0);
-    }
-  }
-
-  async function searchForUsers (event) {
+  async function searchAccounts (event) {
     if (event.target.value.length > 2) {
       try {
-        setLoading(true);
-        const matchingUsers = await searchAccounts(event.target.value);
+        const operation = 'searchAccounts';
+        const matchingUsers = await sendRequest({
+          operation,
+          body: {
+            query: `
+              query {
+                searchAccounts(name: "${event.target.value}") {
+                  _id
+                  avatar
+                  name
+                }
+              }
+            `
+          }
+        })
         setUserSearchResults(matchingUsers);
       } catch (error) {
-        console.log({ 'Error': error.message });
-      } finally {
-        setLoading(false);
+        
       }
     } else {
       setUserSearchResults([]);
@@ -101,7 +108,7 @@ function UserSearchBar (props) {
   }
 
   return (
-    <div className={(props.orientation === 'side' ? classes.sideBar : classes.topBar) + ' ' + classes.search}>
+    <div className={(orientation === 'side' ? classes.sideBar : classes.topBar) + ' ' + classes.search}>
       <div className={classes.searchIcon}>
         <MUISearchIcon />
       </div>
@@ -109,13 +116,13 @@ function UserSearchBar (props) {
         clearOnBlur={false}
         clearOnEscape={true}
         getOptionLabel={(option) => option.name}
-        getOptionSelected={function (option, value) {
-          return option.name === value.name;
-        }}
+        getOptionSelected={(option, value) => option.name === value.name}
         loading={loading}
         onChange={function (event, value, reason) {
           if (reason === 'select-option') {
-            goToUserProfilePage(value._id, props);
+            history.push(`/account/${value._id}`);
+            setUserSearchResults([]);
+            setDrawerOpen(false);
           }
         }}
         onClose={() => setOpen(false)}
@@ -129,7 +136,7 @@ function UserSearchBar (props) {
             color="secondary"
             label="Search for Other Users!"
             margin="dense"
-            onKeyUp={searchForUsers}
+            onKeyUp={searchAccounts}
             variant="outlined"
             InputProps={{
               ...params.InputProps,
@@ -144,8 +151,8 @@ function UserSearchBar (props) {
         )}
         renderOption={(option) => {
           return (
-            <div style={{ alignItems: "center", display: "flex", flexGrow: 1, justifyContent: "space-between" }}>
-              <MUIAvatar alt={option.name} src={option.avatar} />
+            <div className={classes.option}>
+              <SmallAvatar alt={option.name} src={option.avatar} />
               <MUITypography variant="body1">{option.name}</MUITypography>
             </div>
           );
@@ -153,6 +160,4 @@ function UserSearchBar (props) {
       />
     </div>
   );
-}
-
-export default UserSearchBar;
+};

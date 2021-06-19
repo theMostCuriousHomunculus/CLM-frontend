@@ -14,12 +14,11 @@ import UserSearchBar from './UserSearchBar';
 
 const useStyles = makeStyles({
   appBar: {
-    // background: `linear-gradient(${theme.palette.primary.light}, ${theme.palette.primary.dark})`
     background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
   },
   drawer: {
     '& .MuiPaper-root': {
-      background: /*theme.palette.primary.main*//*`radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`*/`linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`
+      background: `linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`
     }
   },
   headlineContainer: {
@@ -27,7 +26,7 @@ const useStyles = makeStyles({
   },
   menuIcon: {
     border: '1px solid',
-    borderRadius: '5px',
+    borderRadius: 4,
     cursor: 'pointer',
     fontSize: '4rem',
     marginRight: 8
@@ -51,11 +50,11 @@ function Navigation (props) {
   const classes = useStyles();
   const { history } = props;
 
-  const toggleDrawer = (open) => (event) => {
+  function toggleDrawer (event) {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
-    setDrawerOpen(open);
+    setDrawerOpen(prevState => !prevState);
   };
 
   return (
@@ -73,7 +72,7 @@ function Navigation (props) {
           <MUIMenuIcon
             className={classes.menuIcon}
             color="secondary"
-            onClick={toggleDrawer(true)}
+            onClick={() => setDrawerOpen(true)}
           />
           <div className={classes.headlineContainer}>
             <MUITypography
@@ -95,7 +94,7 @@ function Navigation (props) {
           anchor="left"
           className={classes.drawer}
           id="side-navigation"
-          onClose={toggleDrawer(false)}
+          onClose={() => setDrawerOpen(false)}
           open={drawerOpen}
         >
           <UserSearchBar

@@ -18,9 +18,14 @@ const theme = createMuiTheme({
     },
     MuiCardActions: {
       root: {
-        // display: 'flex',
-        justifyContent: 'flex-end',
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-between',
         padding: 8
+      },
+      spacing: {
+        '& > :not(:first-child)': {
+          marginLeft: 0
+        }
       }
     },
     MuiCardContent: {
@@ -77,7 +82,7 @@ const theme = createMuiTheme({
     secondary: orange,
     warning: {
       dark: '#b2a429',
-      light: 'ffef62',
+      light: '#ffef62',
       main: yellow['A400']
     }
   },
@@ -89,7 +94,7 @@ const theme = createMuiTheme({
       'sans-serif'
     ].join(',')
   }
-})
+});
 
 export {
   backgroundColor,

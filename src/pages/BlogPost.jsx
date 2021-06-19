@@ -312,8 +312,8 @@ function BlogPost () {
             </article>
           }
         </MUICardContent>
-        <MUICardActions>
-          {blogPostState.author._id === authentication.userId &&
+        {blogPostState.author._id === authentication.userId &&
+          <MUICardActions>
             <MUIButton
               color="primary"
               onClick={submitPost}
@@ -322,8 +322,8 @@ function BlogPost () {
             >
               {blogPostId === 'new-post' ? 'Publish' : <MUISyncIcon />}
             </MUIButton>
-          }
-        </MUICardActions>
+          </MUICardActions>
+        }
       </MUICard>
 
       {authentication.isLoggedIn && blogPostId !== 'new-post' &&
