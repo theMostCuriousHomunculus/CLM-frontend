@@ -13,22 +13,19 @@ import MUITextField from '@material-ui/core/TextField';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import WarningButton from '../miscellaneous/WarningButton';
 import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { createComponent } from '../../requests/REST/cube-requests';
 
-function CreateComponentForm (props) {
+function CreateComponentForm ({
+  dispatchAddComponent,
+  open,
+  toggleOpen
+}) {
 
-  const {
-    dispatchAddComponent,
-    open,
-    toggleOpen
-  } = props;
   const authentication = React.useContext(AuthenticationContext);
   const cubeId = useParams().cubeId;
-  const [errorMessage, setErrorMessage] = React.useState();
   const [newComponentName, setNewComponentName] = React.useState('');
   const [newComponentType, setNewComponentType] = React.useState();
 
@@ -46,62 +43,53 @@ function CreateComponentForm (props) {
       });
 
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
   return (
-    <React.Fragment>
-    
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
+    <MUIDialog open={open} onClose={toggleOpen}>
+      <MUIDialogTitle>Create A New Component</MUIDialogTitle>
+      <MUIDialogContent>
 
-      <MUIDialog open={open} onClose={toggleOpen}>
-        <MUIDialogTitle>Create A New Component</MUIDialogTitle>
-        <MUIDialogContent>
+        <MUITextField
+          autoComplete="off"
+          autoFocus
+          fullWidth
+          label="New Component Name"
+          margin="dense"
+          onChange={(event) => setNewComponentName(event.target.value)}
+          required={true}
+          type="text"
+          value={newComponentName}
+          variant="outlined"
+        />
 
-          <MUITextField
-            autoComplete="off"
-            autoFocus
-            fullWidth
-            label="New Component Name"
-            margin="dense"
-            onChange={(event) => setNewComponentName(event.target.value)}
-            required={true}
-            type="text"
-            value={newComponentName}
-            variant="outlined"
-          />
+        <MUIFormControl component="fieldset" required={true} style={{ marginTop: 8 }}>
+          <MUIFormLabel component="legend">New Component Type</MUIFormLabel>
+          <MUIRadioGroup
+            name="Component Type"
+            onChange={(event) => setNewComponentType(event.target.value)}
+            value={newComponentType}
+          >
+            <MUIFormControlLabel value="module" control={<MUIRadio />} label="Module" />
+            <MUIFormControlLabel value="rotation" control={<MUIRadio />} label="Rotation" />
+          </MUIRadioGroup>
+        </MUIFormControl>
 
-          <MUIFormControl component="fieldset" required={true} style={{ marginTop: 8 }}>
-            <MUIFormLabel component="legend">New Component Type</MUIFormLabel>
-            <MUIRadioGroup
-              name="Component Type"
-              onChange={(event) => setNewComponentType(event.target.value)}
-              value={newComponentType}
-            >
-              <MUIFormControlLabel value="module" control={<MUIRadio />} label="Module" />
-              <MUIFormControlLabel value="rotation" control={<MUIRadio />} label="Rotation" />
-            </MUIRadioGroup>
-          </MUIFormControl>
+      </MUIDialogContent>
+      <MUIDialogActions>
 
-        </MUIDialogContent>
-        <MUIDialogActions>
+        <WarningButton onClick={toggleOpen}>
+          Cancel
+        </WarningButton>
 
-          <WarningButton onClick={toggleOpen}>
-            Cancel
-          </WarningButton>
+        <MUIButton color="primary" onClick={addComponent} size="small" variant="contained">
+          Create!
+        </MUIButton>
 
-          <MUIButton color="primary" onClick={addComponent} size="small" variant="contained">
-            Create!
-          </MUIButton>
-
-        </MUIDialogActions>
-      </MUIDialog>
-    
-    </React.Fragment>
+      </MUIDialogActions>
+    </MUIDialog>
   );
 }
 

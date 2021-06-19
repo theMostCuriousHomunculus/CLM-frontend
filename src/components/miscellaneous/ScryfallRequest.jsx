@@ -11,7 +11,7 @@ import MUITextField from '@material-ui/core/TextField';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { useRequest } from '../../hooks/request-hook';
+import useRequest from '../../hooks/request-hook';
 
 const useStyles = makeStyles({
   list: {
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
   }
 });
 
-const ScryfallRequest = (props) => {
+export default function ScryfallRequest (props) {
 
   const classes = useStyles();
   const { loading, sendRequest } = useRequest();
@@ -39,7 +39,10 @@ const ScryfallRequest = (props) => {
       if (cardSearchInputValue === cardSearchInput.current.value) {
         try {
           if (cardSearchInput.current.value.length === 0) throw new Error();
-          let matches = await sendRequest(`https://api.scryfall.com/cards/search?q=${cardSearchInputValue}` , 'GET', null, {});
+          let matches = await sendRequest({
+            url: `https://api.scryfall.com/cards/search?q=${cardSearchInputValue}`,
+            method: 'GET'
+          });
           if (matches.data) {
             setCardSearchResults(matches.data.map(function (match) {
               let chapters, loyalty, mana_cost, power, toughness, type_line;
@@ -185,7 +188,10 @@ const ScryfallRequest = (props) => {
 
   async function scryfallPrintSearch (prints_search_uri, cardDetails) {
     try {
-      let printings = await sendRequest(prints_search_uri);
+      let printings = await sendRequest({
+        url: prints_search_uri,
+        method: 'GET'
+      });
       printings = await Promise.all(printings.data.map(async function(print) {
         let art_crop, back_image, image;
         switch (print.layout) {
@@ -205,7 +211,10 @@ const ScryfallRequest = (props) => {
             const meldResultPart = print.all_parts.find(function (part) {
               return part.component === 'meld_result';
             });
-            const meldResult = await sendRequest(meldResultPart.uri, 'GET', null, {});
+            const meldResult = await sendRequest({
+              url: meldResultPart.uri,
+              method: 'GET'
+            });
             back_image = meldResult.image_uris.large;
             image = print.image_uris.large;
             break;
@@ -337,6 +346,4 @@ const ScryfallRequest = (props) => {
 
     </MUIGrid>
   );
-}
-
-export default ScryfallRequest;
+};

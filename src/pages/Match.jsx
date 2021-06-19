@@ -1,4 +1,6 @@
 import React from 'react';
+import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import MUIIconButton from '@material-ui/core/IconButton'
 import MUISlider from '@material-ui/core/Slider';
 import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
@@ -6,7 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import CardMenu from '../components/Match Page/CardMenu';
-import ErrorDialog from '../components/miscellaneous/ErrorDialog';
+import HelpDialog from '../components/Match Page/HelpDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MatchLog from '../components/Match Page/MatchLog';
 import NumberInputDialog from '../components/miscellaneous/NumberInputDialog';
@@ -59,8 +61,8 @@ export default function Match () {
     topHand: true,
     topLibrary: true
   });
+  const [helpDisplayed, setHelpDisplayed] = React.useState(false);
   const matchID = useParams().matchId;
-  const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const [match, setMatch] = React.useState({
     game_winners: [],
@@ -140,7 +142,7 @@ export default function Match () {
     try {
       await adjustEnergyCounters(energy, matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
@@ -148,7 +150,7 @@ export default function Match () {
     try {
       await adjustLifeTotal(life, matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -156,7 +158,7 @@ export default function Match () {
     try {
       await adjustPoisonCounters(poison, matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -164,7 +166,7 @@ export default function Match () {
     try {
       await dragCard(cardID, xCoordinate, yCoordinate, zIndex, matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -172,7 +174,7 @@ export default function Match () {
     try {
       await drawCard(matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -180,7 +182,7 @@ export default function Match () {
     try {
       await rollDice(sides, matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -188,7 +190,7 @@ export default function Match () {
     try {
       await shuffleLibrary(matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -196,7 +198,7 @@ export default function Match () {
     try {
       await tapUntapCards(cardIDs, matchID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }, [matchID, authentication.token]);
 
@@ -215,7 +217,7 @@ export default function Match () {
         matchID,
         authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     } finally {
       setRightClickedCard({
         _id: null,
@@ -234,7 +236,7 @@ export default function Match () {
         const matchData = await fetchMatchByID(matchID, authentication.token);
         setMatch(matchData);
       } catch (error) {
-        setErrorMessage(error.message);
+        console.log(error.message);
       } finally {
         setLoading(false);
       }
@@ -272,6 +274,8 @@ export default function Match () {
     }
 
     subscribe(result => console.log(result), error => console.log(error));
+
+    return client.dispose;
   }, [authentication.token, matchID]);
 
   React.useEffect(() => {
@@ -313,9 +317,9 @@ export default function Match () {
     loading ?
     <LoadingSpinner /> :
     <React.Fragment>
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
+      <HelpDialog
+        open={helpDisplayed}
+        close={() => setHelpDisplayed(false)}
       />
 
       <NumberInputDialog
@@ -374,18 +378,23 @@ export default function Match () {
       }
 
       <div className={classes.matchScreenFlexContainer}>
-        <div style={{ display: 'flex', flexShrink: 0 }}>
-          <MUITypography style={{ transform: 'rotate(180deg)', writingMode: 'vertical-lr' }} variant='subtitle1'>
-            Adjust Card Size
-          </MUITypography>
-          <MUISlider
-            aria-labelledby='vertical-slider'
-            max={63*88*3}
-            min={63*88}
-            onChange={(event, newValue) => setCardSize(newValue)}
-            orientation='vertical'
-            value={cardSize}
-          />
+        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
+            <MUIHelpOutlineIcon />
+          </MUIIconButton>
+          <div style={{ display: 'flex', flexGrow: 1 }}>
+            <MUITypography style={{ transform: 'rotate(180deg)', writingMode: 'vertical-lr' }} variant='subtitle1'>
+              Adjust Card Size
+            </MUITypography>
+            <MUISlider
+              aria-labelledby='vertical-slider'
+              max={63*88*3}
+              min={63*88}
+              onChange={(event, newValue) => setCardSize(newValue)}
+              orientation='vertical'
+              value={cardSize}
+            />
+          </div>
         </div>
 
         <PlayZone

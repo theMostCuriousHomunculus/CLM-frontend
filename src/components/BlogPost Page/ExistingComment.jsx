@@ -13,25 +13,33 @@ import MUITypography from '@material-ui/core/Typography';
 import SmallAvatar from '../miscellaneous/SmallAvatar';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
+import useRequest from '../../hooks/request-hook';
 
-const ExistingComment = (props) => {
+export default function ExistingComment ({
+  comment: {
+    _id : commentID,
+    author: {
+      _id: authorID,
+      avatar,
+      name
+    },
+    body,
+    updatedAt
+  },
+  deleteComment
+}) {
 
-  const authentication = React.useContext(AuthenticationContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const blogPostId = useParams().blogPostId;
-  const { author } = props.comment;
   const { sendRequest } = useRequest();
 
-  async function deleteComment () {
+  async function handleDeleteComment () {
     try {
-      const updatedBlogPost = await sendRequest(`${process.env.REACT_APP_REST_URL}/blog/${blogPostId}/${props.comment._id}`,
-        'DELETE',
-        null,
-        {
-          Authorization: 'Bearer ' + authentication.token
-        }
-      );
-      props.deleteComment(updatedBlogPost);
+      const updatedBlogPost = await sendRequest({
+        url: `${process.env.REACT_APP_REST_URL}/blog/${blogPostId}/${commentID}`,
+        method: 'DELETE'
+      });
+      deleteComment(updatedBlogPost);
     } catch (err) {
       console.log(err);
     }
@@ -40,20 +48,20 @@ const ExistingComment = (props) => {
   return (
     <MUICard>
       <MUICardHeader
-        avatar={<SmallAvatar alt={author.name} src={author.avatar}/>}
+        avatar={<SmallAvatar alt={name} src={avatar}/>}
         disableTypography={true}
         title={<MUITypography color="textPrimary" variant="body1">
-          <Link to={`/account/${author._id}`}>{author.name}</Link>
+          <Link to={`/account/${authorID}`}>{name}</Link>
         </MUITypography>}
-        subheader={<MUITypography color="textSecondary" variant="body2">Last updated {new Date(props.comment.updatedAt).toLocaleString()}</MUITypography>}
+        subheader={<MUITypography color="textSecondary" variant="body2">Last updated {new Date(updatedAt).toLocaleString()}</MUITypography>}
       />
       <MUICardContent>
-        <MUITypography variant="body1">{props.comment.body}</MUITypography>
+        <MUITypography variant="body1">{body}</MUITypography>
       </MUICardContent>
       <MUICardActions>
-        {author._id === authentication.userId ?
+        {authorID === userId ?
           <WarningButton
-            onClick={deleteComment}
+            onClick={handleDeleteComment}
             startIcon={<MUIDeleteForeverIcon />}
           >
             Delete
@@ -71,6 +79,4 @@ const ExistingComment = (props) => {
       </MUICardActions>
     </MUICard>
   );
-}
-
-export default ExistingComment;
+};

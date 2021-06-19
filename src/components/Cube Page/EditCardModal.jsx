@@ -12,32 +12,29 @@ import { connect } from 'react-redux';
 
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import WarningButton from '../miscellaneous/WarningButton';
 import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { deleteCard, editCard } from '../../requests/REST/cube-requests';
 import MoveDeleteMenu from './MoveDeleteMenu';
 
-function EditCardModal (props) {
+function EditCardModal ({
+  activeComponentId,
+  card,
+  clear,
+  creator,
+  dispatchEditCard,
+  dispatchMoveOrDeleteCard,
+  hidePreview,
+  showPreview
+}) {
 
-  const {
-    activeComponentId,
-    card,
-    clear,
-    creator,
-    dispatchEditCard,
-    dispatchMoveOrDeleteCard,
-    hidePreview,
-    showPreview
-  } = props;
   const authentication = React.useContext(AuthenticationContext);
   const [cardType, setCardType] = React.useState();
   const [cmc, setCmc] = React.useState();
   const [colorIdentity, setColorIdentity] = React.useState([]);
   const [cubeComponent, setCubeComponent] = React.useState();
   const cubeId = useParams().cubeId;
-  const [errorMessage, setErrorMessage] = React.useState();
   const [printingDetails, setPrintingDetails] = React.useState({
     back_image: null,
     image: null,
@@ -78,93 +75,84 @@ function EditCardModal (props) {
 
       clear();
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   };
 
   return (
-    <React.Fragment>
-
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-
-      <MUIDialog
-        onClose={clear}
-        open={Object.keys(card).length > 0}
-      >
-        {Object.keys(card).length > 0 &&
-          <React.Fragment>
-            <MUIDialogTitle>{creator._id === authentication.userId ? "Edit Card" : card.name}</MUIDialogTitle>
-            <MUIDialogContent>
-              <MUIGrid container={true} spacing={1}>
-                <MUIGrid item={true} xs={12} md={6} style={{ alignSelf: 'center', display: 'flex', justifyContent: 'center' }}>
-                  <img alt={card.name} src={printingDetails.image} height={300} style={{ borderRadius: 4 }} />
-                  {printingDetails.back_image &&
-                    <img alt={card.name} src={printingDetails.back_image} height={300} style={{ borderRadius: 4 }} />
-                  }
-                </MUIGrid>
-                <MUIGrid item={true} xs={12} md={6}>
-                  <MUIDialogContentText>Color Identity:</MUIDialogContentText>
-                  <ColorCheckboxes
-                    color_identity={colorIdentity}
-                    handleColorIdentityChange={(details) => setColorIdentity(details.color_identity)}
-                  />
-                  <MUITextField
-                    inputProps={{
-                      max: 16,
-                      min: 0,
-                      step: 1
-                    }}
-                    label="CMC"
-                    margin="dense"
-                    onChange={(event) => setCmc(event.target.value)}
-                    type="number"
-                    value={cmc}
-                    variant="outlined"
-                  />
-                  <MUITextField
-                    autoComplete="off"
-                    fullWidth
-                    label="Card Type"
-                    margin="dense"
-                    onChange={(event) => setCardType(event.target.value)}
-                    type="text"
-                    value={cardType}
-                    variant="outlined"
-                  />
-                  <MoveDeleteMenu
-                    handleMoveDelete={(details) => setCubeComponent(details)}
-                    listItemPrimaryText="Cube Component"
-                  />
-                  <ChangePrintMenu
-                    handlePrintingChange={(details) => setPrintingDetails(details)}
-                    hidePreview={hidePreview}
-                    listItemPrimaryText="Printing"
-                    oracle_id={card.oracle_id}
-                    printing={printingDetails.printing}
-                    showPreview={showPreview}
-                  />
-                </MUIGrid>
+    <MUIDialog
+      onClose={clear}
+      open={Object.keys(card).length > 0}
+    >
+      {Object.keys(card).length > 0 &&
+        <React.Fragment>
+          <MUIDialogTitle>{creator._id === authentication.userId ? "Edit Card" : card.name}</MUIDialogTitle>
+          <MUIDialogContent>
+            <MUIGrid container={true} spacing={1}>
+              <MUIGrid item={true} xs={12} md={6} style={{ alignSelf: 'center', display: 'flex', justifyContent: 'center' }}>
+                <img alt={card.name} src={printingDetails.image} height={300} style={{ borderRadius: 4 }} />
+                {printingDetails.back_image &&
+                  <img alt={card.name} src={printingDetails.back_image} height={300} style={{ borderRadius: 4 }} />
+                }
               </MUIGrid>
-            </MUIDialogContent>
-            <MUIDialogActions style={{ justifyContent: 'space-between' }}>
-              <WarningButton onClick={clear}>Close</WarningButton>
-              <MUIButton
-                color="primary"
-                onClick={submitChanges}
-                size="small"
-                variant="contained"
-              >
-                Submit
-              </MUIButton>
-            </MUIDialogActions>
-          </React.Fragment>
-        }
-      </MUIDialog>
-
-    </React.Fragment>
+              <MUIGrid item={true} xs={12} md={6}>
+                <MUIDialogContentText>Color Identity:</MUIDialogContentText>
+                <ColorCheckboxes
+                  color_identity={colorIdentity}
+                  handleColorIdentityChange={(details) => setColorIdentity(details.color_identity)}
+                />
+                <MUITextField
+                  inputProps={{
+                    max: 16,
+                    min: 0,
+                    step: 1
+                  }}
+                  label="CMC"
+                  margin="dense"
+                  onChange={(event) => setCmc(event.target.value)}
+                  type="number"
+                  value={cmc}
+                  variant="outlined"
+                />
+                <MUITextField
+                  autoComplete="off"
+                  fullWidth
+                  label="Card Type"
+                  margin="dense"
+                  onChange={(event) => setCardType(event.target.value)}
+                  type="text"
+                  value={cardType}
+                  variant="outlined"
+                />
+                <MoveDeleteMenu
+                  handleMoveDelete={(details) => setCubeComponent(details)}
+                  listItemPrimaryText="Cube Component"
+                />
+                <ChangePrintMenu
+                  handlePrintingChange={(details) => setPrintingDetails(details)}
+                  hidePreview={hidePreview}
+                  listItemPrimaryText="Printing"
+                  oracle_id={card.oracle_id}
+                  printing={printingDetails.printing}
+                  showPreview={showPreview}
+                />
+              </MUIGrid>
+            </MUIGrid>
+          </MUIDialogContent>
+          <MUIDialogActions style={{ justifyContent: 'space-between' }}>
+            <WarningButton onClick={clear}>Close</WarningButton>
+            <MUIButton
+              color="primary"
+              onClick={submitChanges}
+              size="small"
+              variant="contained"
+            >
+              Submit
+            </MUIButton>
+          </MUIDialogActions>
+        </React.Fragment>
+      }
+    </MUIDialog>
   );
 }
 

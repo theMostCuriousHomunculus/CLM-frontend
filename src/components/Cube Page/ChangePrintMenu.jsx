@@ -7,21 +7,20 @@ import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
-import ErrorDialog from '../miscellaneous/ErrorDialog';
+import { ErrorContext } from '../../contexts/error-context';
 
-function ChangePrintMenu (props) {
+export default function ChangePrintMenu ({
+  handlePrintingChange,
+  hidePreview,
+  listItemPrimaryText,
+  oracle_id,
+  printing,
+  showPreview
+}) {
 
-  const {
-    handlePrintingChange,
-    hidePreview,
-    listItemPrimaryText,
-    oracle_id,
-    printing,
-    showPreview
-  } = props;
+  const { setErrorMessage } = React.useContext(ErrorContext);
   const [anchorEl, setAnchorEl] = React.useState();
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
-  const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
 
@@ -67,11 +66,6 @@ function ChangePrintMenu (props) {
 
   return (
     <React.Fragment>
-    
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
 
       <MUIList component="nav">
         <MUIListItem
@@ -112,6 +106,4 @@ function ChangePrintMenu (props) {
       </MUIMenu>
     </React.Fragment>
   );
-}
-
-export default ChangePrintMenu;
+};

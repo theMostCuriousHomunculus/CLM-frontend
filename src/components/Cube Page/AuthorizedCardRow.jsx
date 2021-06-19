@@ -6,10 +6,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import MoveDeleteMenu from './MoveDeleteMenu';
 import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { ErrorContext } from '../../contexts/error-context';
 import { deleteCard } from '../../requests/REST/cube-requests';
 import { ReactComponent as TCGPlayerLogo } from '../../svgs/tcgplayer-logo-full-color.svg';
 
@@ -22,33 +22,32 @@ const useStyles = makeStyles({
   }
 });
 
-const AuthorizedCardRow = (props) => {
+const AuthorizedCardRow = ({
+  activeComponentId,
+  card: {
+    _id,
+    back_image,
+    cmc,
+    color_identity,
+    image,
+    name,
+    oracle_id,
+    printing,
+    purchase_link,
+    type_line
+  },
+  columnWidths,
+  dispatchEditCard,
+  dispatchMoveOrDeleteCard,
+  hidePreview,
+  showPreview,
+  submitCardChange
+}) => {
 
-  const {
-    activeComponentId,
-    card: {
-      _id,
-      back_image,
-      cmc,
-      color_identity,
-      image,
-      name,
-      oracle_id,
-      printing,
-      purchase_link,
-      type_line
-    },
-    columnWidths,
-    dispatchEditCard,
-    dispatchMoveOrDeleteCard,
-    hidePreview,
-    showPreview,
-    submitCardChange
-  } = props;
   const authentication = React.useContext(AuthenticationContext);
+  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
-  const [errorMessage, setErrorMessage] = React.useState();
 
   async function moveDeleteCard (destination) {
     try {
@@ -61,11 +60,6 @@ const AuthorizedCardRow = (props) => {
 
   return (
     <React.Fragment>
-
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
 
       <div
         back_image={back_image}

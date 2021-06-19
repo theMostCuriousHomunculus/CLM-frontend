@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
-import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import HoverPreview from '../components/miscellaneous/HoverPreview';
 import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -24,20 +23,18 @@ const useStyles = makeStyles({
   }
 });
 
-function Cube (props) {
+function Cube ({
+  activeComponentId,
+  activeComponentName,
+  creator,
+  dispatchAddCard,
+  dispatchInitializeCube,
+  viewMode
+}) {
 
-  const {
-    activeComponentId,
-    activeComponentName,
-    creator,
-    dispatchAddCard,
-    dispatchInitializeCube,
-    viewMode
-  } = props;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const cubeId = useParams().cubeId;
-  const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(true);
 
   const initializeCube = React.useCallback(async function () {
@@ -46,7 +43,7 @@ function Cube (props) {
       const response = await fetchCubeById(cubeId);
       dispatchInitializeCube(response);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     } finally {
       setLoading(false);
     }
@@ -62,7 +59,7 @@ function Cube (props) {
       const newCardId = await addCardRequest(chosenCard, activeComponentId, cubeId, authentication.token);
       dispatchAddCard({ ...chosenCard, _id: newCardId._id });
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
@@ -80,41 +77,31 @@ function Cube (props) {
   }
 
   return (
-    <React.Fragment>
-      {loading ?
-        <LoadingSpinner /> :
-        <React.Fragment>
+    loading ?
+      <LoadingSpinner /> :
+      <React.Fragment>
+        <CubeInfo />
 
-          <ErrorDialog
-            clear={() => setErrorMessage(null)}
-            message={errorMessage}
-          />
+        <ComponentInfo />
 
-          <CubeInfo />
+        <HoverPreview marginBottom={190}>
 
-          <ComponentInfo />
+          {authentication.userId === creator._id &&
+            <ScryfallRequestHackyWorkAround />
+          }
 
-          <HoverPreview marginBottom={190}>
+          {viewMode === 'Curve' &&
+            <CurveView />
+          }
+          {viewMode === 'List' &&
+            <ListView />
+          }
+          {viewMode === 'Table' &&
+            <TableView />
+          }
 
-            {authentication.userId === creator._id &&
-              <ScryfallRequestHackyWorkAround />
-            }
-
-            {viewMode === 'Curve' &&
-              <CurveView />
-            }
-            {viewMode === 'List' &&
-              <ListView />
-            }
-            {viewMode === 'Table' &&
-              <TableView />
-            }
-
-          </HoverPreview>
-
-        </React.Fragment>
-      }
-    </React.Fragment>
+        </HoverPreview>
+      </React.Fragment>
   );
 }
 

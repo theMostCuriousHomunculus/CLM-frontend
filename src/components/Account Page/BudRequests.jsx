@@ -20,9 +20,12 @@ const useStyles = makeStyles({
   }
 });
 
-const BudRequests = (props) => {
+export default function BudRequests ({
+  manageBuds,
+  received_bud_requests,
+  sent_bud_requests
+}) {
 
-  const { manageBuds, received_bud_requests, sent_bud_requests } = props;
   const classes = useStyles();
 
   return (
@@ -44,14 +47,14 @@ const BudRequests = (props) => {
                     <Link to={`/account/${request._id}`}>{request.name}</Link>
                   </MUITypography>
                   <WarningButton
-                    onClick={() => manageBuds({ action: 'reject', other_user_id: request._id })}
+                    onClick={() => manageBuds(`action: "reject",\nother_user_id: "${request._id}"`)}
                   >
                     <MUINotInterestedIcon />
                   </WarningButton>
 
                   <MUIButton
                     color="primary"
-                    onClick={() => manageBuds({ action: 'accept', other_user_id: request._id })}
+                    onClick={() => manageBuds(`action: "accept",\nother_user_id: "${request._id}"`)}
                     size="small"
                     style={{ marginLeft: '8px' }}
                     variant="contained"
@@ -87,6 +90,4 @@ const BudRequests = (props) => {
       </MUIGrid>
     </React.Fragment>
   );
-}
-
-export default BudRequests;
+};

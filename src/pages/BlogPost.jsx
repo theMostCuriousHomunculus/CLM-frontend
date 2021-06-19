@@ -11,7 +11,6 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import ExistingComment from '../components/BlogPost Page/ExistingComment';
 import LargeAvatar from '../components/miscellaneous/LargeAvatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -93,7 +92,6 @@ const useStyles = makeStyles({
 function BlogPost () {
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [errorMessage, setErrorMessage] = React.useState();
   const [loading, setLoading] = React.useState(false);
   const [viewMode, setViewMode] = React.useState('Live');
   const [blogPostState, setBlogPostState] = React.useState({
@@ -128,7 +126,7 @@ function BlogPost () {
         }
 
       } catch (error) {
-        setErrorMessage(error.message);
+        console.log(error.message);
       } finally {
         setLoading(false);
       }
@@ -146,7 +144,7 @@ function BlogPost () {
         }));
         setViewMode('Edit');
       } catch (error) {
-        setErrorMessage(error);
+        console.log(error);
       } finally {
         setLoading(false);
       }
@@ -177,7 +175,7 @@ function BlogPost () {
       }
       history.push('/blog');
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
@@ -190,12 +188,6 @@ function BlogPost () {
   return (loading ?
     <LoadingSpinner /> :
     <React.Fragment>
-
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-
       <MUICard>
         <MUICardHeader
           avatar={<LargeAvatar alt={blogPostState.author.name} src={blogPostState.author.avatar} />}
@@ -341,7 +333,6 @@ function BlogPost () {
       {blogPostState.comments.map(function (comment) {
         return <ExistingComment comment={comment} key={comment._id} deleteComment={refreshPage} />;
       })}
-
     </React.Fragment>
   );
 }

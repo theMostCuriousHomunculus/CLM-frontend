@@ -19,28 +19,29 @@ const useStyles = makeStyles({
   }
 });
 
-const ErrorDialog = function (props) {
+export default function ErrorDialog ({
+  clearAll,
+  clearOne,
+  messages
+}) {
 
-  const { clear, message } = props;
   const classes = useStyles();
 
   return (
     <MUIDialog
-      open={!!message}
-      onClose={clear}
+      open={messages.length > 0}
+      onClose={clearAll}
     >
       <MUIDialogTitle className={classes.title}>
         <span>Error</span>
-        <MUIWarningRoundedIcon style={{ color: theme.palette.warning.main, fontSize: 36 }} />
+        <MUIWarningRoundedIcon style={{ alignSelf: 'center', color: theme.palette.warning.main, fontSize: 36 }} />
       </MUIDialogTitle>
       <MUIDialogContent>
-        <MUIDialogContentText>{message}</MUIDialogContentText>
+        <MUIDialogContentText>{messages[0]}</MUIDialogContentText>
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton color="primary" onClick={clear} size="small" variant="contained">Dismiss</MUIButton>
+        <MUIButton color="primary" onClick={clearOne} size="small" variant="contained">Dismiss</MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );
 };
-
-export default ErrorDialog;

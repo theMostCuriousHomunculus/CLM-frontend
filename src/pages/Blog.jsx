@@ -11,7 +11,6 @@ import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core';
 
-import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -31,12 +30,11 @@ const useStyles = makeStyles({
   }
 });
 
-const Blog = () => {
+export default function Blog () {
 
   const authentication = React.useContext(AuthenticationContext);
   const [blogPosts, setBlogPosts] = React.useState([]);
   const classes = useStyles();
-  const [errorMessage, setErrorMessage] = React.useState();
   const history = useHistory();
   const [loading, setLoading] = React.useState(false);
 
@@ -47,7 +45,7 @@ const Blog = () => {
         const allBlogPosts = await fetchAllBlogPosts();
         setBlogPosts(allBlogPosts);
       } catch (error) {
-        setErrorMessage(error.message);
+        console.log(error.message);
       } finally {
         setLoading(false);
       }
@@ -62,19 +60,13 @@ const Blog = () => {
         return prevState.filter((blogPost) => blogPost._id !== blogPostId);
       });
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
-  return (loading ?
-    <LoadingSpinner /> :
-    <React.Fragment>
-
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-
+  return (
+    loading ?
+      <LoadingSpinner /> :
       <MUIGrid container spacing={2}>
         {authentication.isAdmin &&
           <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
@@ -135,9 +127,5 @@ const Blog = () => {
           );
         })}
       </MUIGrid>
-
-    </React.Fragment>
   );
-}
-
-export default Blog;
+};

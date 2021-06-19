@@ -1,13 +1,32 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-export const useRequest = () => {
+import { AuthenticationContext } from '../contexts/authentication-context';
+import { ErrorContext } from '../contexts/error-context';
 
-  const [errorMessage, setErrorMessage] = useState();
+export default function useRequest () {
+
+  const { setErrorMessages } = useContext(ErrorContext);
+  const { token } = useContext(AuthenticationContext);
   const [loading, setLoading] = useState(false);
 
   const activeRequests = useRef([]);
 
-  const sendRequest = useCallback(async function (url, method = 'GET', body = null, headers = {}) {
+  const sendRequest = useCallback(async function ({
+    url = process.env.REACT_APP_GRAPHQL_HTTP_URL,
+    method = 'POST',
+    operation = null,
+    body = null,
+    headers = {}
+  }) {
+
+    if (token && url === process.env.REACT_APP_GRAPHQL_HTTP_URL) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (body && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(body);
+    }
       
     setLoading(true);
     const abortController = new AbortController();
@@ -24,37 +43,41 @@ export const useRequest = () => {
       let responseData;
 
       if (response.status === 204) {
+        // 204 is successful response but no content
         responseData = {};
       } else {
         responseData = await response.json();
       }
 
-      activeRequests.current = activeRequests.current.filter(
-        abrtCntrlr => abrtCntrlr !== abortController
-      );
-      
-      if (!response.ok) {
+      activeRequests.current = activeRequests.current.filter(controller => controller !== abortController);
+
+      if (responseData.errors) {
+        for (const error of responseData.errors) {
+          setErrorMessages(prevState => [...prevState, error.message]);
+        }
+        throw new Error();
+      } else if (!response.ok) {
         throw new Error(responseData.message);
-      };
+      } else if (operation) {
+        return responseData.data[operation];
+      } else {
+        return responseData;
+      }
 
-      setLoading(false);
-      return responseData;
     } catch (error) {
-      setErrorMessage(error.message);
-      setLoading(false);
+      if (error.message) {
+        setErrorMessages(prevState => [...prevState, error.message]);
+      }
       throw error;
-    };
-  }, []);
+    } finally {
+      setLoading(false);
+    }
 
-  function clearError() {
-    setErrorMessage(null);
-  };
+  }, [setErrorMessages, token]);
 
   useEffect(() => {
-    return () => {
-      activeRequests.current.forEach(abrtCntrlr => abrtCntrlr.abort());
-    };
+    return () => activeRequests.current.forEach(controller => controller.abort());
   }, []);
 
-  return { loading, errorMessage, sendRequest, clearError };
+  return { loading, sendRequest };
 };

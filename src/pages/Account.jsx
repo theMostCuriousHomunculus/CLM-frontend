@@ -10,13 +10,12 @@ import MUIListItem from '@material-ui/core/ListItem';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
-import { cloneDeep } from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
 
 import customSort from '../functions/custom-sort';
+import useRequest from '../hooks/request-hook';
 import BudRequests from '../components/Account Page/BudRequests';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
-import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LargeAvatar from '../components/miscellaneous/LargeAvatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -27,7 +26,7 @@ import UserEventCard from '../components/Account Page/UserEventCard';
 import UserMatchCard from '../components/Account Page/UserMatchCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { editAccount, fetchAccountByID } from '../requests/GraphQL/account-requests';
+import { desiredAccountInfo } from '../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -53,7 +52,7 @@ export default function Account () {
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-
+  const { sendRequest } = useRequest();
   const [account, setAccount] = React.useState({
     _id: accountId,
     avatar: '',
@@ -66,71 +65,79 @@ export default function Account () {
     sent_bud_requests: []
   });
   const [dialogInfo, setDialogInfo] = React.useState({});
-  const [errorMessage, setErrorMessage] = React.useState();
+  // not using loading from useRequest hook because i don't want to rip everything out of the dom and display the loading spinner on updates; just on initialization
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
 
     async function fetchAccount () {
+
       try {
         setLoading(true);
-        const response = await fetchAccountByID(accountId, authentication.token);
+        const operation = 'fetchAccountByID';
+        const response = await sendRequest({
+          operation,
+          body: {
+            query: `
+              query {
+                ${operation}(_id: "${accountId}") {
+                  ${desiredAccountInfo}
+                }
+              }
+            `
+          }
+        });
+        
         setAccount(response);
       } catch (error) {
-        setErrorMessage(error.message);
+
       } finally {
         setLoading(false);
       }
+
     }
 
     fetchAccount();
-  }, [accountId, authentication.token]);
+  }, [accountId, sendRequest]);
 
   async function submitChanges (changes) {
+
     try {
-      await editAccount(changes, authentication.token);
-
-      if (changes.action) {
-        const budsCopy = cloneDeep(account.buds);
-        const receivedBudRequestsCopy = cloneDeep(account.received_bud_requests);
-
-        changes.buds = budsCopy;
-        changes.received_bud_requests = receivedBudRequestsCopy;
-
-        switch (changes.action) {
-          case 'accept':
-            const acceptedIndex = receivedBudRequestsCopy.findIndex((request) => request._id === changes.other_user_id);
-            const newBud = receivedBudRequestsCopy.splice(acceptedIndex, 1);
-            budsCopy.push(newBud[0]);
-            break;
-          case 'reject':
-            const rejectedIndex = receivedBudRequestsCopy.findIndex((request) => request._id === changes.other_user_id);
-            receivedBudRequestsCopy.splice(rejectedIndex, 1);
-            break;
-          case 'remove':
-            const removedIndex = budsCopy.findIndex((bud) => bud._id === changes.other_user_id);
-            budsCopy.splice(removedIndex, 1);
-            break;
-          case 'send':
-            receivedBudRequestsCopy.push({ _id: authentication.userId });
-            break;
-          default:
-            // should never happen
+      const operation = 'editAccount';
+      const response = await sendRequest({
+        operation,
+        body: {
+          query: `
+            mutation {
+              ${operation}(
+                input: {
+                  ${changes}
+                }
+              ) {
+                ${desiredAccountInfo}
+              }
+            }
+          `
         }
+      });
 
-        delete changes.action;
-        delete changes.other_user_id;
+      if (changes.includes('send')) {
+        setAccount(prevState => ({
+          ...prevState,
+          received_bud_requests: [...prevState.received_bud_requests, {
+            _id: authentication.userId,
+            avatar: authentication.avatar,
+            name: authentication.name
+          }]
+        }));
+      } else {
+        setAccount(response);
       }
 
-      setAccount((prevState) => {
-        return {
-          ...prevState,
-          ...changes
-        };
-      });
     } catch (error) {
-      setErrorMessage(error.message);
+
     }
+
   }
 
   function updateCubeList (cubeId) {
@@ -143,160 +150,152 @@ export default function Account () {
   }
 
   return (
-    <React.Fragment>
-      {loading ?
-        <LoadingSpinner /> :
-        <React.Fragment>
+    loading ?
+      <LoadingSpinner /> :
+      <React.Fragment>
+        <ConfirmationDialog
+          confirmHandler={submitChanges}
+          dialogInfo={dialogInfo}
+          toggleOpen={() => setDialogInfo({})}
+        />
 
-          <ErrorDialog
-            clear={() => setErrorMessage(null)}
-            message={errorMessage}
+        <MUICard style={{ marginBottom: 0 }}>
+          <MUICardHeader
+            avatar={account.avatar &&
+              <LargeAvatar alt={account.name} src={account.avatar} />
+            }
+            className={classes.cardHeader}
+            disableTypography={true}
+            title={accountId === authentication.userId ?
+              <MUITextField
+                autoComplete="off"
+                inputProps={{
+                  onBlur: (event) => submitChanges(`name: "${event.target.value}"`)
+                }}
+                label="Account Name"
+                margin="dense"
+                onChange={(event) => {
+                  event.persist();
+                  setAccount(prevState => ({
+                    ...prevState,
+                    name: event.target.value
+                  }));
+                }}
+                style={{
+                  width: 300
+                }}
+                type="text"
+                value={account.name}
+                variant="outlined"
+              /> :
+              <MUITypography variant="h5">
+                {account.name}
+              </MUITypography>
+            }
+            subheader={accountId === authentication.userId &&
+              <MUITypography color="textSecondary" variant="subtitle1">
+                {account.email}
+              </MUITypography>
+            }
           />
-
-          <ConfirmationDialog
-            confirmHandler={submitChanges}
-            dialogInfo={dialogInfo}
-            toggleOpen={() => setDialogInfo({})}
-          />
-
-          <MUICard style={{ marginBottom: 0 }}>
-            <MUICardHeader
-              avatar={account.avatar &&
-                <LargeAvatar alt={account.name} src={account.avatar} />
-              }
-              className={classes.cardHeader}
-              disableTypography={true}
-              title={accountId === authentication.userId ?
-                <MUITextField
-                  autoComplete="off"
-                  defaultValue={account.name}
-                  inputProps={{
-                    onBlur: (event) => submitChanges({ name: event.target.value })
-                  }}
-                  label="Account Name"
-                  margin="dense"
-                  style={{
-                    width: 300
-                  }}
-                  type="text"
-                  variant="outlined"
+          {accountId === authentication.userId &&
+            <MUICardActions>
+              <HoverPreview>
+                <ScryfallRequest
+                  buttonText="Change Avatar"
+                  labelText="Change your avatar"
+                  onSubmit={(chosenCard) => submitChanges(`avatar: "${chosenCard.art_crop}"`)}
                 />
-                : <MUITypography variant="h5">
-                  {account.name}
-                </MUITypography>
-              }
-              subheader={accountId === authentication.userId &&
-                <MUITypography color="textSecondary" variant="subtitle1">
-                  {account.email}
-                </MUITypography>
-              }
+              </HoverPreview>
+            </MUICardActions>
+          }
+          {authentication.isLoggedIn &&
+            accountId !== authentication.userId &&
+            account.buds.filter(bud => bud._id === authentication.userId).length === 0 &&
+            account.received_bud_requests.filter(request => request._id === authentication.userId).length === 0 &&
+            account.sent_bud_requests.filter(request => request._id === authentication.userId).length === 0 &&
+            // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
+            <MUICardActions>
+              <MUIButton
+                color="primary"
+                onClick={() => submitChanges(`action: "send",\nother_user_id: "${accountId}"`)}
+                size="small"
+                variant="contained"
+              >
+                <MUIPersonAddIcon />
+              </MUIButton>
+            </MUICardActions>
+          }
+        </MUICard>
+
+        <UserMatchCard
+          events={account.events}
+          matches={account.matches}
+          pageClasses={classes}
+        />
+
+        <MUIGrid container spacing={2}>
+          <MUIGrid item xs={12} lg={6}>
+            <UserCubeCard
+              cubes={account.cubes}
+              pageClasses={classes}
+              updateCubeList={updateCubeList}
             />
-            {accountId === authentication.userId &&
-              <MUICardActions>
-                <HoverPreview>
-                  <ScryfallRequest
-                    buttonText="Change Avatar"
-                    labelText="Change your avatar"
-                    onSubmit={(chosenCard) => submitChanges({ avatar: chosenCard.art_crop })}
-                  />
-                </HoverPreview>
-              </MUICardActions>
-            }
-            {authentication.isLoggedIn &&
-              accountId !== authentication.userId &&
-              account.buds.filter(function (bud) {
-                return bud._id === authentication.userId;
-              }).length === 0 &&
-              account.received_bud_requests.filter(function (request) {
-                return request._id === authentication.userId;
-              }).length === 0 &&
-              account.sent_bud_requests.filter(function (request) {
-                return request._id === authentication.userId;
-              }).length === 0 &&
-              // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
-              <MUICardActions>
-                <MUIButton
-                  color="primary"
-                  onClick={() => submitChanges({ action: 'send', other_user_id: accountId })}
-                  size="small"
-                  variant="contained"
-                >
-                  <MUIPersonAddIcon />
-                </MUIButton>
-              </MUICardActions>
-            }
-          </MUICard>
-
-          <UserMatchCard
-            events={account.events}
-            matches={account.matches}
-            pageClasses={classes}
-          />
-
-          <MUIGrid container spacing={2}>
-            <MUIGrid item xs={12} lg={6}>
-              <UserCubeCard
-                cubes={account.cubes}
-                pageClasses={classes}
-                updateCubeList={updateCubeList}
-              />
-            </MUIGrid>
-
-            <MUIGrid item xs={12} lg={6}>
-              <UserEventCard
-                buds={account.buds}
-                cubes={account.cubes}
-                events={account.events}
-                pageClasses={classes}
-              />
-            </MUIGrid>
           </MUIGrid>
 
-          <MUIGrid container spacing={2}>
-            <MUIGrid item xs={12} sm={6} md={4}>
-              <MUICard>
-                <MUICardHeader
-                  disableTypography={true}
-                  title={<MUITypography variant="h5">Buds</MUITypography>}
-                />
-                <MUIList>
-                  {account.buds &&
-                    customSort(account.buds, ['name']).map(function (bud) {
-                      return (
-                        <MUIListItem key={bud._id}>
-                          <SmallAvatar alt={bud.name} src={bud.avatar} />
-                          <MUITypography className={classes.flexGrow} variant="body1">
-                            <Link to={`/account/${bud._id}`}>{bud.name}</Link>
-                          </MUITypography>
-                          {accountId === authentication.userId &&
-                            <WarningButton
-                              onClick={() => setDialogInfo({
-                                data: { action: 'remove', other_user_id: bud._id },
-                                content: <MUITypography variant="body1">Think of all the good times you've had.</MUITypography>,
-                                title: `Are you sure you want to un-bud ${bud.name}?`
-                              })}
-                            >
-                              Un-Bud
-                            </WarningButton>
-                          }
-                        </MUIListItem>
-                      );
-                    })
-                  }
-                </MUIList>
-              </MUICard>
-            </MUIGrid>
-
-            {accountId === authentication.userId &&
-              <BudRequests
-                manageBuds={submitChanges}
-                received_bud_requests={account.received_bud_requests}
-                sent_bud_requests={account.sent_bud_requests}
-              />
-            }
+          <MUIGrid item xs={12} lg={6}>
+            <UserEventCard
+              buds={account.buds}
+              cubes={account.cubes}
+              events={account.events}
+              pageClasses={classes}
+            />
           </MUIGrid>
-        </React.Fragment>
-      }
-    </React.Fragment>
+        </MUIGrid>
+
+        <MUIGrid container spacing={2}>
+          <MUIGrid item xs={12} sm={6} md={4}>
+            <MUICard>
+              <MUICardHeader
+                disableTypography={true}
+                title={<MUITypography variant="h5">Buds</MUITypography>}
+              />
+              <MUIList>
+                {account.buds &&
+                  customSort(account.buds, ['name']).map(function (bud) {
+                    return (
+                      <MUIListItem key={bud._id}>
+                        <SmallAvatar alt={bud.name} src={bud.avatar} />
+                        <MUITypography className={classes.flexGrow} variant="body1">
+                          <Link to={`/account/${bud._id}`}>{bud.name}</Link>
+                        </MUITypography>
+                        {accountId === authentication.userId &&
+                          <WarningButton
+                            onClick={() => setDialogInfo({
+                              data: `action: "remove",\nother_user_id: "${bud._id}"`,
+                              content: <MUITypography variant="body1">Think of all the good times you've had.</MUITypography>,
+                              title: `Are you sure you want to un-bud ${bud.name}?`
+                            })}
+                          >
+                            Un-Bud
+                          </WarningButton>
+                        }
+                      </MUIListItem>
+                    );
+                  })
+                }
+              </MUIList>
+            </MUICard>
+          </MUIGrid>
+
+          {accountId === authentication.userId &&
+            <BudRequests
+              manageBuds={submitChanges}
+              received_bud_requests={account.received_bud_requests}
+              sent_bud_requests={account.sent_bud_requests}
+            />
+          }
+        </MUIGrid>
+      </React.Fragment>
   );
 };

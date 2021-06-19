@@ -17,10 +17,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import CreateComponentForm from './CreateComponentForm';
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import WarningButton from '../miscellaneous/WarningButton';
 import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { ErrorContext } from '../../contexts/error-context';
 import {
   deleteComponent as deleteComponentRequest,
   editComponent
@@ -73,33 +73,32 @@ const useStyles = makeStyles({
   }
 });
 
-function ComponentInfo (props) {
+function ComponentInfo ({
+  activeComponentCards,
+  activeComponentId,
+  activeComponentName,
+  activeComponentType,
+  activeRotationSize,
+  creator,
+  cube,
+  dispatchChangeComponentName,
+  dispatchChangeRotationSize,
+  dispatchDeleteComponent,
+  dispatchFilterCards,
+  dispatchSwitchComponent,
+  dispatchSwitchViewMode,
+  displayedCards,
+  filter,
+  viewMode
+}) {
 
-  const {
-    activeComponentCards,
-    activeComponentId,
-    activeComponentName,
-    activeComponentType,
-    activeRotationSize,
-    creator,
-    cube,
-    dispatchChangeComponentName,
-    dispatchChangeRotationSize,
-    dispatchDeleteComponent,
-    dispatchFilterCards,
-    dispatchSwitchComponent,
-    dispatchSwitchViewMode,
-    displayedCards,
-    filter,
-    viewMode
-  } = props;
   const authentication = React.useContext(AuthenticationContext);
+  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
   const componentNameRef = React.useRef();
   const cubeId = useParams().cubeId;
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState();
   const rotationSizeRef = React.useRef();
   const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
 
@@ -138,11 +137,6 @@ function ComponentInfo (props) {
 
   return (
     <React.Fragment>
-    
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
 
       <CreateComponentForm
         open={dialogIsOpen}

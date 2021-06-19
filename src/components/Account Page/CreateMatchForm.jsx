@@ -18,12 +18,12 @@ import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import SmallAvatar from '../miscellaneous/SmallAvatar';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { createMatch } from '../../requests/GraphQL/match-requests';
+import { ErrorContext } from '../../contexts/error-context';
 
 const useStyles = makeStyles({
   flex: {
@@ -39,13 +39,16 @@ const useStyles = makeStyles({
   }
 });
 
-const CreateEventForm = (props) => {
+export default function CreateEventForm ({
+  events,
+  open,
+  toggleOpen
+}) {
 
-  const { events, open, toggleOpen } = props;
   const authentication = React.useContext(AuthenticationContext);
+  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const history = useHistory();
-  const [errorMessage, setErrorMessage] = React.useState();
   const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [selectedEvent, setSelectedEvent] = React.useState();
@@ -68,110 +71,99 @@ const CreateEventForm = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <MUIDialog open={open} onClose={toggleOpen}>
+      <MUIDialogTitle>Set Up A Match</MUIDialogTitle>
+      {loading ?
+        <MUIDialogContent className={classes.loadingSpinnerContainer}>
+          <LoadingSpinner />
+        </MUIDialogContent> :
+        <form onSubmit={submitForm}>
+          <MUIDialogContent>
 
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-
-      <MUIDialog open={open} onClose={toggleOpen}>
-        <MUIDialogTitle>Set Up A Match</MUIDialogTitle>
-        {loading ?
-          <MUIDialogContent className={classes.loadingSpinnerContainer}>
-            <LoadingSpinner />
-          </MUIDialogContent> :
-          <form onSubmit={submitForm}>
-            <MUIDialogContent>
-
-              <MUIList component="nav">
-                <MUIListItem
-                  aria-haspopup="true"
-                  aria-controls="lock-menu"
-                  button
-                  onClick={(event) => setEventAnchorEl(event.currentTarget)}
-                >
-                  <MUIListItemText
-                    primary="Use Decks From"
-                    secondary={selectedEvent && selectedEvent.name}
-                  />
-                </MUIListItem>
-              </MUIList>
-              <MUIMenu
-                anchorEl={eventAnchorEl}
-                keepMounted
-                open={Boolean(eventAnchorEl)}
-                onClose={() => setEventAnchorEl(null)}
+            <MUIList component="nav">
+              <MUIListItem
+                aria-haspopup="true"
+                aria-controls="lock-menu"
+                button
+                onClick={(event) => setEventAnchorEl(event.currentTarget)}
               >
-                {events.map(function (evnt) {
+                <MUIListItemText
+                  primary="Use Decks From"
+                  secondary={selectedEvent && selectedEvent.name}
+                />
+              </MUIListItem>
+            </MUIList>
+            <MUIMenu
+              anchorEl={eventAnchorEl}
+              keepMounted
+              open={Boolean(eventAnchorEl)}
+              onClose={() => setEventAnchorEl(null)}
+            >
+              {events.map(function (evnt) {
+                return (
+                  <MUIMenuItem
+                    key={evnt._id}
+                    onClick={function () {
+                      setSelectedEvent(evnt);
+                      setEventAnchorEl(null);
+                    }}
+                    selected={selectedEvent && selectedEvent._id === evnt._id}
+                  >
+                    {evnt.name}
+                  </MUIMenuItem>
+                );
+              })}
+            </MUIMenu>
+
+            <MUIFormControl component="fieldset">
+              <MUIFormLabel component="legend">Your Next Victim</MUIFormLabel>
+              <MUIRadioGroup
+                onChange={(event) => setSelectedOpponent(event.target.value)}
+                value={selectedOpponent}
+              >
+                {selectedEvent && selectedEvent.players.filter(plr => plr.account._id !== authentication.userId).map(function (plr) {
                   return (
-                    <MUIMenuItem
-                      key={evnt._id}
-                      onClick={function () {
-                        setSelectedEvent(evnt);
-                        setEventAnchorEl(null);
-                      }}
-                      selected={selectedEvent && selectedEvent._id === evnt._id}
-                    >
-                      {evnt.name}
-                    </MUIMenuItem>
+                    <MUIFormControlLabel
+                      control={
+                        <MUIRadio />
+                      }
+                      key={plr.account._id}
+                      label={
+                        <span className={classes.flex}>
+                          <SmallAvatar
+                            alt={plr.account.name}
+                            src={plr.account.avatar}
+                          />
+                          <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
+                        </span>
+                      }
+                      value={plr.account._id}
+                    />
                   );
                 })}
-              </MUIMenu>
+              </MUIRadioGroup>
+            </MUIFormControl>
 
-              <MUIFormControl component="fieldset">
-                <MUIFormLabel component="legend">Your Next Victim</MUIFormLabel>
-                <MUIRadioGroup
-                  onChange={(event) => setSelectedOpponent(event.target.value)}
-                  value={selectedOpponent}
-                >
-                  {selectedEvent && selectedEvent.players.filter(plr => plr.account._id !== authentication.userId).map(function (plr) {
-                    return (
-                      <MUIFormControlLabel
-                        control={
-                          <MUIRadio />
-                        }
-                        key={plr.account._id}
-                        label={
-                          <span className={classes.flex}>
-                            <SmallAvatar
-                              alt={plr.account.name}
-                              src={plr.account.avatar}
-                            />
-                            <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
-                          </span>
-                        }
-                        value={plr.account._id}
-                      />
-                    );
-                  })}
-                </MUIRadioGroup>
-              </MUIFormControl>
+          </MUIDialogContent>
 
-            </MUIDialogContent>
+          <MUIDialogActions>
+            <WarningButton
+              onClick={toggleOpen}
+            >
+              Cancel
+            </WarningButton>
 
-            <MUIDialogActions>
-              <WarningButton
-                onClick={toggleOpen}
-              >
-                Cancel
-              </WarningButton>
-
-              <MUIButton
-                color="primary"
-                size="small"
-                type="submit"
-                variant="contained"
-              >
-                Whoop that Ass!
-              </MUIButton>
-            </MUIDialogActions>
-          </form>
-        }
-      </MUIDialog>
-
-    </React.Fragment>
+            <MUIButton
+              color="primary"
+              size="small"
+              type="submit"
+              variant="contained"
+            >
+              Whoop that Ass!
+            </MUIButton>
+          </MUIDialogActions>
+        </form>
+      }
+    </MUIDialog>
   );
-}
-
-export default CreateEventForm;
+};

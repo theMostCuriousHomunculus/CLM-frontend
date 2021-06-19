@@ -8,11 +8,10 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { useRequest } from '../../hooks/request-hook';
+import useRequest from '../../hooks/request-hook';
 
-const NewComment = (props) => {
-  const authentication = React.useContext(AuthenticationContext);
+export default function NewComment (props) {
+
   const bodyInput = React.useRef();
   const { sendRequest } = useRequest();
 
@@ -20,16 +19,12 @@ const NewComment = (props) => {
 
   async function submitComment () {
     try {
-      const refreshedArticle = await sendRequest(`${process.env.REACT_APP_REST_URL}/blog/${blogPostId}`,
-        'POST',
-        JSON.stringify({
+      const refreshedArticle = await sendRequest({
+        url: `${process.env.REACT_APP_REST_URL}/blog/${blogPostId}`,
+        body: JSON.stringify({
           body: bodyInput.current.value
-        }),
-        {
-          Authorization: 'Bearer ' + authentication.token,
-          'Content-Type': 'application/json'
-        }
-      );
+        })
+      });
       bodyInput.current.value = '';
       props.pushNewComment(refreshedArticle);
     } catch (err) {
@@ -60,6 +55,4 @@ const NewComment = (props) => {
       </MUICardActions>
     </MUICard>
   );
-}
-
-export default NewComment;
+};

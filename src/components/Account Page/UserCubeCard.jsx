@@ -18,10 +18,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ConfirmationDialogue from '../miscellaneous/ConfirmationDialog';
 import CreateCubeForm from './CreateCubeForm';
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import theme, { backgroundColor } from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { deleteCube as deleteCubeRequest } from '../../requests/REST/cube-requests';
+import { ErrorContext } from '../../contexts/error-context';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -34,15 +34,17 @@ const useStyles = makeStyles({
   }
 });
 
-const UserCubeCard = (props) => {
-
-  const { cubes, pageClasses, updateCubeList } = props;
+export default function UserCubeCard ({
+  cubes,
+  pageClasses,
+  updateCubeList
+}) {
 
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
+  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const [dialogInfo, setDialogInfo] = React.useState({});
-  const [errorMessage, setErrorMessage] = React.useState();
   const [showCubeForm, setShowCubeForm] = React.useState(false);
 
   async function deleteCube (cubeId) {
@@ -56,11 +58,6 @@ const UserCubeCard = (props) => {
 
   return (
     <React.Fragment>
-
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
 
       <ConfirmationDialogue
         confirmHandler={deleteCube}
@@ -141,5 +138,3 @@ const UserCubeCard = (props) => {
     </React.Fragment>
   );
 };
-
-export default UserCubeCard;

@@ -9,10 +9,10 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ErrorDialog from '../miscellaneous/ErrorDialog';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { ErrorContext } from '../../contexts/error-context';
 import { createCube } from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
@@ -24,16 +24,17 @@ const useStyles = makeStyles({
   }
 });
 
-const CreateCubeForm = function (props) {
-
-  const { open, toggleOpen } = props;
+export default function CreateCubeForm ({
+  open,
+  toggleOpen
+}) {
 
   const authentication = React.useContext(AuthenticationContext);
+  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const cobraId = React.useRef();
   const cubeDescription = React.useRef();
   const cubeName = React.useRef();
-  const [errorMessage, setErrorMessage] = React.useState();
   const history = useHistory();
   const [loading, setLoading] = React.useState(false);
 
@@ -58,82 +59,74 @@ const CreateCubeForm = function (props) {
   }
 
   return (
-    <React.Fragment>
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-      <MUIDialog open={open} onClose={toggleOpen}>
-        <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
-        {loading ?
-          <MUIDialogContent className={classes.loadingSpinnerContainer}>
-            <LoadingSpinner />
-          </MUIDialogContent> :
-          <form onSubmit={submitForm}>
-            <MUIDialogContent style={{ height: 'max-content' }}>
-              <MUITextField
-                autoComplete="off"
-                autoFocus
-                fullWidth
-                inputRef={cubeName}
-                label="Cube Name"
-                margin="dense"
-                required={true}
-                type="text"
-                variant="outlined"
-              />
+    <MUIDialog open={open} onClose={toggleOpen}>
+      <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
+      {loading ?
+        <MUIDialogContent className={classes.loadingSpinnerContainer}>
+          <LoadingSpinner />
+        </MUIDialogContent> :
+        <form onSubmit={submitForm}>
+          <MUIDialogContent style={{ height: 'max-content' }}>
+            <MUITextField
+              autoComplete="off"
+              autoFocus
+              fullWidth
+              inputRef={cubeName}
+              label="Cube Name"
+              margin="dense"
+              required={true}
+              type="text"
+              variant="outlined"
+            />
 
-              <MUITextField
-                autoComplete="off"
-                fullWidth
-                inputRef={cubeDescription}
-                label="Description"
-                margin="dense"
-                multiline
-                required={false}
-                rows={2}
-                style={{ marginBottom: '12px', marginTop: '16px' }}
-                type="text"
-                variant="outlined"
-              />
+            <MUITextField
+              autoComplete="off"
+              fullWidth
+              inputRef={cubeDescription}
+              label="Description"
+              margin="dense"
+              multiline
+              required={false}
+              rows={2}
+              style={{ marginBottom: '12px', marginTop: '16px' }}
+              type="text"
+              variant="outlined"
+            />
 
-              <MUITypography variant="body1">
-                Have an existing cube on CubeCobra?
-              </MUITypography>
+            <MUITypography variant="body1">
+              Have an existing cube on CubeCobra?
+            </MUITypography>
 
-              <MUITextField
-                autoComplete="off"
-                fullWidth
-                inputRef={cobraId}
-                label="24 character ID from cubecobra URL"
-                margin="dense"
-                required={false}
-                style={{ marginTop: '8px' }}
-                type="text"
-                variant="outlined"
-              />
-            </MUIDialogContent>
-            <MUIDialogActions>
-              <WarningButton
-                onClick={toggleOpen}
-              >
-                Cancel
-              </WarningButton>
+            <MUITextField
+              autoComplete="off"
+              fullWidth
+              inputRef={cobraId}
+              label="24 character ID from cubecobra URL"
+              margin="dense"
+              required={false}
+              style={{ marginTop: '8px' }}
+              type="text"
+              variant="outlined"
+            />
+          </MUIDialogContent>
+          <MUIDialogActions>
+            <WarningButton
+              onClick={toggleOpen}
+            >
+              Cancel
+            </WarningButton>
 
-              <MUIButton
-                color="primary"
-                size="small"
-                type="submit"
-                variant="contained"
-              >
-                Create!
-              </MUIButton>
-            </MUIDialogActions>
-          </form>
-        }
-      </MUIDialog>
-    </React.Fragment>
+            <MUIButton
+              color="primary"
+              size="small"
+              type="submit"
+              variant="contained"
+            >
+              Create!
+            </MUIButton>
+          </MUIDialogActions>
+        </form>
+      }
+    </MUIDialog>
   );
 };
-
-export default CreateCubeForm;

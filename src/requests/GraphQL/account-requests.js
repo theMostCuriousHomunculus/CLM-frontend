@@ -1,5 +1,87 @@
 import axios from 'axios';
 
+const desiredAccountInfo = `
+  avatar
+  buds {
+    _id
+    avatar
+    name
+  }
+  cubes {
+    _id
+    description
+    mainboard {
+      _id
+    }
+    modules {
+      _id
+      cards {
+        _id
+      }
+      name
+    }
+    name
+    rotations {
+      _id
+      cards {
+        _id
+      }
+      name
+      size
+    }
+    sideboard {
+      _id
+    }
+  }
+  events {
+    _id
+    createdAt
+    host {
+      _id
+      avatar
+      name
+    }
+    name
+    players {
+      account {
+        _id
+        avatar
+        name
+      }
+    }
+  }
+  matches {
+    _id
+    cube {
+      _id
+      name
+    }
+    event {
+      _id
+      createdAt
+      name
+    }
+    players {
+      account {
+        _id
+        avatar
+        name
+      }
+    }
+  }
+  name
+  received_bud_requests {
+    _id
+    avatar
+    name
+  }
+  sent_bud_requests {
+    _id
+    avatar
+    name
+  }
+`
+
 async function editAccount (changes, token) {
   const { action, avatar, email, name, other_user_id, password } = changes;
   try {
@@ -15,113 +97,52 @@ async function editAccount (changes, token) {
               other_user_id: "${other_user_id}",
               password: "${password}"
             }
-          )
+          ) {
+            ${desiredAccountInfo}
+          }
         }
       `
     };
-    await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery, {
+    const accountData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery, {
       headers: { Authorization: `Bearer ${token}` }
     });
+
+    if (accountData.data.errors) throw new Error(accountData.data.errors[0].message);
+
+    return accountData.data.data.editAccount;
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
 async function fetchAccountByID (accountId, token) {
   const headers = token ? { Authorization: `Bearer ${token}` } : null;
+
   try {
     const graphqlQuery = {
       query: `
         query {
           fetchAccountByID(_id: "${accountId}") {
-            avatar
-            buds {
-              _id
-              avatar
-              name
-            }
-            cubes {
-              _id
-              description
-              mainboard {
-                _id
-              }
-              modules {
-                _id
-                cards {
-                  _id
-                }
-                name
-              }
-              name
-              rotations {
-                _id
-                cards {
-                  _id
-                }
-                name
-                size
-              }
-              sideboard {
-                _id
-              }
-            }
-            events {
-              _id
-              createdAt
-              host {
-                _id
-                avatar
-                name
-              }
-              name
-              players {
-                account {
-                  _id
-                  avatar
-                  name
-                }
-              }
-            }
-            matches {
-              _id
-              cube {
-                _id
-                name
-              }
-              event {
-                _id
-                createdAt
-                name
-              }
-              players {
-                account {
-                  _id
-                  avatar
-                  name
-                }
-              }
-            }
-            name
-            received_bud_requests {
-              _id
-              avatar
-              name
-            }
-            sent_bud_requests {
-              _id
-              avatar
-              name
-            }
+            ${desiredAccountInfo}
           }
         }
       `
     };
     const accountData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery, { headers });
 
+    if (accountData.data.errors) throw new Error(accountData.data.errors[0].message);
+
     return accountData.data.data.fetchAccountByID;
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
@@ -145,19 +166,35 @@ async function login (email, password) {
     };
     const credentials = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
 
+    if (credentials.data.errors) throw new Error(credentials.data.errors[0].message);
+
     return credentials.data.data.login;
   } catch (error) {
-    throw new Error(error.response.data.errors[0].message);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
 async function logout (token) {
   try {
-    await axios.patch(`${process.env.REACT_APP_REST_URL}/account/logoutAll`, null, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const graphqlQuery = {
+      query: `
+        mutation {
+          logoutAllDevices
+        }
+      `
+    };
+
+    await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
+      graphqlQuery,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      });
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error(error.response.data.errors[0].message);
   }
 }
 
@@ -186,9 +223,15 @@ async function register (email, name, password) {
     };
     const credentials = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
 
+    if (credentials.data.errors) throw new Error(credentials.data.errors[0].message);
+
     return credentials.data.data.register;
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
@@ -201,9 +244,16 @@ async function requestPasswordReset (email) {
         }
       `
     };
-    await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
+    const response = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
+
+    if (response.data.errors) throw new Error(response.data.errors[0].message);
+
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
@@ -221,9 +271,16 @@ async function searchAccounts (name) {
       `
     };
     const matchingUsers = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
+
+    if (matchingUsers.data.errors) throw new Error(matchingUsers.data.errors[0].message);
+
     return matchingUsers.data.data.searchAccounts;
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
@@ -247,13 +304,21 @@ async function submitPasswordReset (email, newPassword, resetToken) {
       `
     };
     const credentials = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL, graphqlQuery);
+
+    if (credentials.data.errors) throw new Error(credentials.data.errors[0].message);
+
     return credentials.data.data.submitPasswordReset;
   } catch (error) {
-    throw new Error(error.response.data.errors[0]);
+    if (error.response) {
+      throw new Error(error.response.data.errors[0].message);
+    } else {
+      throw new Error(error);
+    }
   }
 }
 
 export {
+  desiredAccountInfo,
   editAccount,
   fetchAccountByID,
   login,

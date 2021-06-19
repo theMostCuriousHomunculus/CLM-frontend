@@ -11,7 +11,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
-import ErrorDialog from '../components/miscellaneous/ErrorDialog';
 import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import PicksDisplay from '../components/Event Page/PicksDisplay';
@@ -44,7 +43,6 @@ export default function Event () {
   const classes = useStyles();
   const eventID = useParams().eventId;
   const [dialogDisplayed, setDialogDisplayed] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState();
   const [event, setEvent] = React.useState({
     finished: false,
     host: {},
@@ -73,7 +71,7 @@ export default function Event () {
         const eventData = await fetchEventByID(eventID, authentication.token);
         setEvent(eventData);
       } catch (error) {
-        setErrorMessage(error.message);
+        console.log(error.message);
       } finally {
         setLoading(false);
       }
@@ -111,13 +109,15 @@ export default function Event () {
     }
 
     subscribe(result => console.log(result), error => console.log(error));
+
+    return client.dispose;
   }, [authentication.token, eventID]);
 
   async function onMoveCard (cardID, destination, origin) {
     try {
       await moveCard(cardID, destination, eventID, origin, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
@@ -125,7 +125,7 @@ export default function Event () {
     try {
       await selectCard(cardID, eventID, authentication.token);
     } catch (error) {
-      setErrorMessage(error.message);
+      console.log(error.message);
     }
   }
 
@@ -134,7 +134,7 @@ export default function Event () {
       try {
         await sortCard(collection, eventID, newIndex, oldIndex, authentication.token);
       } catch (error) {
-        setErrorMessage(error.message);
+        console.log(error.message);
       }
     }
   }
@@ -142,11 +142,6 @@ export default function Event () {
   return (loading ?
     <LoadingSpinner /> :
     <React.Fragment>
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-
       <SelectConfirmationDialog
         card={selectedCard}
         open={dialogDisplayed}

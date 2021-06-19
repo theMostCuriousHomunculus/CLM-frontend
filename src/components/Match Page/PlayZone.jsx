@@ -40,7 +40,8 @@ const useStyles = makeStyles({
   playZoneContainer: {
     display: 'flex',
     flexDirection: 'column',
-    flexGrow: 1
+    flex: '1 1 0',
+    minWidth: 0
   }
 });
 
@@ -93,7 +94,7 @@ export default function PlayZone ({
               })}
             </div>
           }
-          
+
           <div className={classes.rowFlex}>
             {displayedZones.topLibrary &&
               <VerticalCollapsableZone
@@ -105,7 +106,7 @@ export default function PlayZone ({
                 zone="Library"
               />
             }
-            <div className={classes.battlefieldContainer}>
+            <div className={classes.battlefieldContainer} style={{ transform: 'rotate(180deg)' }}>
               {topPlayer.battlefield.map(card => {
                 return (
                   <MagicCard

@@ -6,18 +6,15 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import { connect } from 'react-redux';
 
-import ErrorDialog from '../miscellaneous/ErrorDialog';
+function MoveDeleteMenu ({
+  activeComponentId,
+  activeComponentName,
+  handleMoveDelete,
+  listItemPrimaryText,
+  modules,
+  rotations
+}) {
 
-function MoveDeleteMenu (props) {
-
-  const {
-    activeComponentId,
-    activeComponentName,
-    handleMoveDelete,
-    listItemPrimaryText,
-    modules,
-    rotations
-  } = props;
   const allComponents = [
     { name: 'Mainboard', _id: 'mainboard' },
     { name: 'Sideboard', _id: 'sideboard' },
@@ -25,7 +22,6 @@ function MoveDeleteMenu (props) {
     ...rotations
   ];
   const [anchorEl, setAnchorEl] = React.useState();
-  const [errorMessage, setErrorMessage] = React.useState();
   const [selectedComponent, setSelectedComponent] = React.useState({
     _id: activeComponentId,
     name: activeComponentName
@@ -39,12 +35,6 @@ function MoveDeleteMenu (props) {
 
   return (
     <React.Fragment>
-
-      <ErrorDialog
-        clear={() => setErrorMessage(null)}
-        message={errorMessage}
-      />
-
       <MUIList component="nav">
         <MUIListItem
           button
@@ -79,7 +69,6 @@ function MoveDeleteMenu (props) {
           Delete from Cube
         </MUIMenuItem>
       </MUIMenu>
-
     </React.Fragment>
   );
 }
