@@ -16,27 +16,27 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { deleteBlogPost as deleteBlogPostRequest } from '../requests/REST/blog-requests';
 
 export default function Blog () {
 
   const authentication = React.useContext(AuthenticationContext);
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
   const [blogPosts, setBlogPosts] = React.useState([]);
   const history = useHistory();
-  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     async function fetchBlogPosts () {
-      try {
-        setLoading(true);
-        const operation = 'searchBlogPosts';
-        const response = await sendRequest({
-          operation,
-          body: {
+      await sendRequest({
+        callback: (data) => {
+          setBlogPosts(data);
+        },
+        load: true,
+        operation: 'searchBlogPosts',
+        get body() {
+          return {
             query: `
               query {
-                ${operation}(search: "") {
+                ${this.operation}(search: "") {
                   _id
                   author {
                     _id
@@ -53,27 +53,29 @@ export default function Blog () {
               }
             `
           }
-        });
-
-        setBlogPosts(response);
-      } catch (error) {
-
-      } finally {
-        setLoading(false);
-      }
+        }
+      });
     }
+
     fetchBlogPosts();
   }, [sendRequest]);
 
   async function deleteBlogPost (blogPostId) {
-    try {
-      await deleteBlogPostRequest(blogPostId, authentication.token);
-      setBlogPosts((prevState) => {
-        return prevState.filter((blogPost) => blogPost._id !== blogPostId);
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
+    await sendRequest({
+      callback: () => {
+        setBlogPosts((prevState) => prevState.filter((blogPost) => blogPost._id !== blogPostId));
+      },
+      operation: 'deleteBlogPost',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(_id: "${blogPostId}")
+            }
+          `
+        }
+      }
+    });
   }
 
   return (

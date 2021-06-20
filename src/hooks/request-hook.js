@@ -59,7 +59,6 @@ export default function useRequest () {
         for (const error of responseData.errors) {
           setErrorMessages(prevState => [...prevState, error.message]);
         }
-        throw new Error();
       } else if (!response.ok) {
         throw new Error(responseData.message);
       } else if (operation) {
@@ -69,10 +68,7 @@ export default function useRequest () {
       }
 
     } catch (error) {
-      if (error.message) {
-        setErrorMessages(prevState => [...prevState, error.message]);
-      }
-      throw error;
+      setErrorMessages(prevState => [...prevState, error.message]);
     } finally {
       setLoading(false);
     }

@@ -9,16 +9,17 @@ import MUICardActions from '@material-ui/core/CardActions';
 import MUISyncIcon from '@material-ui/icons/Sync';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
+import { createClient } from 'graphql-ws';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ExistingComment from '../components/BlogPost Page/ExistingComment';
+import theme, { backgroundColor } from '../theme';
+import useRequest from '../hooks/request-hook';
 import LargeAvatar from '../components/miscellaneous/LargeAvatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import NewComment from '../components/BlogPost Page/NewComment';
-import theme, { backgroundColor } from '../theme';
+import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { fetchAccountById } from '../requests/REST/account-requests';
-import { editBlogPost, fetchBlogPostById, publish } from '../requests/REST/blog-requests';
+
+const desiredBlogPostInfo = `_id\nauthor {\n_id\navatar\nname\n}\nbody\ncomments {\n_id\nauthor {\n_id\navatar\nname\n}\nbody\nupdatedAt\n}\nimage\nsubtitle\ntitle\ncreatedAt\nupdatedAt`;
 
 const useStyles = makeStyles({
   article: {
@@ -86,15 +87,36 @@ const useStyles = makeStyles({
       alignSelf: 'flex-end',
       margin: '0 0 0 16px'
     }
+  },
+  commentCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: 'calc(100vh - 16px)'
+  },
+  commentForm: {
+    alignItems: 'flex-end',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1
+  },
+  commentSection: {
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    flexGrow: 1,
+    overflowY: 'auto'
   }
 });
 
-function BlogPost () {
+export default function BlogPost () {
+
   const authentication = React.useContext(AuthenticationContext);
+  const blogPostID = useParams().blogPostId;
   const classes = useStyles();
-  const [loading, setLoading] = React.useState(false);
+  const history = useHistory();
+  const newComment = React.useRef();
+  const { loading, sendRequest } = useRequest();
   const [viewMode, setViewMode] = React.useState('Live');
-  const [blogPostState, setBlogPostState] = React.useState({
+  const [blogPost, setBlogPost] = React.useState({
     _id: null,
     author: {
       _id: null,
@@ -107,234 +129,335 @@ function BlogPost () {
     subtitle: '',
     title: '',
     createdAt: null,
-    updatedAt: null,
-    __v: null
+    updatedAt: null
   });
 
-  const blogPostId = useParams().blogPostId;
-  const history = useHistory();
-
-  const initializeBlogPost = React.useCallback(async function () {
-    if (blogPostId !== 'new-post') {
-      try {
-        setLoading(true);
-        const blogPostData = await fetchBlogPostById(blogPostId);
-        setBlogPostState(blogPostData);
-
-        if (blogPostData.author._id === authentication.userId) {
-          setViewMode('Edit');
-        }
-
-      } catch (error) {
-        console.log(error.message);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      try {
-        setLoading(true);
-        const profileData = await fetchAccountById(authentication.userId);
-        setBlogPostState((prevState) => ({
-          ...prevState,
-          author: {
-            _id: authentication.userId,
-            avatar: profileData.user.avatar,
-            name: profileData.user.name
-          }
-        }));
-        setViewMode('Edit');
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [authentication.userId, blogPostId]);
-
   React.useEffect(() => {
-    initializeBlogPost();
-  }, [initializeBlogPost]);
 
-  function refreshPage (refreshedArticle) {
-    setBlogPostState(refreshedArticle);
-  }
-
-  async function submitPost () {
-    const details = {
-      body: blogPostState.body,
-      image: blogPostState.image,
-      subtitle: blogPostState.subtitle,
-      title: blogPostState.title
-    };
-
-    try {
-      if (blogPostId === 'new-post') {
-        await publish(details, authentication.token);
+    async function initialize () {
+      if (blogPostID !== 'new-post') {
+        
+        await sendRequest({
+          callback: (data) => {
+            setBlogPost(data);
+          },
+          headers: { BlogPostID: blogPostID },
+          load: true,
+          operation: 'fetchBlogPostByID',
+          get body() {
+            return {
+              query: `
+                query {
+                  ${this.operation} {
+                    ${desiredBlogPostInfo}
+                  }
+                }
+              `
+            }
+          }
+        });
+  
+      } else if (!authentication.isAdmin) {
+        // user is not an admin but trying to create a new blog post
+        history.push('/blog');
       } else {
-        await editBlogPost(details, blogPostId, authentication.token);
-      }
-      history.push('/blog');
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+        
+        setViewMode('Edit');
 
-  function toggleViewMode () {
-    setViewMode((currentViewMode) => {
-      return currentViewMode === 'Edit' ? 'Live' : 'Edit';
+        await sendRequest({
+          callback: (data) => {
+            setBlogPost(prevState => ({
+              ...prevState,
+              author: {
+                ...data
+              }
+            }));
+          },
+          load: true,
+          operation: 'fetchAccountByID',
+          get body() {
+            return {
+              query: `
+                query {
+                  ${this.operation}(_id: "${authentication.userId}") {
+                    _id
+                    avatar
+                    name
+                  }
+                }
+              `
+            }
+          }
+        });
+  
+      }
+    }
+
+    initialize();
+
+    if (blogPostID !== 'new-post') {
+      const client = createClient({
+        connectionParams: {
+          authToken: authentication.token,
+          blogPostID
+        },
+        url: process.env.REACT_APP_GRAPHQL_WS_URL
+      });
+  
+      async function subscribe () {
+        function onNext(update) {
+          setBlogPost(update.data.subscribeBlogPost);
+        }
+  
+        await new Promise((resolve, reject) => {
+          client.subscribe({
+            query: `subscription {
+              subscribeBlogPost {
+                ${desiredBlogPostInfo}
+              }
+            }`
+          },
+          {
+            complete: resolve,
+            error: reject,
+            next: onNext
+          });
+        })
+      }
+  
+      subscribe(result => console.log(result), error => console.log(error));
+  
+      return client.dispose;
+    }
+    
+  }, [authentication.isAdmin, authentication.token, authentication.userId, blogPostID, history, sendRequest]);
+
+  async function submitBlogPost () {
+    const headers = {};
+    let operation;
+
+    if (blogPostID === 'new-post') {
+      operation = 'createBlogPost';
+    } else {
+      headers.BlogPostID = blogPostID;
+      operation = 'editBlogPost';
+    }
+
+    await sendRequest({
+      callback: () => {
+        history.push('/blog');
+      },
+      headers,
+      operation,
+      body: {
+        query: `
+          mutation {
+            ${operation}(
+              input: {
+                body: "${blogPost.body}",
+                image: "${blogPost.image}",
+                subtitle: "${blogPost.subtitle}"
+                title: "${blogPost.title}"
+              }
+            ) {
+              _id
+            }
+          }
+        `
+      }
     });
   }
 
-  return (loading ?
-    <LoadingSpinner /> :
-    <React.Fragment>
-      <MUICard>
-        <MUICardHeader
-          avatar={<LargeAvatar alt={blogPostState.author.name} src={blogPostState.author.avatar} />}
-          className={classes.cardHeader}
-          disableTypography={true}
-          title={blogPostState.author._id === authentication.userId ?
-            <MUITextField
-              defaultValue={blogPostState.title}
-              fullWidth
-              label="Title"
-              margin="dense"
-              onChange={(event) => {
-                event.persist();
-                setBlogPostState((prevState) => {
-                  return {
-                    ...prevState,
-                    title: event.target.value
-                  }
-                });
-              }}
-              type="text"
-              value={blogPostState.title}
-              variant="outlined"
-            /> :
-            <MUITypography variant="subtitle1">{blogPostState.title}</MUITypography>
-          }
-          subheader={
-            <React.Fragment>
-              {blogPostState.author._id === authentication.userId ?
-                <React.Fragment>
+  async function submitComment () {
+    await sendRequest({
+      headers: {
+        BlogPostID: blogPostID
+      },
+      operation: 'createComment',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(body: "${newComment.current.value}") {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }
+
+  return (
+    loading ?
+      <LoadingSpinner /> :
+      <React.Fragment>
+        <MUICard>
+          {blogPost.author._id === authentication.userId ?
+            <form onSubmit={submitBlogPost}>
+              <MUICardHeader
+                avatar={<LargeAvatar alt={blogPost.author.name} src={blogPost.author.avatar} />}
+                className={classes.cardHeader}
+                disableTypography={true}
+                title={
                   <MUITextField
-                    defaultValue={blogPostState.subtitle}
                     fullWidth
-                    label="Subtitle"
+                    label="Title"
                     margin="dense"
-                    onChange={(event) => {
+                    onChange={event => {
                       event.persist();
-                      setBlogPostState((prevState) => {
-                        return {
+                      setBlogPost(prevState => ({
+                        ...prevState,
+                        title: event.target.value
+                      }));
+                    }}
+                    type="text"
+                    value={blogPost.title}
+                    variant="outlined"
+                  />
+                }
+                subheader={
+                  <React.Fragment>
+                    <MUITextField
+                      fullWidth
+                      label="Subtitle"
+                      margin="dense"
+                      onChange={event => {
+                        event.persist();
+                        setBlogPost(prevState => ({
                           ...prevState,
                           subtitle: event.target.value
-                        }
-                      });
-                    }}
-                    style={{ marginTop: 16 }}
-                    type="text"
-                    value={blogPostState.subtitle}
-                    variant="outlined"
-                  />
-                  <MUITextField
-                    defaultValue={blogPostState.image}
-                    fullWidth
-                    label="Image"
-                    margin="dense"
-                    onChange={(event) => {
-                      event.persist();
-                      setBlogPostState((prevState) => {
-                        return {
+                        }));
+                      }}
+                      style={{ marginTop: 16 }}
+                      type="text"
+                      value={blogPost.subtitle}
+                      variant="outlined"
+                    />
+                    <MUITextField
+                      fullWidth
+                      label="Image"
+                      margin="dense"
+                      onChange={event => {
+                        event.persist();
+                        setBlogPost(prevState => ({
                           ...prevState,
                           image: event.target.value
-                        }
-                      });
+                        }));
+                      }}
+                      style={{ marginTop: 16 }}
+                      type="text"
+                      value={blogPost.image}
+                      variant="outlined"
+                    />
+                    <MUITypography color="textSecondary" variant="body2">
+                      A work of genius by {blogPost.author.name}.
+                    </MUITypography>
+                    {blogPost.updatedAt &&
+                      <MUITypography color="textSecondary" variant="body2">
+                        Last updated {new Date(parseInt(blogPost.updatedAt)).toLocaleString()}.
+                      </MUITypography>
+                    }
+                  </React.Fragment>
+                }
+                action={
+                  <MUIButton
+                    color="secondary"
+                    onClick={() => setViewMode(currentViewMode => currentViewMode === 'Edit' ? 'Live' : 'Edit')}
+                    size="small"
+                    variant="contained"
+                  >
+                    {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
+                  </MUIButton>
+                }
+              />
+              <MUICardContent>
+                {viewMode === 'Edit' ?
+                  <MUITextField
+                    fullWidth
+                    label="Body"
+                    margin="dense"
+                    multiline
+                    onChange={event => {
+                      event.persist();
+                      setBlogPost(prevState => ({
+                        ...prevState,
+                        body: event.target.value
+                      }));
                     }}
-                    style={{ marginTop: 16 }}
+                    rows={20}
                     type="text"
-                    value={blogPostState.image}
+                    value={blogPost.body}
                     variant="outlined"
-                  />
-                </React.Fragment>  :
-                <MUITypography variant="subtitle2">{blogPostState.subtitle}</MUITypography>
-              }
-              <MUITypography
-                color="textSecondary"
-                variant="body2"
-              >
-                A work of genius by {blogPostState.author.name}.
-              </MUITypography>
-              {blogPostState.updatedAt &&
-                <MUITypography
-                  color="textSecondary"
-                  variant="body2"
+                  /> :
+                  <article className={classes.article}>
+                    <ReactMarkdown escapeHtml={false} source={blogPost.body} />
+                  </article>
+                }
+              </MUICardContent>
+              <MUICardActions>
+                <MUIButton
+                  color="primary"
+                  type="submit"
+                  size="small"
+                  variant="contained"
                 >
-                  Last updated {new Date(blogPostState.updatedAt).toLocaleString()}.
-                </MUITypography>
-              }
+                  {blogPostID === 'new-post' ? 'Publish' : <MUISyncIcon />}
+                </MUIButton>
+              </MUICardActions>
+            </form> :
+            <React.Fragment>
+              <MUICardHeader
+                avatar={<LargeAvatar alt={blogPost.author.name} src={blogPost.author.avatar} />}
+                className={classes.cardHeader}
+                disableTypography={true}
+                title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
+                subheader={<MUITypography variant="subtitle2">{blogPost.subtitle}</MUITypography>}
+              />
+              <MUICardContent>
+                <article className={classes.article}>
+                  <ReactMarkdown escapeHtml={false} source={blogPost.body} />
+                </article>
+              </MUICardContent>
             </React.Fragment>
           }
-          action={blogPostState.author._id === authentication.userId &&
-            <MUIButton
-              color="secondary"
-              onClick={toggleViewMode}
-              size="small"
-              variant="contained"
-            >
-              {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
-            </MUIButton>}
-        />
-        <MUICardContent>
-          {blogPostState.author._id === authentication.userId &&
-            viewMode === 'Edit' ?
-            <MUITextField
-              fullWidth
-              label="Body"
-              margin="dense"
-              multiline
-              onChange={(event) => {
-                event.persist();
-                setBlogPostState((prevState) => {
-                  return {
-                    ...prevState,
-                    body: event.target.value
-                  }
-                });
-              }}
-              rows={20}
-              type="text"
-              value={blogPostState.body}
-              variant="outlined"
-            /> :
-            <article className={classes.article}>
-              <ReactMarkdown escapeHtml={false} source={blogPostState.body} />
-            </article>
+        </MUICard>
+
+        <MUICard className={classes.commentCard}>
+          <MUICardHeader
+            disableTypography={true}
+            title={<MUITypography variant="subtitle1">Community Reaction</MUITypography>}
+          />
+          <MUICardContent className={classes.commentSection}>
+            {blogPost.comments.map((comment, index, array) => array[array.length - 1 - index]).map(comment => {
+              return (
+                <div key={comment._id} style={{ display: 'flex', margin: '4px 0' }}>
+                  <SmallAvatar alt={comment.author.name} src={comment.author.avatar} />
+                  <MUITypography variant="body2">{comment.body}</MUITypography>
+                </div>
+              );
+            })}
+          </MUICardContent>
+          {authentication.isLoggedIn && blogPostID !== 'new-post' &&
+            <MUICardActions>
+              <form className={classes.commentForm} onSubmit={submitComment}>
+                <MUITextField
+                  autoComplete="off"
+                  fullWidth
+                  inputRef={newComment}
+                  margin="dense"
+                  multiline
+                  rows={2}
+                  type="text"
+                  variant="outlined"
+                />
+                <MUIButton color="primary" fullWidth={false} size="small" type="submit" variant="contained">
+                  Preach!
+                </MUIButton>
+              </form>
+            </MUICardActions>
           }
-        </MUICardContent>
-        {blogPostState.author._id === authentication.userId &&
-          <MUICardActions>
-            <MUIButton
-              color="primary"
-              onClick={submitPost}
-              size="small"
-              variant="contained"
-            >
-              {blogPostId === 'new-post' ? 'Publish' : <MUISyncIcon />}
-            </MUIButton>
-          </MUICardActions>
-        }
-      </MUICard>
-
-      {authentication.isLoggedIn && blogPostId !== 'new-post' &&
-        <NewComment pushNewComment={refreshPage} />
-      }
-
-      {blogPostState.comments.map(function (comment) {
-        return <ExistingComment comment={comment} key={comment._id} deleteComment={refreshPage} />;
-      })}
-    </React.Fragment>
+        </MUICard>
+      </React.Fragment>
   );
-}
-
-export default BlogPost;
+};
