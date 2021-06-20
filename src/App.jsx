@@ -37,6 +37,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     height: '100%',
     margin: 'auto',
+    padding: 4,
     width: '100%'
   }
 });

@@ -71,8 +71,7 @@ const useStyles = makeStyles({
   tableViewMainContainer: {
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: 4
+    justifyContent: 'space-around'
   },
   typeText: {
     fontWeight: 'bold',

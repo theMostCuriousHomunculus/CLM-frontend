@@ -25,7 +25,7 @@ export default function Resources () {
   ];
   
   return (
-    <MUIGrid container spacing={2}>
+    <MUIGrid container spacing={0}>
       {resourcesArray.map(function (resource, index) {
         return (
           <MUIGrid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>

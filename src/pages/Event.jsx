@@ -7,7 +7,6 @@ import MUITab from '@material-ui/core/Tab';
 import MUITabs from '@material-ui/core/Tabs';
 import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
-import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
@@ -16,7 +15,6 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
 import SortableList from '../components/Event Page/SortableList';
-import theme from '../theme';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import {
   desiredEventInfo,
@@ -26,21 +24,9 @@ import {
   sortCard
 } from '../requests/GraphQL/event-requests.js';
 
-const useStyles = makeStyles({
-  paper: {
-    marginLeft: 8,
-    marginRight: 8
-  },
-  tabs: {
-    backgroundColor: theme.palette.secondary.main,
-    borderRadius: 4
-  }
-});
-
 export default function Event () {
 
   const authentication = React.useContext(AuthenticationContext);
-  const classes = useStyles();
   const eventID = useParams().eventId;
   const [dialogDisplayed, setDialogDisplayed] = React.useState(false);
   const [event, setEvent] = React.useState({
@@ -154,9 +140,8 @@ export default function Event () {
       {// displays if the event is a draft and is not yet finished
         !event.finished &&
         <React.Fragment>
-          <MUIPaper className={classes.paper}>
+          <MUIPaper>
             <MUITabs
-              className={classes.tabs}
               indicatorColor="primary"
               onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
               textColor="primary"

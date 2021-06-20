@@ -35,10 +35,7 @@ const useStyles = makeStyles({
     backgroundColor: colorless
   },
   curveViewMainContainer: {
-    marginTop: 16
-  },
-  curveViewSubContainer: {
-    margin: 8
+    marginTop: 4
   },
   curveViewTypeContainer: {
     display: 'grid',
@@ -93,7 +90,7 @@ const CurveView = (props) => {
           return card.color_identity.toString() === color.color_identity;
         });
         return (
-          <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor) + " " + classes.curveViewSubContainer} key={`curve-${color.name}`}>
+          <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor)} key={`curve-${color.name}`}>
             <MUICardHeader
               disableTypography={true}
               title={<MUITypography variant="subtitle1">{color.name}</MUITypography>}

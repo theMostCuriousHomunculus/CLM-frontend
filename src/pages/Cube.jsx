@@ -1,7 +1,7 @@
 import React from 'react';
 import MUIPaper from '@material-ui/core/Paper';
 import { connect } from 'react-redux';
-import { makeStyles } from '@material-ui/core';
+// import { makeStyles } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
@@ -16,13 +16,6 @@ import { actionCreators } from '../redux-store/actions/cube-actions';
 import { addCard as addCardRequest, fetchCubeById } from '../requests/REST/cube-requests';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
-const useStyles = makeStyles({
-  paper: {
-    margin: '0 8px 0 8px',
-    padding: 8
-  }
-});
-
 function Cube ({
   activeComponentId,
   activeComponentName,
@@ -33,7 +26,6 @@ function Cube ({
 }) {
 
   const authentication = React.useContext(AuthenticationContext);
-  const classes = useStyles();
   const cubeId = useParams().cubeId;
   const [loading, setLoading] = React.useState(true);
 
@@ -63,14 +55,14 @@ function Cube ({
     }
   }
 
-  const ScryfallRequestHackyWorkAround = (props2) => {
+  const ScryfallRequestHackyWorkAround = (props) => {
     return (
-      <MUIPaper className={classes.paper}>
+      <MUIPaper>
         <ScryfallRequest
           buttonText="Add it!"
           labelText={`Add a card to ${activeComponentName}`}
           onSubmit={addCard}
-          {...props2}
+          {...props}
         />
       </MUIPaper>
     );

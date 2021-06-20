@@ -46,7 +46,7 @@ function CubeInfo ({
   }
 
   return (
-    <MUICard style={{ marginBottom: 0 }}>
+    <MUICard>
       <MUICardHeader
         avatar={cube.creator.avatar &&
           <LargeAvatar alt={cube.creator.name} src={cube.creator.avatar} />

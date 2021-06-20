@@ -8,13 +8,16 @@ import MUICardActions from '@material-ui/core/CardActions';
 import MUICreateIcon from '@material-ui/icons/Create';
 import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MUIGrid from '@material-ui/core/Grid';
+import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core';
 
+import useRequest from '../hooks/request-hook';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { deleteBlogPost as deleteBlogPostRequest, fetchAllBlogPosts } from '../requests/REST/blog-requests';
+import { deleteBlogPost as deleteBlogPostRequest } from '../requests/REST/blog-requests';
 
 const useStyles = makeStyles({
   fullHeight: {
@@ -30,6 +33,7 @@ const useStyles = makeStyles({
 export default function Blog () {
 
   const authentication = React.useContext(AuthenticationContext);
+  const { sendRequest } = useRequest();
   const [blogPosts, setBlogPosts] = React.useState([]);
   const classes = useStyles();
   const history = useHistory();
@@ -39,16 +43,40 @@ export default function Blog () {
     async function fetchBlogPosts () {
       try {
         setLoading(true);
-        const allBlogPosts = await fetchAllBlogPosts();
-        setBlogPosts(allBlogPosts);
+        const operation = 'searchBlogPosts';
+        const response = await sendRequest({
+          operation,
+          body: {
+            query: `
+              query {
+                ${operation}(search: "") {
+                  _id
+                  author {
+                    _id
+                    avatar
+                    name
+                  }
+                  body
+                  createdAt
+                  image
+                  subtitle
+                  title
+                  updatedAt
+                }
+              }
+            `
+          }
+        });
+
+        setBlogPosts(response);
       } catch (error) {
-        console.log(error.message);
+
       } finally {
         setLoading(false);
       }
     }
     fetchBlogPosts();
-  }, []);
+  }, [sendRequest]);
 
   async function deleteBlogPost (blogPostId) {
     try {
@@ -64,7 +92,7 @@ export default function Blog () {
   return (
     loading ?
       <LoadingSpinner /> :
-      <MUIGrid container spacing={2}>
+      <MUIGrid container spacing={0}>
         {authentication.isAdmin &&
           <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
             <MUICard className={classes.fullHeight}>
@@ -99,8 +127,15 @@ export default function Blog () {
             <MUIGrid item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
               <MUICard className={classes.fullHeight}>
                 <MUICardHeader
-                  title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
+                  avatar={
+                    <MUITooltip title={`By: ${blogPost.author.name}`}>
+                      <span>
+                        <SmallAvatar alt={blogPost.author.name} src={blogPost.author.avatar} />
+                      </span>
+                    </MUITooltip>
+                  }
                   subheader={<MUITypography color="textSecondary" variant="subtitle2">{blogPost.subtitle}</MUITypography>}
+                  title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
                 />
                 <MUICardMedia
                   image={blogPost.image}

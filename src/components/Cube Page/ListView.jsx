@@ -32,7 +32,6 @@ const useStyles = makeStyles({
   },
   tableContainer: {
     height: "80vh",
-    margin: 8,
     padding: 0
   },
   tableRow: {

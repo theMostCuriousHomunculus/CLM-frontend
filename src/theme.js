@@ -9,10 +9,16 @@ const backgroundColor = `#f7f7f7`;
 const theme = createMuiTheme({
   ...defaultTheme,
   overrides: {
+    MuiAppBar: {
+      root: {
+        margin: 0,
+        padding: 0
+      }
+    },
     MuiCard: {
       root: {
         background: backgroundColor,
-        margin: 8,
+        margin: 4,
         padding: 0
       }
     },
@@ -30,15 +36,11 @@ const theme = createMuiTheme({
     },
     MuiCardContent: {
       root: {
-        padding: 8,
-        '&:last-child': {
-          paddingBottom: 8
-        }
+        padding: 8
       }
     },
     MuiCardHeader: {
       content: {
-        // width: 'calc(100% - 166px)',
         wordBreak: 'break-word'
       },
       root: {
@@ -54,15 +56,17 @@ const theme = createMuiTheme({
     MuiGrid: {
       container: {
         margin: '0 !important',
-        padding: '0 !important',
         width: '100% !important'
       },
       item: {
         margin: 0,
-        padding: 0,
-        '& .MuiCard-root': {
-          margin: 0
-        }
+        padding: 0
+      }
+    },
+    MuiPaper: {
+      root: {
+        margin: 4,
+        padding: 8
       }
     },
     MuiTableCell: {
@@ -74,6 +78,12 @@ const theme = createMuiTheme({
       },
       stickyHeader: {
         backgroundColor: deepPurple[500]
+      }
+    },
+    MuiTabs: {
+      root: {
+        backgroundColor: orange,
+        borderRadius: 4
       }
     }
   },

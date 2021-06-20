@@ -54,19 +54,6 @@ const useStyles = makeStyles({
   listContainer: {
     flexGrow: 1
   },
-  marginRight: {
-    marginRight: '1rem'
-  },
-  radioButton: {
-    marginRight: '1rem'
-  },
-  radioButtonContainer: {
-    marginTop: '1rem'
-  },
-  remainingWidth: {
-    flexGrow: 1,
-    width: 'auto'
-  },
   rotationSizeField: {
     margin: '0 8px 0 8px',
     width: '33%'

@@ -34,7 +34,6 @@ import PlayerMenu from '../components/Match Page/PlayerMenu';
 const useStyles = makeStyles({
   matchScreenFlexContainer: {
     display: 'flex',
-    margin: 4,
     '& > *': {
       margin: 4
     }
