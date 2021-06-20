@@ -53,6 +53,18 @@ const theme = createMuiTheme({
         width: '100%'
       }
     },
+    MuiDialogActions: {
+      root: {
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-between',
+        padding: 8
+      },
+      spacing: {
+        '& > :not(:first-child)': {
+          marginLeft: 0
+        }
+      }
+    },
     MuiGrid: {
       container: {
         margin: '0 !important',

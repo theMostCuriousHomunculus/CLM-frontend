@@ -52,7 +52,7 @@ export default function Account () {
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
   const [account, setAccount] = React.useState({
     _id: accountId,
     avatar: '',
@@ -65,51 +65,50 @@ export default function Account () {
     sent_bud_requests: []
   });
   const [dialogInfo, setDialogInfo] = React.useState({});
-  // not using loading from useRequest hook because i don't want to rip everything out of the dom and display the loading spinner on updates; just on initialization
-  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-
     async function fetchAccount () {
-
-      try {
-        setLoading(true);
-        const operation = 'fetchAccountByID';
-        const response = await sendRequest({
-          operation,
-          body: {
+      await sendRequest({
+        callback: (data) => {
+          setAccount(data);
+        },
+        operation: 'fetchAccountByID',
+        load: true,
+        get body () {
+          return {
             query: `
               query {
-                ${operation}(_id: "${accountId}") {
+                ${this.operation}(_id: "${accountId}") {
                   ${desiredAccountInfo}
                 }
               }
             `
           }
-        });
-        
-        setAccount(response);
-      } catch (error) {
-
-      } finally {
-        setLoading(false);
-      }
-
+        }
+      });
     }
 
     fetchAccount();
   }, [accountId, sendRequest]);
 
   async function submitChanges (changes) {
-
-    try {
-      const operation = 'editAccount';
-      const response = await sendRequest({
-        operation,
-        body: {
+    await sendRequest({
+      callback: (data) => {
+        if (changes.includes('send')) {
+          setAccount(prevState => ({
+            ...prevState,
+            received_bud_requests: [...prevState.received_bud_requests, { _id: authentication.userId }]
+          }));
+        } else {
+          setAccount(data);
+        }
+      },
+      operation: 'editAccount',
+      get body() {
+        return {
           query: `
             mutation {
-              ${operation}(
+              ${this.operation}(
                 input: {
                   ${changes}
                 }
@@ -119,21 +118,8 @@ export default function Account () {
             }
           `
         }
-      });
-
-      if (changes.includes('send')) {
-        setAccount(prevState => ({
-          ...prevState,
-          received_bud_requests: [...prevState.received_bud_requests, { _id: authentication.userId }]
-        }));
-      } else {
-        setAccount(response);
       }
-
-    } catch (error) {
-
-    }
-
+    });
   }
 
   function updateCubeList (cubeId) {
@@ -230,7 +216,7 @@ export default function Account () {
           pageClasses={classes}
         />
 
-        <MUIGrid container spacing={2}>
+        <MUIGrid container spacing={0}>
           <MUIGrid item xs={12} lg={6}>
             <UserCubeCard
               cubes={account.cubes}
@@ -249,7 +235,7 @@ export default function Account () {
           </MUIGrid>
         </MUIGrid>
 
-        <MUIGrid container spacing={2}>
+        <MUIGrid container spacing={0}>
           <MUIGrid item xs={12} sm={6} md={4}>
             <MUICard>
               <MUICardHeader

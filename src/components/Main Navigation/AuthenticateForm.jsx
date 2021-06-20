@@ -37,15 +37,18 @@ export default function AuthenticateForm ({
   const [passwordInput, setPasswordInput] = React.useState();
 
   async function handleLogin () {
-
-    try {
-      const operation = 'login';
-      const response = await sendRequest({
-        operation,
-        body: {
+    await sendRequest({
+      callback: (data) => {
+        login(data.isAdmin, data.token, data.userId);
+        toggleOpen();
+      },
+      load: true,
+      operation: 'login',
+      get body () {
+        return {
           query: `
             mutation {
-              ${operation}(
+              ${this.operation}(
                 input: {
                   email: "${emailInput}",
                   password: "${passwordInput}"
@@ -58,38 +61,47 @@ export default function AuthenticateForm ({
             }
           `
         }
-      });
-      
-      login(response.isAdmin, response.token, response.userId);
-      toggleOpen();
-    } catch (error) {
-
-    }
-
+      }
+    });
   }
 
   async function handleRegister () {
+    const avatar = {};
 
-    try {
-      const operation = 'register';
-      const randomCard = await sendRequest({
-        url: 'https://api.scryfall.com/cards/random',
-        method: 'GET'
-      });
-      const randomCardPrintings = await sendRequest({
-        url: randomCard.prints_search_uri,
-        method: 'GET'
-      });
-      const randomIndex = Math.floor(Math.random() * randomCardPrintings.data.length);
-      const avatar = randomCardPrintings.data[randomIndex].image_uris.art_crop;
-      const response = await sendRequest({
-        operation,
-        body: {
+    await sendRequest({
+      callback: (data) => {
+        avatar.prints_search_uri = data.prints_search_uri;
+      },
+      load: true,
+      method: 'GET',
+      url: 'https://api.scryfall.com/cards/random'
+    });
+
+    await sendRequest({
+      callback: (data) => {
+        avatar.printings = data.data;
+      },
+      load: true,
+      method: 'GET',
+      url: avatar.prints_search_uri
+    });
+
+    const randomIndex = Math.floor(Math.random() * avatar.printings.length);
+
+    await sendRequest({
+      callback: (data) => {
+        login(false, data.token, data.userId);
+        toggleOpen();
+      },
+      load: true,
+      operation: 'register',
+      get body () {
+        return {
           query: `
             mutation {
-              ${operation}(
+              ${this.operation}(
                 input: {
-                  avatar: "${avatar}",
+                  avatar: "${avatar.printings[randomIndex].image_uris.art_crop}",
                   email: "${emailInput}",
                   name: "${nameInput}",
                   password: "${passwordInput}"
@@ -101,36 +113,30 @@ export default function AuthenticateForm ({
             }
           `
         }
-      });
-
-      login(false, response.token, response.userId);
-      toggleOpen();
-    } catch (error) {
-
-    }
+      }
+    });
   }
 
   async function handleRequestPasswordReset () {
-
-    try {
-      const operation = 'requestPasswordReset';
-      await sendRequest({
-        body: {
+    await sendRequest({
+      callback: () => {
+        setErrorMessages(prevState => {
+          return [...prevState, `A link to reset your password has been sent.  Please check your email inbox and your spam folder.`];
+        });
+        toggleOpen();
+      },
+      load: true,
+      operation: 'requestPasswordReset',
+      get body () {
+        return {
           query: `
             mutation {
-              ${operation}(email: "${emailInput}")
+              ${this.operation}(email: "${emailInput}")
             }
           `
         }
-      });
-      setErrorMessages(prevState => {
-        return [...prevState, `A link to reset your password has been sent.  Please check your email inbox and your spam folder.`];
-      });
-      toggleOpen();
-    } catch (error) {
-
-    }
-    
+      }
+    });
   }
 
   function submitForm (event) {
@@ -202,12 +208,15 @@ export default function AuthenticateForm ({
               />
             }
           </MUIDialogContent>
-          <MUIDialogActions style={{ justifyContent: 'space-between' }}>
-            <WarningButton
-              onClick={() => setMode((prevState) => prevState === 'Register' ? 'Login' : 'Register')}
+          <MUIDialogActions>
+            <MUIButton
+              color="primary"
+              size="small"
+              type="submit"
+              variant="contained"
             >
-              {mode === 'Register' ? 'Already have an account?' : "Don't have an account yet?"}
-            </WarningButton>
+              {mode}!
+            </MUIButton>
             {mode === 'Login' &&
               <MUIButton
                 color="secondary"
@@ -218,14 +227,11 @@ export default function AuthenticateForm ({
                 Forgot Your Password?
               </MUIButton>
             }
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
+            <WarningButton
+              onClick={() => setMode((prevState) => prevState === 'Register' ? 'Login' : 'Register')}
             >
-              {mode}!
-            </MUIButton>
+              {mode === 'Register' ? 'Already have an account?' : "Don't have an account yet?"}
+            </WarningButton>
           </MUIDialogActions>
         </form>
       }

@@ -8,15 +8,16 @@ export default function useRequest () {
   const { setErrorMessages } = useContext(ErrorContext);
   const { token } = useContext(AuthenticationContext);
   const [loading, setLoading] = useState(false);
-
   const activeRequests = useRef([]);
 
   const sendRequest = useCallback(async function ({
-    url = process.env.REACT_APP_GRAPHQL_HTTP_URL,
+    body = null,
+    callback = () => null,
+    headers = {},
+    load = false,
     method = 'POST',
     operation = null,
-    body = null,
-    headers = {}
+    url = process.env.REACT_APP_GRAPHQL_HTTP_URL
   }) {
 
     if (token && url === process.env.REACT_APP_GRAPHQL_HTTP_URL) {
@@ -27,8 +28,11 @@ export default function useRequest () {
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify(body);
     }
-      
-    setLoading(true);
+    
+    if (load) {
+      setLoading(true);
+    }
+
     const abortController = new AbortController();
     activeRequests.current.push(abortController);
 
@@ -59,9 +63,9 @@ export default function useRequest () {
       } else if (!response.ok) {
         throw new Error(responseData.message);
       } else if (operation) {
-        return responseData.data[operation];
+        callback(responseData.data[operation]);
       } else {
-        return responseData;
+        callback(responseData);
       }
 
     } catch (error) {

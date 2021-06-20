@@ -10,7 +10,6 @@ import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MUIGrid from '@material-ui/core/Grid';
 import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core';
 
 import useRequest from '../hooks/request-hook';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -19,23 +18,11 @@ import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { deleteBlogPost as deleteBlogPostRequest } from '../requests/REST/blog-requests';
 
-const useStyles = makeStyles({
-  fullHeight: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    '& .MuiCardHeader-root': {
-      flexGrow: 1
-    }
-  }
-});
-
 export default function Blog () {
 
   const authentication = React.useContext(AuthenticationContext);
   const { sendRequest } = useRequest();
   const [blogPosts, setBlogPosts] = React.useState([]);
-  const classes = useStyles();
   const history = useHistory();
   const [loading, setLoading] = React.useState(false);
 
@@ -95,7 +82,7 @@ export default function Blog () {
       <MUIGrid container spacing={0}>
         {authentication.isAdmin &&
           <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
-            <MUICard className={classes.fullHeight}>
+            <MUICard>
               <MUICardHeader
                 title={<MUITypography variant="subtitle1">New Article</MUITypography>}
                 subheader={
@@ -109,7 +96,6 @@ export default function Blog () {
               />
               <MUICardActions>
                 <MUIButton
-                  className={classes.iconButton}
                   color="primary"
                   onClick={() => history.push('/blog/new-post')}
                   size="small"
@@ -125,7 +111,7 @@ export default function Blog () {
         {blogPosts.map(function (blogPost) {
           return (
             <MUIGrid item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
-              <MUICard className={classes.fullHeight}>
+              <MUICard>
                 <MUICardHeader
                   avatar={
                     <MUITooltip title={`By: ${blogPost.author.name}`}>
@@ -149,7 +135,7 @@ export default function Blog () {
                   >
                     Read
                   </MUIButton>
-                  {blogPost.author === authentication.userId &&
+                  {blogPost.author._id === authentication.userId &&
                     <WarningButton
                       onClick={() => deleteBlogPost(blogPost._id)}
                       startIcon={<MUIDeleteForeverIcon />}
