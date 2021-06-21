@@ -1,9 +1,9 @@
 import React from 'react';
 import MUIPaper from '@material-ui/core/Paper';
-import { connect } from 'react-redux';
-// import { makeStyles } from '@material-ui/core';
+import { createClient } from 'graphql-ws';
 import { useParams } from 'react-router-dom';
 
+import useRequest from '../hooks/request-hook';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
@@ -12,48 +12,135 @@ import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
-import { actionCreators } from '../redux-store/actions/cube-actions';
-import { addCard as addCardRequest, fetchCubeById } from '../requests/REST/cube-requests';
+import { desiredCubeInfo } from '../requests/GraphQL/cube-requests';
+import { addCard as addCardRequest } from '../requests/REST/cube-requests';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
-function Cube ({
-  activeComponentId,
-  activeComponentName,
-  creator,
-  dispatchAddCard,
-  dispatchInitializeCube,
-  viewMode
-}) {
+export default function Cube () {
 
   const authentication = React.useContext(AuthenticationContext);
-  const cubeId = useParams().cubeId;
-  const [loading, setLoading] = React.useState(true);
-
-  const initializeCube = React.useCallback(async function () {
-    try {
-      setLoading(true);
-      const response = await fetchCubeById(cubeId);
-      dispatchInitializeCube(response);
-    } catch (error) {
-      console.log(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [cubeId, dispatchInitializeCube]);
+  const cubeID = useParams().cubeId;
+  const { loading, sendRequest } = useRequest();
+  // the user does not directly manipulate this state; they send requests to the server and then the server updates the cube state
+  const [cube, setCube] = React.useState({
+    _id: cubeID,
+    creator: {
+      _id: null,
+      avatar: null,
+      name: null
+    },
+    description: '',
+    mainboard: [],
+    modules: [],
+    name: '',
+    rotations: [],
+    sideboard: []
+  });
+  // this state is directly manipulated by the user; all presentational
+  const [display, setDisplay] = React.useState({
+    activeComponentCards: [],
+    activeComponentID: 'mainboard',
+    activeComponentName: 'Mainboard',
+    activeComponentSize: null,
+    filter: '',
+    filteredCards: [],
+    view: 'Table'
+  });
 
   React.useEffect(() => {
-    initializeCube();
-  }, [initializeCube]);
-
-  async function addCard (chosenCard) {
-    delete chosenCard.art_crop;
-    try {
-      const newCardId = await addCardRequest(chosenCard, activeComponentId, cubeId, authentication.token);
-      dispatchAddCard({ ...chosenCard, _id: newCardId._id });
-    } catch (error) {
-      console.log(error.message);
+    async function initialize () {
+      await sendRequest({
+        callback: (data) => {
+          setCube(data);
+        },
+        headers: { CubeID: cubeID },
+        load: true,
+        operation: 'fetchCubeByID',
+        get body() {
+          return {
+            query: `
+              query {
+                ${this.operation} {
+                  ${desiredCubeInfo}
+                }
+              }
+            `
+          }
+        }
+      });
     }
-  }
+
+    initialize();
+
+    const client = createClient({
+      connectionParams: {
+        authToken: authentication.token,
+        cubeID
+      },
+      url: process.env.REACT_APP_GRAPHQL_WS_URL
+    });
+
+    async function subscribe () {
+      function onNext(update) {
+        setCube(update.data.subscribeCube);
+      }
+
+      await new Promise((resolve, reject) => {
+        client.subscribe({
+          query: `subscription {
+            subscribeCube {
+              ${desiredCubeInfo}
+            }
+          }`
+        },
+        {
+          complete: resolve,
+          error: reject,
+          next: onNext
+        });
+      });
+    }
+
+    subscribe(result => console.log(result), error => console.log(error));
+
+    return client.dispose;
+  }, [authentication.token, cubeID, sendRequest]);
+
+  const addCard = React.useCallback(async function () {
+    await sendRequest({
+      headers: { CubeID: cubeID },
+      operation: 'addCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  componentID: "${componentID}",
+                  back_image: "${back_image}",
+                  chapters: ${chapters},
+                  cmc: ${cmc},
+                  color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
+                  image: "${image}",
+                  keywords: [${keywords.map(kw => '"' + kw + '"')}],
+                  loyalty: ${loyalty},
+                  mana_cost: "${mana_cost}",
+                  mtgo_id: ${mtgo_id},
+                  name: ${name},
+                  oracle_id: "${oracle_id}",
+                  power: ${power},
+                  printing: "${printing}",
+                  purchase_link: "${purchase_link}",
+                  toughness: ${toughness},
+                  type_line: "${type_line}"
+                }
+              )
+            }
+          `
+        }
+      }
+    });
+  })
 
   const ScryfallRequestHackyWorkAround = (props) => {
     return (
@@ -72,45 +159,18 @@ function Cube ({
     loading ?
       <LoadingSpinner /> :
       <React.Fragment>
-        <CubeInfo />
+        <CubeInfo cube={cube} />
 
-        <ComponentInfo />
+        <ComponentInfo cube={cube} display={display} setDisplay={setDisplay} />
 
         <HoverPreview marginBottom={190}>
 
-          {authentication.userId === creator._id &&
-            <ScryfallRequestHackyWorkAround />
-          }
-
-          {viewMode === 'Curve' &&
-            <CurveView />
-          }
-          {viewMode === 'List' &&
-            <ListView />
-          }
-          {viewMode === 'Table' &&
-            <TableView />
-          }
+          {authentication.userId === cube.creator._id && <ScryfallRequestHackyWorkAround />}
+          {display.view === 'Curve' && <CurveView cards={display.filteredCards} />}
+          {display.view === 'List' && <ListView cards={display.filteredCards} />}
+          {display.view === 'Table' && <TableView cards={display.filteredCards} />}
 
         </HoverPreview>
       </React.Fragment>
   );
-}
-
-function mapStateToProps (state) {
-  return {
-    activeComponentId: state.active_component_id,
-    activeComponentName: state.active_component_name,
-    creator: state.cube.creator,
-    viewMode: state.view_mode
-  };
-}
-
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchAddCard: (payload) => dispatch(actionCreators.add_card(payload)),
-    dispatchInitializeCube: (payload) => dispatch(actionCreators.initialize_cube(payload))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cube);
+};

@@ -222,7 +222,7 @@ export default function BlogPost () {
             error: reject,
             next: onNext
           });
-        })
+        });
       }
   
       subscribe(result => console.log(result), error => console.log(error));
@@ -268,8 +268,13 @@ export default function BlogPost () {
     });
   }
 
-  async function submitComment () {
+  async function submitComment (event) {
+    event.preventDefault();
     await sendRequest({
+      callback: () => {
+        newComment.current.value = '';
+        newComment.current.focus();
+      },
       headers: {
         BlogPostID: blogPostID
       },

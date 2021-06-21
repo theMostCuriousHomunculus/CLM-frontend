@@ -269,7 +269,7 @@ export default function Match () {
           error: reject,
           next: onNext
         });
-      })
+      });
     }
 
     subscribe(result => console.log(result), error => console.log(error));

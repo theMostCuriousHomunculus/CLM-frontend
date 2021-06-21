@@ -276,6 +276,7 @@ async function fetchCubeById (cubeId) {
 // }
 
 export {
+  desiredCubeInfo,
   addCard,
   createCube,
   createModule,
