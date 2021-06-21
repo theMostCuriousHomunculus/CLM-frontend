@@ -9,199 +9,89 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
-import { makeStyles } from '@material-ui/core/styles';
 
 import useRequest from '../../hooks/request-hook';
 
-const useStyles = makeStyles({
-  list: {
-    padding: 0
-  }
-});
-
 export default function ScryfallRequest (props) {
 
-  const classes = useStyles();
+  const cardSearchInput = React.useRef();
   const { loading, sendRequest } = useRequest();
-
-  const cardSearchInput = React.useRef(null);
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [availablePrintings, setAvailablePrintings] = React.useState([]);
-  const [cardSearchInputValue, setCardSearchInputValue] = React.useState('');
+  const [timer, setTimer] = React.useState();
   const [cardSearchResults, setCardSearchResults] = React.useState([]);
   const [chosenCard, setChosenCard] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
 
-  React.useEffect(function () {
-    const timer = setTimeout(async function () {
-      if (cardSearchInputValue === cardSearchInput.current.value && cardSearchInputValue.length > 1) {
-
+  const scryfallCardSearch = React.useCallback(event => {
+    event.persist();
+    setTimer(setTimeout(async function () {
+      if (event.target.value.length < 2) {
+        setCardSearchResults([]);
+      } else {
         await sendRequest({
           callback: (data) => {
             if (data.data) {
-              setCardSearchResults(data.data.map(function (match) {
-                let chapters, loyalty, mana_cost, power, toughness, type_line;
-                switch(match.layout) {
-                  case 'split':
-                    // split cards are always instants and/or sorceries
-                    mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
-                    type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
-                    break;
-                  case 'flip':
-                    // flip was only in Kamigawa block (plus an "Un" card and a couple of reprints), which was before planeswalkers existed.  unlikely they ever bring this layout back, and if they do, no idea how they would fit a planeswalker onto one side.  all flip cards are creatures on one end and either a creature or an enchantment on the other
-                    mana_cost = match.card_faces[0].mana_cost;
-                    if (match.card_faces[0].power) {
-                      power = match.card_faces[0].power;
-                    } else if (match.card_faces[1].power) {
-                      power = match.card_faces[1].power;
-                    }
-                    if (match.card_faces[0].toughness) {
-                      toughness = match.card_faces[0].toughness;
-                    } else if (match.card_faces[1].toughness) {
-                      toughness = match.card_faces[1].toughness;
-                    }
-                    type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
-                    break;
-                  case 'transform':
-                    if (match.card_faces[0].loyalty) {
-                      loyalty = match.card_faces[0].loyalty;
-                    } else if (match.card_faces[1].loyalty) {
-                      // think baby jace
-                      loyalty = match.card_faces[1].loyalty;
-                    }
-                    mana_cost = match.card_faces[0].mana_cost;
-                    if (match.card_faces[0].power) {
-                      power = match.card_faces[0].power;
-                    } else if (match.card_faces[1].power) {
-                      // think elbrus, the binding blade
-                      power = match.card_faces[1].power;
-                    }
-                    if (match.card_faces[0].toughness) {
-                      toughness = match.card_faces[0].toughness;
-                    } else if (match.card_faces[1].toughness) {
-                      toughness = match.card_faces[1].toughness;
-                    }
-                    type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
-                    break;
-                  case 'modal_dfc':
-                    if (match.card_faces[0].loyalty) {
-                      loyalty = match.card_faces[0].loyalty;
-                    } else if (match.card_faces[1].loyalty) {
-                      // think valki, god of lies
-                      loyalty = match.card_faces[1].loyalty;
-                    }
-                    mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
-                    if (match.card_faces[0].power) {
-                      power = match.card_faces[0].power;
-                    } else if (match.card_faces[1].power) {
-                      power = match.card_faces[1].power;
-                    }
-                    if (match.card_faces[0].toughness) {
-                      toughness = match.card_faces[0].toughness;
-                    } else if (match.card_faces[1].toughness) {
-                      toughness = match.card_faces[1].toughness;
-                    }
-                    type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
-                    break;
-                  case 'meld':
-                    // meld only appeared in Eldritch Moon and probably won't ever come back.  no planeswalkers; only creatures and a single land
-                    mana_cost = match.mana_cost;
-                    power = match.power;
-                    toughness = match.toughness;
-                    type_line = match.type_line;
-                    break;
-                  case 'leveler':
-                    // all level up cards have been creatures.  this is a mechanic that has so far only appeared in Rise of the Eldrazi and a single card in Modern Horizons.  i don't expect the mechanic to return, but the printing of Hexdrinker in MH1 suggests it may
-                    mana_cost = match.mana_cost;
-                    power = match.power;
-                    toughness = match.toughness;
-                    type_line = match.type_line;
-                    break;
-                  case 'saga':
-                    // saga's have no other faces; they simply have their own layout type becuase of the fact that the art is on the right side of the card rather than the top of the card.  all sagas printed so far (through Kaldheim) have only 3 or 4 chapters
-                    if (match.oracle_text.includes('Sacrifice after III')) {
-                      chapters = 3;
-                    }
-                    if (match.oracle_text.includes('Sacrifice after IV')) {
-                      chapters = 4;
-                    }
-                    mana_cost = match.mana_cost;
-                    type_line = match.type_line;
-                    break;
-                  case 'adventure':
-                    // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
-                    mana_cost = `${match.card_faces[0].mana_cost}${match.card_faces[1].mana_cost}`;
-                    power = match.card_faces[0].power;
-                    toughness = match.card_faces[0].toughness;
-                    type_line = `${match.card_faces[0].type_line} / ${match.card_faces[1].type_line}`;
-                    break;
-                  default:
-                    // 'normal' layout
-                    loyalty = match.loyalty;
-                    mana_cost = match.mana_cost;
-                    power = match.power;
-                    toughness = match.toughness;
-                    type_line = match.type_line;
-                }
-  
-                return ({
-                  chapters,
-                  cmc: match.cmc,
-                  color_identity: match.color_identity,
-                  keywords: match.keywords,
-                  loyalty,
-                  mana_cost,
-                  oracle_id: match.oracle_id,
-                  power,
-                  prints_search_uri: match.prints_search_uri,
-                  toughness,
-                  type_line,
-                  name: match.name,
-                  value: match.name
-                });
-              }));
+              setCardSearchResults(data.data.map(match => ({ name: match.name, oracle_id: match.oracle_id })));
             } else {
               setCardSearchResults([]);
             }
           },
           method: 'GET',
-          url: `https://api.scryfall.com/cards/search?q=${cardSearchInputValue}`
+          url: `https://api.scryfall.com/cards/search?q=${event.target.value}`
         });
       }
-    }, 250);
+    }, 250));
+  }, [sendRequest]);
 
-    return () => clearTimeout(timer);
-  }, [cardSearchInput, cardSearchInputValue, sendRequest]);
-
-  const handleMenuItemClick = (index) => {
-    setSelectedPrintIndex(index);
-    setChosenCard(prevState => ({
-      ...prevState,
-      ...availablePrintings[index]
-    }));
-    setAnchorEl(null);
-  };
-
-  async function scryfallPrintSearch (prints_search_uri, cardDetails) {
+  const scryfallPrintSearch = React.useCallback(async function (oracleID) {
     await sendRequest({
       callback: async (data) => {
         const printings = await Promise.all(data.data.map(async function(print) {
-          let art_crop, back_image, image;
+          let art_crop, back_image, chapters, image, loyalty, mana_cost, power, toughness, type_line;
           switch (print.layout) {
-            // just using the front image for the art crop (used for blog images and profile avatars)
-            case 'transform':
-              art_crop = print.card_faces[0].image_uris.art_crop;
-              back_image = print.card_faces[1].image_uris.large;
-              image = print.card_faces[0].image_uris.large;
+            case 'adventure':
+              // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
+              mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
+              power = print.card_faces[0].power;
+              toughness = print.card_faces[0].toughness;
+              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               break;
-            case 'modal_dfc':
-              art_crop = print.card_faces[0].image_uris.art_crop;
-              back_image = print.card_faces[1].image_uris.large;
-              image = print.card_faces[0].image_uris.large;
+            case 'flip':
+              // flip was only in Kamigawa block (plus an "Un" card and a couple of reprints), which was before planeswalkers existed.  unlikely they ever bring this layout back, and if they do, no idea how they would fit a planeswalker onto one side.  all flip cards are creatures on one end and either a creature or an enchantment on the other
+              mana_cost = print.card_faces[0].mana_cost;
+              if (print.card_faces[0].power) {
+                power = print.card_faces[0].power;
+              } else if (print.card_faces[1].power) {
+                power = print.card_faces[1].power;
+              }
+              if (print.card_faces[0].toughness) {
+                toughness = print.card_faces[0].toughness;
+              } else if (print.card_faces[1].toughness) {
+                toughness = print.card_faces[1].toughness;
+              }
+              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
+              break;
+            case 'leveler':
+              // all level up cards have been creatures.  this is a mechanic that has so far only appeared in Rise of the Eldrazi and a single card in Modern Horizons.  i don't expect the mechanic to return, but the printing of Hexdrinker in MH1 suggests it may
+              mana_cost = print.mana_cost;
+              power = print.power;
+              toughness = print.toughness;
+              type_line = print.type_line;
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               break;
             case 'meld':
+              // meld only appeared in Eldritch Moon and probably won't ever come back.  no planeswalkers; only creatures and a single land
+              mana_cost = print.mana_cost;
+              power = print.power;
+              toughness = print.toughness;
+              type_line = print.type_line;
               art_crop = print.image_uris.art_crop;
               const meldResultPart = print.all_parts.find(part => part.component === 'meld_result');
               await sendRequest({
@@ -213,45 +103,132 @@ export default function ScryfallRequest (props) {
                 url: meldResultPart.uri
               });
               break;
+            case 'modal_dfc':
+              if (print.card_faces[0].loyalty) {
+                loyalty = print.card_faces[0].loyalty;
+              } else if (print.card_faces[1].loyalty) {
+                // think valki, god of lies
+                loyalty = print.card_faces[1].loyalty;
+              }
+              mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
+              if (print.card_faces[0].power) {
+                power = print.card_faces[0].power;
+              } else if (print.card_faces[1].power) {
+                power = print.card_faces[1].power;
+              }
+              if (print.card_faces[0].toughness) {
+                toughness = print.card_faces[0].toughness;
+              } else if (print.card_faces[1].toughness) {
+                toughness = print.card_faces[1].toughness;
+              }
+              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
+              art_crop = print.card_faces[0].image_uris.art_crop;
+              back_image = print.card_faces[1].image_uris.large;
+              image = print.card_faces[0].image_uris.large;
+              break;
+            case 'saga':
+              // saga's have no other faces; they simply have their own layout type becuase of the fact that the art is on the right side of the card rather than the top of the card.  all sagas printed so far (through Kaldheim) have only 3 or 4 chapters
+              if (print.oracle_text.includes('Sacrifice after III')) {
+                chapters = 3;
+              }
+              if (print.oracle_text.includes('Sacrifice after IV')) {
+                chapters = 4;
+              }
+              mana_cost = print.mana_cost;
+              type_line = print.type_line;
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
+              break;
+            case 'split':
+              // split cards are always instants and/or sorceries
+              mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
+              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
+              break;
+            case 'transform':
+              if (print.card_faces[0].loyalty) {
+                loyalty = print.card_faces[0].loyalty;
+              } else if (print.card_faces[1].loyalty) {
+                // think baby jace
+                loyalty = print.card_faces[1].loyalty;
+              }
+              mana_cost = print.card_faces[0].mana_cost;
+              if (print.card_faces[0].power) {
+                power = print.card_faces[0].power;
+              } else if (print.card_faces[1].power) {
+                // think elbrus, the binding blade
+                power = print.card_faces[1].power;
+              }
+              if (print.card_faces[0].toughness) {
+                toughness = print.card_faces[0].toughness;
+              } else if (print.card_faces[1].toughness) {
+                toughness = print.card_faces[1].toughness;
+              }
+              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
+              art_crop = print.card_faces[0].image_uris.art_crop;
+              back_image = print.card_faces[1].image_uris.large;
+              image = print.card_faces[0].image_uris.large;
+              break;
             default:
-              // split, flip, leveler, saga, adventure and normal layout cards
+              // adventure, flip, leveler, saga, split and normal layout cards
+              loyalty = print.loyalty;
+              mana_cost = print.mana_cost;
+              power = print.power;
+              toughness = print.toughness;
+              type_line = print.type_line;
               art_crop = print.image_uris.art_crop;
               image = print.image_uris.large;
           }
           return ({
             art_crop,
             back_image,
+            chapters,
+            cmc: print.cmc,
+            color_identity: print.color_identity,
             image,
+            keywords: print.keywords,
+            loyalty,
+            mana_cost,
             mtgo_id: print.mtgo_id,
+            name: print.name,
+            oracle_id: print.oracle_id,
+            power,
             printing: print.set_name + " - " + print.collector_number,
-            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
+            prints_search_uri: print.prints_search_uri,
+            purchase_link: print.purchase_uris.tcgplayer.split("&")[0],
+            toughness,
+            type_line
           });
         }));
 
         setAvailablePrintings(printings);
-        setChosenCard(prevState => ({
-          ...prevState,
-          ...cardDetails,
-          ...printings[0]
-        }));
+        setChosenCard(printings[0]);
+        setSelectedPrintIndex(0);
       },
       method: 'GET',
-      url: prints_search_uri
+      url: `https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleID}&unique=prints`
     });
+  }, [sendRequest]);
 
-    setSelectedPrintIndex(0);
-  }
+  const handleMenuItemClick = (index) => {
+    setSelectedPrintIndex(index);
+    setChosenCard(prevState => ({
+      ...prevState,
+      ...availablePrintings[index]
+    }));
+    setAnchorEl(null);
+  };
 
   function submitForm () {
     setAnchorEl(null);
     setAvailablePrintings([]);
     setCardSearchResults([]);
     setSelectedPrintIndex(0);
-    // document.getElementsByClassName('MuiAutocomplete-clearIndicator')[1].click();
-    setCardSearchInputValue('');
-    cardSearchInput.current.focus();
     props.onSubmit(chosenCard);
     setChosenCard(null);
+    cardSearchInput.current.parentElement.getElementsByClassName('MuiAutocomplete-clearIndicator')[0].click();
+    cardSearchInput.current.focus();
   }
 
   return (
@@ -262,28 +239,28 @@ export default function ScryfallRequest (props) {
           clearOnBlur={false}
           clearOnEscape={true}
           getOptionLabel={(option) => option.name}
-          getOptionSelected={(option, value) => option.name === value.name}
-          id="chosen-card"
+          getOptionSelected={(option, value) => option.oracle_id === value.oracle_id}
+          id="card-search-input"
           loading={loading}
           onChange={function (event, value, reason) {
             if (reason === 'select-option') {
-              let cardDetails = { ...value };
-              delete cardDetails.value;
-              scryfallPrintSearch(value.prints_search_uri, { ...cardDetails });
+              scryfallPrintSearch(value.oracle_id);
             }
           }}
           onClose={() => setOpen(false)}
           onOpen={() => setOpen(true)}
           open={open}
           options={cardSearchResults}
-          renderInput={(params) => (
+          renderInput={params => (
             <MUITextField
               {...params}
               inputRef={cardSearchInput}
               label={props.labelText}
               margin="dense"
-              onChange={event => setCardSearchInputValue(event.target.value)}
-              value={cardSearchInputValue}
+              onKeyUp={(event) => {
+                clearTimeout(timer);
+                scryfallCardSearch(event);
+              }}
               variant="outlined"
               InputProps={{
                 ...params.InputProps,
@@ -300,7 +277,7 @@ export default function ScryfallRequest (props) {
       </MUIGrid>
 
       <MUIGrid item xs={12} md={6} lg={5}>
-        <MUIList className={classes.list} component="nav">
+        <MUIList component="nav">
           <MUIListItem
             button
             aria-haspopup="true"

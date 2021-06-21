@@ -186,7 +186,7 @@ export default function Account () {
                 <ScryfallRequest
                   buttonText="Change Avatar"
                   labelText="Change your avatar"
-                  onSubmit={(chosenCard) => submitChanges(`avatar: "${chosenCard.art_crop}"`)}
+                  onSubmit={chosenCard => submitChanges(`avatar: "${chosenCard.art_crop}"`)}
                 />
               </HoverPreview>
             </MUICardActions>

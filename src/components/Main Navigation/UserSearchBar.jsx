@@ -82,26 +82,27 @@ export default function UserSearchBar ({
 
   async function searchAccounts (event) {
     if (event.target.value.length > 2) {
-      try {
-        const operation = 'searchAccounts';
-        const matchingUsers = await sendRequest({
-          operation,
-          body: {
-            query: `
-              query {
-                searchAccounts(name: "${event.target.value}") {
-                  _id
-                  avatar
-                  name
+        await sendRequest({
+          callback: (data) => {
+            setUserSearchResults(data);
+          },
+          load: true,
+          operation: 'searchAccounts',
+          get body() {
+            return {
+              query: `
+                query {
+                  ${this.operation}(name: "${event.target.value}") {
+                    _id
+                    avatar
+                    name
+                  }
                 }
-              }
-            `
+              `
+            }
+            
           }
-        })
-        setUserSearchResults(matchingUsers);
-      } catch (error) {
-        
-      }
+        });
     } else {
       setUserSearchResults([]);
     }

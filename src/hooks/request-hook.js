@@ -59,8 +59,6 @@ export default function useRequest () {
         for (const error of responseData.errors) {
           setErrorMessages(prevState => [...prevState, error.message]);
         }
-      } else if (!response.ok) {
-        throw new Error(responseData.message);
       } else if (operation) {
         callback(responseData.data[operation]);
       } else {

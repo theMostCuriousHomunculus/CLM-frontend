@@ -13,7 +13,6 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
 import { desiredCubeInfo } from '../requests/GraphQL/cube-requests';
-import { addCard as addCardRequest } from '../requests/REST/cube-requests';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 export default function Cube () {
@@ -106,7 +105,24 @@ export default function Cube () {
     return client.dispose;
   }, [authentication.token, cubeID, sendRequest]);
 
-  const addCard = React.useCallback(async function () {
+  const addCard = React.useCallback(async function ({
+    back_image,
+    chapters,
+    cmc,
+    color_identity,
+    image,
+    keywords,
+    loyalty,
+    mana_cost,
+    mtgo_id,
+    name,
+    oracle_id,
+    power,
+    printing,
+    purchase_link,
+    toughness,
+    type_line
+  }) {
     await sendRequest({
       headers: { CubeID: cubeID },
       operation: 'addCard',
@@ -116,7 +132,7 @@ export default function Cube () {
             mutation {
               ${this.operation}(
                 input: {
-                  componentID: "${componentID}",
+                  componentID: "${display.activeComponentID}",
                   back_image: "${back_image}",
                   chapters: ${chapters},
                   cmc: ${cmc},
@@ -140,14 +156,15 @@ export default function Cube () {
         }
       }
     });
-  })
+  }, [cubeID, display.activeComponentID, sendRequest]);
 
+  // i think this hacky workaround was only needed because i was using redux...
   const ScryfallRequestHackyWorkAround = (props) => {
     return (
       <MUIPaper>
         <ScryfallRequest
           buttonText="Add it!"
-          labelText={`Add a card to ${activeComponentName}`}
+          labelText={`Add a card to ${display.activeComponentName}`}
           onSubmit={addCard}
           {...props}
         />
@@ -159,7 +176,7 @@ export default function Cube () {
     loading ?
       <LoadingSpinner /> :
       <React.Fragment>
-        <CubeInfo cube={cube} />
+        <CubeInfo creator={cube.creator} description={cube.description} name={cube.name} />
 
         <ComponentInfo cube={cube} display={display} setDisplay={setDisplay} />
 
