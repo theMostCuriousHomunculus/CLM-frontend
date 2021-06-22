@@ -3,7 +3,6 @@ import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
-import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import customSort from '../../functions/custom-sort';
@@ -20,7 +19,6 @@ const white = monoColors.find((color) => color.name === "White").hex;
 const useStyles = makeStyles({
   azorius: {
     background: `linear-gradient(45deg, ${white}, ${blue})`
-    // background: `radial-gradient(${white}, #a7bfe7, ${blue})`
   },
   black: {
     backgroundColor: black
@@ -79,14 +77,14 @@ const useStyles = makeStyles({
   }
 });
 
-const CurveView = (props) => {
+export default function CurveView ({ cards }) {
 
   const classes = useStyles();
 
   return (
     <div className={classes.curveViewMainContainer}>
       {[...monoColors, ...multiColors].map(function (color) {
-        const cards_color = props.displayedCards.filter(function (card) {
+        const cards_color = cards.filter(function (card) {
           return card.color_identity.toString() === color.color_identity;
         });
         return (
@@ -117,8 +115,8 @@ const CurveView = (props) => {
                                   back_image={card.back_image}
                                   image={card.image}
                                   key={card._id}
-                                  onMouseOut={props.hidePreview}
-                                  onMouseOver={props.showPreview}
+                                  // onMouseOut={props.hidePreview}
+                                  // onMouseOver={props.showPreview}
                                   style={{ cursor: 'default' }}
                                   variant="body2"
                                 >
@@ -139,12 +137,4 @@ const CurveView = (props) => {
       })}
     </div>
   );
-}
-
-function mapStateToProps (state) {
-  return {
-    displayedCards: state.displayed_cards
-  };
-}
-
-export default connect(mapStateToProps)(React.memo(CurveView));
+};

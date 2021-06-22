@@ -3,7 +3,6 @@ import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
-import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import customSort from '../../functions/custom-sort';
@@ -82,13 +81,12 @@ const useStyles = makeStyles({
   }  
 });
 
-const TableView = (props) => {
+export default function TableView ({
+  displayedCards
+  // hidePreview,
+  // showPreview
+}) {
 
-  const {
-    displayedCards,
-    hidePreview,
-    showPreview
-  } = props;
   const classes = useStyles();
   const costs = [0, 1, 2, 3, 4, 5, 6, 7];
   const [editableCard, setEditableCard] = React.useState({});
@@ -99,8 +97,8 @@ const TableView = (props) => {
       <EditCardModal
         card={editableCard}
         clear={() => setEditableCard({})}
-        hidePreview={hidePreview}
-        showPreview={showPreview}
+        // hidePreview={hidePreview}
+        // showPreview={showPreview}
       />
 
       <div className={classes.tableViewMainContainer}>
@@ -145,8 +143,8 @@ const TableView = (props) => {
                                               image={card.image}
                                               key={card._id}
                                               onDoubleClick={() => setEditableCard(card)}
-                                              onMouseOut={hidePreview}
-                                              onMouseOver={showPreview}
+                                              // onMouseOut={hidePreview}
+                                              // onMouseOver={showPreview}
                                               style={{ cursor: 'pointer', userSelect: 'none' }}
                                               variant="body1"
                                             >
@@ -209,8 +207,8 @@ const TableView = (props) => {
                                   image={card.image}
                                   key={card._id}
                                   onDoubleClick={() => setEditableCard(card)}
-                                  onMouseOut={hidePreview}
-                                  onMouseOver={showPreview}
+                                  // onMouseOut={hidePreview}
+                                  // onMouseOver={showPreview}
                                   style={{ cursor: 'pointer', userSelect: 'none' }}
                                   variant="body1"
                                 >
@@ -232,12 +230,4 @@ const TableView = (props) => {
 
     </React.Fragment>
   );
-}
-
-function mapStateToProps (state) {
-  return {
-    displayedCards: state.displayed_cards
-  };
-}
-
-export default connect(mapStateToProps)(React.memo(TableView));
+};

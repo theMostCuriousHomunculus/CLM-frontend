@@ -2,17 +2,16 @@ import React from 'react';
 import MUIPaper from '@material-ui/core/Paper';
 import MUITypography from '@material-ui/core/Typography';
 import RVAutoSizer from 'react-virtualized-auto-sizer';
-import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
+import theme from '../../theme';
+import useRequest from '../../hooks/request-hook';
 import AuthorizedCardRow from './AuthorizedCardRow';
 import cumulativePercent from '../../functions/cumulative-percent';
 import ReactWindowStickyHeaderList from '../miscellaneous/ReactWindowStickyHeaderList';
-import theme from '../../theme';
 import UnauthorizedCardRow from './UnauthorizedCardRow';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { editCard } from '../../requests/REST/cube-requests';
 import { monoColors } from '../../constants/color-objects';
 
 const useStyles = makeStyles({
@@ -44,17 +43,17 @@ const useStyles = makeStyles({
   }
 });
 
-const ListView = ({
-  activeComponentId,
+export default function ListView ({
+  activeComponentID,
   creator,
   displayedCardsLength,
-  hidePreview,
-  showPreview
-}) => {
+  // hidePreview,
+  // showPreview
+}) {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const cubeId = useParams().cubeId;
+  const cubeID = useParams().cubeId;
   const columnWidths = creator._id === authentication.userId ?
     ["20%", "17.5%", "7.5%", "15%", "15%", "12.5%", "12.5%"] :
     ["22.5%", "20%", "10%", "17.5%", "15%", "15%"];
@@ -80,14 +79,30 @@ const ListView = ({
     );
   });
   const headerRowSize = 60;
+  const { sendRequest } = useRequest();
 
-  const submitCardChange = React.useCallback(async function (cardId, changes) {
-    try {
-      await editCard(changes, cardId, activeComponentId, cubeId, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [activeComponentId, authentication.token, cubeId]);
+  const editCard = React.useCallback(async function (changes) {
+    await sendRequest({
+      headers: { CubeID: cubeID },
+      operation: 'editCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  componentID: "${activeComponentID}",
+                  ${changes}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [cubeID, activeComponentID, sendRequest]);
 
   return (
     <MUIPaper className={classes.tableContainer}>
@@ -111,17 +126,17 @@ const ListView = ({
                 {creator._id === authentication.userId ?
                   <AuthorizedCardRow
                     columnWidths={columnWidths}
-                    hidePreview={hidePreview}
+                    // hidePreview={hidePreview}
                     index={index}
-                    showPreview={showPreview}
-                    submitCardChange={submitCardChange}
+                    // showPreview={showPreview}
+                    editCard={editCard}
                   />
                   :
                   <UnauthorizedCardRow
                     columnWidths={columnWidths}
-                    hidePreview={hidePreview}
+                    // hidePreview={hidePreview}
                     index={index}
-                    showPreview={showPreview}
+                    // showPreview={showPreview}
                   />
                 }
               </div>
@@ -131,14 +146,4 @@ const ListView = ({
       </RVAutoSizer>
     </MUIPaper>
   );
-}
-
-function mapStateToProps (state) {
-  return {
-    activeComponentId: state.active_component_id,
-    creator: state.cube.creator,
-    displayedCardsLength: state.displayed_cards.length
-  };
-}
-
-export default connect(mapStateToProps)(ListView);
+};

@@ -150,7 +150,9 @@ export default function Cube () {
                   toughness: ${toughness},
                   type_line: "${type_line}"
                 }
-              )
+              ) {
+                _id
+              }
             }
           `
         }

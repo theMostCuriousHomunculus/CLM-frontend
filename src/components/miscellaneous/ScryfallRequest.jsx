@@ -53,15 +53,17 @@ export default function ScryfallRequest (props) {
           switch (print.layout) {
             case 'adventure':
               // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
               power = print.card_faces[0].power;
               toughness = print.card_faces[0].toughness;
               type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
-              art_crop = print.image_uris.art_crop;
-              image = print.image_uris.large;
               break;
             case 'flip':
               // flip was only in Kamigawa block (plus an "Un" card and a couple of reprints), which was before planeswalkers existed.  unlikely they ever bring this layout back, and if they do, no idea how they would fit a planeswalker onto one side.  all flip cards are creatures on one end and either a creature or an enchantment on the other
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               mana_cost = print.card_faces[0].mana_cost;
               if (print.card_faces[0].power) {
                 power = print.card_faces[0].power;
@@ -74,25 +76,23 @@ export default function ScryfallRequest (props) {
                 toughness = print.card_faces[1].toughness;
               }
               type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
-              art_crop = print.image_uris.art_crop;
-              image = print.image_uris.large;
               break;
             case 'leveler':
               // all level up cards have been creatures.  this is a mechanic that has so far only appeared in Rise of the Eldrazi and a single card in Modern Horizons.  i don't expect the mechanic to return, but the printing of Hexdrinker in MH1 suggests it may
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               mana_cost = print.mana_cost;
               power = print.power;
               toughness = print.toughness;
               type_line = print.type_line;
-              art_crop = print.image_uris.art_crop;
-              image = print.image_uris.large;
               break;
             case 'meld':
               // meld only appeared in Eldritch Moon and probably won't ever come back.  no planeswalkers; only creatures and a single land
+              art_crop = print.image_uris.art_crop;
               mana_cost = print.mana_cost;
               power = print.power;
               toughness = print.toughness;
               type_line = print.type_line;
-              art_crop = print.image_uris.art_crop;
               const meldResultPart = print.all_parts.find(part => part.component === 'meld_result');
               await sendRequest({
                 callback: (data) => {
@@ -104,6 +104,9 @@ export default function ScryfallRequest (props) {
               });
               break;
             case 'modal_dfc':
+              art_crop = print.card_faces[0].image_uris.art_crop;
+              back_image = print.card_faces[1].image_uris.large;
+              image = print.card_faces[0].image_uris.large;
               if (print.card_faces[0].loyalty) {
                 loyalty = print.card_faces[0].loyalty;
               } else if (print.card_faces[1].loyalty) {
@@ -122,12 +125,11 @@ export default function ScryfallRequest (props) {
                 toughness = print.card_faces[1].toughness;
               }
               type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
-              art_crop = print.card_faces[0].image_uris.art_crop;
-              back_image = print.card_faces[1].image_uris.large;
-              image = print.card_faces[0].image_uris.large;
               break;
             case 'saga':
               // saga's have no other faces; they simply have their own layout type becuase of the fact that the art is on the right side of the card rather than the top of the card.  all sagas printed so far (through Kaldheim) have only 3 or 4 chapters
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               if (print.oracle_text.includes('Sacrifice after III')) {
                 chapters = 3;
               }
@@ -136,17 +138,18 @@ export default function ScryfallRequest (props) {
               }
               mana_cost = print.mana_cost;
               type_line = print.type_line;
-              art_crop = print.image_uris.art_crop;
-              image = print.image_uris.large;
               break;
             case 'split':
               // split cards are always instants and/or sorceries
-              mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
-              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
               art_crop = print.image_uris.art_crop;
               image = print.image_uris.large;
+              mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
+              type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
               break;
             case 'transform':
+              art_crop = print.card_faces[0].image_uris.art_crop;
+              back_image = print.card_faces[1].image_uris.large;
+              image = print.card_faces[0].image_uris.large;
               if (print.card_faces[0].loyalty) {
                 loyalty = print.card_faces[0].loyalty;
               } else if (print.card_faces[1].loyalty) {
@@ -166,19 +169,16 @@ export default function ScryfallRequest (props) {
                 toughness = print.card_faces[1].toughness;
               }
               type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
-              art_crop = print.card_faces[0].image_uris.art_crop;
-              back_image = print.card_faces[1].image_uris.large;
-              image = print.card_faces[0].image_uris.large;
               break;
             default:
               // adventure, flip, leveler, saga, split and normal layout cards
+              art_crop = print.image_uris.art_crop;
+              image = print.image_uris.large;
               loyalty = print.loyalty;
               mana_cost = print.mana_cost;
               power = print.power;
               toughness = print.toughness;
               type_line = print.type_line;
-              art_crop = print.image_uris.art_crop;
-              image = print.image_uris.large;
           }
           return ({
             art_crop,
