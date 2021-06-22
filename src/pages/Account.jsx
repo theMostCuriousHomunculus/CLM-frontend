@@ -16,7 +16,6 @@ import customSort from '../functions/custom-sort';
 import useRequest from '../hooks/request-hook';
 import BudRequests from '../components/Account Page/BudRequests';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
-import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LargeAvatar from '../components/miscellaneous/LargeAvatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -182,13 +181,11 @@ export default function Account () {
           />
           {accountId === authentication.userId &&
             <MUICardActions>
-              <HoverPreview>
-                <ScryfallRequest
-                  buttonText="Change Avatar"
-                  labelText="Change your avatar"
-                  onSubmit={chosenCard => submitChanges(`avatar: "${chosenCard.art_crop}"`)}
-                />
-              </HoverPreview>
+              <ScryfallRequest
+                buttonText="Change Avatar"
+                labelText="Change your avatar"
+                onSubmit={chosenCard => submitChanges(`avatar: "${chosenCard.art_crop}"`)}
+              />
             </MUICardActions>
           }
           {authentication.isLoggedIn &&

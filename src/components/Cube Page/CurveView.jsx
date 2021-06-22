@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import customSort from '../../functions/custom-sort';
 import cardType from '../../functions/specific-card-type';
+import HoverPreview from '../miscellaneous/HoverPreview';
 import { monoColors, multiColors } from '../../constants/color-objects';
 
 const black = monoColors.find((color) => color.name === "Black").hex;
@@ -31,9 +32,6 @@ const useStyles = makeStyles({
   },
   colorless: {
     backgroundColor: colorless
-  },
-  curveViewMainContainer: {
-    marginTop: 4
   },
   curveViewTypeContainer: {
     display: 'grid',
@@ -82,11 +80,9 @@ export default function CurveView ({ cards }) {
   const classes = useStyles();
 
   return (
-    <div className={classes.curveViewMainContainer}>
+    <React.Fragment>
       {[...monoColors, ...multiColors].map(function (color) {
-        const cards_color = cards.filter(function (card) {
-          return card.color_identity.toString() === color.color_identity;
-        });
+        const cards_color = cards.filter(card => card.color_identity.toString() === color.color_identity);
         return (
           <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor)} key={`curve-${color.name}`}>
             <MUICardHeader
@@ -111,17 +107,18 @@ export default function CurveView ({ cards }) {
                             <MUITypography variant="subtitle2">{cost} CMC</MUITypography>
                             {customSort(cards_color_isCreature_cost, ['name']).map(function (card) {
                               return (
-                                <MUITypography
-                                  back_image={card.back_image}
-                                  image={card.image}
-                                  key={card._id}
-                                  // onMouseOut={props.hidePreview}
-                                  // onMouseOver={props.showPreview}
-                                  style={{ cursor: 'default' }}
-                                  variant="body2"
-                                >
-                                  {card.name}
-                                </MUITypography>
+                                <div key={card._id}>
+                                  <HoverPreview>
+                                    <MUITypography
+                                      back_image={card.back_image}
+                                      image={card.image}
+                                      style={{ cursor: 'default' }}
+                                      variant="body2"
+                                    >
+                                      {card.name}
+                                    </MUITypography>
+                                  </HoverPreview>
+                                </div>
                               );
                             })}
                           </div>
@@ -135,6 +132,6 @@ export default function CurveView ({ cards }) {
           </MUICard>
         );
       })}
-    </div>
+    </React.Fragment>
   );
 };

@@ -11,6 +11,7 @@ import MUITextField from '@material-ui/core/TextField';
 import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
 
 import useRequest from '../../hooks/request-hook';
+import HoverPreview from './HoverPreview';
 
 export default function ScryfallRequest (props) {
 
@@ -298,17 +299,18 @@ export default function ScryfallRequest (props) {
           onClose={() => setAnchorEl(null)}
         >
           {availablePrintings.map((option, index) => (
-            <MUIMenuItem
-              back_image={option.back_image}
-              image={option.image}
-              key={`printing-${index}`}
-              onClick={() => handleMenuItemClick(index)}
-              onMouseOut={props.hidePreview}
-              onMouseOver={props.showPreview}
-              selected={index === selectedPrintIndex}
-            >
-              {option.printing}
-            </MUIMenuItem>
+            <span key={option.printing}>
+              <HoverPreview>
+                <MUIMenuItem
+                  back_image={option.back_image}
+                  image={option.image}
+                  onClick={() => handleMenuItemClick(index)}
+                  selected={index === selectedPrintIndex}
+                >
+                  {option.printing}
+                </MUIMenuItem>
+              </HoverPreview>
+            </span>
           ))}
         </MUIMenu>
       </MUIGrid>

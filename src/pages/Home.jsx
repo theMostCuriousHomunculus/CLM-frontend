@@ -6,7 +6,6 @@ import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIComputerIcon from '@material-ui/icons/Computer';
-// import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 import MUIControlCameraIcon from '@material-ui/icons/ControlCamera';
 import MUIPaletteIcon from '@material-ui/icons/Palette';
@@ -14,7 +13,7 @@ import MUITimerIcon from '@material-ui/icons/Timer';
 
 import { AuthenticationContext } from '../contexts/authentication-context';
 
-const Home = () => {
+export default function Home () {
 
   const authentication = React.useContext(AuthenticationContext);
   const history = useHistory();
@@ -39,51 +38,32 @@ const Home = () => {
   ]*/
 
   return (
-    <React.Fragment>
-      <MUICard>
-        <MUICardHeader
-          disableTypography={true}
-          title={<MUITypography variant="subtitle1">A New Tool for Cube Curators</MUITypography>}
-          subheader={!authentication.isLoggedIn &&
-            <MUITypography color="textSecondary" variant="subtitle2">
-              Create an account or login to get started building cubes and connecting with your buds!
-            </MUITypography>
-          }
-        />
-        <MUICardContent>
-          <MUITypography variant="body1"><MUIControlCameraIcon /> Increased Control Over Your Cube</MUITypography>
-          <MUITypography variant="body1"><MUIPaletteIcon /> Diverse Play Experiences</MUITypography>
-          <MUITypography variant="body1"><MUITimerIcon /> Draft in Real Time with Your Buds</MUITypography>
-          <MUITypography variant="body1"><MUIComputerIcon /> Export Draft Picks to CSV Files for Quick and Easy MTGO Play</MUITypography>
-        </MUICardContent>
-        <MUICardActions>
-          <MUIButton
-            color="primary"
-            onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')}
-            size="small"
-            variant="contained"
-          >
-            Check Out Casey's MTGO Cube!
-          </MUIButton>
-        </MUICardActions>
-      </MUICard>
-
-      {/*<MUIGrid container>
-        {components.map(function (component, index) {
-          return (
-            <MUIGrid item key={index} xs={12} md={6} lg={3}>
-              <MUICard className={classes.basicCard}>
-                <MUICardHeader title={<MUITypography variant="h3">{component.type}</MUITypography>} />
-                <MUICardContent>
-                  <MUITypography variant="body1">{component.description}</MUITypography>
-                </MUICardContent>
-              </MUICard>
-            </MUIGrid>
-          );
-        })}
-      </MUIGrid>*/}
-    </React.Fragment>
+    <MUICard>
+      <MUICardHeader
+        disableTypography={true}
+        title={<MUITypography variant="subtitle1">A New Tool for Cube Curators</MUITypography>}
+        subheader={!authentication.isLoggedIn &&
+          <MUITypography color="textSecondary" variant="subtitle2">
+            Create an account or login to get started building cubes and connecting with your buds!
+          </MUITypography>
+        }
+      />
+      <MUICardContent>
+        <MUITypography variant="body1"><MUIControlCameraIcon /> Increased Control Over Your Cube</MUITypography>
+        <MUITypography variant="body1"><MUIPaletteIcon /> Diverse Play Experiences</MUITypography>
+        <MUITypography variant="body1"><MUITimerIcon /> Draft in Real Time with Your Buds</MUITypography>
+        <MUITypography variant="body1"><MUIComputerIcon /> Export Draft Picks to CSV Files for Quick and Easy MTGO Play</MUITypography>
+      </MUICardContent>
+      <MUICardActions>
+        <MUIButton
+          color="primary"
+          onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')}
+          size="small"
+          variant="contained"
+        >
+          Check Out Casey's MTGO Cube!
+        </MUIButton>
+      </MUICardActions>
+    </MUICard>
   );
-}
-
-export default Home;
+};

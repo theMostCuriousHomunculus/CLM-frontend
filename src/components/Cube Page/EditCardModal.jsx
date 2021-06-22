@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 import MUIButton from '@material-ui/core/Button';
 import MUIDialog from '@material-ui/core/Dialog';
 import MUIDialogActions from '@material-ui/core/DialogActions';
@@ -8,23 +8,18 @@ import MUIDialogContentText from '@material-ui/core/DialogContentText';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUIGrid from '@material-ui/core/Grid';
 import MUITextField from '@material-ui/core/TextField';
-import { connect } from 'react-redux';
 
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import WarningButton from '../miscellaneous/WarningButton';
-import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { deleteCard, editCard } from '../../requests/REST/cube-requests';
 import MoveDeleteMenu from './MoveDeleteMenu';
 
-function EditCardModal ({
+export default function EditCardModal ({
   activeComponentId,
   card,
   clear,
   creator,
-  dispatchEditCard,
-  dispatchMoveOrDeleteCard,
   hidePreview,
   showPreview
 }) {
@@ -33,8 +28,8 @@ function EditCardModal ({
   const [cardType, setCardType] = React.useState();
   const [cmc, setCmc] = React.useState();
   const [colorIdentity, setColorIdentity] = React.useState([]);
-  const [cubeComponent, setCubeComponent] = React.useState();
-  const cubeId = useParams().cubeId;
+  // const [cubeComponent, setCubeComponent] = React.useState();
+  // const cubeId = useParams().cubeId;
   const [printingDetails, setPrintingDetails] = React.useState({
     back_image: null,
     image: null,
@@ -47,7 +42,7 @@ function EditCardModal ({
     setCardType(card.type_line);
     setCmc(card.cmc);
     setColorIdentity(card.color_identity);
-    setCubeComponent(activeComponentId);
+    // setCubeComponent(activeComponentId);
     setPrintingDetails({
       back_image: card.back_image,
       image: card.image,
@@ -56,28 +51,6 @@ function EditCardModal ({
       purchase_link: card.purchase_link
     });
   }, [activeComponentId, card]);
-
-  async function submitChanges () {
-    try {
-      const changes = {
-        cmc,
-        color_identity: colorIdentity,
-        type_line: cardType,
-        ...printingDetails
-      };
-      await editCard(changes, card._id, activeComponentId, cubeId, authentication.token);
-      dispatchEditCard({ cardId: card._id, ...changes });
-
-      if (cubeComponent !== activeComponentId) {
-        await deleteCard(card._id, activeComponentId, cubeId, authentication.token, cubeComponent);
-        dispatchMoveOrDeleteCard({ cardId: card._id, destination: cubeComponent });
-      }
-
-      clear();
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
 
   return (
     <MUIDialog
@@ -125,7 +98,7 @@ function EditCardModal ({
                   variant="outlined"
                 />
                 <MoveDeleteMenu
-                  handleMoveDelete={(details) => setCubeComponent(details)}
+                  // handleMoveDelete={(details) => setCubeComponent(details)}
                   listItemPrimaryText="Cube Component"
                 />
                 <ChangePrintMenu
@@ -143,7 +116,7 @@ function EditCardModal ({
             <WarningButton onClick={clear}>Close</WarningButton>
             <MUIButton
               color="primary"
-              onClick={submitChanges}
+              // onClick={submitChanges}
               size="small"
               variant="contained"
             >
@@ -154,20 +127,4 @@ function EditCardModal ({
       }
     </MUIDialog>
   );
-}
-
-function mapStateToProps (state) {
-  return {
-    activeComponentId: state.active_component_id,
-    creator: state.cube.creator
-  };
-}
-
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload)),
-    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(EditCardModal);
+};

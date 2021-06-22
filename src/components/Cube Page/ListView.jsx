@@ -3,10 +3,8 @@ import MUIPaper from '@material-ui/core/Paper';
 import MUITypography from '@material-ui/core/Typography';
 import RVAutoSizer from 'react-virtualized-auto-sizer';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
 
 import theme from '../../theme';
-import useRequest from '../../hooks/request-hook';
 import AuthorizedCardRow from './AuthorizedCardRow';
 import cumulativePercent from '../../functions/cumulative-percent';
 import ReactWindowStickyHeaderList from '../miscellaneous/ReactWindowStickyHeaderList';
@@ -44,16 +42,13 @@ const useStyles = makeStyles({
 });
 
 export default function ListView ({
-  activeComponentID,
   creator,
   displayedCardsLength,
-  // hidePreview,
-  // showPreview
+  editCard
 }) {
 
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const cubeID = useParams().cubeId;
   const columnWidths = creator._id === authentication.userId ?
     ["20%", "17.5%", "7.5%", "15%", "15%", "12.5%", "12.5%"] :
     ["22.5%", "20%", "10%", "17.5%", "15%", "15%"];
@@ -70,39 +65,13 @@ export default function ListView ({
           width: columnWidths[index]
         }}
       >
-        <MUITypography
-          variant="h5"
-        >
+        <MUITypography variant="h5">
           {column}
         </MUITypography>
       </div>
     );
   });
   const headerRowSize = 60;
-  const { sendRequest } = useRequest();
-
-  const editCard = React.useCallback(async function (changes) {
-    await sendRequest({
-      headers: { CubeID: cubeID },
-      operation: 'editCard',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                input: {
-                  componentID: "${activeComponentID}",
-                  ${changes}
-                }
-              ) {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }, [cubeID, activeComponentID, sendRequest]);
 
   return (
     <MUIPaper className={classes.tableContainer}>
@@ -126,17 +95,13 @@ export default function ListView ({
                 {creator._id === authentication.userId ?
                   <AuthorizedCardRow
                     columnWidths={columnWidths}
-                    // hidePreview={hidePreview}
                     index={index}
-                    // showPreview={showPreview}
                     editCard={editCard}
                   />
                   :
                   <UnauthorizedCardRow
                     columnWidths={columnWidths}
-                    // hidePreview={hidePreview}
                     index={index}
-                    // showPreview={showPreview}
                   />
                 }
               </div>

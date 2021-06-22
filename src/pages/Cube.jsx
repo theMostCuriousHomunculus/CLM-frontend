@@ -7,7 +7,6 @@ import useRequest from '../hooks/request-hook';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
-import HoverPreview from '../components/miscellaneous/HoverPreview';
 import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -43,7 +42,7 @@ export default function Cube () {
     activeComponentSize: null,
     filter: '',
     filteredCards: [],
-    view: 'Table'
+    view: 'Curve'
   });
 
   React.useEffect(() => {
@@ -51,6 +50,11 @@ export default function Cube () {
       await sendRequest({
         callback: (data) => {
           setCube(data);
+          setDisplay(prevState => ({
+            ...prevState,
+            activeComponentCards: data.mainboard,
+            filteredCards: [...data.mainboard]
+          }))
         },
         headers: { CubeID: cubeID },
         load: true,
@@ -160,19 +164,28 @@ export default function Cube () {
     });
   }, [cubeID, display.activeComponentID, sendRequest]);
 
-  // i think this hacky workaround was only needed because i was using redux...
-  const ScryfallRequestHackyWorkAround = (props) => {
-    return (
-      <MUIPaper>
-        <ScryfallRequest
-          buttonText="Add it!"
-          labelText={`Add a card to ${display.activeComponentName}`}
-          onSubmit={addCard}
-          {...props}
-        />
-      </MUIPaper>
-    );
-  }
+  const editCard = React.useCallback(async function (changes) {
+    await sendRequest({
+      headers: { CubeID: cubeID },
+      operation: 'editCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  componentID: "${display.activeComponentID}",
+                  ${changes}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [cubeID, display.activeComponentID, sendRequest]);
 
   return (
     loading ?
@@ -180,16 +193,21 @@ export default function Cube () {
       <React.Fragment>
         <CubeInfo creator={cube.creator} description={cube.description} name={cube.name} />
 
-        <ComponentInfo cube={cube} display={display} setDisplay={setDisplay} />
+        {/*<ComponentInfo cube={cube} display={display} setDisplay={setDisplay} />*/}
 
-        <HoverPreview marginBottom={190}>
+        {authentication.userId === cube.creator._id && /*<ScryfallRequestHackyWorkAround />*/
+          <MUIPaper style={{ padding: '0 8px' }}>
+            <ScryfallRequest
+              buttonText="Add it!"
+              labelText={`Add a card to ${display.activeComponentName}`}
+              onSubmit={addCard}
+            />
+          </MUIPaper>
+        }
+        {display.view === 'Curve' && <CurveView cards={display.filteredCards} editCard={editCard} />}
+        {display.view === 'List' && <ListView cards={display.filteredCards} editCard={editCard} />}
+        {display.view === 'Table' && <TableView cards={display.filteredCards} editCard={editCard} />}
 
-          {authentication.userId === cube.creator._id && <ScryfallRequestHackyWorkAround />}
-          {display.view === 'Curve' && <CurveView cards={display.filteredCards} />}
-          {display.view === 'List' && <ListView cards={display.filteredCards} />}
-          {display.view === 'Table' && <TableView cards={display.filteredCards} />}
-
-        </HoverPreview>
       </React.Fragment>
   );
 };

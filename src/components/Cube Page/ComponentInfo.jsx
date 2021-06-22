@@ -12,19 +12,12 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
-import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import CreateComponentForm from './CreateComponentForm';
 import WarningButton from '../miscellaneous/WarningButton';
-import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { ErrorContext } from '../../contexts/error-context';
-import {
-  deleteComponent as deleteComponentRequest,
-  editComponent
-} from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
   cardActions: {
@@ -60,66 +53,35 @@ const useStyles = makeStyles({
   }
 });
 
-function ComponentInfo ({
-  activeComponentCards,
-  activeComponentId,
-  activeComponentName,
-  activeComponentType,
-  activeRotationSize,
-  creator,
-  cube,
-  dispatchChangeComponentName,
-  dispatchChangeRotationSize,
-  dispatchDeleteComponent,
-  dispatchFilterCards,
-  dispatchSwitchComponent,
-  dispatchSwitchViewMode,
-  displayedCards,
-  filter,
-  viewMode
+export default function ComponentInfo ({
+  
 }) {
 
   const authentication = React.useContext(AuthenticationContext);
-  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
   const componentNameRef = React.useRef();
-  const cubeId = useParams().cubeId;
+  const cubeID = useParams().cubeId;
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
   const rotationSizeRef = React.useRef();
   const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
 
   async function deleteComponent () {
-    try {
-      await deleteComponentRequest(activeComponentType, activeComponentId, cubeId, authentication.token);
-      dispatchDeleteComponent();
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
+
   }
 
   const handleMenuItemClickComponent = (component_id) => {
-    dispatchSwitchComponent(component_id);
+
     setComponentAnchorEl(null);
   };
 
   const handleMenuItemClickView = (event) => {
-    dispatchSwitchViewMode(event.target.textContent);
+
     setViewAnchorEl(null);
   };
 
   async function submitComponentChanges () {
-    const componentChanges = {
-      name: componentNameRef.current.value,
-      size: rotationSizeRef.current.value,
-      type: activeComponentType
-    };
 
-    try {
-      await editComponent(componentChanges, activeComponentId, cubeId, authentication.token);
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
   }
 
   return (
@@ -298,31 +260,3 @@ function ComponentInfo ({
     </React.Fragment>
   );
 };
-
-function mapStateToProps (state) {
-  return {
-    activeComponentCards: state.active_component_cards,
-    activeComponentId: state.active_component_id,
-    activeComponentName: state.active_component_name,
-    activeComponentType: state.active_component_type,
-    activeRotationSize: state.active_rotation_size,
-    creator: state.cube.creator,
-    cube: state.cube,
-    displayedCards: state.displayed_cards,
-    filter: state.filter,
-    viewMode: state.view_mode
-  };
-}
-
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchChangeComponentName: (payload) => dispatch(actionCreators.change_component_name(payload)),
-    dispatchChangeRotationSize: (payload) => dispatch(actionCreators.change_rotation_size(payload)),
-    dispatchDeleteComponent: () => dispatch(actionCreators.delete_component()),
-    dispatchFilterCards: (payload) => dispatch(actionCreators.filter_cards(payload)),
-    dispatchSwitchComponent: (payload) => dispatch(actionCreators.switch_component(payload)),
-    dispatchSwitchViewMode: (payload) => dispatch(actionCreators.switch_view_mode(payload))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ComponentInfo);
