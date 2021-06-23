@@ -10,42 +10,43 @@ import { useParams } from 'react-router-dom';
 
 import useRequest from '../../hooks/request-hook';
 import LargeAvatar from '../miscellaneous/LargeAvatar';
-import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const useStyles = makeStyles({
   cardHeader: {
-    alignItems: 'stretch',
-    display: 'flex'
+    // alignItems: 'stretch',
+    // display: 'flex'
   }
 });
 
 export default function CubeInfo ({
   creator,
   description,
+  editable,
   name
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
   const descriptionRef = React.useRef();
   const classes = useStyles();
   const cubeID = useParams().cubeId;
   const nameRef = React.useRef();
   const { sendRequest } = useRequest();
 
-  async function submitCubeChanges () {
+  async function editCube () {
     await sendRequest({
       headers: { CubeID: cubeID },
       operation: 'editCube',
       get body() {
         return {
           query: `
-            ${this.operation}(
-              input: {
-                description: "${descriptionRef.current.value}",
-                name: "${nameRef.current.value}"
+            mutation {
+              ${this.operation}(
+                input: {
+                  description: "${descriptionRef.current.value}",
+                  name: "${nameRef.current.value}"
+                }
+              ) {
+                _id
               }
-            ) {
-              _id
             }
           `
         }
@@ -59,11 +60,11 @@ export default function CubeInfo ({
         avatar={<LargeAvatar alt={creator.name} src={creator.avatar} />}
         className={classes.cardHeader}
         disableTypography={true}
-        title={authentication.userId === creator._id ?
+        title={editable ?
           <MUITextField
+            defaultValue={name}
             inputProps={{
-              defaultValue: name,
-              onBlur: submitCubeChanges
+              onBlur: editCube
             }}
             inputRef={nameRef}
             label="Cube Name"
@@ -81,12 +82,12 @@ export default function CubeInfo ({
       />
 
       <MUICardContent>
-        {authentication.userId === creator._id ?
+        {editable ?
           <MUITextField
+            defaultValue={description}
             fullWidth={true}
             inputProps={{
-              defaultValue: description,
-              onBlur: submitCubeChanges
+              onBlur: editCube
             }}
             inputRef={descriptionRef}
             label="Cube Description"

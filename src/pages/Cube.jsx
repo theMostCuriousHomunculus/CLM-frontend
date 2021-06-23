@@ -37,27 +37,29 @@ export default function Cube () {
   });
   // this state is directly manipulated by the user; all presentational
   const [display, setDisplay] = React.useState({
-    activeComponentCards: [],
     activeComponentID: 'mainboard',
-    activeComponentName: 'Mainboard',
-    activeComponentSize: null,
     filter: '',
-    filteredCards: [],
     view: 'Curve'
   });
   const editable = cube.creator._id === authentication.userId;
   const [selectedCard, setSelectedCard] = React.useState({});
+
+  const filterCards = React.useCallback((cards, text) => cards.filter(card => {
+    const wordArray = text.split(" ");
+    return (
+      wordArray.every(word => (
+        card.keywords.map(keyword => keyword.toLowerCase()).includes(word.toLowerCase()) ||
+        card.name.toLowerCase().includes(word.toLowerCase()) ||
+        card.type_line.toLowerCase().includes(word.toLowerCase())
+      ))
+    );
+  }), []);
 
   React.useEffect(() => {
     async function initialize () {
       await sendRequest({
         callback: (data) => {
           setCube(data);
-          setDisplay(prevState => ({
-            ...prevState,
-            activeComponentCards: [...data.mainboard],
-            filteredCards: [...data.mainboard]
-          }));
         },
         headers: { CubeID: cubeID },
         load: true,
@@ -190,36 +192,55 @@ export default function Cube () {
     });
   }, [cubeID, display.activeComponentID, sendRequest]);
 
+  const component = {};
+
+  if (display.activeComponentID === 'sideboard') {
+    component.displayedCards = filterCards(cube.sideboard, display.filter);
+    component.name = 'Sideboard';
+  } else if (cube.modules.find(module => module._id === display.activeComponentID)) {
+    const module = cube.modules.find(mdl => mdl._id === display.activeComponentID);
+    component.displayedCards = filterCards(module.cards, display.filter);
+    component.name = module.name;
+  } else if (cube.rotations.find(rotation => rotation._id === display.activeComponentID)) {
+    const rotation = cube.rotations.find(rtn => rtn._id === display.activeComponentID);
+    component.displayedCards = filterCards(rotation.cards, display.filter);
+    component.maxSize = rotation.cards.length;
+    component.name = rotation.name;
+    component.size = rotation.size;
+  } else {
+    component.displayedCards = filterCards(cube.mainboard, display.filter);
+    component.name = 'Mainboard';
+  }
+
   return (
     loading ?
       <LoadingSpinner /> :
       <React.Fragment>
         <EditCardModal card={selectedCard} clear={() => setSelectedCard({})} editable={editable} editCard={editCard} />
 
-        <CubeInfo creator={cube.creator} description={cube.description} name={cube.name} />
+        <CubeInfo creator={cube.creator} description={cube.description} editable={editable} name={cube.name} />
 
         <ComponentInfo
+          component={component}
           display={display}
           editable={editable}
-          mainboard={cube.mainboard}
-          modules={cube.modules}
-          rotations={cube.rotations}
+          modules={cube.modules.map(module => ({ _id: module._id, name: module.name }))}
+          rotations={cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))}
           setDisplay={setDisplay}
-          sideboard={cube.sideboard}
         />
 
         {editable &&
           <MUIPaper style={{ padding: '0 8px' }}>
             <ScryfallRequest
               buttonText="Add it!"
-              labelText={`Add a card to ${display.activeComponentName}`}
+              labelText={`Add a card to ${component.name}`}
               onSubmit={addCard}
             />
           </MUIPaper>
         }
-        {display.view === 'Curve' && <CurveView cards={display.filteredCards} setSelectedCard={setSelectedCard} />}
-        {display.view === 'List' && <ListView cards={display.filteredCards} editCard={editCard} />}
-        {display.view === 'Table' && <TableView cards={display.filteredCards} setSelectedCard={setSelectedCard} />}
+        {display.view === 'Curve' && <CurveView cards={component.displayedCards} setSelectedCard={setSelectedCard} />}
+        {display.view === 'List' && <ListView cards={component.displayedCards} editCard={editCard} />}
+        {display.view === 'Table' && <TableView cards={component.displayedCards} setSelectedCard={setSelectedCard} />}
 
       </React.Fragment>
   );
