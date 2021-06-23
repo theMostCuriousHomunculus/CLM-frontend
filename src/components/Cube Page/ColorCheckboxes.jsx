@@ -42,34 +42,33 @@ const useStyles = makeStyles({
   }
 });
 
-const ColorCheckboxes = (props) => {
+export default function ColorCheckboxes ({
+  colorIdentity,
+  handleColorIdentityChange
+}) {
 
-  const {
-    color_identity,
-    handleColorIdentityChange
-  } = props;
   const classes = useStyles();
 
   const colorObj = {
     "W": {
-      "icon": <WhiteManaSymbol className={classes.manaSymbol} />,
-      "checked": color_identity.includes("W")
+      "checked": colorIdentity.includes("W"),
+      "icon": <WhiteManaSymbol className={classes.manaSymbol} />
     },
     "U": {
-      "icon": <BlueManaSymbol className={classes.manaSymbol} />,
-      "checked": color_identity.includes("U")
+      "checked": colorIdentity.includes("U"),
+      "icon": <BlueManaSymbol className={classes.manaSymbol} />
     },
     "B": {
-      "icon": <BlackManaSymbol className={classes.manaSymbol} />,
-      "checked": color_identity.includes("B")
+      "checked": colorIdentity.includes("B"),
+      "icon": <BlackManaSymbol className={classes.manaSymbol} />
     },
     "R": {
-      "icon": <RedManaSymbol className={classes.manaSymbol} />,
-      "checked": color_identity.includes("R")
+      "checked": colorIdentity.includes("R"),
+      "icon": <RedManaSymbol className={classes.manaSymbol} />
     },
     "G": {
-      "icon": <GreenManaSymbol className={classes.manaSymbol} />,
-      "checked": color_identity.includes("G")
+      "checked": colorIdentity.includes("G"),
+      "icon": <GreenManaSymbol className={classes.manaSymbol} />
     }
   };
 
@@ -81,26 +80,21 @@ const ColorCheckboxes = (props) => {
       if (key !== color && value.checked) colors.push(key);
     }
 
-    handleColorIdentityChange({ color_identity: colors.sort() });
+    handleColorIdentityChange(colors.sort());
   }
-  
+
   return (
     <MUIGrid container justify="space-around">
-      {Array.from(Object.keys(colorObj)).map(function (color) {
-        return (
-          <MUIGrid className={classes.colorCheckboxContainer} item key={color} xs={4}>
-            <MUICheckbox
-              checked={colorObj[color]['checked']}
-              checkedIcon={colorObj[color]['icon']}
-              className={`${classes.colorCheckbox} ${classes[color]}`}
-              color="primary"
-              onChange={() => handleColorCheckboxClick(color)}
-            />
-          </MUIGrid>
-        );
-      })}
+      {Array.from(Object.keys(colorObj)).map(color => (
+        <MUIGrid className={classes.colorCheckboxContainer} item key={color} xs={4}>
+          <MUICheckbox
+            checked={colorObj[color].checked}
+            checkedIcon={colorObj[color].icon}
+            className={`${classes.colorCheckbox} ${classes[color]}`}
+            onChange={() => handleColorCheckboxClick(color)}
+          />
+        </MUIGrid>
+      ))}
     </MUIGrid>
   );
-}
-
-export default ColorCheckboxes;
+};

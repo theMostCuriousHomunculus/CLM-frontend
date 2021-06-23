@@ -6,31 +6,20 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
 export default function MoveDeleteMenu ({
-  activeComponentId = "",
-  activeComponentName = "",
-  handleMoveDelete = () => null,
-  listItemPrimaryText = "",
-  modules = [],
-  rotations = []
+  destination,
+  listItemPrimaryText,
+  modules,
+  rotations,
+  setDestination
 }) {
 
   const allComponents = [
-    { name: 'Mainboard', _id: 'mainboard' },
-    { name: 'Sideboard', _id: 'sideboard' },
+    { _id: 'mainboard', name: 'Mainboard' },
+    { _id: 'sideboard', name: 'Sideboard' },
     ...modules,
     ...rotations
   ];
   const [anchorEl, setAnchorEl] = React.useState();
-  const [selectedComponent, setSelectedComponent] = React.useState({
-    _id: activeComponentId,
-    name: activeComponentName
-  });
-
-  function handleMenuItemClick (destination) {
-    setAnchorEl(null);
-    setSelectedComponent(destination);
-    handleMoveDelete(destination._id);
-  }
 
   return (
     <React.Fragment>
@@ -43,7 +32,7 @@ export default function MoveDeleteMenu ({
         >
           <MUIListItemText
             primary={listItemPrimaryText}
-            secondary={selectedComponent.name}
+            secondary={destination.name}
           />
         </MUIListItem>
       </MUIList>
@@ -55,16 +44,23 @@ export default function MoveDeleteMenu ({
         onClose={() => setAnchorEl(null)}
       >
         {allComponents.map((component) => (
-            <MUIMenuItem
-              key={component._id}
-              onClick={() => handleMenuItemClick({ _id: component._id, name: component.name })}
-              selected={selectedComponent._id === component._id}
-            >
-              {component.name}
-            </MUIMenuItem>
-          ))
-        }
-        <MUIMenuItem onClick={() => handleMenuItemClick({ _id: null, name: null })}>
+          <MUIMenuItem
+            key={component._id}
+            onClick={() => {
+              setAnchorEl(null);
+              setDestination({ _id: component._id, name: component.name });
+            }}
+            selected={destination._id === component._id}
+          >
+            {component.name}
+          </MUIMenuItem>
+        ))}
+        <MUIMenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            setDestination({ _id: null, name: null });
+          }}
+        >
           Delete from Cube
         </MUIMenuItem>
       </MUIMenu>

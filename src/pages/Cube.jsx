@@ -8,7 +8,7 @@ import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
 import EditCardModal from '../components/Cube Page/EditCardModal';
-import ListView from '../components/Cube Page/ListView';
+// import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
@@ -42,7 +42,7 @@ export default function Cube () {
     view: 'Curve'
   });
   const editable = cube.creator._id === authentication.userId;
-  const [selectedCard, setSelectedCard] = React.useState({});
+  const [selectedCard, setSelectedCard] = React.useState();
 
   const filterCards = React.useCallback((cards, text) => cards.filter(card => {
     const wordArray = text.split(" ");
@@ -169,6 +169,28 @@ export default function Cube () {
     });
   }, [cubeID, display.activeComponentID, sendRequest]);
 
+  const deleteCard = React.useCallback(async function (cardID, destinationID) {
+    await sendRequest({
+      headers: { CubeID: cubeID },
+      operation: 'deleteCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cardID: "${cardID}",
+                  ${destinationID ? 'destinationID: "' + destinationID + '",' : ''}
+                  originID: "${display.activeComponentID}"
+                }
+              )
+            }
+          `
+        }
+      }
+    });
+  }, [cubeID, display.activeComponentID, sendRequest]);
+
   const editCard = React.useCallback(async function (changes) {
     await sendRequest({
       headers: { CubeID: cubeID },
@@ -216,7 +238,19 @@ export default function Cube () {
     loading ?
       <LoadingSpinner /> :
       <React.Fragment>
-        <EditCardModal card={selectedCard} clear={() => setSelectedCard({})} editable={editable} editCard={editCard} />
+        {selectedCard &&
+          <EditCardModal
+            activeComponentID={display.activeComponentID}
+            activeComponentName={component.name}
+            card={selectedCard}
+            clear={() => setSelectedCard()}
+            deleteCard={deleteCard}
+            editable={editable}
+            editCard={editCard}
+            modules={cube.modules.map(module => ({ _id: module._id, name: module.name }))}
+            rotations={cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))}
+          />
+        }
 
         <CubeInfo creator={cube.creator} description={cube.description} editable={editable} name={cube.name} />
 
@@ -225,7 +259,7 @@ export default function Cube () {
           display={display}
           editable={editable}
           modules={cube.modules.map(module => ({ _id: module._id, name: module.name }))}
-          rotations={cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))}
+          rotations={cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name, size: rotation.size }))}
           setDisplay={setDisplay}
         />
 
@@ -239,7 +273,7 @@ export default function Cube () {
           </MUIPaper>
         }
         {display.view === 'Curve' && <CurveView cards={component.displayedCards} setSelectedCard={setSelectedCard} />}
-        {display.view === 'List' && <ListView cards={component.displayedCards} editCard={editCard} />}
+        {/*display.view === 'List' && <ListView cards={component.displayedCards} editCard={editCard} />*/}
         {display.view === 'Table' && <TableView cards={component.displayedCards} setSelectedCard={setSelectedCard} />}
 
       </React.Fragment>

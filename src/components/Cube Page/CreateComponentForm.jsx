@@ -12,21 +12,78 @@ import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITextField from '@material-ui/core/TextField';
 import { useParams } from 'react-router-dom';
 
+import useRequest from '../../hooks/request-hook';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
 
 export default function CreateComponentForm ({
   open,
+  setDisplay,
   toggleOpen
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
-  const cubeId = useParams().cubeId;
-  const [newComponentName, setNewComponentName] = React.useState('');
-  const [newComponentType, setNewComponentType] = React.useState();
+  const cubeID = useParams().cubeId;
+  const { sendRequest } = useRequest();
+  const nameInput = React.useRef();
+  const [newComponentType, setNewComponentType] = React.useState('module');
 
   async function addComponent () {
-    
+    if (newComponentType === 'module') {
+      await sendRequest({
+        callback: (data) => {
+          setDisplay(prevState => ({
+            ...prevState,
+            activeComponentID: data.modules[data.modules.length - 1]
+          }));
+        },
+        headers: {
+          CubeID: cubeID
+        },
+        operation: 'createModule',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(name: "${nameInput.current.value}") {
+                  modules {
+                    _id
+                  }
+                }
+              }
+            `
+          }
+        }
+      });
+    }
+
+    if (newComponentType === 'rotation') {
+      await sendRequest({
+        callback: (data) => {
+          setDisplay(prevState => ({
+            ...prevState,
+            activeComponentID: data.rotations[data.rotations.length - 1]
+          }));
+        },
+        headers: {
+          CubeID: cubeID
+        },
+        operation: 'createRotation',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(name: "${nameInput.current.value}") {
+                  rotations {
+                    _id
+                  }
+                }
+              }
+            `
+          }
+        }
+      });
+    }
+
+    toggleOpen();
   }
 
   return (
@@ -38,12 +95,11 @@ export default function CreateComponentForm ({
           autoComplete="off"
           autoFocus
           fullWidth
+          inputRef={nameInput}
           label="New Component Name"
           margin="dense"
-          onChange={(event) => setNewComponentName(event.target.value)}
           required={true}
           type="text"
-          value={newComponentName}
           variant="outlined"
         />
 
@@ -61,15 +117,12 @@ export default function CreateComponentForm ({
 
       </MUIDialogContent>
       <MUIDialogActions>
-
-        <WarningButton onClick={toggleOpen}>
-          Cancel
-        </WarningButton>
-
         <MUIButton color="primary" onClick={addComponent} size="small" variant="contained">
           Create!
         </MUIButton>
-
+        <WarningButton onClick={toggleOpen}>
+          Cancel
+        </WarningButton>
       </MUIDialogActions>
     </MUIDialog>
   );

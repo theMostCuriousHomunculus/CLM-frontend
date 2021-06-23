@@ -14,11 +14,54 @@ import WarningButton from '../miscellaneous/WarningButton';
 import MoveDeleteMenu from './MoveDeleteMenu';
 
 export default function EditCardModal ({
+  activeComponentID,
+  activeComponentName,
   card,
   clear,
+  deleteCard,
   editable,
-  editCard
+  editCard,
+  modules,
+  rotations
 }) {
+
+  const cmcInput = React.useRef();
+  const typeInput = React.useRef();
+  const [colorIdentity, setColorIdentity] = React.useState([...card.color_identity]);
+  const [destination, setDestination] = React.useState({ _id: activeComponentID, name: activeComponentName });
+  const [printingDetails, setPrintingDetails] = React.useState({
+    back_image: card.back_image,
+    image: card.image,
+    mtgo_id: card.mtgo_id,
+    printing: card.printing,
+    purchase_link: card.purchase_link
+  });
+
+  const submitForm = React.useCallback(async event => {
+    event.preventDefault();
+
+    if (
+      card.cmc !== parseInt(cmcInput.current.value) ||
+      card.color_identity.toString() !== colorIdentity.toString() ||
+      card.type_line !== typeInput.current.value ||
+      printingDetails.toString() !== {
+        back_image: card.back_image,
+        image: card.image,
+        mtgo_id: card.mtgo_id,
+        printing: card.printing,
+        purchase_link: card.purchase_link
+      }.toString()
+    ) {
+      await editCard(`cardID: "${card._id}",\n${printingDetails.back_image ? 'back_image: "' + printingDetails.back_image + '",\n' : ''}cmc: ${parseInt(cmcInput.current.value)},\ncolor_identity: [${colorIdentity.map(ci => '"' + ci + '"')}],\nimage: "${printingDetails.image}",\n${Number.isInteger(printingDetails.mtgo_id) ? 'mtgo_id: ' + printingDetails.mtgo_id + ',\n' : ''}printing: "${printingDetails.printing}",\npurchase_link: "${printingDetails.purchase_link}"\ntype_line: "${typeInput.current.value}"`);
+    }
+    
+    if (activeComponentID !== destination._id) {
+      deleteCard(card._id, destination._id);
+    }
+
+    clear();
+
+  }, [activeComponentID, card, clear, colorIdentity, deleteCard, destination._id, editCard, printingDetails]);
 
   return (
     <MUIDialog
@@ -26,7 +69,7 @@ export default function EditCardModal ({
       open={Object.keys(card).length > 0}
     >
       {Object.keys(card).length > 0 &&
-        <React.Fragment>
+        <form onSubmit={submitForm}>
           <MUIDialogTitle>{editable ? "Edit Card" : card.name}</MUIDialogTitle>
           <MUIDialogContent>
             <MUIGrid container={true} spacing={1}>
@@ -39,8 +82,8 @@ export default function EditCardModal ({
               <MUIGrid item={true} xs={12} md={6}>
                 <MUIDialogContentText>Color Identity:</MUIDialogContentText>
                 <ColorCheckboxes
-                  color_identity={card.color_identity}
-                  handleColorIdentityChange={/*(details) => setColorIdentity(details.color_identity)*/() => null}
+                  colorIdentity={colorIdentity}
+                  handleColorIdentityChange={ci => setColorIdentity([...ci])}
                 />
                 <MUITextField
                   defaultValue={card.cmc}
@@ -49,6 +92,7 @@ export default function EditCardModal ({
                     min: 0,
                     step: 1
                   }}
+                  inputRef={cmcInput}
                   label="CMC"
                   margin="dense"
                   type="number"
@@ -58,20 +102,22 @@ export default function EditCardModal ({
                   autoComplete="off"
                   defaultValue={card.type_line}
                   fullWidth
+                  inputRef={typeInput}
                   label="Card Type"
                   margin="dense"
                   type="text"
                   variant="outlined"
                 />
                 <MoveDeleteMenu
-                  handleMoveDelete={(details) => /*setCubeComponent(details)*/() => null}
+                  destination={destination}
                   listItemPrimaryText="Cube Component"
+                  modules={modules}
+                  rotations={rotations}
+                  setDestination={setDestination}
                 />
                 <ChangePrintMenu
-                  handlePrintingChange={(details) => /*setPrintingDetails(details)*/() => null}
-                  listItemPrimaryText="Printing"
-                  oracle_id={card.oracle_id}
-                  printing={card.printing}
+                  card={card}
+                  handlePrintingChange={(pd) => setPrintingDetails({ ...pd })}
                 />
               </MUIGrid>
             </MUIGrid>
@@ -79,15 +125,15 @@ export default function EditCardModal ({
           <MUIDialogActions>
             <MUIButton
               color="primary"
-              onClick={() => null}
               size="small"
+              type="submit"
               variant="contained"
             >
               Submit Changes
             </MUIButton>
-            <WarningButton onClick={clear}>Discard Changes</WarningButton>
+            <WarningButton onClick={clear} type="button">Discard Changes</WarningButton>
           </MUIDialogActions>
-        </React.Fragment>
+        </form>
       }
     </MUIDialog>
   );

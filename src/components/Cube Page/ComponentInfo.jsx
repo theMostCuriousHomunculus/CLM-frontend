@@ -62,20 +62,22 @@ export default function ComponentInfo ({
 
   const classes = useStyles();
   const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
-  const componentNameRef = React.useRef();
+  const [componentName, setComponentName] = React.useState(component.name);
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
-  const rotationSizeRef = React.useRef();
+  const [componentSize, setComponentSize] = React.useState(component.size);
   const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
 
   async function deleteComponent () {
 
   }
 
-  const handleComponentMenuItemClick = (componentID) => {
+  const handleComponentMenuItemClick = ({ _id, name, size }) => {
     setDisplay(prevState => ({
       ...prevState,
-      activeComponentID: componentID
+      activeComponentID: _id
     }));
+    setComponentName(name);
+    setComponentSize(size);
     setComponentAnchorEl(null);
   };
 
@@ -88,6 +90,7 @@ export default function ComponentInfo ({
 
       <CreateComponentForm
         open={dialogIsOpen}
+        setDisplay={setDisplay}
         toggleOpen={() => setDialogIsOpen(prevState => !prevState)}
       />
     
@@ -101,13 +104,13 @@ export default function ComponentInfo ({
             <MUITextField
               autoComplete="off"
               inputProps={{
-                defaultValue: component.name,
                 onBlur: submitComponentChanges
               }}
-              inputRef={componentNameRef}
               label="Active Component"
               margin="dense"
+              onChange={event => setComponentName(event.target.value)}
               type="text"
+              value={componentName}
               variant="outlined"
             /> :
             <MUITypography variant="subtitle1">{component.name}</MUITypography>
@@ -143,7 +146,7 @@ export default function ComponentInfo ({
                   ].map(component => (
                     <MUIMenuItem
                       key={component._id}
-                      onClick={() => handleComponentMenuItemClick(component._id)}
+                      onClick={() => handleComponentMenuItemClick({ _id: component._id, name: component.name, size: component.size })}
                       selected={display.activeComponentID === component._id}
                     >
                       {component.name}
@@ -210,20 +213,20 @@ export default function ComponentInfo ({
               className={classes.rotationSizeField}
               label="Size"
               inputProps={{
-                defaultValue: component.size,
                 max: component.maxSize,
                 min: 0,
                 onBlur: submitComponentChanges,
                 step: 1
               }}
-              inputRef={rotationSizeRef}
               margin="dense"
+              onChange={event => setComponentSize(event.target.value)}
               type="number"
+              value={componentSize}
               variant="outlined"
             />
           }
 
-          {editable && Number.isInteger(component.size) &&
+          {!editable && Number.isInteger(component.size) &&
             <MUITypography variant="subtitle1">Rotation Size: {component.size}</MUITypography>
           }
 
