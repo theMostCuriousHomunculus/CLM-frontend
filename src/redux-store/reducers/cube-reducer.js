@@ -286,7 +286,7 @@ function filterCards (activeComponentCards, filterText) {
     return (
       wordArray.every(function (word) {
         return (
-          card.keywords.find((keyword) => keyword.toLowerCase().includes(word.toLowerCase())) ||
+          card.keywords.find(keyword => keyword.toLowerCase().includes(word.toLowerCase())) ||
           card.name.toLowerCase().includes(word.toLowerCase()) ||
           card.type_line.toLowerCase().includes(word.toLowerCase())
         );

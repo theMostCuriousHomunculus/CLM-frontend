@@ -7,6 +7,7 @@ import useRequest from '../hooks/request-hook';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
 import CurveView from '../components/Cube Page/CurveView';
+import EditCardModal from '../components/Cube Page/EditCardModal';
 import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -44,6 +45,8 @@ export default function Cube () {
     filteredCards: [],
     view: 'Curve'
   });
+  const editable = cube.creator._id === authentication.userId;
+  const [selectedCard, setSelectedCard] = React.useState({});
 
   React.useEffect(() => {
     async function initialize () {
@@ -52,9 +55,9 @@ export default function Cube () {
           setCube(data);
           setDisplay(prevState => ({
             ...prevState,
-            activeComponentCards: data.mainboard,
+            activeComponentCards: [...data.mainboard],
             filteredCards: [...data.mainboard]
-          }))
+          }));
         },
         headers: { CubeID: cubeID },
         load: true,
@@ -137,21 +140,21 @@ export default function Cube () {
               ${this.operation}(
                 input: {
                   componentID: "${display.activeComponentID}",
-                  back_image: "${back_image}",
-                  chapters: ${chapters},
-                  cmc: ${cmc},
+                  ${back_image ? 'back_image: "' + back_image + '",' : ''}
+                  ${Number.isInteger(chapters) ? 'chapters: ' + chapters + ',' : ''}
+                  ${Number.isInteger(cmc) ? 'cmc: ' + cmc + ',' : ''}
                   color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
                   image: "${image}",
                   keywords: [${keywords.map(kw => '"' + kw + '"')}],
-                  loyalty: ${loyalty},
+                  ${Number.isInteger(loyalty) ? 'loyalty: ' + loyalty + ',' : ''}
                   mana_cost: "${mana_cost}",
-                  mtgo_id: ${mtgo_id},
-                  name: ${name},
+                  ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''}
+                  name: "${name}",
                   oracle_id: "${oracle_id}",
-                  power: ${power},
+                  ${Number.isInteger(power) ? 'power: ' + power + ',' : ''}
                   printing: "${printing}",
                   purchase_link: "${purchase_link}",
-                  toughness: ${toughness},
+                  ${Number.isInteger(toughness) ? 'toughness: ' + toughness + ',' : ''},
                   type_line: "${type_line}"
                 }
               ) {
@@ -191,11 +194,21 @@ export default function Cube () {
     loading ?
       <LoadingSpinner /> :
       <React.Fragment>
+        <EditCardModal card={selectedCard} clear={() => setSelectedCard({})} editable={editable} editCard={editCard} />
+
         <CubeInfo creator={cube.creator} description={cube.description} name={cube.name} />
 
-        {/*<ComponentInfo cube={cube} display={display} setDisplay={setDisplay} />*/}
+        <ComponentInfo
+          display={display}
+          editable={editable}
+          mainboard={cube.mainboard}
+          modules={cube.modules}
+          rotations={cube.rotations}
+          setDisplay={setDisplay}
+          sideboard={cube.sideboard}
+        />
 
-        {authentication.userId === cube.creator._id && /*<ScryfallRequestHackyWorkAround />*/
+        {editable &&
           <MUIPaper style={{ padding: '0 8px' }}>
             <ScryfallRequest
               buttonText="Add it!"
@@ -204,9 +217,9 @@ export default function Cube () {
             />
           </MUIPaper>
         }
-        {display.view === 'Curve' && <CurveView cards={display.filteredCards} editCard={editCard} />}
+        {display.view === 'Curve' && <CurveView cards={display.filteredCards} setSelectedCard={setSelectedCard} />}
         {display.view === 'List' && <ListView cards={display.filteredCards} editCard={editCard} />}
-        {display.view === 'Table' && <TableView cards={display.filteredCards} editCard={editCard} />}
+        {display.view === 'Table' && <TableView cards={display.filteredCards} setSelectedCard={setSelectedCard} />}
 
       </React.Fragment>
   );

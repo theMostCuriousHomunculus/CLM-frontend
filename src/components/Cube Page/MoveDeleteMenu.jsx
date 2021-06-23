@@ -4,15 +4,14 @@ import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
-import { connect } from 'react-redux';
 
-function MoveDeleteMenu ({
-  activeComponentId,
-  activeComponentName,
-  handleMoveDelete,
-  listItemPrimaryText,
-  modules,
-  rotations
+export default function MoveDeleteMenu ({
+  activeComponentId = "",
+  activeComponentName = "",
+  handleMoveDelete = () => null,
+  listItemPrimaryText = "",
+  modules = [],
+  rotations = []
 }) {
 
   const allComponents = [
@@ -40,7 +39,7 @@ function MoveDeleteMenu ({
           button
           aria-haspopup="true"
           aria-controls="lock-menu"
-          onClick={(event) => setAnchorEl(event.currentTarget)}
+          onClick={event => setAnchorEl(event.currentTarget)}
         >
           <MUIListItemText
             primary={listItemPrimaryText}
@@ -71,15 +70,4 @@ function MoveDeleteMenu ({
       </MUIMenu>
     </React.Fragment>
   );
-}
-
-function mapStateToProps (state) {
-  return {
-    activeComponentId: state.active_component_id,
-    activeComponentName: state.active_component_name,
-    modules: state.cube.modules.map(module => ({ _id: module._id, name: module.name})),
-    rotations: state.cube.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))
-  };
-}
-
-export default connect(mapStateToProps, null)(MoveDeleteMenu);
+};

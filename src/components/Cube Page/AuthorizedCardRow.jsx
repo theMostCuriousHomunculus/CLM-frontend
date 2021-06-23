@@ -1,16 +1,11 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import MUITextField from '@material-ui/core/TextField';
-import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import MoveDeleteMenu from './MoveDeleteMenu';
-import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { ErrorContext } from '../../contexts/error-context';
-import { deleteCard } from '../../requests/REST/cube-requests';
 import { ReactComponent as TCGPlayerLogo } from '../../svgs/tcgplayer-logo-full-color.svg';
 
 
@@ -22,8 +17,7 @@ const useStyles = makeStyles({
   }
 });
 
-const AuthorizedCardRow = ({
-  activeComponentId,
+export default function AuthorizedCardRow ({
   card: {
     _id,
     back_image,
@@ -36,26 +30,14 @@ const AuthorizedCardRow = ({
     purchase_link,
     type_line
   },
-  columnWidths,
-  dispatchEditCard,
-  dispatchMoveOrDeleteCard,
-  hidePreview,
-  showPreview,
-  submitCardChange
-}) => {
+  columnWidths
+}) {
 
   const authentication = React.useContext(AuthenticationContext);
-  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
-  const cubeId = useParams().cubeId;
 
   async function moveDeleteCard (destination) {
-    try {
-      await deleteCard(_id, activeComponentId, cubeId, authentication.token, destination);
-      dispatchMoveOrDeleteCard({ cardId: _id, destination });
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
+
   }
 
   return (
@@ -65,8 +47,6 @@ const AuthorizedCardRow = ({
         back_image={back_image}
         className={classes.tableCell}
         image={image}
-        onMouseOut={hidePreview}
-        onMouseOver={showPreview}
         style={{ cursor: "default", width: columnWidths[0] }}
       >
         {name}
@@ -75,8 +55,7 @@ const AuthorizedCardRow = ({
         <ColorCheckboxes
           color_identity={color_identity}
           handleColorIdentityChange={(details) => {
-            submitCardChange(_id, details);
-            dispatchEditCard({ cardId: _id, ...details });
+
           }}
         />
       </div>
@@ -87,8 +66,7 @@ const AuthorizedCardRow = ({
             max: 16,
             min: 0,
             onBlur: (event) => {
-              submitCardChange(_id, { cmc: parseInt(event.target.value) });
-              dispatchEditCard({ cardId: _id, cmc: parseInt(event.target.value) })
+
             },
             step: 1
           }}
@@ -103,8 +81,7 @@ const AuthorizedCardRow = ({
           defaultValue={type_line}
           inputProps={{
             onBlur: (event) => {
-              submitCardChange(_id, { type_line: event.target.value });
-              dispatchEditCard({ cardId: _id, type_line: event.target.value });
+
             }
           }}
           margin="dense"
@@ -120,13 +97,10 @@ const AuthorizedCardRow = ({
       <div className={classes.tableCell} style={{ width: columnWidths[5] }}>
         <ChangePrintMenu
           handlePrintingChange={(details) => {
-            submitCardChange(_id, details);
-            dispatchEditCard({ cardId: _id, ...details });
+
           }}
-          hidePreview={hidePreview}
           oracle_id={oracle_id}
           printing={printing}
-          showPreview={showPreview}
         />
       </div>
       <div className={classes.tableCell} style={{ width: columnWidths[6] }}>
@@ -136,20 +110,4 @@ const AuthorizedCardRow = ({
       </div>
     </React.Fragment>
   );
-}
-
-function mapStateToProps (state, ownProps) {
-  return {
-    activeComponentId: state.active_component_id,
-    card: state.displayed_cards[ownProps.index]
-  };
-}
-
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchEditCard: (payload) => dispatch(actionCreators.edit_card(payload)),
-    dispatchMoveOrDeleteCard: (payload) => dispatch(actionCreators.move_or_delete_card(payload))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(React.memo(AuthorizedCardRow));
+};

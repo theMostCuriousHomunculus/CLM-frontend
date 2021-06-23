@@ -13,11 +13,10 @@ import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 
 import CreateComponentForm from './CreateComponentForm';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const useStyles = makeStyles({
   cardActions: {
@@ -54,14 +53,19 @@ const useStyles = makeStyles({
 });
 
 export default function ComponentInfo ({
-  
+  display,
+  editable,
+  mainboard,
+  modules,
+  rotations,
+  setDisplay,
+  sideboard
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
   const componentNameRef = React.useRef();
-  const cubeID = useParams().cubeId;
+  // const cubeID = useParams().cubeId;
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
   const rotationSizeRef = React.useRef();
   const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
@@ -70,14 +74,55 @@ export default function ComponentInfo ({
 
   }
 
-  const handleMenuItemClickComponent = (component_id) => {
+  const filterCards = React.useCallback((cards, text) => cards.filter(card => {
+    const wordArray = text.split(" ");
+    return (
+      wordArray.every(word => (
+        card.keywords.map(keyword => keyword.toLowerCase()).includes(word.toLowerCase()) ||
+        card.name.toLowerCase().includes(word.toLowerCase()) ||
+        card.type_line.toLowerCase().includes(word.toLowerCase())
+      ))
+    );
+  }), []);
 
+  const handleComponentMenuItemClick = (componentID, type) => {
+    let activeComponentID, activeComponentCards, activeComponentName, activeComponentSize;
+    
+    if (componentID === 'sideboard') {
+      activeComponentID = 'sideboard';
+      activeComponentCards = [...sideboard];
+      activeComponentName = 'Sideboard';
+      activeComponentSize = null;
+    } else if (type === 'module') {
+      const component = modules.find(module => module._id === componentID);
+      activeComponentID = component._id;
+      activeComponentCards = [...component.cards];
+      activeComponentName = component.name;
+      activeComponentSize = null;
+    } else if (type === 'rotation') {
+      const component = rotations.find(rotation => rotation._id === componentID);
+      activeComponentID = component._id;
+      activeComponentCards = [...component.cards];
+      activeComponentName = component.name;
+      activeComponentSize = component.size;
+    } else {
+      activeComponentID = 'mainboard';
+      activeComponentCards = [...mainboard];
+      activeComponentName = 'Mainboard';
+      activeComponentSize = null;
+    }
+
+    const filteredCards = filterCards(activeComponentCards, display.filter);
+
+    setDisplay(prevState => ({
+      ...prevState,
+      activeComponentID,
+      activeComponentCards,
+      activeComponentName,
+      activeComponentSize,
+      filteredCards
+    }));
     setComponentAnchorEl(null);
-  };
-
-  const handleMenuItemClickView = (event) => {
-
-    setViewAnchorEl(null);
   };
 
   async function submitComponentChanges () {
@@ -89,29 +134,29 @@ export default function ComponentInfo ({
 
       <CreateComponentForm
         open={dialogIsOpen}
-        toggleOpen={() => setDialogIsOpen(false)}
+        toggleOpen={() => setDialogIsOpen(prevState => !prevState)}
       />
     
       <MUICard>
         <MUICardHeader
           className={classes.cardHeader}
           disableTypography={true}
-          title={(authentication.userId === creator._id &&
-            activeComponentType !== 'builtIn') ?
+          title={(editable &&
+            display.activeComponentID !== 'mainboard' &&
+            display.activeComponentID !== 'sideboard') ?
             <MUITextField
               autoComplete="off"
               inputProps={{
-                defaultValue: activeComponentName,
+                defaultValue: display.activeComponentName,
                 onBlur: submitComponentChanges
               }}
               inputRef={componentNameRef}
               label="Active Component"
               margin="dense"
-              onChange={(event) => dispatchChangeComponentName(event.target.value)}
               type="text"
               variant="outlined"
             /> :
-            <MUITypography variant="subtitle1">{activeComponentName}</MUITypography>
+            <MUITypography variant="subtitle1">{display.activeComponentName}</MUITypography>
           }
           action={
             <React.Fragment>
@@ -124,8 +169,8 @@ export default function ComponentInfo ({
                     onClick={(event) => setComponentAnchorEl(event.currentTarget)}
                   >
                     <MUIListItemText
-                      primary="Switch Component"
-                      secondary={activeComponentName}
+                      primary="Viewing"
+                      secondary={display.activeComponentName}
                     />
                   </MUIListItem>
                 </MUIList>
@@ -136,23 +181,20 @@ export default function ComponentInfo ({
                   open={Boolean(componentAnchorEl)}
                   onClose={() => setComponentAnchorEl(null)}
                 >
-                  {[{ name: 'Mainboard', _id: 'mainboard' },
-                    { name: 'Sideboard', _id: 'sideboard' },
-                    ...cube.modules.map(function (module) {
-                      return { name: module.name, _id: module._id };
-                    }),
-                    ...cube.rotations.map(function (rotation) {
-                      return { name: rotation.name, _id: rotation._id };
-                    })].map((component) => (
-                      <MUIMenuItem
-                        key={component._id}
-                        onClick={() => handleMenuItemClickComponent(component._id)}
-                        selected={component.active_component_id === component._id}
-                      >
-                        {component.name}
-                      </MUIMenuItem>
-                    ))
-                  }
+                  {[
+                    { _id: 'mainboard', name: 'Mainboard' },
+                    { _id: 'sideboard', name: 'Sideboard' },
+                    ...modules.map(module => ({ _id: module._id, name: module.name, type: 'module' })),
+                    ...rotations.map(rotation => ({ _id: rotation._id, name: rotation.name, type: 'rotation' }))
+                  ].map(component => (
+                    <MUIMenuItem
+                      key={component._id}
+                      onClick={() => handleComponentMenuItemClick(component._id, component.type)}
+                      selected={display.activeComponentID === component._id}
+                    >
+                      {component.name}
+                    </MUIMenuItem>
+                  ))}
                 </MUIMenu>
               </div>
               <div className={classes.listContainer}>
@@ -164,8 +206,8 @@ export default function ComponentInfo ({
                     onClick={(event) => setViewAnchorEl(event.currentTarget)}
                   >
                     <MUIListItemText
-                      primary="View Mode"
-                      secondary={viewMode}
+                      primary="Display"
+                      secondary={display.view}
                     />
                   </MUIListItem>
                 </MUIList>
@@ -176,11 +218,17 @@ export default function ComponentInfo ({
                   open={Boolean(viewAnchorEl)}
                   onClose={() => setViewAnchorEl(null)}
                 >
-                  {["Curve", "List", "Table"].map((option) => (
+                  {["Curve", "List", "Table"].map(option => (
                     <MUIMenuItem
                       key={option}
-                      onClick={handleMenuItemClickView}
-                      selected={option === viewMode}
+                      onClick={() => {
+                        setDisplay(prevState => ({
+                          ...prevState,
+                          view: option
+                        }));
+                        setViewAnchorEl(null);
+                      }}
+                      selected={option === display.view}
                     >
                       {option}
                     </MUIMenuItem>
@@ -192,7 +240,7 @@ export default function ComponentInfo ({
         />
 
         <MUICardContent className={classes.cardContent}>
-          {authentication.userId === creator._id &&
+          {editable &&
             <MUIButton
               color="primary"
               onClick={() => setDialogIsOpen(true)}
@@ -203,55 +251,54 @@ export default function ComponentInfo ({
             </MUIButton>
           }
 
-          {activeComponentType === 'rotation' &&
-            authentication.userId === creator._id &&
+          {editable && Number.isInteger(display.activeComponentSize) &&
             <MUITextField
               className={classes.rotationSizeField}
               label="Size"
               inputProps={{
-                defaultValue: activeRotationSize,
-                max: activeComponentCards.length,
+                defaultValue: display.activeRotationSize,
+                max: display.activeComponentCards.length,
                 min: 0,
                 onBlur: submitComponentChanges,
                 step: 1
               }}
               inputRef={rotationSizeRef}
               margin="dense"
-              onChange={(event) => dispatchChangeRotationSize(parseInt(event.target.value))}
               type="number"
               variant="outlined"
             />
           }
 
-          {activeComponentType === 'rotation' &&
-            authentication.userId !== creator._id &&
-            <MUITypography variant="subtitle1">Rotation Size: {activeRotationSize}</MUITypography>
+          {editable && Number.isInteger(display.activeComponentSize) &&
+            <MUITypography variant="subtitle1">Rotation Size: {display.activeComponentSize}</MUITypography>
           }
 
-          {authentication.userId === creator._id &&
-            activeComponentType !== 'builtIn' &&
-            <WarningButton
-              onClick={deleteComponent}
-              startIcon={<MUIDeleteForeverIcon />}
-            >
-              Delete this {activeComponentType === 'module' ? 'Module' : 'Rotation'}
+          {editable && display.activeComponentID !== 'mainboard' && display.activeComponentID !== 'sideboard' &&
+            <WarningButton onClick={deleteComponent} startIcon={<MUIDeleteForeverIcon />}>
+              Delete this {Number.isInteger(display.activeComponentSize) ? 'Rotation' : 'Module'}
             </WarningButton>
           }
         </MUICardContent>
 
         <MUICardActions className={classes.cardActions}>
           <MUITypography variant="subtitle1">
-            Matches: <strong>{displayedCards.length}</strong>
+            Matches: <strong>{display.filteredCards.length}</strong>
           </MUITypography>
           <MUITextField
             autoComplete="off"
             fullWidth
-            id="search-filter"
             label="Filter by keywords, name or type"
             margin="dense"
-            onChange={(event) => dispatchFilterCards(event.target.value)}
+            onChange={event => {
+              event.persist();
+              setDisplay(prevState => ({
+                ...prevState,
+                filter: event.target.value,
+                filteredCards: filterCards(prevState.activeComponentCards, event.target.value)
+              }));
+            }}
             type="text"
-            value={filter}
+            value={display.filter}
             variant="outlined"
           />
         </MUICardActions>

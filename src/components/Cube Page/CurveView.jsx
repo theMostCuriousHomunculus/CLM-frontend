@@ -75,7 +75,10 @@ const useStyles = makeStyles({
   }
 });
 
-export default function CurveView ({ cards }) {
+export default function CurveView ({
+  cards,
+  setSelectedCard
+}) {
 
   const classes = useStyles();
 
@@ -87,40 +90,43 @@ export default function CurveView ({ cards }) {
           <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor)} key={`curve-${color.name}`}>
             <MUICardHeader
               disableTypography={true}
-              title={<MUITypography variant="subtitle1">{color.name}</MUITypography>}
+              title={<MUITypography variant="h5">{color.name}</MUITypography>}
             />
-            <MUICardContent>
+            <MUICardContent style={{ overflowX: 'auto' }}>
               {[true, false].map(function (isCreature) {
                 const cards_color_isCreature = cards_color.filter(function (card) {
                   return isCreature ? cardType(card.type_line) === "Creature" : cardType(card.type_line) !== "Creature";
                 });
                 return (
                   <React.Fragment key={isCreature ? "a" : "b"}>
-                    <MUITypography variant="subtitle2">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
+                    <MUITypography variant="subtitle1">{isCreature ? "Creature" : "Non-Creature"}</MUITypography>
                     <div className={classes.curveViewTypeContainer}>
                       {[0, 1, 2, 3, 4, 5, 6, 7].map(function (cost) {
                         const cards_color_isCreature_cost = cards_color_isCreature.filter(function (card) {
                           return card.cmc === cost || (cost === 7 && card.cmc > cost);
                         });
                         return (
-                          <div key={cost}>
+                          <div key={cost} style={{ display: 'flex', flexDirection: 'column' }}>
                             <MUITypography variant="subtitle2">{cost} CMC</MUITypography>
-                            {customSort(cards_color_isCreature_cost, ['name']).map(function (card) {
-                              return (
-                                <div key={card._id}>
-                                  <HoverPreview>
-                                    <MUITypography
-                                      back_image={card.back_image}
-                                      image={card.image}
-                                      style={{ cursor: 'default' }}
-                                      variant="body2"
-                                    >
-                                      {card.name}
-                                    </MUITypography>
-                                  </HoverPreview>
-                                </div>
-                              );
-                            })}
+                            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'flex-end' }}>
+                              {customSort(cards_color_isCreature_cost, ['name']).map(function (card) {
+                                return (
+                                  <span key={card._id}>
+                                    <HoverPreview>
+                                      <MUITypography
+                                        back_image={card.back_image}
+                                        image={card.image}
+                                        onDoubleClick={() => setSelectedCard(card)}
+                                        style={{ cursor: 'pointer' }}
+                                        variant="body1"
+                                      >
+                                        {card.name}
+                                      </MUITypography>
+                                    </HoverPreview>
+                                  </span>
+                                );
+                              })}
+                            </div>
                           </div>
                         );
                       })}

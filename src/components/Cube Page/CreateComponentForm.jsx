@@ -10,16 +10,12 @@ import MUIFormLabel from '@material-ui/core/FormLabel';
 import MUIRadio from '@material-ui/core/Radio';
 import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITextField from '@material-ui/core/TextField';
-import { connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import WarningButton from '../miscellaneous/WarningButton';
-import { actionCreators } from '../../redux-store/actions/cube-actions';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { createComponent } from '../../requests/REST/cube-requests';
 
-function CreateComponentForm ({
-  dispatchAddComponent,
+export default function CreateComponentForm ({
   open,
   toggleOpen
 }) {
@@ -30,21 +26,7 @@ function CreateComponentForm ({
   const [newComponentType, setNewComponentType] = React.useState();
 
   async function addComponent () {
-    try {
-      const newComponentId = await createComponent(cubeId, {
-        name: newComponentName, type: newComponentType
-      }, authentication.token);
-
-      toggleOpen();
-      dispatchAddComponent({
-        newComponentId: newComponentId._id,
-        newComponentName,
-        newComponentType: newComponentType
-      });
-
-    } catch (error) {
-      console.log(error.message);
-    }
+    
   }
 
   return (
@@ -91,12 +73,4 @@ function CreateComponentForm ({
       </MUIDialogActions>
     </MUIDialog>
   );
-}
-
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatchAddComponent: (payload) => dispatch(actionCreators.add_component(payload))
-  };
-}
-
-export default connect(null, mapDispatchToProps)(CreateComponentForm);
+};
