@@ -19,9 +19,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import ConfirmationDialogue from '../miscellaneous/ConfirmationDialog';
 import CreateCubeForm from './CreateCubeForm';
 import theme, { backgroundColor } from '../../theme';
+import useRequest from '../../hooks/request-hook';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { deleteCube as deleteCubeRequest } from '../../requests/REST/cube-requests';
-import { ErrorContext } from '../../contexts/error-context';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -42,18 +41,28 @@ export default function UserCubeCard ({
 
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
-  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const [dialogInfo, setDialogInfo] = React.useState({});
   const [showCubeForm, setShowCubeForm] = React.useState(false);
+  const { sendRequest } = useRequest();
 
-  async function deleteCube (cubeId) {
-    try {
-      await deleteCubeRequest(cubeId, authentication.token);
-      updateCubeList(cubeId);
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
+  async function deleteCube (cubeID) {
+    await sendRequest({
+      callback: () => {
+        updateCubeList(cubeID);
+      },
+      headers: { CubeID: cubeID },
+      operation: 'deleteCube',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}
+            }
+          `
+        }
+      }
+    });
   }
 
   return (

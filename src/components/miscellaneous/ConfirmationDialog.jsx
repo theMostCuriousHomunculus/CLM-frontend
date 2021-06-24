@@ -6,13 +6,11 @@ import MUIDialogContent from '@material-ui/core/DialogContent';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import WarningButton from './WarningButton';
 
-function ConfirmationDialogue (props) {
-
-  const {
-    confirmHandler,
-    dialogInfo,
-    toggleOpen
-  } = props;
+export default function ConfirmationDialogue ({
+  confirmHandler,
+  dialogInfo,
+  toggleOpen
+}) {
 
   return (
     <MUIDialog
@@ -23,10 +21,7 @@ function ConfirmationDialogue (props) {
       <MUIDialogContent>
         {dialogInfo.content}
       </MUIDialogContent>
-      <MUIDialogActions style={{ justifyContent: 'space-between' }}>
-        <WarningButton onClick={toggleOpen}>
-          Cancel
-        </WarningButton>
+      <MUIDialogActions>
         <MUIButton
           autoFocus
           color="primary"
@@ -39,9 +34,10 @@ function ConfirmationDialogue (props) {
         >
           Yes
         </MUIButton>
+        <WarningButton onClick={toggleOpen}>
+          Cancel
+        </WarningButton>
       </MUIDialogActions>
     </MUIDialog>
   );
-}
-
-export default ConfirmationDialogue;
+};

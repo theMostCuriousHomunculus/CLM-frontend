@@ -9,11 +9,9 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import useRequest from '../../hooks/request-hook';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { ErrorContext } from '../../contexts/error-context';
-import { createCube } from '../../requests/REST/cube-requests';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {
@@ -29,33 +27,40 @@ export default function CreateCubeForm ({
   toggleOpen
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
-  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
-  const cobraId = React.useRef();
+  const cobraID = React.useRef();
   const cubeDescription = React.useRef();
   const cubeName = React.useRef();
   const history = useHistory();
-  const [loading, setLoading] = React.useState(false);
+  const { loading, sendRequest } = useRequest();
 
   async function submitForm (event) {
     event.preventDefault();
 
-    const cubeDetails = {
-      cobraId: cobraId.current.value,
-      description: cubeDescription.current.value,
-      name: cubeName.current.value
-    };
-
-    try {
-      setLoading(true);
-      const responseData = await createCube(cubeDetails, authentication.token);
-      setLoading(false);
-      history.push(`/cube/${responseData._id}`);
-    } catch (error) {
-      setLoading(false);
-      setErrorMessage(error.message);
-    }
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/cube/${data._id}`);
+      },
+      load: true,
+      operation: 'createCube',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  ${cobraID.current.value ? 'cobraID: "' + cobraID + '",\n' : ''}
+                  description: "${cubeDescription.current.value}",
+                  name: "${cubeName.current.value}"
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
   }
 
   return (
@@ -100,7 +105,7 @@ export default function CreateCubeForm ({
             <MUITextField
               autoComplete="off"
               fullWidth
-              inputRef={cobraId}
+              inputRef={cobraID}
               label="24 character ID from cubecobra URL"
               margin="dense"
               required={false}
@@ -110,12 +115,6 @@ export default function CreateCubeForm ({
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <WarningButton
-              onClick={toggleOpen}
-            >
-              Cancel
-            </WarningButton>
-
             <MUIButton
               color="primary"
               size="small"
@@ -124,6 +123,9 @@ export default function CreateCubeForm ({
             >
               Create!
             </MUIButton>
+            <WarningButton onClick={toggleOpen}>
+              Cancel
+            </WarningButton>
           </MUIDialogActions>
         </form>
       }
