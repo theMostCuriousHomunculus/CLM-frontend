@@ -13,7 +13,9 @@ import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { useParams } from 'react-router';
 
+import useRequest from '../../hooks/request-hook';
 import CreateComponentForm from './CreateComponentForm';
 import WarningButton from '../miscellaneous/WarningButton';
 
@@ -61,14 +63,59 @@ export default function ComponentInfo ({
 }) {
 
   const classes = useStyles();
+  const cubeID = useParams().cubeId;
   const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
   const [componentName, setComponentName] = React.useState(component.name);
-  const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
   const [componentSize, setComponentSize] = React.useState(component.size);
+  const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
   const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
+  const { sendRequest } = useRequest();
 
   async function deleteComponent () {
-
+    if (Number.isInteger(parseInt(componentSize))) {
+      await sendRequest({
+        callback: () => {
+          setComponentName('Mainboard');
+          setComponentSize(null);
+          setDisplay(prevState => ({
+            ...prevState,
+            activeComponentID: 'mainboard'
+          }));
+        },
+        headers: { CubeID: cubeID },
+        operation: 'deleteRotation',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(_id: "${display.activeComponentID}")
+              }
+            `
+          }
+        }
+      });
+    } else {
+      await sendRequest({
+        callback: () => {
+          setComponentName('Mainboard');
+          setDisplay(prevState => ({
+            ...prevState,
+            activeComponentID: 'mainboard'
+          }));
+        },
+        headers: { CubeID: cubeID },
+        operation: 'deleteModule',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(_id: "${display.activeComponentID}")
+              }
+            `
+          }
+        }
+      });
+    }
   }
 
   const handleComponentMenuItemClick = ({ _id, name, size }) => {
@@ -82,14 +129,60 @@ export default function ComponentInfo ({
   };
 
   async function submitComponentChanges () {
-
+    if (Number.isInteger(parseInt(componentSize))) {
+      await sendRequest({
+        headers: { CubeID: cubeID },
+        operation: 'editRotation',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  input: {
+                    rotationID: "${display.activeComponentID}",
+                    name: "${componentName}",
+                    size: ${componentSize}
+                  }
+                ) {
+                  _id
+                }
+              }
+            `
+          }
+        }
+      });
+    } else {
+      await sendRequest({
+        headers: { CubeID: cubeID },
+        operation: 'editModule',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  input: {
+                    moduleID: "${display.activeComponentID}",
+                    name: "${componentName}"
+                  }
+                ) {
+                  _id
+                }
+              }
+            `
+          }
+        }
+      });
+    }
   }
 
   return (
+    // i'm not sure i should have the createcomponentform dialog here instead of in the cube page directly.  i am sure that i should not be using the muicard component tho; muipaper or something else would be much more appropriate
     <React.Fragment>
 
       <CreateComponentForm
         open={dialogIsOpen}
+        setComponentName={setComponentName}
+        setComponentSize={setComponentSize}
         setDisplay={setDisplay}
         toggleOpen={() => setDialogIsOpen(prevState => !prevState)}
       />
@@ -175,7 +268,7 @@ export default function ComponentInfo ({
                   open={Boolean(viewAnchorEl)}
                   onClose={() => setViewAnchorEl(null)}
                 >
-                  {["Curve", "List", "Table"].map(option => (
+                  {["Curve"/*, "List"*/, "Table"].map(option => (
                     <MUIMenuItem
                       key={option}
                       onClick={() => {

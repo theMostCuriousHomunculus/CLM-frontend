@@ -44,13 +44,13 @@ export default function EditCardModal ({
       card.cmc !== parseInt(cmcInput.current.value) ||
       card.color_identity.toString() !== colorIdentity.toString() ||
       card.type_line !== typeInput.current.value ||
-      printingDetails.toString() !== {
+      JSON.stringify(printingDetails) !== JSON.stringify({
         back_image: card.back_image,
         image: card.image,
         mtgo_id: card.mtgo_id,
         printing: card.printing,
         purchase_link: card.purchase_link
-      }.toString()
+      })
     ) {
       await editCard(`cardID: "${card._id}",\n${printingDetails.back_image ? 'back_image: "' + printingDetails.back_image + '",\n' : ''}cmc: ${parseInt(cmcInput.current.value)},\ncolor_identity: [${colorIdentity.map(ci => '"' + ci + '"')}],\nimage: "${printingDetails.image}",\n${Number.isInteger(printingDetails.mtgo_id) ? 'mtgo_id: ' + printingDetails.mtgo_id + ',\n' : ''}printing: "${printingDetails.printing}",\npurchase_link: "${printingDetails.purchase_link}"\ntype_line: "${typeInput.current.value}"`);
     }
@@ -117,7 +117,7 @@ export default function EditCardModal ({
                 />
                 <ChangePrintMenu
                   card={card}
-                  handlePrintingChange={(pd) => setPrintingDetails({ ...pd })}
+                  handlePrintingChange={pd => setPrintingDetails({ ...pd })}
                 />
               </MUIGrid>
             </MUIGrid>

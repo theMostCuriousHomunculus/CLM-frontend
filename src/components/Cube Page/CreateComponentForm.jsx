@@ -17,6 +17,8 @@ import WarningButton from '../miscellaneous/WarningButton';
 
 export default function CreateComponentForm ({
   open,
+  setComponentName,
+  setComponentSize,
   setDisplay,
   toggleOpen
 }) {
@@ -32,8 +34,11 @@ export default function CreateComponentForm ({
         callback: (data) => {
           setDisplay(prevState => ({
             ...prevState,
-            activeComponentID: data.modules[data.modules.length - 1]
+            activeComponentID: data.modules[data.modules.length - 1]._id
           }));
+          setComponentName(nameInput.current.value);
+          setComponentSize(null);
+          toggleOpen();
         },
         headers: {
           CubeID: cubeID
@@ -60,8 +65,11 @@ export default function CreateComponentForm ({
         callback: (data) => {
           setDisplay(prevState => ({
             ...prevState,
-            activeComponentID: data.rotations[data.rotations.length - 1]
+            activeComponentID: data.rotations[data.rotations.length - 1]._id
           }));
+          setComponentName(nameInput.current.value);
+          setComponentSize(0);
+          toggleOpen();
         },
         headers: {
           CubeID: cubeID
@@ -82,8 +90,6 @@ export default function CreateComponentForm ({
         }
       });
     }
-
-    toggleOpen();
   }
 
   return (
