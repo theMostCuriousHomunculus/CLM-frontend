@@ -9,24 +9,15 @@ import MUIListItem from '@material-ui/core/ListItem';
 import MUITypography from '@material-ui/core/Typography';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
-import { makeStyles } from '@material-ui/core/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import WarningButton from '../miscellaneous/WarningButton';
-
-const useStyles = makeStyles({
-  flexGrow: {
-    flexGrow: 1
-  }
-});
 
 export default function BudRequests ({
   manageBuds,
   received_bud_requests,
   sent_bud_requests
 }) {
-
-  const classes = useStyles();
 
   return (
     <React.Fragment>
@@ -40,10 +31,7 @@ export default function BudRequests ({
             {received_bud_requests.map(function (request) {
               return (
                 <MUIListItem key={request._id}>
-                  <Avatar alt={request.name} size='small' src={request.avatar} />
-                  <MUITypography className={classes.flexGrow} variant="body1">
-                    <Link to={`/account/${request._id}`}>{request.name}</Link>
-                  </MUITypography>
+                  <Link to={`/account/${request._id}`}><Avatar alt={request.name} size='small' src={request.avatar} /></Link>
                   <WarningButton onClick={() => manageBuds(`action: "reject",\nother_user_id: "${request._id}"`)}>
                     <MUINotInterestedIcon />
                   </WarningButton>
@@ -74,10 +62,7 @@ export default function BudRequests ({
             {sent_bud_requests.map(function (request) {
               return (
                 <MUIListItem key={request._id}>
-                  <Avatar alt={request.name} size='small' src={request.avatar} />
-                  <MUITypography variant="body1">
-                    <Link to={`/account/${request._id}`}>{request.name}</Link>
-                  </MUITypography>
+                  <Link to={`/account/${request._id}`}><Avatar alt={request.name} size='small' src={request.avatar} /></Link>
                 </MUIListItem>
               );
             })}

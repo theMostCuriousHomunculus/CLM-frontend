@@ -18,12 +18,11 @@ import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { createMatch } from '../../requests/GraphQL/match-requests';
-import { ErrorContext } from '../../contexts/error-context';
 
 const useStyles = makeStyles({
   flex: {
@@ -39,35 +38,50 @@ const useStyles = makeStyles({
   }
 });
 
-export default function CreateEventForm ({
+export default function CreateMatchForm ({
   events,
   open,
   toggleOpen
 }) {
 
   const authentication = React.useContext(AuthenticationContext);
-  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const history = useHistory();
+  const { loading, sendRequest } = useRequest();
   const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
   const [selectedEvent, setSelectedEvent] = React.useState();
   const [selectedOpponent, setSelectedOpponent] = React.useState()
 
   async function submitForm (event) {
     event.preventDefault();
 
-    try {
-      setLoading(true);
-      const responseData = await createMatch(selectedEvent._id,
-        selectedOpponent ? [authentication.userId, selectedOpponent] : [authentication.userId],
-        authentication.token);
-      setLoading(false);
-      history.push(`/match/${responseData._id}`);
-    } catch (error) {
-      setLoading(false);
-      setErrorMessage(error.message);
-    }
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/match/${data._id}`);
+      },
+      load: true,
+      operation: 'createMatch',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  eventID: "${selectedEvent._id}",
+                  playerIDs: [${(
+                      selectedOpponent ?
+                      [authentication.userId, selectedOpponent] :
+                      [authentication.userId]
+                    ).map(plrID => '"' + plrID + '"')}]
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
   }
 
   return (

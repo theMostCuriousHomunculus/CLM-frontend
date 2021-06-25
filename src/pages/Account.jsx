@@ -24,7 +24,6 @@ import UserEventCard from '../components/Account Page/UserEventCard';
 import UserMatchCard from '../components/Account Page/UserMatchCard';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import { desiredAccountInfo } from '../requests/GraphQL/account-requests';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -63,6 +62,87 @@ export default function Account () {
     sent_bud_requests: []
   });
   const [dialogInfo, setDialogInfo] = React.useState({});
+  const desiredAccountInfo = `
+    avatar
+    buds {
+      _id
+      avatar
+      name
+    }
+    cubes {
+      _id
+      description
+      mainboard {
+        _id
+      }
+      modules {
+        _id
+        cards {
+          _id
+        }
+        name
+      }
+      name
+      rotations {
+        _id
+        cards {
+          _id
+        }
+        name
+        size
+      }
+      sideboard {
+        _id
+      }
+    }
+    events {
+      _id
+      createdAt
+      host {
+        _id
+        avatar
+        name
+      }
+      name
+      players {
+        account {
+          _id
+          avatar
+          name
+        }
+      }
+    }
+    matches {
+      _id
+      cube {
+        _id
+        name
+      }
+      event {
+        _id
+        createdAt
+        name
+      }
+      players {
+        account {
+          _id
+          avatar
+          name
+        }
+      }
+    }
+    name
+    received_bud_requests {
+      _id
+      avatar
+      name
+    }
+    sent_bud_requests {
+      _id
+      avatar
+      name
+    }
+  `;
 
   React.useEffect(() => {
     async function fetchAccount () {
@@ -87,7 +167,7 @@ export default function Account () {
     }
 
     fetchAccount();
-  }, [accountId, sendRequest]);
+  }, [accountId, desiredAccountInfo, sendRequest]);
 
   async function submitChanges (changes) {
     await sendRequest({
@@ -139,7 +219,7 @@ export default function Account () {
           toggleOpen={() => setDialogInfo({})}
         />
 
-        <MUICard style={{ marginBottom: 0 }}>
+        <MUICard>
           <MUICardHeader
             avatar={<Avatar alt={account.name} size='large' src={account.avatar} />}
             className={classes.cardHeader}
@@ -235,29 +315,24 @@ export default function Account () {
                 title={<MUITypography variant="h5">Buds</MUITypography>}
               />
               <MUIList>
-                {account.buds &&
-                  customSort(account.buds, ['name']).map(function (bud) {
-                    return (
-                      <MUIListItem key={bud._id}>
-                        <Avatar alt={bud.name} size='small' src={bud.avatar} />
-                        <MUITypography className={classes.flexGrow} variant="body1">
-                          <Link to={`/account/${bud._id}`}>{bud.name}</Link>
-                        </MUITypography>
-                        {accountId === authentication.userId &&
-                          <WarningButton
-                            onClick={() => setDialogInfo({
-                              data: `action: "remove",\nother_user_id: "${bud._id}"`,
-                              content: <MUITypography variant="body1">Think of all the good times you've had.</MUITypography>,
-                              title: `Are you sure you want to un-bud ${bud.name}?`
-                            })}
-                          >
-                            Un-Bud
-                          </WarningButton>
-                        }
-                      </MUIListItem>
-                    );
-                  })
-                }
+                {customSort(account.buds, ['name']).map(bud => (
+                  <MUIListItem key={bud._id} style={{ justifyContent: 'space-between' }}>
+                    <Link to={`/account/${bud._id}`}>
+                      <Avatar alt={bud.name} size='small' src={bud.avatar} />
+                    </Link>
+                    {accountId === authentication.userId &&
+                      <WarningButton
+                        onClick={() => setDialogInfo({
+                          data: `action: "remove",\nother_user_id: "${bud._id}"`,
+                          content: <MUITypography variant="body1">Think of all the good times you've had.</MUITypography>,
+                          title: `Are you sure you want to un-bud ${bud.name}?`
+                        })}
+                      >
+                        Un-Bud
+                      </WarningButton>
+                    }
+                  </MUIListItem>
+                ))}
               </MUIList>
             </MUICard>
           </MUIGrid>

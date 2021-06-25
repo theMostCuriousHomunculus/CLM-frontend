@@ -1,34 +1,25 @@
 import React from 'react';
-import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
-import MUIIconButton from '@material-ui/core/IconButton';
 import MUIPaper from '@material-ui/core/Paper';
-import MUITooltip from '@material-ui/core/Tooltip';
 import { makeStyles } from '@material-ui/core/styles';
 
-import theme from '../../theme';
-
 const useStyles = makeStyles({
-  buttonBar: {
-    display: 'flex',
-    justifyContent: 'space-between'
-  },
-  iconButton: {
-    background: theme.palette.primary.main,
-    color: '#ffffff',
-    height: 30,
-    width: 30,
-    '&:hover': {
-      background: theme.palette.primary.dark
-    }
+  magicCard: {
+    backgroundSize: 'cover',
+    height: 264,
+    justifyContent: 'space-between',
+    margin: 0,
+    padding: '30px 15px',
+    position: 'relative',
+    width: 189,
   }
 });
 
 export default function MagicCard ({
   cardData,
   children,
-  clickFunction,
+  clickFunction = () => null,
   customStyle,
-  rightClickFunction,
+  rightClickFunction = () => null,
   // for Draggable wrapped cards
   style,
   className,
@@ -71,17 +62,12 @@ export default function MagicCard ({
 
   return (
     <MUIPaper
-      className={className}
+      className={`${classes.magicCard}${className ? ' ' + className : ''}`}
       id={`drag-${_id}`}
-      onClick={clickFunction ? () => clickFunction(cardData) : () => null}
-      onContextMenu={rightClickFunction ? event => rightClickFunction(event) : () => null}
+      onClick={() => clickFunction(cardData)}
+      onContextMenu={event => rightClickFunction(event)}
       style={{
         backgroundImage: `url(${displayedImage})`,
-        backgroundSize: 'cover',
-        height: 264,
-        margin: 0,
-        padding: 0,
-        width: 189,
         ...customStyle,
         ...style,
         transform: `${ style && style.transform ? style.transform : ''}${tapped ? ' rotate(90deg)' : ''}`
@@ -91,23 +77,7 @@ export default function MagicCard ({
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {(children || back_image) && <div className={classes.buttonBar}>
-        {children && children[0]}
-
-        {back_image &&
-          <MUITooltip title="Flip Card">
-            <MUIIconButton
-              className={classes.iconButton}
-              // onClick={() => setFlipped(true)}
-              size="small"
-            >
-              <MUIAutorenewIcon />
-            </MUIIconButton>
-          </MUITooltip>
-        }
-
-        {children && children[1]}
-      </div>}
+      {children}
     </MUIPaper>
   );
 };

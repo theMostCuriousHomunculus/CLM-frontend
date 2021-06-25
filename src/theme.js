@@ -17,8 +17,6 @@ const theme = createMuiTheme({
     },
     MuiCard: {
       root: {
-        background: backgroundColor,
-        margin: 4,
         padding: 0
       }
     },
@@ -77,6 +75,7 @@ const theme = createMuiTheme({
     },
     MuiPaper: {
       root: {
+        backgroundColor: backgroundColor,
         margin: 4,
         padding: 8
       }

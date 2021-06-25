@@ -8,32 +8,29 @@ const useStyles = makeStyles({
   container: {
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'space-between'
+    margin: -4
   }
 });
 
-export default SortableContainer(({ cards, clickFunction, fromCollection, moveCard, toCollection1, toCollection2 }) => {
+export default SortableContainer(({ cards, clickFunction, fromCollection, moveCard, otherCollections }) => {
 
   const classes = useStyles();
 
   return (
     <div className={classes.container}>
-      {cards.map(function (card, index) {
-        return (
-          <SortableCard
-            card={card}
-            clickFunction={clickFunction}
-            collection={fromCollection}
-            fromCollection={fromCollection}
-            index={index}
-            key={card._id}
-            moveCard={moveCard}
-            toCollection1={toCollection1}
-            toCollection2={toCollection2}
-          >
-          </SortableCard>
-        );
-      })}
+      {cards.map((card, index) => (
+        <SortableCard
+          card={card}
+          clickFunction={clickFunction}
+          collection={fromCollection}
+          fromCollection={fromCollection}
+          index={index}
+          key={card._id}
+          moveCard={moveCard}
+          otherCollections={otherCollections}
+        >
+        </SortableCard>
+      ))}
     </div>
   );
 });

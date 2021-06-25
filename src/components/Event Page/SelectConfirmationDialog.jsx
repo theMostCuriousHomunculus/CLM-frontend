@@ -33,9 +33,6 @@ const SelectConfirmationDialogue = (props) => {
         }
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton onClick={props.toggleOpen} color="primary" size="small" variant="contained">
-          No
-        </MUIButton>
         <MUIButton
           autoFocus
           color="primary"
@@ -47,6 +44,9 @@ const SelectConfirmationDialogue = (props) => {
           variant="contained"
         >
           Yes
+        </MUIButton>
+        <MUIButton onClick={props.toggleOpen} color="primary" size="small" variant="contained">
+          No
         </MUIButton>
       </MUIDialogActions>
     </MUIDialog>

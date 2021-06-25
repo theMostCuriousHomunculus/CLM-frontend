@@ -40,9 +40,12 @@ export default function HoverPreview ({ children }) {
 
   const movePreview = React.useCallback(function (event) {
     event.persist();
+
     const hpcWidth = imageContainer.current.offsetWidth;
+    const pageHeight = document.getElementsByTagName('body')[0].offsetHeight;
+    const windowHeight = window.screen.height;
     const windowWidth = window.screen.width;
-    let left, right;
+    let bottom, left, right, top;
 
     if (event.pageX < windowWidth / 2) {
       left = `${event.pageX - (hpcWidth * event.pageX / windowWidth)}px`;
@@ -52,13 +55,20 @@ export default function HoverPreview ({ children }) {
       right = `${windowWidth - event.pageX - hpcWidth + (hpcWidth * event.pageX / windowWidth)}px`;
     }
 
-    // TODO: something similar for the vertical axis
+    if (event.screenY < windowHeight / 2) {
+      bottom = undefined;
+      top = `${event.pageY + 24}px`;
+    } else {
+      bottom = `${pageHeight - event.pageY + 12}px`;
+      top = undefined;
+    }
 
     setPreview(prevState => ({
       ...prevState,
+      bottom,
       left,
       right,
-      top: `${event.pageY + 12}px`
+      top
     }));
   }, []);
 

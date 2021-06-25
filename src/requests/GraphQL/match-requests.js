@@ -309,38 +309,6 @@ async function adjustPoisonCounters (poison, matchID, token) {
   }
 }
 
-async function createMatch (eventId, playerIds, token) {
-  try {
-    const graphqlQuery = {
-      query: `
-        mutation {
-          createMatch(
-            input: {
-              eventID: "${eventId}",
-              playerIDs: [${playerIds.map(plrID => '"' + plrID + '"')}]
-            }
-          ) {
-            ${desiredMatchInfo}
-          }
-        }
-      `
-    };
-    const matchData = await axios.post(process.env.REACT_APP_GRAPHQL_HTTP_URL,
-      graphqlQuery,
-      { headers: { Authorization: `Bearer ${token}` } });
-
-    if (matchData.data.errors) throw new Error(matchData.data.errors[0].message);
-
-    return matchData.data.data.createMatch;
-  } catch (error) {
-    if (error.response) {
-      throw new Error(error.response.data.errors[0].message);
-    } else {
-      throw new Error(error);
-    }
-  }
-}
-
 async function dragCard (cardID, xCoordinate, yCoordinate, zIndex, matchID, token) {
   try {
     const graphqlQuery = {
@@ -587,7 +555,6 @@ export {
   adjustEnergyCounters,
   adjustLifeTotal,
   adjustPoisonCounters,
-  createMatch,
   dragCard,
   drawCard,
   fetchMatchByID,

@@ -17,9 +17,12 @@ import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-const UserEventCard = (props) => {
+export default function UserEventCard ({
+  events,
+  matches,
+  pageClasses
+}) {
 
-  const { events, matches, pageClasses } = props;
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const [showMatchForm, setShowMatchForm] = React.useState(false);
@@ -96,5 +99,3 @@ const UserEventCard = (props) => {
     </React.Fragment>
   );
 };
-
-export default UserEventCard;

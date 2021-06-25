@@ -3,9 +3,11 @@ import MUIPaper from '@material-ui/core/Paper';
 import MUITab from '@material-ui/core/Tab';
 import MUITabs from '@material-ui/core/Tabs';
 import MUITypography from '@material-ui/core/Typography';
+import arrayMove from 'array-move';
 import { createClient } from 'graphql-ws';
 import { useParams } from 'react-router-dom';
 
+import useRequest from '../hooks/request-hook';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
 import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -13,18 +15,12 @@ import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
 import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import {
-  desiredEventInfo,
-  fetchEventByID,
-  moveCard,
-  selectCard,
-  sortCard
-} from '../requests/GraphQL/event-requests.js';
 
 export default function Event () {
 
   const authentication = React.useContext(AuthenticationContext);
   const eventID = useParams().eventId;
+  const { loading, sendRequest } = useRequest();
   const [dialogDisplayed, setDialogDisplayed] = React.useState(false);
   const [event, setEvent] = React.useState({
     finished: false,
@@ -42,7 +38,6 @@ export default function Event () {
       sideboard: []
     }]
   });
-  const [loading, setLoading] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [tabNumber, setTabNumber] = React.useState(0);
   const me = event.players.find(plr => plr.account._id === authentication.userId);
@@ -50,16 +45,68 @@ export default function Event () {
 
   React.useEffect(function () {
 
-    async function initialize () {
-      try {
-        setLoading(true);
-        const eventData = await fetchEventByID(eventID, authentication.token);
-        setEvent(eventData);
-      } catch (error) {
-        console.log(error.message);
-      } finally {
-        setLoading(false);
+    const desiredEventInfo = `
+      _id
+      finished
+      host {
+        _id
       }
+      name
+      players {
+        account {
+          _id
+          avatar
+          name
+        }
+        chaff {
+          _id
+          back_image
+          image
+          mtgo_id
+          name
+        }
+        current_pack {
+          _id
+          back_image
+          image
+          name
+        }
+        mainboard {
+          _id
+          back_image
+          image
+          mtgo_id
+          name
+        }
+        sideboard {
+          _id
+          back_image
+          image
+          mtgo_id
+          name
+        }
+      }
+    `;
+
+    async function initialize () {
+      await sendRequest({
+        callback: (data) => {
+          setEvent(data);
+        },
+        headers: { EventID: eventID },
+        operation: 'fetchEventByID',
+        get body() {
+          return {
+            query: `
+              query {
+                ${this.operation} {
+                  ${desiredEventInfo}
+                }
+              }
+            `
+          }
+        }
+      });
     }
 
     initialize();
@@ -74,13 +121,13 @@ export default function Event () {
 
     async function subscribe () {
       function onNext(update) {
-        setEvent(update.data.joinEvent);
+        setEvent(update.data.subscribeEvent);
       }
 
       await new Promise((resolve, reject) => {
         client.subscribe({
           query: `subscription {
-            joinEvent {
+            subscribeEvent {
               ${desiredEventInfo}
             }
           }`
@@ -96,31 +143,81 @@ export default function Event () {
     subscribe(result => console.log(result), error => console.log(error));
 
     return client.dispose;
-  }, [authentication.token, eventID]);
+  }, [authentication.token, eventID, sendRequest]);
 
   async function onMoveCard (cardID, destination, origin) {
-    try {
-      await moveCard(cardID, destination, eventID, origin, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
+    await sendRequest({
+      headers: { EventID: eventID },
+      operation: 'moveCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cardID: "${cardID}"
+                  destination: ${destination}
+                  origin: ${origin}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
   }
 
   async function onSelectCard (cardID) {
-    try {
-      await selectCard(cardID, eventID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
+    await sendRequest({
+      headers: { EventID: eventID },
+      operation: 'selectCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(_id: "${cardID}") {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
   }
 
   async function onSortEnd ({ collection, newIndex, oldIndex }) {
     if (newIndex !== oldIndex) {
-      try {
-        await sortCard(collection, eventID, newIndex, oldIndex, authentication.token);
-      } catch (error) {
-        console.log(error.message);
-      }
+      const meIndex = event.players.indexOf(me);
+      setEvent(prevState => ({
+        ...prevState,
+        players: prevState.players.slice(0, meIndex).concat([{
+          ...me,
+          [collection]: arrayMove(me[collection], oldIndex, newIndex)
+        }]).concat(prevState.players.slice(meIndex + 1))
+      }));
+      await sendRequest({
+        headers: { EventID: eventID },
+        operation: 'sortCard',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  input: {
+                    collection: ${collection}
+                    newIndex: ${newIndex}
+                    oldIndex: ${oldIndex}
+                  }
+                ) {
+                  _id
+                }
+              }
+            `
+          }
+        }
+      });
     }
   }
 
@@ -138,7 +235,7 @@ export default function Event () {
 
       {// displays if the event is a draft and is not yet finished
         !event.finished &&
-        <MUIPaper>
+        <MUIPaper style={{ overflow: 'hidden' }}>
           <MUITabs
             indicatorColor="primary"
             onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
@@ -161,11 +258,10 @@ export default function Event () {
                   setSelectedCard(cardData);
                   setDialogDisplayed(true);
                 }}
+                distance={2}
                 fromCollection="current_pack"
-                moveCard={() => null}
                 onSortEnd={onSortEnd}
-                toCollection1={null}
-                toCollection2={null}
+                otherCollections={[]}
               />
             </React.Fragment>
           }
@@ -198,11 +294,13 @@ export default function Event () {
         <React.Fragment>
           <CardPoolDownloadLinks me={me} others={others} />
 
-          <PicksDisplay
-            moveCard={onMoveCard}
-            onSortEnd={onSortEnd}
-            player={me}
-          />
+          <MUIPaper style={{ overflow: 'hidden' }}>
+            <PicksDisplay
+              moveCard={onMoveCard}
+              onSortEnd={onSortEnd}
+              player={me}
+            />
+          </MUIPaper>
         </React.Fragment>
       }
     </React.Fragment>

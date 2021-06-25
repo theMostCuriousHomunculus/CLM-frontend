@@ -21,12 +21,10 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
-import { ErrorContext } from '../../contexts/error-context';
-import { createEvent } from '../../requests/GraphQL/event-requests';
 
 const useStyles = makeStyles({
   budSwitch: {
@@ -55,17 +53,15 @@ export default function CreateEventForm ({
   toggleOpen
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
-  const { setErrorMessage } = React.useContext(ErrorContext);
   const classes = useStyles();
   const history = useHistory();
+  const { loading, sendRequest } = useRequest();
   const [cardsPerPack, setCardsPerPack] = React.useState(1);
   const [cubeAnchorEl, setCubeAnchorEl] = React.useState(null);
   const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
   const eventName = React.useRef();
   const [eventType, setEventType] = React.useState('draft');
   const [includedModules, setIncludedModules] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
   const [otherPlayers, setOtherPlayers] = React.useState([]);
   const [packsPerPlayer, setPacksPerPlayer] = React.useState(1);
   const [selectedCube, setSelectedCube] = React.useState(cubes[0]);
@@ -73,23 +69,34 @@ export default function CreateEventForm ({
   async function submitForm (event) {
     event.preventDefault();
 
-    try {
-      setLoading(true);
-      const eventData = await createEvent(
-        cardsPerPack,
-        eventType,
-        includedModules,
-        eventName.current.value,
-        otherPlayers,
-        packsPerPlayer,
-        selectedCube._id,
-        authentication.token);
-      history.push(`/event/${eventData._id}`);
-    } catch (error) {
-      setErrorMessage(error.message);
-    } finally {
-      setLoading(false);
-    }
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/event/${data._id}`);
+      },
+      headers: { CubeID: selectedCube._id },
+      load: true,
+      operation: 'createEvent',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cards_per_pack: ${cardsPerPack},
+                  event_type: ${eventType},
+                  modules: [${includedModules.map(mdl => '"' + mdl + '"')}],
+                  name: "${eventName.current.value}",
+                  other_players: [${otherPlayers.map(plr => '"' + plr + '"')}],
+                  packs_per_player: ${packsPerPlayer}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
   }
 
   return (

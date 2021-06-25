@@ -12,7 +12,6 @@ import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import TableView from '../components/Cube Page/TableView';
-import { desiredCubeInfo } from '../requests/GraphQL/cube-requests';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 export default function Cube () {
@@ -26,7 +25,7 @@ export default function Cube () {
     creator: {
       _id: null,
       avatar: null,
-      name: null
+      name: '...'
     },
     description: '',
     mainboard: [],
@@ -56,6 +55,59 @@ export default function Cube () {
   }), []);
 
   React.useEffect(() => {
+
+    const desiredCardInfo = `
+      _id
+      back_image
+      chapters
+      cmc
+      color_identity
+      image
+      keywords
+      loyalty
+      mana_cost
+      mtgo_id
+      name
+      oracle_id
+      power
+      printing
+      purchase_link
+      toughness
+      type_line
+    `;
+
+    const desiredCubeInfo = `
+      _id
+      creator {
+        _id
+        avatar
+        name
+      }
+      description
+      mainboard {
+        ${desiredCardInfo}
+      }
+      modules {
+        _id
+        cards {
+          ${desiredCardInfo}
+        }
+        name
+      }
+      name
+      rotations {
+        _id
+        cards {
+          ${desiredCardInfo}
+        }
+        name
+        size
+      }
+      sideboard {
+        ${desiredCardInfo}
+      }
+    `;
+
     async function initialize () {
       await sendRequest({
         callback: (data) => {

@@ -16,7 +16,7 @@ export default function InfoSection (props) {
     <MUICard>
       <MUICardHeader
         disableTypography={true}
-        title={<MUITypography variant="h5">{name}</MUITypography>}
+        title={<MUITypography variant="h2">{name}</MUITypography>}
       />
       <MUICardContent>
         <MUIGrid container justify="space-around" spacing={2}>

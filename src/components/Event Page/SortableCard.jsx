@@ -1,4 +1,5 @@
 import React from 'react';
+import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
 import MUIIconButton from '@material-ui/core/IconButton';
 import MUITooltip from '@material-ui/core/Tooltip';
 import { SortableElement } from 'react-sortable-hoc';
@@ -8,48 +9,61 @@ import theme from '../../theme';
 import MagicCard from '../miscellaneous/MagicCard';
 
 const useStyles = makeStyles({
+  buttonBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%'
+  },
   iconButton: {
     background: theme.palette.primary.main,
     color: '#ffffff',
     height: 30,
     width: 30,
     '&:hover': {
-      background: theme.palette.primary.dark,
-      padding: 18
+      background: theme.palette.primary.dark
     }
   }
 });
 
-export default SortableElement(({ card, clickFunction, fromCollection, moveCard, toCollection1, toCollection2 }) => {
+export default SortableElement(({ card, clickFunction, fromCollection, moveCard, otherCollections }) => {
 
   const classes = useStyles();
+  const [flipped, setFlipped] = React.useState(false);
 
   return (
     <MagicCard
-      cardData={card}
+      cardData={{ ...card, flipped }}
       clickFunction={clickFunction}
-      style={{ cursor: 'grab', margin: '4px 0' }}
+      style={{ cursor: 'grab', margin: 4 }}
     >
-      {toCollection1 &&
-        <MUITooltip title={`Move to ${toCollection1}`}>
+      <div className={classes.buttonBar}>
+        {otherCollections.map(toCollection => (
+          <MUITooltip key={toCollection} title={`Move to ${toCollection}`}>
+            <MUIIconButton
+              className={classes.iconButton}
+              onClick={event => {
+                moveCard(card._id, toCollection, fromCollection);
+                event.stopPropagation();
+              }}
+              size='small'
+            >
+              {toCollection[0].toUpperCase()}
+            </MUIIconButton>
+          </MUITooltip>
+        ))}
+      </div>
+      {card.back_image &&
+        <MUITooltip title="Flip Card">
           <MUIIconButton
             className={classes.iconButton}
-            onClick={() => moveCard(card._id, toCollection1, fromCollection)}
+            onClick={event => {
+              setFlipped(prevState => !prevState);
+              event.stopPropagation();
+            }}
             size="small"
+            style={{ left: '50%', position: 'absolute', top: '44%', transform: 'translateX(-50%)' }}
           >
-            {toCollection1[0].toUpperCase()}
-          </MUIIconButton>
-        </MUITooltip>
-      }
-
-      {toCollection2 &&
-        <MUITooltip title={`Move to ${toCollection2}`}>
-          <MUIIconButton
-            className={classes.iconButton}
-            onClick={() => moveCard(card._id, toCollection2, fromCollection)}
-            size="small"
-          >
-            {toCollection2[0].toUpperCase()}
+            <MUIAutorenewIcon />
           </MUIIconButton>
         </MUITooltip>
       }
