@@ -11,7 +11,7 @@ const useStyles = makeStyles({
   }
 })
 
-const LoadingSpinner = () => {
+export default function LoadingSpinner () {
 
   const classes = useStyles();
 
@@ -20,6 +20,4 @@ const LoadingSpinner = () => {
       <MUICircularProgress size={100} />
     </div>
   );
-}
-
-export default LoadingSpinner;
+};

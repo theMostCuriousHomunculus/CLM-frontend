@@ -24,14 +24,7 @@ const useStyles = makeStyles({
 });
 
 export default function MagicCard ({
-  cardData: {
-    _id,
-    back_image,
-    face_down_image,
-    flipped,
-    image,
-    tapped
-  },
+  cardData,
   children,
   clickFunction,
   customStyle,
@@ -45,6 +38,14 @@ export default function MagicCard ({
   onTouchEnd
 }) {
 
+  const {
+    _id,
+    back_image,
+    face_down_image,
+    flipped,
+    image,
+    tapped
+  } = cardData;
   const classes = useStyles();
   let displayedImage;
   
@@ -72,8 +73,8 @@ export default function MagicCard ({
     <MUIPaper
       className={className}
       id={`drag-${_id}`}
-      onClick={clickFunction ? () => clickFunction() : () => null}
-      onContextMenu={rightClickFunction ? (event) => rightClickFunction(event) : () => null}
+      onClick={clickFunction ? () => clickFunction(cardData) : () => null}
+      onContextMenu={rightClickFunction ? event => rightClickFunction(event) : () => null}
       style={{
         backgroundImage: `url(${displayedImage})`,
         backgroundSize: 'cover',

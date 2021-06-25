@@ -1,15 +1,14 @@
 import React from 'react';
-import MUICardContent from '@material-ui/core/CardContent';
 import { SortableContainer } from 'react-sortable-hoc';
 import { makeStyles } from '@material-ui/core/styles';
 
 import SortableCard from './SortableCard';
 
 const useStyles = makeStyles({
-  cardContent: {
+  container: {
     display: 'flex',
     flexWrap: 'wrap',
-    padding: 4
+    justifyContent: 'space-between'
   }
 });
 
@@ -18,9 +17,7 @@ export default SortableContainer(({ cards, clickFunction, fromCollection, moveCa
   const classes = useStyles();
 
   return (
-    <MUICardContent
-      className={classes.cardContent}
-    >
+    <div className={classes.container}>
       {cards.map(function (card, index) {
         return (
           <SortableCard
@@ -37,6 +34,6 @@ export default SortableContainer(({ cards, clickFunction, fromCollection, moveCa
           </SortableCard>
         );
       })}
-    </MUICardContent>
+    </div>
   );
 });

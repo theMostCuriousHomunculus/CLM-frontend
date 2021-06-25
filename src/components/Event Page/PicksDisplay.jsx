@@ -2,24 +2,16 @@ import React from 'react';
 import MUICard from '@material-ui/core/Card';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 
 import SortableList from './SortableList';
 
-const useStyles = makeStyles({
-  collectionContainer: {
-    marginBottom: 0
-  }
-});
+export default function PicksDisplay (props) {
 
-const PicksDisplay = function (props) {
-
-  const classes = useStyles();
   const { moveCard, onSortEnd, player } = props;
 
   return (
     <React.Fragment>
-      <MUICard className={classes.collectionContainer}>
+      <MUICard>
         <MUICardHeader
           disableTypography={true}
           title={<MUITypography variant="h5">Mainboard</MUITypography>}
@@ -38,7 +30,7 @@ const PicksDisplay = function (props) {
         </SortableList>
       </MUICard>
 
-      <MUICard className={classes.collectionContainer}>
+      <MUICard>
         <MUICardHeader
           disableTypography={true}
           title={<MUITypography variant="h5">Sideboard</MUITypography>}
@@ -78,5 +70,3 @@ const PicksDisplay = function (props) {
     </React.Fragment>
   );
 };
-
-export default PicksDisplay;

@@ -147,9 +147,7 @@ export default function Account () {
             title={accountId === authentication.userId ?
               <MUITextField
                 autoComplete="off"
-                inputProps={{
-                  onBlur: (event) => submitChanges(`name: "${event.target.value}"`)
-                }}
+                inputProps={{ onBlur: event => submitChanges(`name: "${event.target.value}"`) }}
                 label="Account Name"
                 margin="dense"
                 onChange={(event) => {

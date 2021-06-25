@@ -1,7 +1,4 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIPaper from '@material-ui/core/Paper';
 import MUITab from '@material-ui/core/Tab';
 import MUITabs from '@material-ui/core/Tabs';
@@ -35,7 +32,9 @@ export default function Event () {
     name: '',
     players: [{
       account: {
-        _id: authentication.userId
+        _id: authentication.userId,
+        avatar: '',
+        name: ''
       },
       chaff: [],
       current_pack: null,
@@ -131,7 +130,7 @@ export default function Event () {
       <SelectConfirmationDialog
         card={selectedCard}
         open={dialogDisplayed}
-        selectCardHandler={(cardID) => onSelectCard(cardID)}
+        selectCardHandler={cardID => onSelectCard(cardID)}
         toggleOpen={() => setDialogDisplayed(false)}
       />
 
@@ -139,31 +138,26 @@ export default function Event () {
 
       {// displays if the event is a draft and is not yet finished
         !event.finished &&
-        <React.Fragment>
-          <MUIPaper>
-            <MUITabs
-              indicatorColor="primary"
-              onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
-              textColor="primary"
-              value={tabNumber}
-              variant="fullWidth"
-            >
-              <MUITab label="Current Pack" />
-              <MUITab label="My Picks" />
-            </MUITabs>
-          </MUIPaper>
+        <MUIPaper>
+          <MUITabs
+            indicatorColor="primary"
+            onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
+            textColor="primary"
+            value={tabNumber}
+            variant="fullWidth"
+          >
+            <MUITab label="Current Pack" />
+            <MUITab label="My Picks" />
+          </MUITabs>
 
           {tabNumber === 0 &&
-            event.players.some(plr => plr.current_pack) &&
-            <MUICard>
-              <MUICardHeader
-                disableTypography={true}
-                title={<MUITypography variant="subtitle1">Select a Card to Draft</MUITypography>}
-              />
+            me.current_pack &&
+            <React.Fragment>
+              <MUITypography variant="h3">Select a Card to Draft</MUITypography>
               <SortableList
                 axis="xy"
-                cards={event.players.find(plr => plr.account._id === authentication.userId).current_pack}
-                clickFunction={(cardData) => {
+                cards={me.current_pack}
+                clickFunction={cardData => {
                   setSelectedCard(cardData);
                   setDialogDisplayed(true);
                 }}
@@ -173,25 +167,20 @@ export default function Event () {
                 toCollection1={null}
                 toCollection2={null}
               />
-            </MUICard>
+            </React.Fragment>
           }
 
           {tabNumber === 0 &&
-            !event.players.some(plr => plr.current_pack) &&
-            <MUICard>
-            <MUICardHeader
-              disableTypography={true}
-              title={<MUITypography variant="h5">Other drafters are still making their picks...</MUITypography>}
-            />
-              <MUICardContent>
-                <MUITypography variant="body1">
-                  Yell at them to hurry up!
-                </MUITypography>
-                <MUITypography variant="body1">
-                  While you're waiting, review the picks you've already made.
-                </MUITypography>
-              </MUICardContent>
-            </MUICard>
+            !me.current_pack &&
+            <React.Fragment>
+              <MUITypography variant="h3">Other drafters are still making their picks...</MUITypography>
+              <MUITypography variant="body1">
+                Yell at them to hurry up!
+              </MUITypography>
+              <MUITypography variant="body1">
+                While you're waiting, review the picks you've already made.
+              </MUITypography>
+            </React.Fragment>
           }
 
           {tabNumber === 1 &&
@@ -201,7 +190,7 @@ export default function Event () {
               player={me}
             />
           }
-        </React.Fragment>
+        </MUIPaper>
       }
 
       {// displays once the event is finished

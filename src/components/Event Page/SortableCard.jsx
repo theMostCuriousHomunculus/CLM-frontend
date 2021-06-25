@@ -4,8 +4,8 @@ import MUITooltip from '@material-ui/core/Tooltip';
 import { SortableElement } from 'react-sortable-hoc';
 import { makeStyles } from '@material-ui/core/styles';
 
-import MagicCard from '../miscellaneous/MagicCard';
 import theme from '../../theme';
+import MagicCard from '../miscellaneous/MagicCard';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -28,7 +28,7 @@ export default SortableElement(({ card, clickFunction, fromCollection, moveCard,
     <MagicCard
       cardData={card}
       clickFunction={clickFunction}
-      cursor="grab"
+      style={{ cursor: 'grab', margin: '4px 0' }}
     >
       {toCollection1 &&
         <MUITooltip title={`Move to ${toCollection1}`}>
