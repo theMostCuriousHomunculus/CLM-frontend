@@ -11,11 +11,10 @@ import MUITableCell from '@material-ui/core/TableCell';
 import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
-import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 
 import CreateEventForm from './CreateEventForm';
-import SmallAvatar from '../miscellaneous/SmallAvatar';
+import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const UserEventCard = (props) => {
@@ -61,11 +60,9 @@ const UserEventCard = (props) => {
                         <Link to={`/event/${event._id}`}>{event.name}</Link>
                       </MUITableCell>
                       <MUITableCell>
-                        <MUITooltip title={event.host.name}>
-                          <Link to ={`/account/${event.host._id}`}>
-                            <SmallAvatar alt={event.host.name} src={event.host.avatar} />
-                          </Link>
-                        </MUITooltip>
+                        <Link to ={`/account/${event.host._id}`}>
+                          <Avatar alt={event.host.name} size='small' src={event.host.avatar} />
+                        </Link>
                       </MUITableCell>
                       <MUITableCell>
                         {new Date(parseInt(event.createdAt)).toLocaleString()}

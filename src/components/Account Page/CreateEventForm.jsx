@@ -21,8 +21,8 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import SmallAvatar from '../miscellaneous/SmallAvatar';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { ErrorContext } from '../../contexts/error-context';
@@ -211,10 +211,7 @@ export default function CreateEventForm ({
                       key={bud._id}
                       label={
                         <span className={classes.flex}>
-                          <SmallAvatar
-                            alt={bud.name}
-                            src={bud.avatar}
-                          />
+                          <Avatar alt={bud.name} size='small' src={bud.avatar} />
                           <MUITypography variant="subtitle1">{bud.name}</MUITypography>
                         </span>
                       }

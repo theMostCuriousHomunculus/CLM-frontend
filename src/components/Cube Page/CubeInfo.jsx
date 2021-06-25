@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../../hooks/request-hook';
-import LargeAvatar from '../miscellaneous/LargeAvatar';
+import Avatar from '../miscellaneous/Avatar';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -57,7 +57,7 @@ export default function CubeInfo ({
   return (
     <MUICard>
       <MUICardHeader
-        avatar={<LargeAvatar alt={creator.name} src={creator.avatar} />}
+        avatar={<Avatar alt={creator.name} size='large' src={creator.avatar} />}
         className={classes.cardHeader}
         disableTypography={true}
         title={editable ?

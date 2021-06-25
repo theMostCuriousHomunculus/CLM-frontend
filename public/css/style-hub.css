@@ -6,6 +6,10 @@
   padding: 0;
 }
 
+a:visited {
+  color: #00F;
+}
+
 body {
   box-sizing: border-box;
   max-width: 100vw;

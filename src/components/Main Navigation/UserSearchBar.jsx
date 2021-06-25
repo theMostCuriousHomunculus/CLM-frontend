@@ -8,7 +8,7 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 
 import theme from '../../theme';
 import useRequest from '../../hooks/request-hook';
-import SmallAvatar from '../miscellaneous/SmallAvatar';
+import Avatar from '../miscellaneous/Avatar';
 
 const useStyles = makeStyles({
   input: {
@@ -153,7 +153,7 @@ export default function UserSearchBar ({
         renderOption={(option) => {
           return (
             <div className={classes.option}>
-              <SmallAvatar alt={option.name} src={option.avatar} />
+              <Avatar alt={option.name} size='small' src={option.avatar} />
               <MUITypography variant="body1">{option.name}</MUITypography>
             </div>
           );

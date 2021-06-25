@@ -14,9 +14,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import theme, { backgroundColor } from '../theme';
 import useRequest from '../hooks/request-hook';
-import LargeAvatar from '../components/miscellaneous/LargeAvatar';
+import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 const desiredBlogPostInfo = `_id\nauthor {\n_id\navatar\nname\n}\nbody\ncomments {\n_id\nauthor {\n_id\navatar\nname\n}\nbody\nupdatedAt\n}\nimage\nsubtitle\ntitle\ncreatedAt\nupdatedAt`;
@@ -301,7 +300,7 @@ export default function BlogPost () {
           {blogPost.author._id === authentication.userId ?
             <form onSubmit={submitBlogPost}>
               <MUICardHeader
-                avatar={<LargeAvatar alt={blogPost.author.name} src={blogPost.author.avatar} />}
+                avatar={<Avatar alt={blogPost.author.name} size='large' src={blogPost.author.avatar} />}
                 className={classes.cardHeader}
                 disableTypography={true}
                 title={
@@ -413,7 +412,7 @@ export default function BlogPost () {
             </form> :
             <React.Fragment>
               <MUICardHeader
-                avatar={<LargeAvatar alt={blogPost.author.name} src={blogPost.author.avatar} />}
+                avatar={<Avatar alt={blogPost.author.name} size='large' src={blogPost.author.avatar} />}
                 className={classes.cardHeader}
                 disableTypography={true}
                 title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
@@ -437,7 +436,7 @@ export default function BlogPost () {
             {blogPost.comments.map((comment, index, array) => array[array.length - 1 - index]).map(comment => {
               return (
                 <div key={comment._id} style={{ display: 'flex', margin: '4px 0' }}>
-                  <SmallAvatar alt={comment.author.name} src={comment.author.avatar} />
+                  <Avatar alt={comment.author.name} size='small' src={comment.author.avatar} />
                   <MUITypography variant="body2">{comment.body}</MUITypography>
                 </div>
               );

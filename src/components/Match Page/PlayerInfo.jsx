@@ -2,13 +2,12 @@ import React from 'react';
 import Draggable from 'react-draggable';
 import MUIBadge from '@material-ui/core/Badge';
 import MUIFavoriteIcon from '@material-ui/icons/Favorite';
-import MUITooltip from '@material-ui/core/Tooltip';
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
 import { makeStyles } from '@material-ui/core/styles';
 
-import LargeAvatar from '../miscellaneous/LargeAvatar';
+import Avatar from '../miscellaneous/Avatar';
 import { ReactComponent as EnergySymbol } from '../../svgs/energy.svg';
 import { ReactComponent as PoisonSymbol } from '../../svgs/poison.svg';
 
@@ -77,50 +76,43 @@ export default function PlayerInfo ({
       }}
     >
       <span className={classes.avatarContainer} id={`${position}-avatar`} ref={avatarRef}>
-        <MUITooltip title={player.account.name} PopperProps={{ style: { zIndex: 2147483647 } }}>
-          <span>
+        <MUIBadge
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          badgeContent={
+            <React.Fragment>
+              <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
+            </React.Fragment>
+          }
+          className={classes.energyBadge}
+          overlap='circle'
+          showZero
+        >
+          <MUIBadge
+            anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+            badgeContent={
+              <React.Fragment>
+                <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
+              </React.Fragment>
+            }
+            className={classes.lifeBadge}
+            overlap='circle'
+            showZero
+          >
             <MUIBadge
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
               badgeContent={
                 <React.Fragment>
-                  <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
+                  <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
                 </React.Fragment>
               }
-              className={classes.energyBadge}
+              className={classes.poisonBadge}
               overlap='circle'
               showZero
             >
-              <MUIBadge
-                anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-                badgeContent={
-                  <React.Fragment>
-                    <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
-                  </React.Fragment>
-                }
-                className={classes.lifeBadge}
-                overlap='circle'
-                showZero
-              >
-                <MUIBadge
-                  anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
-                  badgeContent={
-                    <React.Fragment>
-                      <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
-                    </React.Fragment>
-                  }
-                  className={classes.poisonBadge}
-                  overlap='circle'
-                  showZero
-                >
-                  <LargeAvatar
-                    alt={player.account.name}
-                    src={player.account.avatar}
-                  />
-                </MUIBadge>
-              </MUIBadge>
+              <Avatar alt={player.account.name} size='large' src={player.account.avatar} />
             </MUIBadge>
-          </span>
-        </MUITooltip>
+          </MUIBadge>
+        </MUIBadge>
       </span>
     </Draggable>
   );

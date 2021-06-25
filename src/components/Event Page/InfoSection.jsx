@@ -3,13 +3,12 @@ import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIGrid from '@material-ui/core/Grid';
-import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
 
-import SmallAvatar from '../miscellaneous/SmallAvatar';
+import Avatar from '../miscellaneous/Avatar';
 
-const InfoSection = (props) => {
+export default function InfoSection (props) {
 
   const { event: { name, players } } = props;
 
@@ -34,14 +33,9 @@ const InfoSection = (props) => {
                 lg={2}
                 xl={1}
               >
-                <MUITooltip title={player.account.name}>
-                  <Link to={`/account/${player.account._id}`}>
-                    <SmallAvatar
-                      alt={player.account.name}
-                      src={player.account.avatar}
-                    />
-                  </Link>
-                </MUITooltip>
+                <Link to={`/account/${player.account._id}`}>
+                  <Avatar alt={player.account.name} size='small' src={player.account.avatar} />
+                </Link>
               </MUIGrid>
             );
           })}
@@ -50,5 +44,3 @@ const InfoSection = (props) => {
     </MUICard>
   );
 };
-
-export default InfoSection;

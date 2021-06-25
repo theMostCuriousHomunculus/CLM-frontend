@@ -8,12 +8,11 @@ import MUICardActions from '@material-ui/core/CardActions';
 import MUICreateIcon from '@material-ui/icons/Create';
 import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MUIGrid from '@material-ui/core/Grid';
-import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 
 import useRequest from '../hooks/request-hook';
+import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
@@ -115,13 +114,7 @@ export default function Blog () {
             <MUIGrid item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
               <MUICard>
                 <MUICardHeader
-                  avatar={
-                    <MUITooltip title={`By: ${blogPost.author.name}`}>
-                      <span>
-                        <SmallAvatar alt={blogPost.author.name} src={blogPost.author.avatar} />
-                      </span>
-                    </MUITooltip>
-                  }
+                  avatar={<Avatar alt={blogPost.author.name} size='small' src={blogPost.author.avatar} />}
                   subheader={<MUITypography color="textSecondary" variant="subtitle2">{blogPost.subtitle}</MUITypography>}
                   title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
                 />

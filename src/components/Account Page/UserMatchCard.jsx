@@ -11,11 +11,10 @@ import MUITableCell from '@material-ui/core/TableCell';
 import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
-import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 
+import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
-import SmallAvatar from '../miscellaneous/SmallAvatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const UserEventCard = (props) => {
@@ -54,26 +53,17 @@ const UserEventCard = (props) => {
                 {matches.map(function (match) {
                   return (
                     <MUITableRow key={match._id}>
-                      <MUITooltip
-                        title={
-                          `${match.players[0].account.name}  — VERSUS —  
-                          ${match.players[1] ? match.players[1].account.name : 'No One'}`
-                        }
-                      >
-                        <MUITableCell>
-                          <Link to={`/match/${match._id}`} style={{ alignItems: 'center', display: 'flex' }}>
-                            <SmallAvatar
-                              alt={match.players[0].account.name}
-                              src={match.players[0].account.avatar}
-                            />
-                              — VERSUS — 
-                            {match.players[1] ?
-                              <SmallAvatar alt={match.players[1].account.name} src={match.players[1].account.avatar} /> :
-                              "No One"
-                            }
-                          </Link>
-                        </MUITableCell>
-                      </MUITooltip>
+                      <MUITableCell>
+                        <Link to={`/match/${match._id}`} style={{ alignItems: 'center', display: 'flex' }}>
+                          <Avatar alt={match.players[0].account.name} size='small' src={match.players[0].account.avatar} style={{ marginRight: 16 }} />
+                          {match.players[1] &&
+                            <React.Fragment>
+                              <span> — VERSUS — </span>
+                              <Avatar alt={match.players[1].account.name} size='small' src={match.players[1].account.avatar} style={{ marginLeft: 16 }} />
+                            </React.Fragment>
+                          }
+                        </Link>
+                      </MUITableCell>
                       <MUITableCell>
                         <Link to ={`/event/${match.event._id}`}>
                           {match.event.name}

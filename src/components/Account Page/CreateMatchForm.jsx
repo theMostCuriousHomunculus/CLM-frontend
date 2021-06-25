@@ -18,8 +18,8 @@ import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import SmallAvatar from '../miscellaneous/SmallAvatar';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { createMatch } from '../../requests/GraphQL/match-requests';
@@ -124,16 +124,11 @@ export default function CreateEventForm ({
                 {selectedEvent && selectedEvent.players.filter(plr => plr.account._id !== authentication.userId).map(function (plr) {
                   return (
                     <MUIFormControlLabel
-                      control={
-                        <MUIRadio />
-                      }
+                      control={<MUIRadio />}
                       key={plr.account._id}
                       label={
                         <span className={classes.flex}>
-                          <SmallAvatar
-                            alt={plr.account.name}
-                            src={plr.account.avatar}
-                          />
+                          <Avatar alt={plr.account.name} size='small' src={plr.account.avatar} />
                           <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
                         </span>
                       }
@@ -147,9 +142,7 @@ export default function CreateEventForm ({
           </MUIDialogContent>
 
           <MUIDialogActions>
-            <WarningButton
-              onClick={toggleOpen}
-            >
+            <WarningButton onClick={toggleOpen}>
               Cancel
             </WarningButton>
 

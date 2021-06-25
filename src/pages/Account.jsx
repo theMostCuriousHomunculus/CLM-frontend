@@ -16,10 +16,9 @@ import customSort from '../functions/custom-sort';
 import useRequest from '../hooks/request-hook';
 import BudRequests from '../components/Account Page/BudRequests';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
-import LargeAvatar from '../components/miscellaneous/LargeAvatar';
+import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
-import SmallAvatar from '../components/miscellaneous/SmallAvatar';
 import UserCubeCard from '../components/Account Page/UserCubeCard';
 import UserEventCard from '../components/Account Page/UserEventCard';
 import UserMatchCard from '../components/Account Page/UserMatchCard';
@@ -142,9 +141,7 @@ export default function Account () {
 
         <MUICard style={{ marginBottom: 0 }}>
           <MUICardHeader
-            avatar={account.avatar &&
-              <LargeAvatar alt={account.name} src={account.avatar} />
-            }
+            avatar={<Avatar alt={account.name} size='large' src={account.avatar} />}
             className={classes.cardHeader}
             disableTypography={true}
             title={accountId === authentication.userId ?
@@ -244,7 +241,7 @@ export default function Account () {
                   customSort(account.buds, ['name']).map(function (bud) {
                     return (
                       <MUIListItem key={bud._id}>
-                        <SmallAvatar alt={bud.name} src={bud.avatar} />
+                        <Avatar alt={bud.name} size='small' src={bud.avatar} />
                         <MUITypography className={classes.flexGrow} variant="body1">
                           <Link to={`/account/${bud._id}`}>{bud.name}</Link>
                         </MUITypography>

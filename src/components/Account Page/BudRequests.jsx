@@ -11,7 +11,7 @@ import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import { makeStyles } from '@material-ui/core/styles';
 
-import SmallAvatar from '../miscellaneous/SmallAvatar';
+import Avatar from '../miscellaneous/Avatar';
 import WarningButton from '../miscellaneous/WarningButton';
 
 const useStyles = makeStyles({
@@ -40,15 +40,11 @@ export default function BudRequests ({
             {received_bud_requests.map(function (request) {
               return (
                 <MUIListItem key={request._id}>
-                  {request.avatar &&
-                    <SmallAvatar alt={request.name} src={request.avatar} />
-                  }
+                  <Avatar alt={request.name} size='small' src={request.avatar} />
                   <MUITypography className={classes.flexGrow} variant="body1">
                     <Link to={`/account/${request._id}`}>{request.name}</Link>
                   </MUITypography>
-                  <WarningButton
-                    onClick={() => manageBuds(`action: "reject",\nother_user_id: "${request._id}"`)}
-                  >
+                  <WarningButton onClick={() => manageBuds(`action: "reject",\nother_user_id: "${request._id}"`)}>
                     <MUINotInterestedIcon />
                   </WarningButton>
 
@@ -78,7 +74,7 @@ export default function BudRequests ({
             {sent_bud_requests.map(function (request) {
               return (
                 <MUIListItem key={request._id}>
-                  <SmallAvatar alt={request.name} src={request.avatar} />
+                  <Avatar alt={request.name} size='small' src={request.avatar} />
                   <MUITypography variant="body1">
                     <Link to={`/account/${request._id}`}>{request.name}</Link>
                   </MUITypography>
