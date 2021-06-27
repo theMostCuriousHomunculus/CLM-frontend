@@ -302,7 +302,6 @@ export default function BlogPost () {
               <MUICardHeader
                 avatar={<Avatar alt={blogPost.author.name} size='large' src={blogPost.author.avatar} />}
                 className={classes.cardHeader}
-                disableTypography={true}
                 title={
                   <MUITextField
                     fullWidth
@@ -414,9 +413,8 @@ export default function BlogPost () {
               <MUICardHeader
                 avatar={<Avatar alt={blogPost.author.name} size='large' src={blogPost.author.avatar} />}
                 className={classes.cardHeader}
-                disableTypography={true}
-                title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
-                subheader={<MUITypography variant="subtitle2">{blogPost.subtitle}</MUITypography>}
+                title={blogPost.title}
+                subheader={blogPost.subtitle}
               />
               <MUICardContent>
                 <article className={classes.article}>
@@ -427,41 +425,38 @@ export default function BlogPost () {
           }
         </MUICard>
 
-        <MUICard className={classes.commentCard}>
-          <MUICardHeader
-            disableTypography={true}
-            title={<MUITypography variant="subtitle1">Community Reaction</MUITypography>}
-          />
-          <MUICardContent className={classes.commentSection}>
-            {blogPost.comments.map((comment, index, array) => array[array.length - 1 - index]).map(comment => {
-              return (
+        {blogPostID !== 'new-post' &&
+          <MUICard className={classes.commentCard}>
+            <MUICardHeader title="Community Reaction" />
+            <MUICardContent className={classes.commentSection}>
+              {blogPost.comments.map((comment, index, array) => array[array.length - 1 - index]).map(comment => (
                 <div key={comment._id} style={{ display: 'flex', margin: '4px 0' }}>
                   <Avatar alt={comment.author.name} size='small' src={comment.author.avatar} />
                   <MUITypography variant="body2">{comment.body}</MUITypography>
                 </div>
-              );
-            })}
-          </MUICardContent>
-          {authentication.isLoggedIn && blogPostID !== 'new-post' &&
-            <MUICardActions>
-              <form className={classes.commentForm} onSubmit={submitComment}>
-                <MUITextField
-                  autoComplete="off"
-                  fullWidth
-                  inputRef={newComment}
-                  margin="dense"
-                  multiline
-                  rows={2}
-                  type="text"
-                  variant="outlined"
-                />
-                <MUIButton color="primary" fullWidth={false} size="small" type="submit" variant="contained">
-                  Preach!
-                </MUIButton>
-              </form>
-            </MUICardActions>
-          }
-        </MUICard>
+              ))}
+            </MUICardContent>
+            {authentication.isLoggedIn &&
+              <MUICardActions>
+                <form className={classes.commentForm} onSubmit={submitComment}>
+                  <MUITextField
+                    autoComplete="off"
+                    fullWidth
+                    inputRef={newComment}
+                    margin="dense"
+                    multiline
+                    rows={2}
+                    type="text"
+                    variant="outlined"
+                  />
+                  <MUIButton color="primary" fullWidth={false} size="small" type="submit" variant="contained">
+                    Preach!
+                  </MUIButton>
+                </form>
+              </MUICardActions>
+            }
+          </MUICard>
+        }
       </React.Fragment>
   );
 };

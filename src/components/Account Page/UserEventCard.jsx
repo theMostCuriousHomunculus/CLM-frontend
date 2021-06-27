@@ -11,19 +11,20 @@ import MUITableCell from '@material-ui/core/TableCell';
 import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
-import MUITypography from '@material-ui/core/Typography';
 
 import CreateEventForm from './CreateEventForm';
 import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-const UserEventCard = (props) => {
-
-  const { buds, cubes, events, pageClasses } = props;
+export default function UserEventCard ({
+  buds,
+  cubes,
+  events,
+  pageClasses
+}) {
 
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
-
   const [showEventForm, setShowEventForm] = React.useState(false);
 
   return (
@@ -38,10 +39,7 @@ const UserEventCard = (props) => {
       }
       
       <MUICard>
-        <MUICardHeader
-          disableTypography={true}
-          title={<MUITypography variant="h5">Events</MUITypography>}
-        />
+        <MUICardHeader title="Events" />
         <MUICardContent>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
@@ -91,5 +89,3 @@ const UserEventCard = (props) => {
     </React.Fragment>
   );
 };
-
-export default UserEventCard;

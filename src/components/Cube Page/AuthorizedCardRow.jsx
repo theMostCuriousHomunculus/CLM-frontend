@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import MoveDeleteMenu from './MoveDeleteMenu';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+// import { AuthenticationContext } from '../../contexts/authentication-context';
 import { ReactComponent as TCGPlayerLogo } from '../../svgs/tcgplayer-logo-full-color.svg';
 
 
@@ -33,7 +33,7 @@ export default function AuthorizedCardRow ({
   columnWidths
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
+  // const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
 
   async function moveDeleteCard (destination) {

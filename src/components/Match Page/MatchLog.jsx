@@ -28,10 +28,7 @@ export default function MatchLog ({ log }) {
 
   return (
     <MUICard className={classes.card}>
-      <MUICardHeader
-        disableTypography={true}
-        title={<MUITypography variant="h5">Match Log</MUITypography>}
-      />
+      <MUICardHeader title="Match Log" />
       <MUICardContent className={classes.cardContent}>
         {/*some tricky css here for a nice auto scroll effect*/} 
         {log.map((val, index, array) => array[array.length - 1 - index]).map((update, index, array) => {

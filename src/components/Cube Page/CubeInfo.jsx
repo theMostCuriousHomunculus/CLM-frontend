@@ -5,18 +5,10 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
-
-const useStyles = makeStyles({
-  cardHeader: {
-    // alignItems: 'stretch',
-    // display: 'flex'
-  }
-});
 
 export default function CubeInfo ({
   creator,
@@ -26,7 +18,6 @@ export default function CubeInfo ({
 }) {
 
   const descriptionRef = React.useRef();
-  const classes = useStyles();
   const cubeID = useParams().cubeId;
   const nameRef = React.useRef();
   const { sendRequest } = useRequest();
@@ -58,24 +49,20 @@ export default function CubeInfo ({
     <MUICard>
       <MUICardHeader
         avatar={<Avatar alt={creator.name} size='large' src={creator.avatar} />}
-        className={classes.cardHeader}
-        disableTypography={true}
         title={editable ?
           <MUITextField
             defaultValue={name}
-            inputProps={{
-              onBlur: editCube
-            }}
+            inputProps={{ onBlur: editCube }}
             inputRef={nameRef}
             label="Cube Name"
             margin="dense"
             type="text"
             variant="outlined"
           /> :
-          <MUITypography variant="subtitle1">{name}</MUITypography>
+          <MUITypography variant="h2">{name}</MUITypography>
         }
         subheader={
-          <MUITypography color="textSecondary" variant="subtitle2">
+          <MUITypography color="textSecondary" variant="subtitle1">
             Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
           </MUITypography>
         }
@@ -86,9 +73,7 @@ export default function CubeInfo ({
           <MUITextField
             defaultValue={description}
             fullWidth={true}
-            inputProps={{
-              onBlur: editCube
-            }}
+            inputProps={{ onBlur: editCube }}
             inputRef={descriptionRef}
             label="Cube Description"
             margin="dense"
@@ -96,10 +81,7 @@ export default function CubeInfo ({
             rows={2}
             variant="outlined"
           /> :
-          <React.Fragment>
-            <MUITypography variant="subtitle1">Description:</MUITypography>
-            <MUITypography variant="body1">{description}</MUITypography>
-          </React.Fragment>
+          <MUITypography variant="body1">{description}</MUITypography>
         }        
       </MUICardContent>
     </MUICard>

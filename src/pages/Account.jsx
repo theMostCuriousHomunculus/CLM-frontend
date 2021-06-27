@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
+import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIGrid from '@material-ui/core/Grid';
 import MUIList from '@material-ui/core/List';
@@ -61,7 +62,7 @@ export default function Account () {
     received_bud_requests: [],
     sent_bud_requests: []
   });
-  const [dialogInfo, setDialogInfo] = React.useState({});
+  const [budToDelete, setBudToDelete] = React.useState({ _id: null, avatar: null, name: null })
   const desiredAccountInfo = `
     avatar
     buds {
@@ -214,16 +215,26 @@ export default function Account () {
       <LoadingSpinner /> :
       <React.Fragment>
         <ConfirmationDialog
-          confirmHandler={submitChanges}
-          dialogInfo={dialogInfo}
-          toggleOpen={() => setDialogInfo({})}
-        />
+          confirmHandler={() => {
+            submitChanges(`action: "remove",\nother_user_id: "${budToDelete._id}"`);
+            setBudToDelete({ _id: null, avatar: null, name: null });
+          }}
+          open={!!budToDelete._id}
+          title={`Are you sure you want to un-bud ${budToDelete.name}?`}
+          toggleOpen={() => setBudToDelete({ _id: null, avatar: null, name: null })}
+        >
+          <div style={{ display: 'flex' }}>
+            <Avatar alt={budToDelete.name} size='large' src={budToDelete.avatar} style={{ marginRight: 16 }} />
+            <MUITypography variant="body1">
+              Think of all the good times you've had.  And how lonely they'll be without you.
+            </MUITypography>
+          </div>
+        </ConfirmationDialog>
 
         <MUICard>
           <MUICardHeader
             avatar={<Avatar alt={account.name} size='large' src={account.avatar} />}
             className={classes.cardHeader}
-            disableTypography={true}
             title={accountId === authentication.userId ?
               <MUITextField
                 autoComplete="off"
@@ -244,7 +255,7 @@ export default function Account () {
                 value={account.name}
                 variant="outlined"
               /> :
-              <MUITypography variant="h5">
+              <MUITypography variant="h2">
                 {account.name}
               </MUITypography>
             }
@@ -282,12 +293,6 @@ export default function Account () {
           }
         </MUICard>
 
-        <UserMatchCard
-          events={account.events}
-          matches={account.matches}
-          pageClasses={classes}
-        />
-
         <MUIGrid container spacing={0}>
           <MUIGrid item xs={12} lg={6}>
             <UserCubeCard
@@ -298,6 +303,16 @@ export default function Account () {
           </MUIGrid>
 
           <MUIGrid item xs={12} lg={6}>
+            <MUICard>
+              <MUICardHeader title="Decks" />
+              <MUICardContent>
+              </MUICardContent>
+              <MUICardActions>
+              </MUICardActions>
+            </MUICard>
+          </MUIGrid>
+
+          <MUIGrid item xs={12} lg={6}>
             <UserEventCard
               buds={account.buds}
               cubes={account.cubes}
@@ -305,15 +320,18 @@ export default function Account () {
               pageClasses={classes}
             />
           </MUIGrid>
-        </MUIGrid>
 
-        <MUIGrid container spacing={0}>
+          <MUIGrid item xs={12} lg={6}>
+            <UserMatchCard
+              events={account.events}
+              matches={account.matches}
+              pageClasses={classes}
+            />
+          </MUIGrid>
+
           <MUIGrid item xs={12} sm={6} md={4}>
             <MUICard>
-              <MUICardHeader
-                disableTypography={true}
-                title={<MUITypography variant="h5">Buds</MUITypography>}
-              />
+              <MUICardHeader title="Buds" />
               <MUIList>
                 {customSort(account.buds, ['name']).map(bud => (
                   <MUIListItem key={bud._id} style={{ justifyContent: 'space-between' }}>
@@ -321,13 +339,7 @@ export default function Account () {
                       <Avatar alt={bud.name} size='small' src={bud.avatar} />
                     </Link>
                     {accountId === authentication.userId &&
-                      <WarningButton
-                        onClick={() => setDialogInfo({
-                          data: `action: "remove",\nother_user_id: "${bud._id}"`,
-                          content: <MUITypography variant="body1">Think of all the good times you've had.</MUITypography>,
-                          title: `Are you sure you want to un-bud ${bud.name}?`
-                        })}
-                      >
+                      <WarningButton onClick={() => setBudToDelete(bud)}>
                         Un-Bud
                       </WarningButton>
                     }

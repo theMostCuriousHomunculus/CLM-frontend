@@ -42,7 +42,7 @@ export default function UserCubeCard ({
   const accountId = useParams().accountId;
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [dialogInfo, setDialogInfo] = React.useState({});
+  const [cubeToDelete, setCubeToDelete] = React.useState({ _id: null, name: null })
   const [showCubeForm, setShowCubeForm] = React.useState(false);
   const { sendRequest } = useRequest();
 
@@ -69,10 +69,18 @@ export default function UserCubeCard ({
     <React.Fragment>
 
       <ConfirmationDialogue
-        confirmHandler={deleteCube}
-        dialogInfo={dialogInfo}
-        toggleOpen={() => setDialogInfo({})}
-      />
+        confirmHandler={() => {
+          deleteCube(cubeToDelete._id);
+          setCubeToDelete({ _id: null, name: null });
+        }}
+        open={!!cubeToDelete._id}
+        title={`Are you sure you want to delete "${cubeToDelete.name}?`}
+        toggleOpen={() => setCubeToDelete({ _id: null, name: null })}
+      >
+        <MUITypography variant="body1">
+          This action cannot be undone.  You may want to export your list first.
+        </MUITypography>
+      </ConfirmationDialogue>
 
       <CreateCubeForm
         open={showCubeForm}
@@ -80,10 +88,7 @@ export default function UserCubeCard ({
       />
 
       <MUICard>
-        <MUICardHeader
-          disableTypography={true}
-          title={<MUITypography variant="h5">Cubes</MUITypography>}
-        />
+        <MUICardHeader title="Cubes" />
         <MUICardContent>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
@@ -97,36 +102,28 @@ export default function UserCubeCard ({
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
-                {cubes.map(function (cube) {
-                  return (
-                    <MUITableRow key={cube._id}>
+                {cubes.map(cube => (
+                  <MUITableRow key={cube._id}>
+                    <MUITableCell>
+                      <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
+                    </MUITableCell>
+                    <MUITableCell>
+                      {cube.description}
+                    </MUITableCell>
+                    {accountId === authentication.userId &&
                       <MUITableCell>
-                        <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
+                        <MUIIconButton
+                          className={classes.iconButton}
+                          // color="secondary"
+                          onClick={() => setCubeToDelete({ _id: cube._id, name: cube.name })}
+                          size="small"
+                        >
+                          <MUIDeleteForeverIcon />
+                        </MUIIconButton>
                       </MUITableCell>
-                      <MUITableCell>
-                        {cube.description}
-                      </MUITableCell>
-                      {accountId === authentication.userId &&
-                        <MUITableCell>
-                          <MUIIconButton
-                            className={classes.iconButton}
-                            // color="secondary"
-                            onClick={() => setDialogInfo({
-                              data: cube._id,
-                              content: <MUITypography variant="body1">
-                                This action cannot be undone.  You may want to export your list first.
-                              </MUITypography>,
-                              title: `Are you sure you want to delete "${cube.name}?`
-                            })}
-                            size="small"
-                          >
-                            <MUIDeleteForeverIcon />
-                          </MUIIconButton>
-                        </MUITableCell>
-                      }
-                    </MUITableRow>
-                  );
-                })}
+                    }
+                  </MUITableRow>
+                ))}
               </MUITableBody>
             </MUITable>
           </MUITableContainer>

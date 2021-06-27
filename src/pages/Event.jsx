@@ -9,10 +9,10 @@ import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
+import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import PicksDisplay from '../components/Event Page/PicksDisplay';
-import SelectConfirmationDialog from '../components/Event Page/SelectConfirmationDialog';
 import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
@@ -21,7 +21,6 @@ export default function Event () {
   const authentication = React.useContext(AuthenticationContext);
   const eventID = useParams().eventId;
   const { loading, sendRequest } = useRequest();
-  const [dialogDisplayed, setDialogDisplayed] = React.useState(false);
   const [event, setEvent] = React.useState({
     finished: false,
     host: {},
@@ -38,7 +37,12 @@ export default function Event () {
       sideboard: []
     }]
   });
-  const [selectedCard, setSelectedCard] = React.useState();
+  const [selectedCard, setSelectedCard] = React.useState({
+    _id: null,
+    image: null,
+    back_image: null,
+    name: null
+  });
   const [tabNumber, setTabNumber] = React.useState(0);
   const me = event.players.find(plr => plr.account._id === authentication.userId);
   const others = event.players.filter(plr => plr.account._id !== authentication.userId);
@@ -224,17 +228,39 @@ export default function Event () {
   return (loading ?
     <LoadingSpinner /> :
     <React.Fragment>
-      <SelectConfirmationDialog
-        card={selectedCard}
-        open={dialogDisplayed}
-        selectCardHandler={cardID => onSelectCard(cardID)}
-        toggleOpen={() => setDialogDisplayed(false)}
+      <ConfirmationDialog
+        confirmHandler={() => {
+          onSelectCard(selectedCard._id);
+          setSelectedCard({
+            _id: null,
+            image: null,
+            back_image: null,
+            name: null
+          });
+        }}
+        open={!!selectedCard._id}
+        title={`Are you sure you want to draft ${selectedCard.name}?`}
+        toggleOpen={() => setSelectedCard({
+          _id: null,
+          image: null,
+          back_image: null,
+          name: null
+        })}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <img alt={selectedCard.name} src={selectedCard.image} style={{ height: 264 }} />
+          {selectedCard.back_image &&
+            <img alt={selectedCard.name} src={selectedCard.back_image} style={{ height: 264 }} />
+          }
+        </div>
+      </ConfirmationDialog>
+
+      <InfoSection
+        name={event.name}
+        players={event.players.map(plr => plr.account)}
       />
 
-      <InfoSection event={event} />
-
-      {// displays if the event is a draft and is not yet finished
-        !event.finished &&
+      {!event.finished &&
         <MUIPaper style={{ overflow: 'hidden' }}>
           <MUITabs
             indicatorColor="primary"
@@ -254,10 +280,12 @@ export default function Event () {
               <SortableList
                 axis="xy"
                 cards={me.current_pack}
-                clickFunction={cardData => {
-                  setSelectedCard(cardData);
-                  setDialogDisplayed(true);
-                }}
+                clickFunction={cardData => setSelectedCard({
+                  _id: cardData._id,
+                  back_image: cardData.back_image,
+                  image: cardData.image,
+                  name: cardData.name
+                })}
                 distance={2}
                 fromCollection="current_pack"
                 onSortEnd={onSortEnd}
@@ -289,8 +317,7 @@ export default function Event () {
         </MUIPaper>
       }
 
-      {// displays once the event is finished
-        event.finished &&
+      {event.finished &&
         <React.Fragment>
           <CardPoolDownloadLinks me={me} others={others} />
 

@@ -11,11 +11,8 @@ import MUIControlCameraIcon from '@material-ui/icons/ControlCamera';
 import MUIPaletteIcon from '@material-ui/icons/Palette';
 import MUITimerIcon from '@material-ui/icons/Timer';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-
 export default function Home () {
 
-  const authentication = React.useContext(AuthenticationContext);
   const history = useHistory();
 
   /*const components = [
@@ -39,15 +36,7 @@ export default function Home () {
 
   return (
     <MUICard>
-      <MUICardHeader
-        disableTypography={true}
-        title={<MUITypography variant="subtitle1">A New Tool for Cube Curators</MUITypography>}
-        subheader={!authentication.isLoggedIn &&
-          <MUITypography color="textSecondary" variant="subtitle2">
-            Create an account or login to get started building cubes and connecting with your buds!
-          </MUITypography>
-        }
-      />
+      <MUICardHeader title="A New Tool for Cube Curators" />
       <MUICardContent>
         <MUITypography variant="body1"><MUIControlCameraIcon /> Increased Control Over Your Cube</MUITypography>
         <MUITypography variant="body1"><MUIPaletteIcon /> Diverse Play Experiences</MUITypography>

@@ -99,10 +99,9 @@ export default function TableView ({
           return (
             <MUICard className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`} key={`table-${color.name}`}>
               <MUICardHeader
-                disableTypography={true}
                 className={classes.cardHeader}
-                title={<MUITypography variant="h6">{color.name}</MUITypography>}
-                subheader={<MUITypography variant="h6">({cards_color.length})</MUITypography>}
+                title={color.name}
+                subheader={`(${cards_color.length})`}
               />
               <MUICardContent className={classes.cardContent}>
                 {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
@@ -161,11 +160,8 @@ export default function TableView ({
       <MUICard className={classes.multicolor + ' ' + classes.basicCard}>
         <MUICardHeader
           className={classes.cardHeader}
-          disableTypography={true}
-          title={<MUITypography variant="h6">Multicolor</MUITypography>}
-          subheader={<MUITypography variant="h6">
-            ({cards.filter(card => card.color_identity.length > 1).length})
-          </MUITypography>}
+          title="Multicolor"
+          subheader={`(${cards.filter(card => card.color_identity.length > 1).length})`}
         />
         <MUICardContent className={classes.cardContent}>
           {multiColors.map(function (color) {

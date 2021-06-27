@@ -6,7 +6,6 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIGrid from '@material-ui/core/Grid';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
-import MUITypography from '@material-ui/core/Typography';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 
@@ -23,10 +22,7 @@ export default function BudRequests ({
     <React.Fragment>
       <MUIGrid item xs={12} sm={6} md={4}>
         <MUICard>
-          <MUICardHeader
-            disableTypography={true}
-            title={<MUITypography variant="h5">Aspiring Buds</MUITypography>}
-          />
+          <MUICardHeader title="Aspiring Buds" />
           <MUIList>
             {received_bud_requests.map(function (request) {
               return (
@@ -54,10 +50,7 @@ export default function BudRequests ({
         
       <MUIGrid item xs={12} sm={6} md={4}>
         <MUICard>
-          <MUICardHeader
-            disableTypography={true}
-            title={<MUITypography variant="h5">Pending Buds</MUITypography>}
-          />
+          <MUICardHeader title="Pending Buds" />
           <MUIList>
             {sent_bud_requests.map(function (request) {
               return (

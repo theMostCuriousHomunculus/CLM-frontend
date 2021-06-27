@@ -88,10 +88,7 @@ export default function CurveView ({
         const cards_color = cards.filter(card => card.color_identity.toString() === color.color_identity);
         return (
           <MUICard className={(classes[`${color.name.toLowerCase()}`] || classes.multicolor)} key={`curve-${color.name}`}>
-            <MUICardHeader
-              disableTypography={true}
-              title={<MUITypography variant="h5">{color.name}</MUITypography>}
-            />
+            <MUICardHeader title={color.name} />
             <MUICardContent style={{ overflowX: 'auto' }}>
               {[true, false].map(function (isCreature) {
                 const cards_color_isCreature = cards_color.filter(function (card) {

@@ -11,7 +11,6 @@ import MUITableCell from '@material-ui/core/TableCell';
 import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
-import MUITypography from '@material-ui/core/Typography';
 
 import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
@@ -38,10 +37,7 @@ export default function UserEventCard ({
       }
       
       <MUICard>
-        <MUICardHeader
-          disableTypography={true}
-          title={<MUITypography variant="h5">Matches</MUITypography>}
-        />
+        <MUICardHeader title="Matches" />
         <MUICardContent>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
