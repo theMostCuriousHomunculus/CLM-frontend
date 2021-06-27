@@ -20,7 +20,6 @@ const Home = React.lazy(() => import('./pages/Home'));
 const Match = React.lazy(() => import('./pages/Match'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
-const Test = React.lazy(() => import('./pages/Test'));
 
 const useStyles = makeStyles({
   main: {
@@ -135,9 +134,6 @@ export default function App() {
                 </Route>
                 <Route path='/resources' exact>
                   <Resources />
-                </Route>
-                <Route path='/test'>
-                  <Test />
                 </Route>
               </Switch>
             </React.Suspense>
