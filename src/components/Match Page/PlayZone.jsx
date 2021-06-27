@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import MagicCard from '../miscellaneous/MagicCard';
 import PlayerInfo from './PlayerInfo';
 import VerticalCollapsableZone from './VerticalCollapsableZone';
+import { MatchContext } from '../../contexts/match-context';
 import { ReactComponent as GraveyardSymbol } from '../../svgs/graveyard.svg';
 import { ReactComponent as LibrarySymbol } from '../../svgs/deck.svg';
 
@@ -49,8 +50,6 @@ export default function PlayZone ({
   bottomPlayer,
   cardSize,
   displayedZones,
-  handleDragCard,
-  handleTapUntapCards,
   setClickedPlayer,
   setRightClickedCard,
   topPlayer
@@ -59,6 +58,7 @@ export default function PlayZone ({
   const battlefieldRef = React.useRef();
   const classes = useStyles();
   const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
+  const { dragCard, tapUntapCards } = React.useContext(MatchContext);
   const notInPlay = {
     flexShrink: 0,
     // magic card dimentions are 63mm x 88mm
@@ -196,9 +196,9 @@ export default function PlayZone ({
                     const oldYPosition = parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100;
                     
                     if (Math.abs(oldXPosition - data.x) < 2 && Math.abs(oldYPosition - data.y) < 2) {
-                      handleTapUntapCards([card._id]);
+                      tapUntapCards([card._id]);
                     } else {
-                      handleDragCard(
+                      dragCard(
                         data.node.id.replace("drag-", ""),
                         data.x * 100 / battlefieldRef.current.offsetWidth,
                         data.y * 100 / battlefieldRef.current.offsetHeight,

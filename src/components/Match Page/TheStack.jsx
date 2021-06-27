@@ -4,13 +4,13 @@ import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 
-import MagicCard from '../miscellaneous/MagicCard';
 import theme from '../../theme';
+import MagicCard from '../miscellaneous/MagicCard';
+import { MatchContext } from '../../contexts/match-context';
 
-export default function TheStack ({
-  setRightClickedCard,
-  stack
-}) {
+export default function TheStack ({ setRightClickedCard }) {
+
+  const { matchState: { stack } } = React.useContext(MatchContext);
 
   return (
     <Draggable bounds="body" handle="#stack">
@@ -33,6 +33,9 @@ export default function TheStack ({
           {stack.map(card => (
             <MagicCard
               cardData={card}
+              customStyle={{
+                flexShrink: 0
+              }}
               key={card._id}
               rightClickFunction={event => {
                 event.preventDefault();

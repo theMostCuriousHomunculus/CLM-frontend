@@ -5,7 +5,6 @@ import MUISlider from '@material-ui/core/Slider';
 import MUITypography from '@material-ui/core/Typography';
 import { createClient } from 'graphql-ws';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
 
 import CardMenu from '../components/Match Page/CardMenu';
 import HelpDialog from '../components/Match Page/HelpDialog';
@@ -16,19 +15,7 @@ import PlayZone from '../components/Match Page/PlayZone';
 import TheStack from '../components/Match Page/TheStack';
 import ZoneInspectionDialog from '../components/Match Page/ZoneInspectionDialog';
 import { AuthenticationContext } from '../contexts/authentication-context';
-import {
-  adjustEnergyCounters,
-  adjustLifeTotal,
-  adjustPoisonCounters,
-  desiredMatchInfo,
-  dragCard,
-  drawCard,
-  fetchMatchByID,
-  rollDice,
-  shuffleLibrary,
-  tapUntapCards,
-  transferCard
-} from '../requests/GraphQL/match-requests.js';
+import { MatchContext } from '../contexts/match-context';
 import PlayerMenu from '../components/Match Page/PlayerMenu';
 
 const useStyles = makeStyles({
@@ -61,51 +48,6 @@ export default function Match () {
     topLibrary: true
   });
   const [helpDisplayed, setHelpDisplayed] = React.useState(false);
-  const matchID = useParams().matchId;
-  const [loading, setLoading] = React.useState(false);
-  const [match, setMatch] = React.useState({
-    game_winners: [],
-    log: [],
-    players: [
-      {
-        account: {
-          _id: "A",
-          avatar: "",
-          name: ""
-        },
-        battlefield: [],
-        energy: 0,
-        exile: [],
-        graveyard: [],
-        hand: [],
-        library: [],
-        life: 20,
-        mainboard: [],
-        poison: 0,
-        sideboard: [],
-        temporary: []
-      },
-      {
-        account: {
-          _id: "B",
-          avatar: "",
-          name: ""
-        },
-        battlefield: [],
-        energy: 0,
-        exile: [],
-        graveyard: [],
-        hand: [],
-        library: [],
-        life: 20,
-        mainboard: [],
-        poison: 0,
-        sideboard: [],
-        temporary: []
-      }
-    ],
-    stack: []
-  });
   const [numberInputDialogInfo, setNumberInputDialogInfo] = React.useState({
     buttonText: null,
     defaultValue: null,
@@ -113,16 +55,27 @@ export default function Match () {
     title: null,
     updateFunction: null
   });
-  const participant = match.players.some(plr => plr.account._id === authentication.userId);
+  const {
+    loading,
+    matchQuery,
+    matchState,
+    setMatchState,
+    drawCard,
+    fetchMatchByID,
+    rollDice,
+    shuffleLibrary,
+    tapUntapCards
+  } = React.useContext(MatchContext);
+  const participant = matchState.players.some(plr => plr.account._id === authentication.userId);
   const bottomPlayer = participant ?
-    match.players.find(plr => plr.account._id === authentication.userId) :
-    match.players[0];
+    matchState.players.find(plr => plr.account._id === authentication.userId) :
+    matchState.players[0];
   let topPlayer;
   
-  if (participant && match.players.length === 2) {
-    topPlayer = match.players.find(plr => plr.account._id !== authentication.userId);
-  } else if (!participant && match.players.length === 2) {
-    topPlayer = match.players[1];
+  if (participant && matchState.players.length === 2) {
+    topPlayer = matchState.players.find(plr => plr.account._id !== authentication.userId);
+  } else if (!participant && matchState.players.length === 2) {
+    topPlayer = matchState.players[1];
   } else {
     topPlayer = null;
   }
@@ -137,108 +90,10 @@ export default function Match () {
   });
   const [zoneName, setZoneName] = React.useState(null);
 
-  async function handleAdjustEnergyCounters (energy) {
-    try {
-      await adjustEnergyCounters(energy, matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
-  const handleAdjustLifeTotal = React.useCallback(async function (life) {
-    try {
-      await adjustLifeTotal(life, matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleAdjustPoisonCounters = React.useCallback(async function  (poison) {
-    try {
-      await adjustPoisonCounters(poison, matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleDragCard = React.useCallback(async function (cardID, xCoordinate, yCoordinate, zIndex) {
-    try {
-      await dragCard(cardID, xCoordinate, yCoordinate, zIndex, matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleDrawCard = React.useCallback(async function () {
-    try {
-      await drawCard(matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleRollDice = React.useCallback(async function  (sides) {
-    try {
-      await rollDice(sides, matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleShuffleLibrary = React.useCallback(async function () {
-    try {
-      await shuffleLibrary(matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleTapUntapCards = React.useCallback(async function  (cardIDs) {
-    try {
-      await tapUntapCards(cardIDs, matchID, authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [matchID, authentication.token]);
-
-  const handleTransferCard = React.useCallback(async function  (destinationZone, index, reveal, shuffle) {
-    try {
-      setRightClickedCard(prevState => ({
-        ...prevState,
-        anchorElement: null
-      }));
-      await transferCard(rightClickedCard._id,
-        destinationZone,
-        index,
-        rightClickedCard.origin,
-        reveal,
-        shuffle,
-        matchID,
-        authentication.token);
-    } catch (error) {
-      console.log(error.message);
-    } finally {
-      setRightClickedCard({
-        _id: null,
-        anchorElement: null,
-        origin: null,
-        visibility: []
-      });
-    }
-  }, [rightClickedCard, matchID, authentication.token]);
-
   React.useEffect(function () {
 
     async function initialize () {
-      try {
-        setLoading(true);
-        const matchData = await fetchMatchByID(matchID, authentication.token);
-        setMatch(matchData);
-      } catch (error) {
-        console.log(error.message);
-      } finally {
-        setLoading(false);
-      }
+      await fetchMatchByID();
     }
 
     initialize();
@@ -246,21 +101,21 @@ export default function Match () {
     const client = createClient({
       connectionParams: {
         authToken: authentication.token,
-        matchID
+        matchID: matchState._id
       },
       url: process.env.REACT_APP_GRAPHQL_WS_URL
     });
 
     async function subscribe () {
       function onNext(update) {
-        setMatch(update.data.joinMatch);
+        setMatchState(update.data.joinMatch);
       }
 
       await new Promise((resolve, reject) => {
         client.subscribe({
           query: `subscription {
             joinMatch {
-              ${desiredMatchInfo}
+              ${matchQuery}
             }
           }`
         },
@@ -275,13 +130,13 @@ export default function Match () {
     subscribe(result => console.log(result), error => console.log(error));
 
     return client.dispose;
-  }, [authentication.token, matchID]);
+  }, [authentication.token, fetchMatchByID, matchQuery, matchState._id, setMatchState]);
 
   React.useEffect(() => {
     function handleHotKeys (event) {
 
       if (event.altKey && event.shiftKey && event.key === 'D') {
-        handleDrawCard();
+        drawCard();
       }
 
       if (event.altKey && event.shiftKey && event.key === 'R') {
@@ -290,16 +145,16 @@ export default function Match () {
           defaultValue: 6,
           inputLabel: "Number of Sides",
           title: "Roll Dice",
-          updateFunction: (updatedValue) => handleRollDice(updatedValue)
+          updateFunction: updatedValue => rollDice(updatedValue)
         });
       }
 
       if (event.altKey && event.shiftKey && event.key === 'S') {
-        handleShuffleLibrary();
+        shuffleLibrary();
       }
 
       if (event.altKey && event.shiftKey && event.key === 'U') {
-        handleTapUntapCards(bottomPlayer.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
+        tapUntapCards(bottomPlayer.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
       }
 
     }
@@ -310,7 +165,7 @@ export default function Match () {
       return () => document.removeEventListener("keydown", handleHotKeys);
     }
 
-  }, [handleDrawCard, handleRollDice, handleShuffleLibrary, handleTapUntapCards, participant, bottomPlayer.battlefield]);
+  }, [drawCard, rollDice, shuffleLibrary, tapUntapCards, participant, bottomPlayer.battlefield]);
 
   return (
     loading ?
@@ -351,7 +206,6 @@ export default function Match () {
       />
 
       <CardMenu
-        handleTransferCard={handleTransferCard}
         rightClickedCard={rightClickedCard}
         setRightClickedCard={setRightClickedCard}
       />
@@ -360,20 +214,14 @@ export default function Match () {
         bottomPlayer={bottomPlayer}
         clickedPlayer={clickedPlayer}
         displayedZones={displayedZones}
-        handleAdjustEnergyCounters={handleAdjustEnergyCounters}
-        handleAdjustLifeTotal={handleAdjustLifeTotal}
-        handleAdjustPoisonCounters={handleAdjustPoisonCounters}
         setClickedPlayer={setClickedPlayer}
         setDisplayedZones={setDisplayedZones}
         setNumberInputDialogInfo={setNumberInputDialogInfo}
         setZoneName={setZoneName}
       />
 
-      {match.stack.length > 0 &&
-        <TheStack
-          setRightClickedCard={setRightClickedCard}
-          stack={match.stack}
-        />
+      {matchState.stack.length > 0 &&
+        <TheStack setRightClickedCard={setRightClickedCard} />
       }
 
       <div className={classes.matchScreenFlexContainer}>
@@ -400,14 +248,12 @@ export default function Match () {
           bottomPlayer={bottomPlayer}
           cardSize={cardSize}
           displayedZones={displayedZones}
-          handleDragCard={handleDragCard}
-          handleTapUntapCards={handleTapUntapCards}
           setClickedPlayer={setClickedPlayer}
           setRightClickedCard={setRightClickedCard}
           topPlayer={topPlayer}
         />
 
-        <MatchLog log={match.log} />
+        <MatchLog />
       </div>
     </React.Fragment>
   );

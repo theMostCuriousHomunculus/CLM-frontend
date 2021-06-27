@@ -2,11 +2,31 @@ import React from 'react';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
+import { MatchContext } from '../../contexts/match-context';
+
 export default function CardMenu ({
-  handleTransferCard,
   rightClickedCard,
   setRightClickedCard
 }) {
+
+  const { transferCard } = React.useContext(MatchContext);
+
+  function handleTransferCard (destinationZone, reveal, shuffle, index) {
+    transferCard(
+      rightClickedCard._id,
+      destinationZone,
+      rightClickedCard.origin,
+      reveal,
+      shuffle,
+      index
+    );
+    setRightClickedCard({
+      _id: null,
+      anchorElement: null,
+      origin: null,
+      visibility: []
+    });
+  }
 
   return (
     <MUIMenu
@@ -21,37 +41,37 @@ export default function CardMenu ({
       })}
       style={{ zIndex: 2147483647 }}
     >
-      <MUIMenuItem onClick={() => handleTransferCard('battlefield', null, false, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('battlefield', false, false)}>
         Place Face Down on Battlefield
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('battlefield', null, true, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('battlefield', true, false)}>
         Place Face Up on Battlefield
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('exile', null, false, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('exile', false, false)}>
         Place Face Down in Exile
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('exile', null, true, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('exile', true, false)}>
         Place Face Up in Exile
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('graveyard', null, true, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('graveyard', true, false)}>
         Move to Graveyard
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('hand', null, true, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('hand', true, false)}>
         Reveal and Put in Hand
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('hand', null, false, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('hand', false, false)}>
         Put in Hand Without Revealing
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('library', null, true, true)}>
+      <MUIMenuItem onClick={() => handleTransferCard('library', true, true)}>
         Reveal and Shuffle into Library
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('library', null, false, true)}>
+      <MUIMenuItem onClick={() => handleTransferCard('library', false, true)}>
         Shuffle into Library Without Revealing
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('stack', null, false, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('stack', false, false)}>
         Place Face Down on the Stack
       </MUIMenuItem>
-      <MUIMenuItem onClick={() => handleTransferCard('stack', null, true, false)}>
+      <MUIMenuItem onClick={() => handleTransferCard('stack', true, false)}>
         Place Face Up on the Stack
       </MUIMenuItem>
     </MUIMenu>

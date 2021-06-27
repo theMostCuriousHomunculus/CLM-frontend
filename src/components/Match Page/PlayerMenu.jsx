@@ -3,14 +3,12 @@ import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
 import { AuthenticationContext } from '../../contexts/authentication-context';
+import { MatchContext } from '../../contexts/match-context';
 
 export default function PlayerMenu ({
   bottomPlayer,
   clickedPlayer,
   displayedZones,
-  handleAdjustEnergyCounters,
-  handleAdjustLifeTotal,
-  handleAdjustPoisonCounters,
   setClickedPlayer,
   setDisplayedZones,
   setNumberInputDialogInfo,
@@ -18,6 +16,7 @@ export default function PlayerMenu ({
 }) {
 
   const authentication = React.useContext(AuthenticationContext);
+  const { adjustEnergyCounters, adjustLifeTotal, adjustPoisonCounters } = React.useContext(MatchContext);
 
   return (
     <MUIMenu
@@ -46,7 +45,7 @@ export default function PlayerMenu ({
                 defaultValue: bottomPlayer.energy,
                 inputLabel: "Energy",
                 title: "Update Your Energy Counters",
-                updateFunction: (updatedValue) => handleAdjustEnergyCounters(updatedValue)
+                updateFunction: updatedValue => adjustEnergyCounters(updatedValue)
               });
             }}
           >
@@ -65,7 +64,7 @@ export default function PlayerMenu ({
                 defaultValue: bottomPlayer.life,
                 inputLabel: "Life",
                 title: "Update Your Life Total",
-                updateFunction: (updatedValue) => handleAdjustLifeTotal(updatedValue)
+                updateFunction: updatedValue => adjustLifeTotal(updatedValue)
               });
             }}
           >
@@ -83,7 +82,7 @@ export default function PlayerMenu ({
                 defaultValue: bottomPlayer.poison,
                 inputLabel: "Poison",
                 title: "Update Your Poison Counters",
-                updateFunction: (updatedValue) => handleAdjustPoisonCounters(updatedValue)
+                updateFunction: updatedValue => adjustPoisonCounters(updatedValue)
               });
             }}
           >

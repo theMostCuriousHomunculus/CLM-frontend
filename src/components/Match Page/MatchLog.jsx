@@ -5,6 +5,8 @@ import MUICardContent from '@material-ui/core/CardContent';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { MatchContext } from '../../contexts/match-context';
+
 const useStyles = makeStyles({
   card: {
     display: 'flex',
@@ -22,9 +24,10 @@ const useStyles = makeStyles({
   }
 });
 
-export default function MatchLog ({ log }) {
+export default function MatchLog () {
 
   const classes = useStyles();
+  const { matchState: { log } } = React.useContext(MatchContext);
 
   return (
     <MUICard className={classes.card}>
