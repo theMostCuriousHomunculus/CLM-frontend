@@ -118,9 +118,9 @@ export default function BlogPost () {
   const [blogPost, setBlogPost] = React.useState({
     _id: null,
     author: {
-      _id: null,
-      avatar: null,
-      name: null
+      _id: '',
+      avatar: '',
+      name: '...'
     },
     body: '',
     comments: [],
@@ -231,7 +231,9 @@ export default function BlogPost () {
     
   }, [authentication.isAdmin, authentication.token, authentication.userId, blogPostID, history, sendRequest]);
 
-  async function submitBlogPost () {
+  async function submitBlogPost (event) {
+    event.preventDefault();
+
     const headers = {};
     let operation;
 
@@ -244,7 +246,7 @@ export default function BlogPost () {
 
     await sendRequest({
       callback: () => {
-        history.push('/blog');
+        setTimeout(() => history.push('/blog'), 0);
       },
       headers,
       operation,
