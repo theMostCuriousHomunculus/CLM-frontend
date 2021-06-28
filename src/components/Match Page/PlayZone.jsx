@@ -50,6 +50,7 @@ export default function PlayZone ({
   bottomPlayer,
   cardSize,
   displayedZones,
+  participant,
   setClickedPlayer,
   setRightClickedCard,
   topPlayer
@@ -58,7 +59,7 @@ export default function PlayZone ({
   const battlefieldRef = React.useRef();
   const classes = useStyles();
   const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
-  const { dragCard, tapUntapCards } = React.useContext(MatchContext);
+  const { matchState: { players }, dragCard, tapUntapCards } = React.useContext(MatchContext);
   const notInPlay = {
     flexShrink: 0,
     // magic card dimentions are 63mm x 88mm
@@ -107,34 +108,32 @@ export default function PlayZone ({
               />
             }
             <div className={classes.battlefieldContainer} style={{ transform: 'rotate(180deg)' }}>
-              {topPlayer.battlefield.map(card => {
-                return (
-                  <MagicCard
-                    cardData={card}
-                    key={card._id}
-                    rightClickFunction={(event) => {
-                      event.preventDefault();
-                      setRightClickedCard({
-                        _id: card._id,
-                        anchorElement: event.currentTarget,
-                        controller: card.controller._id,
-                        origin: 'battlefield',
-                        owner: card.owner._id,
-                        visibility: card.visibility
-                      });
-                    }}
-                    style={{
-                      // magic card dimentions are 63mm x 88mm
-                      height: cardSize / 63,
-                      left: `${card.x_coordinate}%`,
-                      position: 'absolute',
-                      top: `${card.y_coordinate}%`,
-                      width: cardSize / 88,
-                      zIndex: card.z_index
-                    }}
-                  />
-                )
-              })}
+              {topPlayer.battlefield.map(card => (
+                <MagicCard
+                  cardData={card}
+                  key={card._id}
+                  rightClickFunction={(event) => {
+                    event.preventDefault();
+                    setRightClickedCard({
+                      _id: card._id,
+                      anchorElement: event.currentTarget,
+                      controller: card.controller._id,
+                      origin: 'battlefield',
+                      owner: card.owner._id,
+                      visibility: card.visibility
+                    });
+                  }}
+                  style={{
+                    // magic card dimentions are 63mm x 88mm
+                    height: cardSize / 63,
+                    left: `${card.x_coordinate}%`,
+                    position: 'absolute',
+                    top: `${card.y_coordinate}%`,
+                    width: cardSize / 88,
+                    zIndex: card.z_index
+                  }}
+                />
+              ))}
             </div>
             {displayedZones.topGraveyard &&
               <VerticalCollapsableZone
@@ -180,63 +179,94 @@ export default function PlayZone ({
             />
           }
 
-          <div className={classes.battlefieldContainer} id="bottom-player-battlefield" ref={battlefieldRef}>
-            {battlefieldRef.current && bottomPlayer.battlefield.map(card => {
-              return (
-                <Draggable
-                  bounds="#bottom-player-battlefield"
-                  handle={`#drag-${card._id}`}
-                  key={`drag-${card._id}`}
-                  onStart={(event, data) => {
-                    event.target.style.zIndex = topZIndex;
-                  }}
-                  onStop={(event, data) => {
-                    
-                    const oldXPosition = parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100;
-                    const oldYPosition = parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100;
-                    
-                    if (Math.abs(oldXPosition - data.x) < 2 && Math.abs(oldYPosition - data.y) < 2) {
-                      tapUntapCards([card._id]);
-                    } else {
-                      dragCard(
-                        data.node.id.replace("drag-", ""),
-                        data.x * 100 / battlefieldRef.current.offsetWidth,
-                        data.y * 100 / battlefieldRef.current.offsetHeight,
-                        topZIndex);
-                    }
+          {participant ?
+            <div className={classes.battlefieldContainer} id="bottom-player-battlefield" ref={battlefieldRef}>
+              {battlefieldRef.current && bottomPlayer.battlefield.map(card => {
+                return (
+                  <Draggable
+                    bounds="#bottom-player-battlefield"
+                    handle={`#drag-${card._id}`}
+                    key={`drag-${card._id}`}
+                    onStart={(event, data) => {
+                      event.target.style.zIndex = topZIndex;
+                    }}
+                    onStop={(event, data) => {
+                      
+                      const oldXPosition = parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100;
+                      const oldYPosition = parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100;
+                      
+                      if (Math.abs(oldXPosition - data.x) < 2 && Math.abs(oldYPosition - data.y) < 2) {
+                        tapUntapCards([card._id]);
+                      } else {
+                        dragCard(
+                          data.node.id.replace("drag-", ""),
+                          data.x * 100 / battlefieldRef.current.offsetWidth,
+                          data.y * 100 / battlefieldRef.current.offsetHeight,
+                          topZIndex);
+                      }
 
-                  }}
-                  defaultPosition={{
-                    x: parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100,
-                    y: parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100
-                  }}
-                >
-                  <MagicCard
-                    cardData={card}
-                    rightClickFunction={(event) => {
-                      event.preventDefault();
-                      setRightClickedCard({
-                        _id: card._id,
-                        anchorElement: event.currentTarget,
-                        controller: card.controller._id,
-                        origin: 'battlefield',
-                        owner: card.owner._id,
-                        visibility: card.visibility
-                      });
                     }}
-                    customStyle={{
-                      // magic card dimentions are 63mm x 88mm
-                      cursor: 'move',
-                      height: cardSize / 63,
-                      position: 'absolute',
-                      width: cardSize / 88,
-                      zIndex: card.z_index
+                    defaultPosition={{
+                      x: parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100,
+                      y: parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100
                     }}
-                  />
-                </Draggable>
-              );
-            })}
-          </div>
+                  >
+                    <MagicCard
+                      cardData={card}
+                      notVisibleToOthers={card.visibility.length < players.length}
+                      rightClickFunction={event => {
+                        event.preventDefault();
+                        setRightClickedCard({
+                          _id: card._id,
+                          anchorElement: event.currentTarget,
+                          controller: card.controller._id,
+                          origin: 'battlefield',
+                          owner: card.owner._id,
+                          visibility: card.visibility
+                        });
+                      }}
+                      customStyle={{
+                        // magic card dimentions are 63mm x 88mm
+                        cursor: 'move',
+                        height: cardSize / 63,
+                        position: 'absolute',
+                        width: cardSize / 88,
+                        zIndex: card.z_index
+                      }}
+                    />
+                  </Draggable>
+                );
+              })}
+            </div> :
+            <div className={classes.battlefieldContainer}>
+              {bottomPlayer.battlefield.map(card => (
+                <MagicCard
+                  cardData={card}
+                  key={card._id}
+                  rightClickFunction={(event) => {
+                    event.preventDefault();
+                    setRightClickedCard({
+                      _id: card._id,
+                      anchorElement: event.currentTarget,
+                      controller: card.controller._id,
+                      origin: 'battlefield',
+                      owner: card.owner._id,
+                      visibility: card.visibility
+                    });
+                  }}
+                  style={{
+                    // magic card dimentions are 63mm x 88mm
+                    height: cardSize / 63,
+                    left: `${card.x_coordinate}%`,
+                    position: 'absolute',
+                    top: `${card.y_coordinate}%`,
+                    width: cardSize / 88,
+                    zIndex: card.z_index
+                  }}
+                />
+              ))}
+            </div>
+          }
 
           {displayedZones.bottomGraveyard &&
             <VerticalCollapsableZone

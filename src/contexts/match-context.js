@@ -351,7 +351,7 @@ export default function ContextualizedMatchPage() {
 
   const changeFaceDownImage = React.useCallback(async function (cardID, faceDownImage, zone) {
     await sendRequest({
-        headers: { MatchID: matchState._id },
+      headers: { MatchID: matchState._id },
       operation: 'changeFaceDownImage',
       get body() {
         return {

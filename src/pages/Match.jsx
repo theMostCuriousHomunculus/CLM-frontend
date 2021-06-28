@@ -248,6 +248,7 @@ export default function Match () {
           bottomPlayer={bottomPlayer}
           cardSize={cardSize}
           displayedZones={displayedZones}
+          participant={participant}
           setClickedPlayer={setClickedPlayer}
           setRightClickedCard={setRightClickedCard}
           topPlayer={topPlayer}
