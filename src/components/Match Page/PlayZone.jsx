@@ -59,7 +59,7 @@ export default function PlayZone ({
   const battlefieldRef = React.useRef();
   const classes = useStyles();
   const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
-  const { matchState: { players }, dragCard, tapUntapCards } = React.useContext(MatchContext);
+  const { dragCard, tapUntapCards } = React.useContext(MatchContext);
   const notInPlay = {
     flexShrink: 0,
     // magic card dimentions are 63mm x 88mm
@@ -84,6 +84,7 @@ export default function PlayZone ({
                         _id: card._id,
                         anchorElement: event.currentTarget,
                         controller: card.controller._id,
+                        face_down: card.face_down,
                         origin: 'hand',
                         owner: card.owner._id,
                         visibility: card.visibility
@@ -118,6 +119,7 @@ export default function PlayZone ({
                       _id: card._id,
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
+                      face_down: card.face_down,
                       origin: 'battlefield',
                       owner: card.owner._id,
                       visibility: card.visibility
@@ -213,13 +215,13 @@ export default function PlayZone ({
                   >
                     <MagicCard
                       cardData={card}
-                      notVisibleToOthers={card.visibility.length < players.length}
                       rightClickFunction={event => {
                         event.preventDefault();
                         setRightClickedCard({
                           _id: card._id,
                           anchorElement: event.currentTarget,
                           controller: card.controller._id,
+                          face_down: card.face_down,
                           origin: 'battlefield',
                           owner: card.owner._id,
                           visibility: card.visibility
@@ -249,6 +251,7 @@ export default function PlayZone ({
                       _id: card._id,
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
+                      face_down: card.face_down,
                       origin: 'battlefield',
                       owner: card.owner._id,
                       visibility: card.visibility
@@ -305,6 +308,7 @@ export default function PlayZone ({
                       _id: card._id,
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
+                      face_down: card.face_down,
                       origin: 'hand',
                       owner: card.owner._id,
                       visibility: card.visibility

@@ -32,6 +32,7 @@ export default function ZoneInspectionDialogue ({
                   _id: card._id,
                   anchorElement: event.currentTarget,
                   controller: card.controller._id,
+                  face_down: card.face_down,
                   origin: zoneName,
                   owner: card.owner._id,
                   visibility: card.visibility

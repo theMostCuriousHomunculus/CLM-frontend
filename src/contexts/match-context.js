@@ -27,6 +27,7 @@ export const MatchContext = createContext({
   shuffleLibrary: () => null,
   tapUntapCards: () => null,
   transferCard: () => null,
+  turnCard: () => null,
   viewCard: () => null,
   viewZone: () => null
 });
@@ -101,6 +102,7 @@ export default function ContextualizedMatchPage() {
           counterAmount
           counterType
         }
+        face_down
         face_down_image
         flipped
         image
@@ -135,6 +137,7 @@ export default function ContextualizedMatchPage() {
           counterAmount
           counterType
         }
+        face_down
         face_down_image
         flipped
         image
@@ -187,6 +190,7 @@ export default function ContextualizedMatchPage() {
         controller {
           _id
         }
+        face_down
         face_down_image
         flipped
         image
@@ -211,6 +215,7 @@ export default function ContextualizedMatchPage() {
         controller {
           _id
         }
+        face_down
         face_down_image
         image
         name
@@ -274,6 +279,7 @@ export default function ContextualizedMatchPage() {
         counterAmount
         counterType
       }
+      face_down
       face_down_image
       image
       isCopyToken
@@ -675,6 +681,29 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
+  const turnCard = React.useCallback(async function (cardID, zone) {
+    await sendRequest({
+      headers: { MatchID: matchState._id },
+      operation: 'turnCard',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cardID: "${cardID}",
+                  zone: ${zone}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [matchState._id, sendRequest]);
+
   const viewCard = React.useCallback(async function (cardID, controllerID, zone) {
     await sendRequest({
       headers: { MatchID: matchState._id },
@@ -747,6 +776,7 @@ export default function ContextualizedMatchPage() {
         shuffleLibrary,
         tapUntapCards,
         transferCard,
+        turnCard,
         viewCard,
         viewZone
       }}

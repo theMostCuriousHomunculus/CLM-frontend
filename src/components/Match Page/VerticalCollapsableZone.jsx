@@ -63,6 +63,7 @@ export default function VerticalCollapsableZone ({
                 _id: card._id,
                 anchorElement: event.currentTarget,
                 controller: card.controller._id,
+                face_down: card.face_down,
                 origin: zone.toLowerCase(),
                 owner: card.owner._id,
                 visibility: card.visibility

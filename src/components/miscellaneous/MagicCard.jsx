@@ -7,7 +7,6 @@ export default function MagicCard ({
   children,
   clickFunction = () => null,
   customStyle,
-  notVisibleToOthers,
   rightClickFunction = () => null,
   // for Draggable wrapped cards
   style,
@@ -21,6 +20,7 @@ export default function MagicCard ({
   const {
     _id,
     back_image,
+    face_down,
     face_down_image,
     flipped,
     image,
@@ -54,8 +54,8 @@ export default function MagicCard ({
     width: 189
   };
 
-  if (notVisibleToOthers) {
-
+  if (face_down) {
+    // cards in graveyards are always faceup and visible to all players.
     if (image) {
       css = {
         ...css,
