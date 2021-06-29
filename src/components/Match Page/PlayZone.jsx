@@ -85,6 +85,7 @@ export default function PlayZone ({
                         anchorElement: event.currentTarget,
                         controller: card.controller._id,
                         face_down: card.face_down,
+                        name: card.name,
                         origin: 'hand',
                         owner: card.owner._id,
                         visibility: card.visibility
@@ -120,6 +121,7 @@ export default function PlayZone ({
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
                       face_down: card.face_down,
+                      name: card.name,
                       origin: 'battlefield',
                       owner: card.owner._id,
                       visibility: card.visibility
@@ -222,6 +224,7 @@ export default function PlayZone ({
                           anchorElement: event.currentTarget,
                           controller: card.controller._id,
                           face_down: card.face_down,
+                          name: card.name,
                           origin: 'battlefield',
                           owner: card.owner._id,
                           visibility: card.visibility
@@ -252,6 +255,7 @@ export default function PlayZone ({
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
                       face_down: card.face_down,
+                      name: card.name,
                       origin: 'battlefield',
                       owner: card.owner._id,
                       visibility: card.visibility
@@ -309,6 +313,7 @@ export default function PlayZone ({
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
                       face_down: card.face_down,
+                      name: card.name,
                       origin: 'hand',
                       owner: card.owner._id,
                       visibility: card.visibility

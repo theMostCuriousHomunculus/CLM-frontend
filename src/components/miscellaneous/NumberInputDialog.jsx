@@ -9,16 +9,15 @@ import MUITextField from '@material-ui/core/TextField';
 import WarningButton from './WarningButton';
 import { isNumber } from 'lodash';
 
-export default function NumberInputDialogue (props) {
+export default function NumberInputDialogue ({
+  buttonText,
+  close,
+  defaultValue,
+  inputLabel,
+  title,
+  updateFunction
+}) {
 
-  const {
-    buttonText,
-    close,
-    defaultValue,
-    inputLabel,
-    title,
-    updateFunction
-  } = props;
   const valueRef = React.useRef();
 
   return (

@@ -7,6 +7,7 @@ import { MatchContext } from '../../contexts/match-context';
 
 export default function CardMenu ({
   rightClickedCard,
+  setNumberInputDialogInfo,
   setRightClickedCard
 }) {
 
@@ -14,6 +15,7 @@ export default function CardMenu ({
   const {
     matchState: { players },
     changeFaceDownImage,
+    createCopies,
     gainControlOfCard,
     revealCard,
     transferCard,
@@ -27,6 +29,7 @@ export default function CardMenu ({
       anchorElement: null,
       controller: null,
       face_down: null,
+      name: null,
       origin: null,
       owner: null,
       visibility: []
@@ -37,6 +40,23 @@ export default function CardMenu ({
     changeFaceDownImage(rightClickedCard._id, faceDownImage, rightClickedCard.origin);
     setFaceDownImageAnchorEl(null);
     clearRightClickedCard();
+  }
+
+  function handleCreateCopies () {
+    setRightClickedCard(prevState => ({
+      ...prevState,
+      anchorElement: null
+    }));
+    setNumberInputDialogInfo({
+      buttonText: "Create Copies!",
+      defaultValue: 1,
+      inputLabel: "Number of Copies",
+      title: `Create Copies of ${rightClickedCard.name}`,
+      updateFunction: (value) => {
+        createCopies(rightClickedCard._id, rightClickedCard.controller, value, rightClickedCard.origin);
+        clearRightClickedCard();
+      }
+    });
   }
 
   function handleGainControlOfCard () {
@@ -97,6 +117,9 @@ export default function CardMenu ({
           }}
         >
           Move Card to...
+        </MUIMenuItem>
+        <MUIMenuItem onClick={handleCreateCopies}>
+          Create Copies
         </MUIMenuItem>
         {/**/}
         <MUIMenuItem

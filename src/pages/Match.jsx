@@ -109,13 +109,13 @@ export default function Match () {
 
     async function subscribe () {
       function onNext(update) {
-        setMatchState(update.data.joinMatch);
+        setMatchState(update.data.subscribeMatch);
       }
 
       await new Promise((resolve, reject) => {
         client.subscribe({
           query: `subscription {
-            joinMatch {
+            subscribeMatch {
               ${matchQuery}
             }
           }`
@@ -208,6 +208,7 @@ export default function Match () {
 
       <CardMenu
         rightClickedCard={rightClickedCard}
+        setNumberInputDialogInfo={setNumberInputDialogInfo}
         setRightClickedCard={setRightClickedCard}
       />
 

@@ -24,6 +24,7 @@ export default function MagicCard ({
     face_down_image,
     flipped,
     image,
+    isCopyToken,
     tapped
   } = cardData;
   
@@ -46,6 +47,7 @@ export default function MagicCard ({
   let css = {
     backgroundImage: `url(${displayedImage})`,
     backgroundSize: 'cover',
+    borderRadius: 8,
     height: 264,
     justifyContent: 'space-between',
     margin: 0,
@@ -76,6 +78,13 @@ export default function MagicCard ({
     css = {
       ...css,
       backgroundImage: `url(${displayedImage})`
+    }
+  }
+
+  if (isCopyToken) {
+    css = {
+      ...css,
+      boxShadow: 'inset 1000px 0 0 0 rgba(255, 255, 0, 0.5)'
     }
   }
 
