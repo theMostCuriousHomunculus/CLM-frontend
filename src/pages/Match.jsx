@@ -1,13 +1,12 @@
 import React from 'react';
 import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import MUIIconButton from '@material-ui/core/IconButton'
-import MUISlider from '@material-ui/core/Slider';
-import MUITypography from '@material-ui/core/Typography';
+import MUIIconButton from '@material-ui/core/IconButton';
 import { createClient } from 'graphql-ws';
 import { makeStyles } from '@material-ui/core/styles';
 
 import CardMenu from '../components/Match Page/CardMenu';
 import HelpDialog from '../components/Match Page/HelpDialog';
+import Intermission from '../components/Match Page/Intermission';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MatchLog from '../components/Match Page/MatchLog';
 import NumberInputDialog from '../components/miscellaneous/NumberInputDialog';
@@ -30,7 +29,6 @@ const useStyles = makeStyles({
 export default function Match () {
 
   const authentication = React.useContext(AuthenticationContext);
-  const [cardSize, setCardSize] = React.useState(63*88*2);
   const classes = useStyles();
   const [clickedPlayer, setClickedPlayer] = React.useState({
     _id: null,
@@ -60,6 +58,7 @@ export default function Match () {
     matchQuery,
     matchState,
     setMatchState,
+    concedeGame,
     drawCard,
     fetchMatchByID,
     rollDice,
@@ -138,6 +137,10 @@ export default function Match () {
   React.useEffect(() => {
     function handleHotKeys (event) {
 
+      if (event.altKey && event.shiftKey && event.key === 'C') {
+        concedeGame();
+      }
+
       if (event.altKey && event.shiftKey && event.key === 'D') {
         drawCard();
       }
@@ -168,7 +171,7 @@ export default function Match () {
       return () => document.removeEventListener("keydown", handleHotKeys);
     }
 
-  }, [drawCard, rollDice, shuffleLibrary, tapUntapCards, participant, bottomPlayer.battlefield]);
+  }, [concedeGame, drawCard, rollDice, shuffleLibrary, tapUntapCards, participant, bottomPlayer.battlefield]);
 
   return (
     loading ?
@@ -233,30 +236,19 @@ export default function Match () {
           <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
             <MUIHelpOutlineIcon />
           </MUIIconButton>
-          <div style={{ display: 'flex', flexGrow: 1 }}>
-            <MUITypography style={{ transform: 'rotate(180deg)', writingMode: 'vertical-lr' }} variant='subtitle1'>
-              Adjust Card Size
-            </MUITypography>
-            <MUISlider
-              aria-labelledby='vertical-slider'
-              max={63*88*3}
-              min={63*88}
-              onChange={(event, newValue) => setCardSize(newValue)}
-              orientation='vertical'
-              value={cardSize}
-            />
-          </div>
         </div>
 
-        <PlayZone
-          bottomPlayer={bottomPlayer}
-          cardSize={cardSize}
-          displayedZones={displayedZones}
-          participant={participant}
-          setClickedPlayer={setClickedPlayer}
-          setRightClickedCard={setRightClickedCard}
-          topPlayer={topPlayer}
-        />
+        {matchState.players.every(plr => plr.mainboard.length === 0) ?
+          <PlayZone
+            bottomPlayer={bottomPlayer}
+            displayedZones={displayedZones}
+            participant={participant}
+            setClickedPlayer={setClickedPlayer}
+            setRightClickedCard={setRightClickedCard}
+            topPlayer={topPlayer}
+          /> :
+          <Intermission />
+        }
 
         <MatchLog />
       </div>

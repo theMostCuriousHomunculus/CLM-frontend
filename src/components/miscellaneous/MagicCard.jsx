@@ -6,6 +6,7 @@ import MUITooltip from '@material-ui/core/Tooltip';
 import { makeStyles } from '@material-ui/core/styles';
 
 import theme from '../../theme';
+import HoverPreview from './HoverPreview';
 
 export default function MagicCard ({
   cardData,
@@ -13,6 +14,7 @@ export default function MagicCard ({
   clickFunction = () => null,
   customStyle,
   flipHandler,
+  hoverPreview,
   rightClickFunction = () => null,
   // for Draggable wrapped cards
   style,
@@ -57,7 +59,7 @@ export default function MagicCard ({
     height: 264,
     justifyContent: 'space-between',
     margin: 0,
-    padding: '30px 15px',
+    padding: 0,
     position: 'relative',
     width: 189
   };
@@ -129,7 +131,21 @@ export default function MagicCard ({
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {children}
+      {hoverPreview ?
+        <HoverPreview back_image={back_image} image={image}>
+          <div
+            id={`hover-${_id}`}
+            onClick={event => {
+              clickFunction(cardData);
+              event.stopPropagation();
+            }}
+            style={{ height: '100%', width: '100%' }}
+          >
+            {children}
+          </div>
+        </HoverPreview> :
+        children
+      }
       {back_image &&
         <MUITooltip title="Flip Card">
           <MUIIconButton

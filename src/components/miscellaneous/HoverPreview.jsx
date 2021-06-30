@@ -14,14 +14,12 @@ const useStyles = makeStyles({
   }
 });
 
-export default function HoverPreview ({ children }) {
+export default function HoverPreview ({ back_image, children, image }) {
 
   const classes = useStyles();
   const imageContainer = React.useRef();
   const [preview, setPreview] = React.useState({
-    back_image: null,
     bottom: undefined,
-    image: null,
     image_display: "none",
     left: 0,
     right: undefined,
@@ -32,8 +30,6 @@ export default function HoverPreview ({ children }) {
   const hidePreview = React.useCallback(function () {
     setPreview(prevState => ({
       ...prevState,
-      back_image: null,
-      image: null,
       visible: false
     }));
   }, []);
@@ -72,25 +68,22 @@ export default function HoverPreview ({ children }) {
     }));
   }, []);
 
-  const showPreview = React.useCallback(function (event) {
-    event.persist();
+  const showPreview = React.useCallback(function () {
     setPreview(prevState => ({
       ...prevState,
-      back_image: event.target.getAttribute('back_image'),
-      image: event.target.getAttribute('image'),
       visible: true
     }));
   }, []);
 
-  const childrenWithShowHidePreview = React.Children.map(children, (child) => {
-    return child ? React.cloneElement(child,
+  const childrenWithShowHidePreview = React.Children.map(children, child => (
+    child ? React.cloneElement(child,
       {
         onMouseMove: movePreview,
         onMouseOut: hidePreview,
         onMouseOver: showPreview
       }
-    ) : null;
-  });
+    ) : null
+  ));
 
   return (
     <React.Fragment>
@@ -110,13 +103,13 @@ export default function HoverPreview ({ children }) {
             <img
               alt="front of card"
               className={classes.hoverPreviewImage}
-              src={preview.image}
+              src={image}
             />
-            {preview.back_image &&
+            {back_image &&
               <img
                 alt="back of card"
                 className={classes.hoverPreviewImage}
-                src={preview.back_image}
+                src={back_image}
               />
             }
           </div>

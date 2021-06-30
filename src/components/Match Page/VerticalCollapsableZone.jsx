@@ -41,7 +41,6 @@ const useStyles = makeStyles({
 });
 
 export default function VerticalCollapsableZone ({
-  cardSize,
   customStyle,
   iconColor,
   iconElement,
@@ -55,36 +54,30 @@ export default function VerticalCollapsableZone ({
   const { flipCard } = React.useContext(MatchContext);
 
   return (
-    <div className={classes.collapsableZoneContainer} style={{ ...customStyle, minWidth: cardSize / 88 }}>
-      {player[zone.toLowerCase()].map((val, index, array) => array[array.length - 1 - index]).map(card => {
-        return (
-          <MagicCard
-            cardData={card}
-            flipHandler={card.controller._id === userId ? () => flipCard(card._id, zone.toLowerCase()) : () => console.log('balls')}
-            key={card._id}
-            rightClickFunction={event => {
-              event.preventDefault();
-              setRightClickedCard({
-                _id: card._id,
-                anchorElement: event.currentTarget,
-                controller: card.controller._id,
-                face_down: card.face_down,
-                isCopyToken: card.isCopyToken,
-                name: card.name,
-                origin: zone.toLowerCase(),
-                owner: card.owner._id,
-                visibility: card.visibility
-              });
-            }}
-            customStyle={{
-              flexShrink: 0,
-              // magic card dimentions are 63mm x 88mm
-              height: cardSize / 63,
-              width: cardSize / 88
-            }}
-          />
-        );
-      })}
+    <div className={classes.collapsableZoneContainer} style={{ minWidth: customStyle.width + 2 }}>
+      {player[zone.toLowerCase()].map((val, index, array) => array[array.length - 1 - index]).map(card => (
+        <MagicCard
+          cardData={card}
+          customStyle={customStyle}
+          flipHandler={card.controller._id === userId ? () => flipCard(card._id, zone.toLowerCase()) : () => null}
+          hoverPreview={!!card.image}
+          key={card._id}
+          rightClickFunction={event => {
+            event.preventDefault();
+            setRightClickedCard({
+              _id: card._id,
+              anchorElement: event.currentTarget,
+              controller: card.controller._id,
+              face_down: card.face_down,
+              isCopyToken: card.isCopyToken,
+              name: card.name,
+              origin: zone.toLowerCase(),
+              owner: card.owner._id,
+              visibility: card.visibility
+            });
+          }}
+        />
+      ))}
       <div className={classes.badgeContainer}>
         <MUITooltip title={zone}>
           <MUIBadge badgeContent={player[zone.toLowerCase()].length} className={classes.zoneBadge} color='primary' showZero>

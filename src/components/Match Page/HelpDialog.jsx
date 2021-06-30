@@ -18,6 +18,7 @@ export default function HelpDialog ({
     >
       <MUIDialogTitle>Match Hot Keys</MUIDialogTitle>
       <MUIDialogContent>
+        <MUITypography variant="body1">Alt + Shift + C = Concede from game and begin sideboarding.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + D = Draw a card.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + R = Roll dice.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + S = Shuffle your library.</MUITypography>

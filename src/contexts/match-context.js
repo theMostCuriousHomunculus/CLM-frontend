@@ -23,6 +23,7 @@ export const MatchContext = createContext({
   flipCard: () => null,
   flipCoin: () => null,
   gainControlOfCard: () => null,
+  ready: () => null,
   revealCard: () => null,
   rollDice: () => null,
   shuffleLibrary: () => null,
@@ -232,22 +233,20 @@ export default function ContextualizedMatchPage() {
       poison
       mainboard {
         _id
+        cmc
         back_image
         image
         name
+        visibility {
+          _id
+        }
       }
       sideboard {
         _id
         back_image
-        controller {
-          _id
-        }
-        face_down_image
+        cmc
         image
         name
-        owner {
-          _id
-        }
         visibility {
           _id
         }
@@ -388,7 +387,7 @@ export default function ContextualizedMatchPage() {
       get body() {
         return {
           query: `
-            mutation: {
+            mutation {
               ${this.operation} {
                 _id
               }
@@ -599,6 +598,24 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
+  const ready = React.useCallback(async function () {
+    await sendRequest({
+      headers: { MatchID: matchState._id },
+      operation: 'ready',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation} {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [matchState._id, sendRequest]);
+
   const revealCard = React.useCallback(async function (cardID, zone) {
     await sendRequest({
       headers: { MatchID: matchState._id },
@@ -800,6 +817,7 @@ export default function ContextualizedMatchPage() {
         flipCard,
         flipCoin,
         gainControlOfCard,
+        ready,
         revealCard,
         rollDice,
         shuffleLibrary,
