@@ -85,6 +85,8 @@ export default function Match () {
     anchorElement: null,
     controller: null,
     face_down: null,
+    isCopyToken: null,
+    name: null,
     origin: null,
     owner: null,
     visibility: []

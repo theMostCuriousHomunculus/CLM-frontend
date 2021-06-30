@@ -16,6 +16,7 @@ export const MatchContext = createContext({
   concedeGame: () => null,
   createCopies: () => null,
   createTokens: () => null,
+  destroyCopyToken: () => null,
   dragCard: () => null,
   drawCard: () => null,
   fetchMatchByID: () => null,
@@ -217,6 +218,7 @@ export default function ContextualizedMatchPage() {
         }
         face_down
         face_down_image
+        flipped
         image
         name
         owner {
@@ -446,6 +448,29 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
+  const destroyCopyToken = React.useCallback(async function (cardID, zone) {
+    await sendRequest({
+      headers: { MatchID: matchState._id },
+      operation: 'destroyCopyToken',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cardID: "${cardID}",
+                  zone: ${zone}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    })
+  }, [matchState._id, sendRequest])
+
   const dragCard = React.useCallback(async function (cardID, xCoordinate, yCoordinate, zIndex) {
     await sendRequest({
       headers: { MatchID: matchState._id },
@@ -509,7 +534,6 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchQuery, matchState._id, sendRequest]);
 
-  // TODO: Implement
   const flipCard = React.useCallback(async function (cardID, zone) {
     await sendRequest({
       headers: { MatchID: matchState._id },
@@ -769,6 +793,7 @@ export default function ContextualizedMatchPage() {
         concedeGame,
         createCopies,
         createTokens,
+        destroyCopyToken,
         dragCard,
         drawCard,
         fetchMatchByID,

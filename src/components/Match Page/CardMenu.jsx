@@ -16,6 +16,7 @@ export default function CardMenu ({
     matchState: { players },
     changeFaceDownImage,
     createCopies,
+    destroyCopyToken,
     gainControlOfCard,
     revealCard,
     transferCard,
@@ -29,6 +30,7 @@ export default function CardMenu ({
       anchorElement: null,
       controller: null,
       face_down: null,
+      isCopyToken: null,
       name: null,
       origin: null,
       owner: null,
@@ -59,16 +61,6 @@ export default function CardMenu ({
     });
   }
 
-  function handleGainControlOfCard () {
-    gainControlOfCard(rightClickedCard._id, rightClickedCard.controller, rightClickedCard.origin);
-    clearRightClickedCard();
-  }
-
-  function handleRevealCard () {
-    revealCard(rightClickedCard._id, rightClickedCard.origin);
-    clearRightClickedCard();
-  }
-
   function handleTransferCard (destinationZone, reveal, shuffle, index) {
     transferCard(
       rightClickedCard._id,
@@ -79,16 +71,6 @@ export default function CardMenu ({
       index
     );
     setMoveToAnchorEl(null);
-    clearRightClickedCard();
-  }
-
-  function handleTurnCard () {
-    turnCard(rightClickedCard._id, rightClickedCard.origin);
-    clearRightClickedCard();
-  }
-
-  function handleViewCard () {
-    viewCard(rightClickedCard._id, rightClickedCard.controller, rightClickedCard.origin);
     clearRightClickedCard();
   }
 
@@ -107,48 +89,83 @@ export default function CardMenu ({
         }))}
         style={{ zIndex: 2147483647 }}
       >
-        <MUIMenuItem
-          onClick={() => {
-            setMoveToAnchorEl(rightClickedCard.anchorElement);
-            setRightClickedCard(prevState => ({
-              ...prevState,
-              anchorElement: null
-            }));
-          }}
-        >
-          Move Card to...
-        </MUIMenuItem>
-        <MUIMenuItem onClick={handleCreateCopies}>
-          Create Copies
-        </MUIMenuItem>
-        {/**/}
-        <MUIMenuItem
-          onClick={() => {
-            setFaceDownImageAnchorEl(rightClickedCard.anchorElement);
-            setRightClickedCard(prevState => ({
-              ...prevState,
-              anchorElement: null
-            }));
-          }}
-        >
-          Change Face Down Image
-        </MUIMenuItem>
-        <MUIMenuItem onClick={handleTurnCard}>
-          {rightClickedCard.face_down ? "Turn Face-Up" : "Turn Face-Down"}
-        </MUIMenuItem>
-        {rightClickedCard.visibility.length < players.length &&
-          rightClickedCard.controller === userId &&
-          <MUIMenuItem onClick={handleRevealCard}>
-            Reveal Card
-          </MUIMenuItem>
+        {rightClickedCard.controller === userId &&
+          <React.Fragment>
+            <MUIMenuItem
+              onClick={() => {
+                setMoveToAnchorEl(rightClickedCard.anchorElement);
+                setRightClickedCard(prevState => ({
+                  ...prevState,
+                  anchorElement: null
+                }));
+              }}
+            >
+              Move Card to...
+            </MUIMenuItem>
+            {['battlefield', 'stack'].includes(rightClickedCard.origin) &&
+              <MUIMenuItem onClick={handleCreateCopies}>
+                Create Copies
+              </MUIMenuItem>
+            }
+            {/**/}
+            <MUIMenuItem
+              onClick={() => {
+                setFaceDownImageAnchorEl(rightClickedCard.anchorElement);
+                setRightClickedCard(prevState => ({
+                  ...prevState,
+                  anchorElement: null
+                }));
+              }}
+            >
+              Change Face Down Image
+            </MUIMenuItem>
+            <MUIMenuItem
+              onClick={() => {
+                turnCard(rightClickedCard._id, rightClickedCard.origin);
+                clearRightClickedCard();
+              }}
+            >
+              {rightClickedCard.face_down ? "Turn Face-Up" : "Turn Face-Down"}
+            </MUIMenuItem>
+            {rightClickedCard.visibility.length < players.length &&
+              <MUIMenuItem
+                onClick={() => {
+                  revealCard(rightClickedCard._id, rightClickedCard.origin);
+                  clearRightClickedCard();
+                }}
+              >
+                Reveal Card
+              </MUIMenuItem>
+            }
+            {rightClickedCard.isCopyToken &&
+              <MUIMenuItem
+                onClick={() => {
+                  destroyCopyToken(rightClickedCard._id, rightClickedCard.origin);
+                  clearRightClickedCard();
+                }}
+              >
+                Destroy Copy/Token
+              </MUIMenuItem>
+            }
+          </React.Fragment>
         }
         {!rightClickedCard.visibility.map(plr => plr._id).includes(userId) &&
-          <MUIMenuItem onClick={handleViewCard}>
+          <MUIMenuItem
+            onClick={() => {
+              viewCard(rightClickedCard._id, rightClickedCard.controller, rightClickedCard.origin);
+              clearRightClickedCard();
+            }}
+          >
             View Card
           </MUIMenuItem>
         }
         {rightClickedCard.controller !== userId &&
-          <MUIMenuItem onClick={handleGainControlOfCard}>
+          <MUIMenuItem
+            onClick={() => {
+              gainControlOfCard(rightClickedCard._id, rightClickedCard.controller, rightClickedCard.origin);
+              clearRightClickedCard();
+            }}
+          >
             Gain Control of Card
           </MUIMenuItem>
         }

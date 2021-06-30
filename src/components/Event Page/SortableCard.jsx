@@ -1,5 +1,4 @@
 import React from 'react';
-import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
 import MUIIconButton from '@material-ui/core/IconButton';
 import MUITooltip from '@material-ui/core/Tooltip';
 import { SortableElement } from 'react-sortable-hoc';
@@ -34,6 +33,7 @@ export default SortableElement(({ card, clickFunction, fromCollection, moveCard,
     <MagicCard
       cardData={{ ...card, flipped }}
       clickFunction={clickFunction}
+      flipHandler={() => setFlipped(prevState => !prevState)}
       style={{ cursor: 'grab', margin: 4 }}
     >
       <div className={classes.buttonBar}>
@@ -52,21 +52,6 @@ export default SortableElement(({ card, clickFunction, fromCollection, moveCard,
           </MUITooltip>
         ))}
       </div>
-      {card.back_image &&
-        <MUITooltip title="Flip Card">
-          <MUIIconButton
-            className={classes.iconButton}
-            onClick={event => {
-              setFlipped(prevState => !prevState);
-              event.stopPropagation();
-            }}
-            size="small"
-            style={{ left: '50%', position: 'absolute', top: '44%', transform: 'translateX(-50%)' }}
-          >
-            <MUIAutorenewIcon />
-          </MUIIconButton>
-        </MUITooltip>
-      }
     </MagicCard>
   );
 });

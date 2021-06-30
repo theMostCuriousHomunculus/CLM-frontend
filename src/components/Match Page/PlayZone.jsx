@@ -59,7 +59,7 @@ export default function PlayZone ({
   const battlefieldRef = React.useRef();
   const classes = useStyles();
   const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
-  const { dragCard, tapUntapCards } = React.useContext(MatchContext);
+  const { dragCard, flipCard, tapUntapCards } = React.useContext(MatchContext);
   const notInPlay = {
     flexShrink: 0,
     // magic card dimentions are 63mm x 88mm
@@ -77,6 +77,7 @@ export default function PlayZone ({
                 return (
                   <MagicCard
                     cardData={card}
+                    flipHandler={() => null}
                     key={card._id}
                     rightClickFunction={(event) => {
                       event.preventDefault();
@@ -85,6 +86,7 @@ export default function PlayZone ({
                         anchorElement: event.currentTarget,
                         controller: card.controller._id,
                         face_down: card.face_down,
+                        isCopyToken: card.isCopyToken,
                         name: card.name,
                         origin: 'hand',
                         owner: card.owner._id,
@@ -113,6 +115,7 @@ export default function PlayZone ({
               {topPlayer.battlefield.map(card => (
                 <MagicCard
                   cardData={card}
+                  flipHandler={() => null}
                   key={card._id}
                   rightClickFunction={(event) => {
                     event.preventDefault();
@@ -121,6 +124,7 @@ export default function PlayZone ({
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
                       face_down: card.face_down,
+                      isCopyToken: card.isCopyToken,
                       name: card.name,
                       origin: 'battlefield',
                       owner: card.owner._id,
@@ -199,7 +203,11 @@ export default function PlayZone ({
                       const oldXPosition = parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100;
                       const oldYPosition = parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100;
                       
-                      if (Math.abs(oldXPosition - data.x) < 2 && Math.abs(oldYPosition - data.y) < 2) {
+                      if (Math.abs(oldXPosition - data.x) < 2 &&
+                        Math.abs(oldYPosition - data.y < 2) &&
+                        // so that a click on the flip button doesn't also tap or untap the card
+                        event.target.id === `drag-${card._id}`
+                      ) {
                         tapUntapCards([card._id]);
                       } else {
                         dragCard(
@@ -217,6 +225,7 @@ export default function PlayZone ({
                   >
                     <MagicCard
                       cardData={card}
+                      flipHandler={() => flipCard(card._id, 'battlefield')}
                       rightClickFunction={event => {
                         event.preventDefault();
                         setRightClickedCard({
@@ -224,6 +233,7 @@ export default function PlayZone ({
                           anchorElement: event.currentTarget,
                           controller: card.controller._id,
                           face_down: card.face_down,
+                          isCopyToken: card.isCopyToken,
                           name: card.name,
                           origin: 'battlefield',
                           owner: card.owner._id,
@@ -247,6 +257,7 @@ export default function PlayZone ({
               {bottomPlayer.battlefield.map(card => (
                 <MagicCard
                   cardData={card}
+                  flipHandler={() => null}
                   key={card._id}
                   rightClickFunction={(event) => {
                     event.preventDefault();
@@ -255,6 +266,7 @@ export default function PlayZone ({
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
                       face_down: card.face_down,
+                      isCopyToken: card.isCopyToken,
                       name: card.name,
                       origin: 'battlefield',
                       owner: card.owner._id,
@@ -305,6 +317,7 @@ export default function PlayZone ({
               return (
                 <MagicCard
                   cardData={card}
+                  flipHandler={participant ? () => flipCard(card._id, 'hand') : () => null}
                   key={card._id}
                   rightClickFunction={(event) => {
                     event.preventDefault();
@@ -313,6 +326,7 @@ export default function PlayZone ({
                       anchorElement: event.currentTarget,
                       controller: card.controller._id,
                       face_down: card.face_down,
+                      isCopyToken: card.isCopyToken,
                       name: card.name,
                       origin: 'hand',
                       owner: card.owner._id,

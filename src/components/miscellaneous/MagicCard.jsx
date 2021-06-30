@@ -1,12 +1,18 @@
 import React from 'react';
+import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
+import MUIIconButton from '@material-ui/core/IconButton';
 import MUIPaper from '@material-ui/core/Paper';
+import MUITooltip from '@material-ui/core/Tooltip';
 import { makeStyles } from '@material-ui/core/styles';
+
+import theme from '../../theme';
 
 export default function MagicCard ({
   cardData,
   children,
   clickFunction = () => null,
   customStyle,
+  flipHandler,
   rightClickFunction = () => null,
   // for Draggable wrapped cards
   style,
@@ -89,6 +95,19 @@ export default function MagicCard ({
   }
 
   const useStyles = makeStyles({
+    flipButton: {
+      background: theme.palette.primary.main,
+      color: '#ffffff',
+      height: 30,
+      left: '50%',
+      position: 'absolute',
+      top: '44%',
+      transform: 'translateX(-50%)',
+      width: 30,
+      '&:hover': {
+        background: theme.palette.primary.dark
+      }
+    },
     magicCard: css
   });
 
@@ -111,6 +130,20 @@ export default function MagicCard ({
       onTouchEnd={onTouchEnd}
     >
       {children}
+      {back_image &&
+        <MUITooltip title="Flip Card">
+          <MUIIconButton
+            className={classes.flipButton}
+            onClick={event => {
+              flipHandler();
+              event.stopPropagation();
+            }}
+            size="small"
+          >
+            <MUIAutorenewIcon />
+          </MUIIconButton>
+        </MUITooltip>
+      }
     </MUIPaper>
   );
 };

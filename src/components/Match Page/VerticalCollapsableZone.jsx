@@ -5,6 +5,8 @@ import MUITooltip from '@material-ui/core/Tooltip';
 import { makeStyles } from '@material-ui/core/styles';
 
 import MagicCard from '../miscellaneous/MagicCard';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { MatchContext } from '../../contexts/match-context';
 
 const useStyles = makeStyles({
   badgeContainer: {
@@ -49,6 +51,8 @@ export default function VerticalCollapsableZone ({
 }) {
 
   const classes = useStyles();
+  const { userId } = React.useContext(AuthenticationContext);
+  const { flipCard } = React.useContext(MatchContext);
 
   return (
     <div className={classes.collapsableZoneContainer} style={{ ...customStyle, minWidth: cardSize / 88 }}>
@@ -56,14 +60,16 @@ export default function VerticalCollapsableZone ({
         return (
           <MagicCard
             cardData={card}
+            flipHandler={card.controller._id === userId ? () => flipCard(card._id, zone.toLowerCase()) : () => console.log('balls')}
             key={card._id}
-            rightClickFunction={(event) => {
+            rightClickFunction={event => {
               event.preventDefault();
               setRightClickedCard({
                 _id: card._id,
                 anchorElement: event.currentTarget,
                 controller: card.controller._id,
                 face_down: card.face_down,
+                isCopyToken: card.isCopyToken,
                 name: card.name,
                 origin: zone.toLowerCase(),
                 owner: card.owner._id,
