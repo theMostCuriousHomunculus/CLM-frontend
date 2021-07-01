@@ -1,6 +1,7 @@
 import React from 'react';
 import MUITypography from '@material-ui/core/Typography';
 
+import BasicLandAdder from '../miscellaneous/BasicLandAdder';
 import SortableList from './SortableList';
 
 export default function PicksDisplay ({
@@ -11,6 +12,8 @@ export default function PicksDisplay ({
 
   return (
     <React.Fragment>
+      <BasicLandAdder />
+      
       <MUITypography variant="h3">Mainboard</MUITypography>
       <MUITypography variant="subtitle1">The Crème de la Crème</MUITypography>
       <SortableList
