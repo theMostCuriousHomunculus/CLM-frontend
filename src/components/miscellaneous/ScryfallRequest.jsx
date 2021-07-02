@@ -300,10 +300,8 @@ export default function ScryfallRequest (props) {
         >
           {availablePrintings.map((option, index) => (
             <span key={option.printing}>
-              <HoverPreview>
+              <HoverPreview back_image={option.back_image} image={option.image}>
                 <MUIMenuItem
-                  back_image={option.back_image}
-                  image={option.image}
                   onClick={() => handleMenuItemClick(index)}
                   selected={index === selectedPrintIndex}
                 >

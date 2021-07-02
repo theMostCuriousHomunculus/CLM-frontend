@@ -149,6 +149,29 @@ export default function Event () {
     return client.dispose;
   }, [authentication.token, eventID, sendRequest]);
 
+  const addBasics = React.useCallback(async function (numberOfCopies, scryfallID) {
+    await sendRequest({
+      headers: { EventID: eventID },
+      operation: 'addBasics',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  numberOfCopies: ${numberOfCopies},
+                  scryfallID: "${scryfallID}"
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [sendRequest, eventID]);
+
   async function onMoveCard (cardID, destination, origin) {
     await sendRequest({
       headers: { EventID: eventID },
@@ -309,6 +332,7 @@ export default function Event () {
 
           {tabNumber === 1 &&
             <PicksDisplay
+              addBasics={addBasics}
               moveCard={onMoveCard}
               onSortEnd={onSortEnd}
               player={me}
@@ -323,6 +347,7 @@ export default function Event () {
 
           <MUIPaper style={{ overflow: 'hidden' }}>
             <PicksDisplay
+              addBasics={addBasics}
               moveCard={onMoveCard}
               onSortEnd={onSortEnd}
               player={me}

@@ -1,44 +1,52 @@
 import React from 'react';
+import MUIButton from '@material-ui/core/Button';
 import MUIFormControl from '@material-ui/core/FormControl';
+import MUIGrid from '@material-ui/core/Grid';
 import MUIInputLabel from '@material-ui/core/InputLabel';
+import MUIList from '@material-ui/core/List';
+import MUIListItem from '@material-ui/core/ListItem';
+import MUIListItemText from '@material-ui/core/ListItemText'
+import MUIMenu from '@material-ui/core/Menu';
+import MUIMenuItem from '@material-ui/core/MenuItem';
 import MUISelect from '@material-ui/core/Select';
 import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
 
-export default function BasicLandAdder () {
+export default function BasicLandAdder ({ submitFunction }) {
 
-  const { loading, sendRequest } = useRequest();
+  const { sendRequest } = useRequest();
+  const [anchorEl, setAnchorEl] = React.useState();
   const [availablePrints, setAvailablePrints] = React.useState([]);
   const [availableSets, setAvailableSets] = React.useState([]);
-  const [chosenPrint, setChosenPrint] = React.useState('placeholder');
-  const [chosenSetName, setChosenSetName] = React.useState('placeholder');
+  const [chosenPrint, setChosenPrint] = React.useState({ id: '', collector_number: '', image: '' });
+  const [chosenSetName, setChosenSetName] = React.useState('');
   const [basicLandName, setBasicLandName] = React.useState('plains');
   const [numberOfCopies, setNumberOfCopies] = React.useState(1);
 
   React.useEffect(() => {
 
     async function requestPrints () {
-      await sendRequest({
-        callback: data => {
+      if (chosenSetName) {
+        await sendRequest({
+          callback: data => {
 
-          if (data.data) {
-            setAvailablePrints(data.data.map(print => ({
-              id: print.id,
-              collector_number: print.collector_number,
-              image: print.image_uris.normal
-            })));
-          } else {
-            setAvailablePrints([]);
-          }
+            if (data.data) {
+              setAvailablePrints(data.data.map(print => ({
+                id: print.id,
+                collector_number: print.collector_number,
+                image: print.image_uris.normal
+              })));
+            } else {
+              setAvailablePrints([]);
+            }
 
-        },
-        load: true,
-        method: 'GET',
-        url: `https://api.scryfall.com/cards/search?q=${basicLandName}+type=basic+set=${chosenSetName}&unique=prints`
-      });
+          },
+          method: 'GET',
+          url: `https://api.scryfall.com/cards/search?q=${basicLandName}+type=basic+set=${chosenSetName}&unique=prints`
+        });
+      }
     }
 
     requestPrints();
@@ -52,7 +60,6 @@ export default function BasicLandAdder () {
           setAvailableSets(data.data.map(set => ({ code: set.code, name: set.name })));
           setChosenSetName(data.data[0].code);
         },
-        load: true,
         method: 'GET',
         url: 'https://api.scryfall.com/sets'
       })
@@ -62,9 +69,8 @@ export default function BasicLandAdder () {
   }, [sendRequest]);
 
   return (
-    <React.Fragment>
-      <MUITypography variant="h3">Add Basic Lands to Your Deck</MUITypography>
-      <div style={{ alignItems: 'baseline', display: 'flex', margin: '8px 0' }}>
+    <MUIGrid alignItems="center" container justify="space-between" spacing={1}>
+      <MUIGrid container item xs={12} md={6} lg={3}>
         <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
           <MUIInputLabel htmlFor="basic-land-name-selector">Basic Land Name</MUIInputLabel>
           <MUISelect
@@ -87,7 +93,9 @@ export default function BasicLandAdder () {
             <option value="wastes">Wastes</option>
           </MUISelect>
         </MUIFormControl>
-        
+      </MUIGrid>
+      
+      <MUIGrid container item xs={12} md={6} lg={3}>
         <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
           <MUIInputLabel htmlFor="set-name-selector">Set Name</MUIInputLabel>
           <MUISelect
@@ -102,40 +110,67 @@ export default function BasicLandAdder () {
               name: 'set-name'
             }}
           >
-            {loading ?
-              <option value="placeholder">...</option> :
+            {availableSets.length === 0 ?
+              <option value="">Could not fetch sets from Scryfall...</option> :
               availableSets.map(set => (
                 <option key={set.code} value={set.code}>{set.name}</option>
               ))
             }
           </MUISelect>
         </MUIFormControl>
+      </MUIGrid>
 
-        <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
-          <MUIInputLabel htmlFor="print-number">Print Number</MUIInputLabel>
-          <MUISelect
-            label="Print Number"
-            margin="dense"
-            native
-            onChange={event => setChosenPrint(event.target.value)}
-            value={chosenPrint}
-            variant="outlined"
-            inputProps={{
-              id: 'print-selector',
-              name: 'print-number'
-            }}
+      <MUIGrid item xs={4} md={2}>
+        <MUIList component="nav" dense={true} style={{ flexGrow: 1 }}>
+          <MUIListItem
+            button
+            aria-haspopup="true"
+            aria-controls="lock-menu"
+            onClick={event => setAnchorEl(event.currentTarget)}
           >
-            {loading ?
-              <option value="placeholder">...</option> :
-              availablePrints.map(print => (
-                <HoverPreview image={print.image} key={print.id}>
-                  <option value={print.id}>{print.collector_number}</option>
+            <MUIListItemText
+              primary="Selected Printing"
+              secondary={chosenPrint.collector_number}
+            />
+          </MUIListItem>
+        </MUIList>
+        <MUIMenu
+          id="printing"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+        >
+          {availablePrints.length === 0 ?
+            <MUIMenuItem
+              onClick={() => {
+                setChosenPrint({ id: '', collector_number: '', image: '' });
+                setAnchorEl(null);
+              }}
+              value=''
+            >
+              No printings available from this set
+            </MUIMenuItem> :
+            availablePrints.map(print => (
+              <span key={print.id}>
+                <HoverPreview image={print.image}>
+                  <MUIMenuItem
+                    onClick={() => {
+                      setChosenPrint(print);
+                      setAnchorEl(null);
+                    }}
+                    value={print.id}
+                  >
+                    {print.collector_number}
+                  </MUIMenuItem>
                 </HoverPreview>
-              ))
-            }
-          </MUISelect>
-        </MUIFormControl>
+              </span>
+            ))
+          }
+        </MUIMenu>
+      </MUIGrid>
 
+      <MUIGrid item xs={4} md={2}>
         <MUITextField
           label="Number of Copies"
           margin="dense"
@@ -148,7 +183,21 @@ export default function BasicLandAdder () {
             step: 1
           }}
         />
-      </div>
-    </React.Fragment>
+      </MUIGrid>
+
+      <MUIGrid container item justify="flex-end" xs={4} md={2}>
+        <MUIButton
+          color="primary"
+          onClick={() => {
+            submitFunction(numberOfCopies, chosenPrint.id);
+            setChosenPrint({ id: '', collector_number: '', image: '' });
+            setNumberOfCopies(1);
+          }}
+          variant="contained"
+        >
+          Add To Deck
+        </MUIButton>
+      </MUIGrid>
+    </MUIGrid>
   );
 };

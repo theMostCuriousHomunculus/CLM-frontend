@@ -11,6 +11,7 @@ const useStyles = makeStyles({
   buttonBar: {
     display: 'flex',
     justifyContent: 'space-between',
+    padding: '30px 15px 0 15px',
     width: '100%'
   },
   iconButton: {
