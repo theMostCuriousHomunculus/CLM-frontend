@@ -11,12 +11,11 @@ import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 
 import Avatar from '../miscellaneous/Avatar';
 import WarningButton from '../miscellaneous/WarningButton';
+import { AccountContext } from '../../contexts/account-context';
 
-export default function BudRequests ({
-  manageBuds,
-  received_bud_requests,
-  sent_bud_requests
-}) {
+export default function BudRequests () {
+
+  const { accountState: { received_bud_requests, sent_bud_requests }, editAccount } = React.useContext(AccountContext);
 
   return (
     <React.Fragment>
@@ -28,13 +27,13 @@ export default function BudRequests ({
               return (
                 <MUIListItem key={request._id}>
                   <Link to={`/account/${request._id}`}><Avatar alt={request.name} size='small' src={request.avatar} /></Link>
-                  <WarningButton onClick={() => manageBuds(`action: "reject",\nother_user_id: "${request._id}"`)}>
+                  <WarningButton onClick={() => editAccount(`action: "reject",\nother_user_id: "${request._id}"`)}>
                     <MUINotInterestedIcon />
                   </WarningButton>
 
                   <MUIButton
                     color="primary"
-                    onClick={() => manageBuds(`action: "accept",\nother_user_id: "${request._id}"`)}
+                    onClick={() => editAccount(`action: "accept",\nother_user_id: "${request._id}"`)}
                     size="small"
                     style={{ marginLeft: '8px' }}
                     variant="contained"

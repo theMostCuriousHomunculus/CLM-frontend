@@ -38,6 +38,10 @@ const theme = createMuiTheme({
       }
     },
     MuiCardHeader: {
+      action: {
+        marginRight: 0,
+        marginTop: 0
+      },
       content: {
         wordBreak: 'break-word'
       },

@@ -11,12 +11,13 @@ import Navigation from './components/Main Navigation/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
 import { ErrorContext } from './contexts/error-context';
 
-const Account = React.lazy(() => import('./pages/Account'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Cube = React.lazy(() => import('./pages/Cube'));
 const Event = React.lazy(() => import('./pages/Event'));
 const Home = React.lazy(() => import('./pages/Home'));
+const ContextualizedAccountPage = React.lazy(() => import ('./contexts/account-context'));
+const ContextualizedDeckPage = React.lazy(() => import('./contexts/deck-context'));
 const ContextualizedMatchPage = React.lazy(() => import('./contexts/match-context'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
@@ -112,7 +113,7 @@ export default function App() {
                   <Home />
                 </Route>
                 <Route path='/account/:accountId'>
-                  <Account />
+                  <ContextualizedAccountPage />
                 </Route>
                 <Route path='/blog/:blogPostId'>
                   <BlogPost />
@@ -122,6 +123,9 @@ export default function App() {
                 </Route>
                 <Route path='/cube/:cubeId'>
                   <Cube />
+                </Route>
+                <Route path='/deck/:deckId'>
+                  <ContextualizedDeckPage />
                 </Route>
                 <Route path='/event/:eventId'>
                   <Event />

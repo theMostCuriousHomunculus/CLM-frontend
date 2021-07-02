@@ -28,7 +28,7 @@ const useStyles = makeStyles({
 
 export default function Match () {
 
-  const authentication = React.useContext(AuthenticationContext);
+  const { token, userId } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [clickedPlayer, setClickedPlayer] = React.useState({
     _id: null,
@@ -65,14 +65,14 @@ export default function Match () {
     shuffleLibrary,
     tapUntapCards
   } = React.useContext(MatchContext);
-  const participant = matchState.players.some(plr => plr.account._id === authentication.userId);
+  const participant = matchState.players.some(plr => plr.account._id === userId);
   const bottomPlayer = participant ?
-    matchState.players.find(plr => plr.account._id === authentication.userId) :
+    matchState.players.find(plr => plr.account._id === userId) :
     matchState.players[0];
   let topPlayer;
   
   if (participant && matchState.players.length === 2) {
-    topPlayer = matchState.players.find(plr => plr.account._id !== authentication.userId);
+    topPlayer = matchState.players.find(plr => plr.account._id !== userId);
   } else if (!participant && matchState.players.length === 2) {
     topPlayer = matchState.players[1];
   } else {
@@ -102,7 +102,7 @@ export default function Match () {
 
     const client = createClient({
       connectionParams: {
-        authToken: authentication.token,
+        authToken: token,
         matchID: matchState._id
       },
       url: process.env.REACT_APP_GRAPHQL_WS_URL
@@ -132,7 +132,7 @@ export default function Match () {
     subscribe(result => console.log(result), error => console.log(error));
 
     return client.dispose;
-  }, [authentication.token, fetchMatchByID, matchQuery, matchState._id, setMatchState]);
+  }, [fetchMatchByID, matchQuery, matchState._id, setMatchState, token]);
 
   React.useEffect(() => {
     function handleHotKeys (event) {

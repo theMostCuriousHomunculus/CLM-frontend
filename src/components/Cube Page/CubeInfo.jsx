@@ -49,17 +49,17 @@ export default function CubeInfo ({
     <MUICard>
       <MUICardHeader
         avatar={<Avatar alt={creator.name} size='large' src={creator.avatar} />}
-        title={editable ?
+        title={
           <MUITextField
             defaultValue={name}
+            disabled={!editable}
             inputProps={{ onBlur: editCube }}
             inputRef={nameRef}
             label="Cube Name"
             margin="dense"
             type="text"
             variant="outlined"
-          /> :
-          <MUITypography variant="h2">{name}</MUITypography>
+          />
         }
         subheader={
           <MUITypography color="textSecondary" variant="subtitle1">
@@ -69,20 +69,18 @@ export default function CubeInfo ({
       />
 
       <MUICardContent>
-        {editable ?
-          <MUITextField
-            defaultValue={description}
-            fullWidth={true}
-            inputProps={{ onBlur: editCube }}
-            inputRef={descriptionRef}
-            label="Cube Description"
-            margin="dense"
-            multiline
-            rows={2}
-            variant="outlined"
-          /> :
-          <MUITypography variant="body1">{description}</MUITypography>
-        }        
+        <MUITextField
+          defaultValue={description}
+          disabled={!editable}
+          fullWidth={true}
+          inputProps={{ onBlur: editCube }}
+          inputRef={descriptionRef}
+          label="Cube Description"
+          margin="dense"
+          multiline
+          rows={2}
+          variant="outlined"
+        />       
       </MUICardContent>
     </MUICard>
   );

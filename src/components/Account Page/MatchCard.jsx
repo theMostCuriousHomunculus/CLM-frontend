@@ -16,7 +16,7 @@ import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function UserEventCard ({
+export default function MatchCard ({
   events,
   matches,
   pageClasses

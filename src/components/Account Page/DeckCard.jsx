@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
@@ -17,9 +17,9 @@ import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ConfirmationDialogue from '../miscellaneous/ConfirmationDialog';
-import CreateCubeForm from './CreateCubeForm';
+import CreateDeckForm from './CreateDeckForm';
 import theme, { backgroundColor } from '../../theme';
-import useRequest from '../../hooks/request-hook';
+import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const useStyles = makeStyles({
@@ -27,95 +27,71 @@ const useStyles = makeStyles({
     background: theme.palette.secondary.main,
     color: backgroundColor,
     '&:hover': {
-      background: theme.palette.secondary.dark,
-      // padding: 18
+      background: theme.palette.secondary.dark
     }
   }
 });
 
-export default function UserCubeCard ({
-  cubes,
-  pageClasses,
-  updateCubeList
+export default function DeckCard ({
+  pageClasses
 }) {
 
-  const accountId = useParams().accountId;
-  const authentication = React.useContext(AuthenticationContext);
+  const { accountState: { _id, decks }, deleteDeck } = React.useContext(AccountContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const [cubeToDelete, setCubeToDelete] = React.useState({ _id: null, name: null })
-  const [showCubeForm, setShowCubeForm] = React.useState(false);
-  const { sendRequest } = useRequest();
-
-  async function deleteCube (cubeID) {
-    await sendRequest({
-      callback: () => {
-        updateCubeList(cubeID);
-      },
-      headers: { CubeID: cubeID },
-      operation: 'deleteCube',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}
-            }
-          `
-        }
-      }
-    });
-  }
+  const [deckToDelete, setDeckToDelete] = React.useState({ _id: null, name: null })
+  const [showDeckForm, setShowDeckForm] = React.useState(false);
 
   return (
     <React.Fragment>
 
       <ConfirmationDialogue
         confirmHandler={() => {
-          deleteCube(cubeToDelete._id);
-          setCubeToDelete({ _id: null, name: null });
+          deleteDeck(deckToDelete._id);
+          setDeckToDelete({ _id: null, name: null });
         }}
-        open={!!cubeToDelete._id}
-        title={`Are you sure you want to delete "${cubeToDelete.name}?`}
-        toggleOpen={() => setCubeToDelete({ _id: null, name: null })}
+        open={!!deckToDelete._id}
+        title={`Are you sure you want to delete "${deckToDelete.name}?`}
+        toggleOpen={() => setDeckToDelete({ _id: null, name: null })}
       >
         <MUITypography variant="body1">
           This action cannot be undone.  You may want to export your list first.
         </MUITypography>
       </ConfirmationDialogue>
 
-      <CreateCubeForm
-        open={showCubeForm}
-        toggleOpen={() => setShowCubeForm(prevState => !prevState)}
+      <CreateDeckForm
+        open={showDeckForm}
+        toggleOpen={() => setShowDeckForm(prevState => !prevState)}
       />
 
       <MUICard>
-        <MUICardHeader title="Cubes" />
+        <MUICardHeader title="Decks" />
         <MUICardContent>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
-                  <MUITableCell>Description</MUITableCell>
-                  {accountId === authentication.userId &&
+                  <MUITableCell>Format</MUITableCell>
+                  {_id === userId &&
                     <MUITableCell>Delete</MUITableCell>
                   }
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
-                {cubes.map(cube => (
-                  <MUITableRow key={cube._id}>
+                {decks.map(deck => (
+                  <MUITableRow key={deck._id}>
                     <MUITableCell>
-                      <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
+                      <Link to={`/deck/${deck._id}`}>{deck.name}</Link>
                     </MUITableCell>
                     <MUITableCell>
-                      {cube.description}
+                      {deck.format}
                     </MUITableCell>
-                    {accountId === authentication.userId &&
+                    {_id === userId &&
                       <MUITableCell>
                         <MUIIconButton
                           className={classes.iconButton}
-                          // color="secondary"
-                          onClick={() => setCubeToDelete({ _id: cube._id, name: cube.name })}
+                          onClick={() => setDeckToDelete({ _id: deck._id, name: deck.name })}
                           size="small"
                         >
                           <MUIDeleteForeverIcon />
@@ -128,15 +104,15 @@ export default function UserCubeCard ({
             </MUITable>
           </MUITableContainer>
         </MUICardContent>
-        {accountId === authentication.userId &&
+        {_id === userId &&
           <MUICardActions>
             <MUIButton
               color="primary"
-              onClick={() => setShowCubeForm(true)}
+              onClick={() => setShowDeckForm(true)}
               size="small"
               variant="contained"
             >
-              Create a Cube
+              Create a Deck
             </MUIButton>
           </MUICardActions>
         }

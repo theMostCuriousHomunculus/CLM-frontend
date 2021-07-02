@@ -38,7 +38,7 @@ export default function Cube () {
   const [display, setDisplay] = React.useState({
     activeComponentID: 'mainboard',
     filter: '',
-    view: 'Curve'
+    view: 'Table'
   });
   const editable = cube.creator._id === authentication.userId;
   const [selectedCard, setSelectedCard] = React.useState();

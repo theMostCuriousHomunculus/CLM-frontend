@@ -16,7 +16,7 @@ import CreateEventForm from './CreateEventForm';
 import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function UserEventCard ({
+export default function EventCard ({
   buds,
   cubes,
   events,
