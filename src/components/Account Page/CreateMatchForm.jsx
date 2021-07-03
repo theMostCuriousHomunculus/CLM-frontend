@@ -1,5 +1,4 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import MUIButton from '@material-ui/core/Button';
 import MUIDialog from '@material-ui/core/Dialog';
 import MUIDialogActions from '@material-ui/core/DialogActions';
@@ -18,10 +17,10 @@ import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
+import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 const useStyles = makeStyles({
@@ -44,45 +43,12 @@ export default function CreateMatchForm ({
   toggleOpen
 }) {
 
-  const authentication = React.useContext(AuthenticationContext);
+  const { loading, createMatch } = React.useContext(AccountContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const classes = useStyles();
-  const history = useHistory();
-  const { loading, sendRequest } = useRequest();
-  const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedEvent, setSelectedEvent] = React.useState();
   const [selectedOpponent, setSelectedOpponent] = React.useState()
-
-  async function submitForm (event) {
-    event.preventDefault();
-
-    await sendRequest({
-      callback: (data) => {
-        history.push(`/match/${data._id}`);
-      },
-      load: true,
-      operation: 'createMatch',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                input: {
-                  eventID: "${selectedEvent._id}",
-                  playerIDs: [${(
-                      selectedOpponent ?
-                      [authentication.userId, selectedOpponent] :
-                      [authentication.userId]
-                    ).map(plrID => '"' + plrID + '"')}]
-                }
-              ) {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
@@ -91,7 +57,7 @@ export default function CreateMatchForm ({
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
         </MUIDialogContent> :
-        <form onSubmit={submitForm}>
+        <form onSubmit={event => createMatch(event, selectedEvent._id, [userId, selectedOpponent])}>
           <MUIDialogContent>
 
             <MUIList component="nav">
@@ -99,7 +65,7 @@ export default function CreateMatchForm ({
                 aria-haspopup="true"
                 aria-controls="lock-menu"
                 button
-                onClick={(event) => setEventAnchorEl(event.currentTarget)}
+                onClick={(event) => setAnchorEl(event.currentTarget)}
               >
                 <MUIListItemText
                   primary="Use Decks From"
@@ -108,48 +74,44 @@ export default function CreateMatchForm ({
               </MUIListItem>
             </MUIList>
             <MUIMenu
-              anchorEl={eventAnchorEl}
+              anchorEl={anchorEl}
               keepMounted
-              open={Boolean(eventAnchorEl)}
-              onClose={() => setEventAnchorEl(null)}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
             >
-              {events.map(function (evnt) {
-                return (
-                  <MUIMenuItem
-                    key={evnt._id}
-                    onClick={function () {
-                      setSelectedEvent(evnt);
-                      setEventAnchorEl(null);
-                    }}
-                    selected={selectedEvent && selectedEvent._id === evnt._id}
-                  >
-                    {evnt.name}
-                  </MUIMenuItem>
-                );
-              })}
+              {events.map(evnt => (
+                <MUIMenuItem
+                  key={evnt._id}
+                  onClick={function () {
+                    setSelectedEvent(evnt);
+                    setAnchorEl(null);
+                  }}
+                  selected={selectedEvent && selectedEvent._id === evnt._id}
+                >
+                  {evnt.name}
+                </MUIMenuItem>
+              ))}
             </MUIMenu>
 
-            <MUIFormControl component="fieldset">
+            <MUIFormControl component="fieldset" required={true}>
               <MUIFormLabel component="legend">Your Next Victim</MUIFormLabel>
               <MUIRadioGroup
                 onChange={(event) => setSelectedOpponent(event.target.value)}
                 value={selectedOpponent}
               >
-                {selectedEvent && selectedEvent.players.filter(plr => plr.account._id !== authentication.userId).map(function (plr) {
-                  return (
-                    <MUIFormControlLabel
-                      control={<MUIRadio />}
-                      key={plr.account._id}
-                      label={
-                        <span className={classes.flex}>
-                          <Avatar alt={plr.account.name} size='small' src={plr.account.avatar} />
-                          <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
-                        </span>
-                      }
-                      value={plr.account._id}
-                    />
-                  );
-                })}
+                {selectedEvent && selectedEvent.players.filter(plr => plr.account._id !== userId).map(plr => (
+                  <MUIFormControlLabel
+                    control={<MUIRadio />}
+                    key={plr.account._id}
+                    label={
+                      <span className={classes.flex}>
+                        <Avatar alt={plr.account.name} size='small' src={plr.account.avatar} />
+                        <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
+                      </span>
+                    }
+                    value={plr.account._id}
+                  />
+                ))}
               </MUIRadioGroup>
             </MUIFormControl>
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import MUIButton from '@material-ui/core/Button';
 import MUICheckbox from '@material-ui/core/Checkbox';
 import MUIDialog from '@material-ui/core/Dialog';
@@ -21,10 +20,10 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
+import { AccountContext } from '../../contexts/account-context';
 
 const useStyles = makeStyles({
   budSwitch: {
@@ -53,51 +52,18 @@ export default function CreateEventForm ({
   toggleOpen
 }) {
 
+  const { loading, createEvent } = React.useContext(AccountContext);
   const classes = useStyles();
-  const history = useHistory();
-  const { loading, sendRequest } = useRequest();
   const [cardsPerPack, setCardsPerPack] = React.useState(1);
   const [cubeAnchorEl, setCubeAnchorEl] = React.useState(null);
   const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
-  const eventName = React.useRef();
+  const [eventName, setEventName] = React.useState('');
   const [eventType, setEventType] = React.useState('draft');
   const [includedModules, setIncludedModules] = React.useState([]);
   const [otherPlayers, setOtherPlayers] = React.useState([]);
   const [packsPerPlayer, setPacksPerPlayer] = React.useState(1);
   const [selectedCube, setSelectedCube] = React.useState(cubes[0]);
 
-  async function submitForm (event) {
-    event.preventDefault();
-
-    await sendRequest({
-      callback: (data) => {
-        history.push(`/event/${data._id}`);
-      },
-      headers: { CubeID: selectedCube._id },
-      load: true,
-      operation: 'createEvent',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                input: {
-                  cards_per_pack: ${cardsPerPack},
-                  event_type: ${eventType},
-                  modules: [${includedModules.map(mdl => '"' + mdl + '"')}],
-                  name: "${eventName.current.value}",
-                  other_players: [${otherPlayers.map(plr => '"' + plr + '"')}],
-                  packs_per_player: ${packsPerPlayer}
-                }
-              ) {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
@@ -106,18 +72,32 @@ export default function CreateEventForm ({
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
         </MUIDialogContent> :
-        <form onSubmit={submitForm}>
+        <form
+          onSubmit={event => {
+            createEvent(
+              event,
+              selectedCube._id,
+              cardsPerPack,
+              eventType,
+              includedModules,
+              eventName,
+              otherPlayers,
+              packsPerPlayer
+            )
+          }}
+        >
           <MUIDialogContent>
 
             <MUITextField
               autoComplete="off"
               autoFocus
               fullWidth
-              inputRef={eventName}
               label="Event Name"
               margin="dense"
+              onChange={event => setEventName(event.target.value)}
               required={true}
               type="text"
+              value={eventName}
               variant="outlined"
             />
 
@@ -140,20 +120,18 @@ export default function CreateEventForm ({
               open={Boolean(cubeAnchorEl)}
               onClose={() => setCubeAnchorEl(null)}
             >
-              {cubes.map(function (cube) {
-                return (
-                  <MUIMenuItem
-                    key={cube._id}
-                    onClick={() => {
-                      setCubeAnchorEl(null);
-                      setSelectedCube(cube);
-                    }}
-                    selected={selectedCube._id === cube._id}
-                  >
-                    {cube.name}
-                  </MUIMenuItem>
-                );
-              })}
+              {cubes.map(cube => (
+                <MUIMenuItem
+                  key={cube._id}
+                  onClick={() => {
+                    setCubeAnchorEl(null);
+                    setSelectedCube(cube);
+                  }}
+                  selected={selectedCube._id === cube._id}
+                >
+                  {cube.name}
+                </MUIMenuItem>
+              ))}
             </MUIMenu>
 
             <MUIList component="nav">
@@ -199,58 +177,54 @@ export default function CreateEventForm ({
             <MUIFormControl component="fieldset" className={classes.formControl}>
               <MUIFormLabel component="legend">Buds to Invite</MUIFormLabel>
               <MUIFormGroup>
-                {buds.map(function (bud) {
-                  return (
-                    <MUIFormControlLabel
-                      className={classes.budSwitch}
-                      control={
-                        <MUISwitch
-                          onChange={() => {
-                            if (otherPlayers.includes(bud._id)) {
-                              setOtherPlayers(prevState => prevState.filter(plr => plr!== bud._id));
-                            } else {
-                              setOtherPlayers(prevState => [...prevState, bud._id]);
-                            }
-                          }}
-                          value={bud._id}
-                        />
-                      }
-                      key={bud._id}
-                      label={
-                        <span className={classes.flex}>
-                          <Avatar alt={bud.name} size='small' src={bud.avatar} />
-                          <MUITypography variant="subtitle1">{bud.name}</MUITypography>
-                        </span>
-                      }
-                    />
-                  );
-                })}
+                {buds.map(bud => (
+                  <MUIFormControlLabel
+                    className={classes.budSwitch}
+                    control={
+                      <MUISwitch
+                        onChange={() => {
+                          if (otherPlayers.includes(bud._id)) {
+                            setOtherPlayers(prevState => prevState.filter(plr => plr!== bud._id));
+                          } else {
+                            setOtherPlayers(prevState => [...prevState, bud._id]);
+                          }
+                        }}
+                        value={bud._id}
+                      />
+                    }
+                    key={bud._id}
+                    label={
+                      <span className={classes.flex}>
+                        <Avatar alt={bud.name} size='small' src={bud.avatar} />
+                        <MUITypography variant="subtitle1">{bud.name}</MUITypography>
+                      </span>
+                    }
+                  />
+                ))}
               </MUIFormGroup>
             </MUIFormControl>
 
             <MUIFormControl component="fieldset" className={classes.formControl}>
               <MUIFormLabel component="legend">Modules to Include</MUIFormLabel>
               <MUIFormGroup>
-                {selectedCube && selectedCube.modules.map(function (module) {
-                  return (
-                    <MUIFormControlLabel
-                      control={
-                        <MUICheckbox
-                          onChange={() => {
-                            if (includedModules.includes(module._id)) {
-                              setIncludedModules(prevState => prevState.filter(mdl => mdl!== module._id));
-                            } else {
-                              setIncludedModules(prevState => [...prevState, module._id]);
-                            }
-                          }}
-                          value={module._id}
-                        />
-                      }
-                      key={module._id}
-                      label={module.name}
-                    />
-                  );
-                })}
+                {selectedCube && selectedCube.modules.map(module => (
+                  <MUIFormControlLabel
+                    control={
+                      <MUICheckbox
+                        onChange={() => {
+                          if (includedModules.includes(module._id)) {
+                            setIncludedModules(prevState => prevState.filter(mdl => mdl!== module._id));
+                          } else {
+                            setIncludedModules(prevState => [...prevState, module._id]);
+                          }
+                        }}
+                        value={module._id}
+                      />
+                    }
+                    key={module._id}
+                    label={module.name}
+                  />
+                ))}
               </MUIFormGroup>
             </MUIFormControl>
 

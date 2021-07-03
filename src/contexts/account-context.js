@@ -12,6 +12,8 @@ export const AccountContext = createContext({
   setAccountState: () => null,
   createCube: () => null,
   createDeck: () => null,
+  createEvent: () => null,
+  createMatch: () => null,
   deleteCube: () => null,
   deleteDeck: () => null,
   editAccount: () => null,
@@ -182,6 +184,76 @@ export default function ContextualizedAccountPage() {
     });
   }, [history, sendRequest]);
 
+  const createEvent = React.useCallback(async function (
+    event,
+    cubeID,
+    cardsPerPack,
+    eventType,
+    modules,
+    name,
+    otherPlayers,
+    packsPerPlayer
+  ) {
+    event.preventDefault();
+
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/event/${data._id}`);
+      },
+      headers: { CubeID: cubeID },
+      load: true,
+      operation: 'createEvent',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cards_per_pack: ${cardsPerPack},
+                  event_type: ${eventType},
+                  modules: [${modules.map(mdl => '"' + mdl + '"')}],
+                  name: "${name}",
+                  other_players: [${otherPlayers.map(plr => '"' + plr + '"')}],
+                  packs_per_player: ${packsPerPlayer}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [history, sendRequest]);
+
+  const createMatch = React.useCallback(async function (event, eventID, playerIDs) {
+    event.preventDefault();
+
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/match/${data._id}`);
+      },
+      load: true,
+      operation: 'createMatch',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  eventID: "${eventID}",
+                  playerIDs: [${playerIDs.map(plrID => '"' + plrID + '"')}]
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [history, sendRequest]);
+
   const deleteCube = React.useCallback(async function (cubeID) {
     await sendRequest({
       headers: { CubeID: cubeID },
@@ -273,10 +345,12 @@ export default function ContextualizedAccountPage() {
         setAccountState,
         createCube,
         createDeck,
+        createEvent,
+        createMatch,
         deleteCube,
         deleteDeck,
         editAccount,
-        fetchAccountByID,
+        fetchAccountByID
       }}
     >
       <Account />
