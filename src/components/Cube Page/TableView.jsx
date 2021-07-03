@@ -91,72 +91,62 @@ export default function TableView ({
 
   return (
     <div className={classes.tableViewMainContainer}>
-      <React.Fragment>
-        {monoColors.map(function (color) {
-          const cards_color = cards.filter(function (card) {
-            return card.color_identity.toString() === color.color_identity;
-          });
-          return (
-            <MUICard className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`} key={`table-${color.name}`}>
-              <MUICardHeader
-                className={classes.cardHeader}
-                title={color.name}
-                subheader={`(${cards_color.length})`}
-              />
-              <MUICardContent className={classes.cardContent}>
-                {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
-                  const cards_color_type = cards_color.filter(function (card) {
-                    return specificCardType(card.type_line) === type;
-                  });
-                  return (
-                    <React.Fragment key={type}>
-                      {cards_color_type.length > 0 &&
-                        <React.Fragment>
-                          <MUITypography className={classes.typeText} variant="subtitle1">
-                            {`${type} (${cards_color_type.length})`}
-                          </MUITypography>
-                          <div className={classes.cmcBlock}>
-                            {costs.map(function (cost) {
-                              const cards_color_type_cost = cards_color_type.filter(function (card) {
-                                return card.cmc === cost || (cost === 7 && card.cmc > cost);
-                              });
-                              return (
-                                <React.Fragment key={cost}>
-                                  {cards_color_type_cost.length > 0 &&
-                                    <div>
-                                      {customSort(cards_color_type_cost, ['name']).map(function (card, index) {
-                                        return (
-                                          <span key={card._id}>
-                                            <HoverPreview>
-                                              <MUITypography
-                                                back_image={card.back_image}
-                                                image={card.image}
-                                                onDoubleClick={() => setSelectedCard(card)}
-                                                style={{ cursor: 'pointer' }}
-                                                variant="body1"
-                                              >
-                                                {index + 1}) {card.name}
-                                              </MUITypography>
-                                            </HoverPreview>
-                                          </span>
-                                        );
-                                      })}
-                                    </div>
-                                  }
-                                </React.Fragment>
-                              );
-                            })}
-                          </div>
-                        </React.Fragment>
-                      }
-                    </React.Fragment>
-                  );
-                })}
-              </MUICardContent>
-            </MUICard>
-          );
-        })}
-      </React.Fragment>
+      {monoColors.map(function (color) {
+        const cards_color = cards.filter(card => card.color_identity.toString() === color.color_identity);
+        return (
+          <MUICard className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`} key={`table-${color.name}`}>
+            <MUICardHeader
+              className={classes.cardHeader}
+              title={color.name}
+              subheader={`(${cards_color.length})`}
+            />
+            <MUICardContent className={classes.cardContent}>
+              {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
+                const cards_color_type = cards_color.filter(card => specificCardType(card.type_line) === type);
+                return (
+                  <React.Fragment key={type}>
+                    {cards_color_type.length > 0 &&
+                      <React.Fragment>
+                        <MUITypography className={classes.typeText} variant="subtitle1">
+                          {`${type} (${cards_color_type.length})`}
+                        </MUITypography>
+                        <div className={classes.cmcBlock}>
+                          {costs.map(function (cost) {
+                            const cards_color_type_cost = cards_color_type.filter(card => card.cmc === cost || (cost === 7 && card.cmc > cost));
+                            return (
+                              <React.Fragment key={cost}>
+                                {cards_color_type_cost.length > 0 &&
+                                  <div>
+                                    {customSort(cards_color_type_cost, ['name']).map(function (card, index) {
+                                      return (
+                                        <span key={card._id}>
+                                          <HoverPreview back_image={card.back_image} image={card.image}>
+                                            <MUITypography
+                                              onDoubleClick={() => setSelectedCard(card)}
+                                              style={{ cursor: 'pointer' }}
+                                              variant="body1"
+                                            >
+                                              {index + 1}) {card.name}
+                                            </MUITypography>
+                                          </HoverPreview>
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                }
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+                      </React.Fragment>
+                    }
+                  </React.Fragment>
+                );
+              })}
+            </MUICardContent>
+          </MUICard>
+        );
+      })}
       <MUICard className={classes.multicolor + ' ' + classes.basicCard}>
         <MUICardHeader
           className={classes.cardHeader}
@@ -174,9 +164,7 @@ export default function TableView ({
                       {`${color.name} (${cards_color.length})`}
                     </MUITypography>
                     {["Creature", "Non-Creature", "Land"].map(function (value) {
-                      const cards_color_type = cards_color.filter(function (card) {
-                        return value === generalCardType(card.type_line);
-                      });
+                      const cards_color_type = cards_color.filter(card => value === generalCardType(card.type_line));
                       return (
                         <div key={`${color.name}-${value}`}>
                           <MUITypography style={{ fontStyle: 'italic', textAlign: 'center' }} variant="subtitle1">
@@ -185,10 +173,8 @@ export default function TableView ({
                           {customSort(cards_color_type, ['cmc']).map(function (card, index) {
                             return (
                               <span key={card._id}>
-                                <HoverPreview>
+                                <HoverPreview back_image={card.back_image} image={card.image}>
                                   <MUITypography
-                                    back_image={card.back_image}
-                                    image={card.image}
                                     onDoubleClick={() => setSelectedCard(card)}
                                     style={{ cursor: 'pointer', userSelect: 'none' }}
                                     variant="body1"

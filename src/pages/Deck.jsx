@@ -1,15 +1,20 @@
 import React from 'react';
 import { createClient } from 'graphql-ws';
+import MUIPaper from '@material-ui/core/Paper';
+import MUITypography from '@material-ui/core/Typography';
 
+import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import DeckInfo from '../components/Deck Page/DeckInfo';
+import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { DeckContext } from '../contexts/deck-context';
 
 export default function Deck () {
 
-  const { token } = React.useContext(AuthenticationContext);
-  const { loading, deckQuery, deckState, setDeckState, fetchDeckByID } = React.useContext(DeckContext);
+  const { token, userId } = React.useContext(AuthenticationContext);
+  const { loading, deckQuery, deckState, setDeckState, addCardsToDeck, fetchDeckByID } = React.useContext(DeckContext);
 
   React.useEffect(function () {
 
@@ -55,6 +60,35 @@ export default function Deck () {
 
   return (loading ?
     <LoadingSpinner /> :
-    <DeckInfo />
+    <React.Fragment>
+      <DeckInfo />
+
+      {deckState.creator._id === userId &&
+        <React.Fragment>
+          <MUIPaper style={{ padding: '0 4px' }}>
+            <ScryfallRequest
+              buttonText="Add to Deck"
+              labelText={`Add a card to ${deckState.name}`}
+              onSubmit={cardData => addCardsToDeck(cardData, 'mainboard', 1)}
+            />
+          </MUIPaper>
+
+          <MUIPaper style={{ padding: '0 4px' }}>
+            <div style={{ padding: 4 }}>
+              <MUITypography variant="subtitle1">Add Basic Lands to Deck</MUITypography>
+            </div>
+            <BasicLandAdder submitFunction={() => null} />
+          </MUIPaper>
+        </React.Fragment>
+      }
+
+      {deckState.mainboard.map(card => (
+        <span key={card._id}>
+          <HoverPreview back_image={card.back_image} image={card.image}>
+            <MUITypography variant="body1">{card.name}</MUITypography>
+          </HoverPreview>
+        </span>
+      ))}
+    </React.Fragment>
   );
 };

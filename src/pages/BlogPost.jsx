@@ -81,12 +81,6 @@ const useStyles = makeStyles({
       textIndent: 24
     }
   },
-  cardHeader: {
-    '& .MuiCardHeader-action': {
-      alignSelf: 'flex-end',
-      margin: '0 0 0 16px'
-    }
-  },
   commentCard: {
     display: 'flex',
     flexDirection: 'column',

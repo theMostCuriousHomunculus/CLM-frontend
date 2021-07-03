@@ -51,7 +51,7 @@ export default function CubeCard ({
           setCubeToDelete({ _id: null, name: null });
         }}
         open={!!cubeToDelete._id}
-        title={`Are you sure you want to delete "${cubeToDelete.name}?`}
+        title={`Are you sure you want to delete "${cubeToDelete.name}"?`}
         toggleOpen={() => setCubeToDelete({ _id: null, name: null })}
       >
         <MUITypography variant="body1">

@@ -3,13 +3,10 @@ import MUIButton from '@material-ui/core/Button';
 import MUIDialog from '@material-ui/core/Dialog';
 import MUIDialogActions from '@material-ui/core/DialogActions';
 import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogContentText from '@material-ui/core/DialogContentText';
 import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUIGrid from '@material-ui/core/Grid';
-import MUITextField from '@material-ui/core/TextField';
 
 import ChangePrintMenu from './ChangePrintMenu';
-import ColorCheckboxes from './ColorCheckboxes';
 import WarningButton from '../miscellaneous/WarningButton';
 import MoveDeleteMenu from './MoveDeleteMenu';
 
@@ -25,34 +22,34 @@ export default function EditCardModal ({
   rotations
 }) {
 
-  const cmcInput = React.useRef();
-  const typeInput = React.useRef();
-  const [colorIdentity, setColorIdentity] = React.useState([...card.color_identity]);
   const [destination, setDestination] = React.useState({ _id: activeComponentID, name: activeComponentName });
   const [printingDetails, setPrintingDetails] = React.useState({
     back_image: card.back_image,
+    collector_number: card.collector_number,
     image: card.image,
     mtgo_id: card.mtgo_id,
-    printing: card.printing,
-    purchase_link: card.purchase_link
+    scryfall_id: card.scryfall_id,
+    set: card.set,
+    set_name: card.set_name,
+    tcgplayer_id: card.tcgplayer_id
   });
 
   const submitForm = React.useCallback(async event => {
     event.preventDefault();
 
     if (
-      card.cmc !== parseInt(cmcInput.current.value) ||
-      card.color_identity.toString() !== colorIdentity.toString() ||
-      card.type_line !== typeInput.current.value ||
       JSON.stringify(printingDetails) !== JSON.stringify({
         back_image: card.back_image,
+        collector_number: card.collector_number,
         image: card.image,
         mtgo_id: card.mtgo_id,
-        printing: card.printing,
-        purchase_link: card.purchase_link
+        scryfall_id: card.scryfall_id,
+        set: card.set,
+        set_name: card.set_name,
+        tcgplayer_id: card.tcgplayer_id
       })
     ) {
-      await editCard(`cardID: "${card._id}",\n${printingDetails.back_image ? 'back_image: "' + printingDetails.back_image + '",\n' : ''}cmc: ${parseInt(cmcInput.current.value)},\ncolor_identity: [${colorIdentity.map(ci => '"' + ci + '"')}],\nimage: "${printingDetails.image}",\n${Number.isInteger(printingDetails.mtgo_id) ? 'mtgo_id: ' + printingDetails.mtgo_id + ',\n' : ''}printing: "${printingDetails.printing}",\npurchase_link: "${printingDetails.purchase_link}"\ntype_line: "${typeInput.current.value}"`);
+      await editCard(`cardID: "${card._id}",\n${printingDetails.back_image ? 'back_image: "' + printingDetails.back_image + '",\n' : ''}collector_number: ${printingDetails.collector_number},\nimage: "${printingDetails.image}",\n${Number.isInteger(printingDetails.mtgo_id) ? 'mtgo_id: ' + printingDetails.mtgo_id + ',\n' : ''}scryfall_id: "${printingDetails.scryfall_id}",\nset: "${printingDetails.set}",\nset_name: "${printingDetails.set_name}"\n${printingDetails.tcgplayer_id ? 'tcgplayer_id: ' + printingDetails.tcgplayer_id : ''}`);
     }
     
     if (activeComponentID !== destination._id) {
@@ -61,7 +58,7 @@ export default function EditCardModal ({
 
     clear();
 
-  }, [activeComponentID, card, clear, colorIdentity, deleteCard, destination._id, editCard, printingDetails]);
+  }, [activeComponentID, card, clear, deleteCard, destination._id, editCard, printingDetails]);
 
   return (
     <MUIDialog
@@ -80,34 +77,6 @@ export default function EditCardModal ({
                 }
               </MUIGrid>
               <MUIGrid item={true} xs={12} md={6}>
-                <MUIDialogContentText>Color Identity:</MUIDialogContentText>
-                <ColorCheckboxes
-                  colorIdentity={colorIdentity}
-                  handleColorIdentityChange={ci => setColorIdentity([...ci])}
-                />
-                <MUITextField
-                  defaultValue={card.cmc}
-                  inputProps={{
-                    max: 16,
-                    min: 0,
-                    step: 1
-                  }}
-                  inputRef={cmcInput}
-                  label="CMC"
-                  margin="dense"
-                  type="number"
-                  variant="outlined"
-                />
-                <MUITextField
-                  autoComplete="off"
-                  defaultValue={card.type_line}
-                  fullWidth
-                  inputRef={typeInput}
-                  label="Card Type"
-                  margin="dense"
-                  type="text"
-                  variant="outlined"
-                />
                 <MoveDeleteMenu
                   destination={destination}
                   listItemPrimaryText="Cube Component"

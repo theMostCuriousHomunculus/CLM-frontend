@@ -59,20 +59,23 @@ export default function Cube () {
     const desiredCardInfo = `
       _id
       back_image
-      chapters
       cmc
+      collector_number
       color_identity
       image
       keywords
-      loyalty
       mana_cost
       mtgo_id
       name
       oracle_id
-      power
-      printing
-      purchase_link
-      toughness
+      scryfall_id
+      set
+      set_name
+      tcgplayer_id
+      tokens {
+        name
+        scryfall_id
+      }
       type_line
     `;
 
@@ -166,27 +169,27 @@ export default function Cube () {
     return client.dispose;
   }, [authentication.token, cubeID, sendRequest]);
 
-  const addCard = React.useCallback(async function ({
+  const addCardToCube = React.useCallback(async function ({
     back_image,
-    chapters,
     cmc,
+    collector_number,
     color_identity,
     image,
     keywords,
-    loyalty,
     mana_cost,
     mtgo_id,
     name,
     oracle_id,
-    power,
-    printing,
-    purchase_link,
-    toughness,
+    scryfall_id,
+    set,
+    set_name,
+    tcgplayer_id,
+    tokens,
     type_line
   }) {
     await sendRequest({
       headers: { CubeID: cubeID },
-      operation: 'addCard',
+      operation: 'addCardToCube',
       get body() {
         return {
           query: `
@@ -194,22 +197,24 @@ export default function Cube () {
               ${this.operation}(
                 input: {
                   componentID: "${display.activeComponentID}",
-                  ${back_image ? 'back_image: "' + back_image + '",' : ''}
-                  ${Number.isInteger(chapters) ? 'chapters: ' + chapters + ',' : ''}
-                  ${Number.isInteger(cmc) ? 'cmc: ' + cmc + ',' : ''}
-                  color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
-                  image: "${image}",
-                  keywords: [${keywords.map(kw => '"' + kw + '"')}],
-                  ${Number.isInteger(loyalty) ? 'loyalty: ' + loyalty + ',' : ''}
-                  mana_cost: "${mana_cost}",
-                  ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''}
-                  name: "${name}",
-                  oracle_id: "${oracle_id}",
-                  ${Number.isInteger(power) ? 'power: ' + power + ',' : ''}
-                  printing: "${printing}",
-                  purchase_link: "${purchase_link}",
-                  ${Number.isInteger(toughness) ? 'toughness: ' + toughness + ',' : ''},
-                  type_line: "${type_line}"
+                  card: {
+                    ${back_image ? 'back_image: "' + back_image + '",' : ''}
+                    cmc: ${cmc},
+                    collector_number: ${collector_number},
+                    color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
+                    image: "${image}",
+                    keywords: [${keywords.map(kw => '"' + kw + '"')}],
+                    mana_cost: "${mana_cost}",
+                    ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''}
+                    name: "${name}",
+                    oracle_id: "${oracle_id}",
+                    scryfall_id: "${scryfall_id}",
+                    set: "${set}",
+                    set_name: "${set_name}",
+                    ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',' : ''}
+                    tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],
+                    type_line: "${type_line}"
+                  }
                 }
               ) {
                 _id
@@ -316,11 +321,11 @@ export default function Cube () {
         />
 
         {editable &&
-          <MUIPaper style={{ padding: '0 8px' }}>
+          <MUIPaper style={{ padding: '0 4px' }}>
             <ScryfallRequest
               buttonText="Add it!"
               labelText={`Add a card to ${component.name}`}
-              onSubmit={addCard}
+              onSubmit={addCardToCube}
             />
           </MUIPaper>
         }

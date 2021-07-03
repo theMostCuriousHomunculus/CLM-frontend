@@ -39,6 +39,7 @@ const theme = createMuiTheme({
     },
     MuiCardHeader: {
       action: {
+        marginLeft: 8,
         marginRight: 0,
         marginTop: 0
       },

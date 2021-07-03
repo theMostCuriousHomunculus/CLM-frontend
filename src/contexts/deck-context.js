@@ -59,6 +59,7 @@ export default function ContextualizedDeckPage() {
   const addCardsToDeck = React.useCallback(async function ({
     back_image,
     cmc,
+    collector_number,
     color_identity,
     image,
     keywords,
@@ -85,15 +86,16 @@ export default function ContextualizedDeckPage() {
                   card: {
                     ${back_image ? 'back_image: "' + back_image + '",\n' : ''}
                     cmc: ${cmc},
+                    collector_number: ${collector_number},
                     color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
                     image: "${image}",
                     keywords: [${keywords.map(kw => '"' + kw + '"')}],
                     mana_cost: "${mana_cost}",
-                    ${typeof mtgo_id === 'number' ? 'mtgo_id: ' + mtgo_id + ',\n' : ''}
+                    ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',\n' : ''}
                     name: "${name}",
                     oracle_id: "${oracle_id}",
-                    ${typeof tcgplayer_id === 'number' ? 'tcgplayer_id: ' + tcgplayer_id + ',\n' : ''} 
-                    scryfall_id: "${scryfall_id},
+                    ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',\n' : ''} 
+                    scryfall_id: "${scryfall_id}",
                     set: "${set}",
                     set_name: "${set_name}",
                     tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],

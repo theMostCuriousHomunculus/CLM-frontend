@@ -184,7 +184,7 @@ export default function ContextualizedAccountPage() {
 
   const deleteCube = React.useCallback(async function (cubeID) {
     await sendRequest({
-      headers: { AccountID: accountState._id, CubeID: cubeID },
+      headers: { CubeID: cubeID },
       operation: 'deleteCube',
       get body() {
         return {
@@ -196,7 +196,7 @@ export default function ContextualizedAccountPage() {
         }
       }
     });
-  }, [accountState._id, sendRequest]);
+  }, [sendRequest]);
 
   const deleteDeck = React.useCallback(async function (deckID) {
     await sendRequest({

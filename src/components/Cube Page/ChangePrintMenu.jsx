@@ -18,12 +18,24 @@ export default function ChangePrintMenu ({
   const [anchorEl, setAnchorEl] = React.useState();
   const [availablePrintings, setAvailablePrintings] = React.useState([{
     back_image: card.back_image,
+    collector_number: card.collector_number,
     image: card.image,
     mtgo_id: card.mtgo_id,
-    printing: card.printing,
-    purchase_link: card.purchase_link
+    scryfall_id: card.scryfall_id,
+    set: card.set,
+    set_name: card.set_name,
+    tcgplayer_id: card.tcgplayer_id
   }]);
-  const [selectedPrintIndex, setSelectedPrintIndex] = React.useState(0);
+  const [selectedPrint, setSelectedPrint] = React.useState({
+    back_image: card.back_image,
+    collector_number: card.collector_number,
+    image: card.image,
+    mtgo_id: card.mtgo_id,
+    scryfall_id: card.scryfall_id,
+    set: card.set,
+    set_name: card.set_name,
+    tcgplayer_id: card.tcgplayer_id
+  });
 
   async function enablePrintChange (event) {
     setAnchorEl(event.currentTarget);
@@ -58,15 +70,17 @@ export default function ChangePrintMenu ({
           }
           return ({
             back_image,
+            collector_number: print.collector_number,
             image,
             mtgo_id: print.mtgo_id,
-            printing: print.set_name + " - " + print.collector_number,
-            purchase_link: print.purchase_uris.tcgplayer.split("&")[0]
+            scryfall_id: print.scryfall_id,
+            set: print.set,
+            set_name: print.set_name,
+            tcgplayer_id: print.tcgplayer_id
           });
         }));
 
         setAvailablePrintings(printings);
-        setSelectedPrintIndex(printings.findIndex(print => print.printing === card.printing));
       },
       load: true,
       method: 'GET',
@@ -76,7 +90,7 @@ export default function ChangePrintMenu ({
 
   function handleMenuItemClick (index) {
     setAnchorEl(null);
-    setSelectedPrintIndex(index);
+    setSelectedPrint(availablePrintings[index]);
     handlePrintingChange(availablePrintings[index]);
   };
 
@@ -92,7 +106,7 @@ export default function ChangePrintMenu ({
         >
           <MUIListItemText
             primary={"Printing"}
-            secondary={availablePrintings[selectedPrintIndex].printing}
+            secondary={`${selectedPrint.set_name} - ${selectedPrint.collector_number}`}
           />
         </MUIListItem>
       </MUIList>
@@ -106,15 +120,13 @@ export default function ChangePrintMenu ({
         {loading ?
           <MUICircularProgress color="primary" size={20} /> :
           availablePrintings.map((option, index) => (
-            <span key={option.printing}>
-              <HoverPreview>
+            <span key={option.scryfall_id}>
+              <HoverPreview back_image={option.back_image} image={option.image}>
                 <MUIMenuItem
-                  back_image={option.back_image}
-                  image={option.image}
-                  selected={index === selectedPrintIndex}
+                  selected={option.scryfall_id === selectedPrint.scryfall_id}
                   onClick={() => handleMenuItemClick(index)}
                 >
-                  {option.printing}
+                  {`${option.set_name} - ${option.collector_number}`}
                 </MUIMenuItem>
               </HoverPreview>
             </span>

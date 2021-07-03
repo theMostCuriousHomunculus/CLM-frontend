@@ -109,10 +109,8 @@ export default function CurveView ({
                               {customSort(cards_color_isCreature_cost, ['name']).map(function (card) {
                                 return (
                                   <span key={card._id}>
-                                    <HoverPreview>
+                                    <HoverPreview back_image={card.back_image} image={card.image}>
                                       <MUITypography
-                                        back_image={card.back_image}
-                                        image={card.image}
                                         onDoubleClick={() => setSelectedCard(card)}
                                         style={{ cursor: 'pointer' }}
                                         variant="body1"

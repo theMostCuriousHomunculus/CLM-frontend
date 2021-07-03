@@ -179,7 +179,7 @@ export default function BasicLandAdder ({ submitFunction }) {
           value={numberOfCopies}
           variant="outlined"
           inputProps={{
-            min: 0,
+            min: 1,
             step: 1
           }}
         />
@@ -193,6 +193,7 @@ export default function BasicLandAdder ({ submitFunction }) {
             setChosenPrint({ id: '', collector_number: '', image: '' });
             setNumberOfCopies(1);
           }}
+          size="small"
           variant="contained"
         >
           Add To Deck
