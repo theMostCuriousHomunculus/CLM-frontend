@@ -4,8 +4,8 @@ import MUIPaper from '@material-ui/core/Paper';
 import MUITypography from '@material-ui/core/Typography';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
+import DeckDisplay from '../components/Deck Page/DeckDisplay';
 import DeckInfo from '../components/Deck Page/DeckInfo';
-import HoverPreview from '../components/miscellaneous/HoverPreview';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -82,13 +82,7 @@ export default function Deck () {
         </React.Fragment>
       }
 
-      {deckState.mainboard.map(card => (
-        <span key={card._id}>
-          <HoverPreview back_image={card.back_image} image={card.image}>
-            <MUITypography variant="body1">{card.name}</MUITypography>
-          </HoverPreview>
-        </span>
-      ))}
+      <DeckDisplay />
     </React.Fragment>
   );
 };

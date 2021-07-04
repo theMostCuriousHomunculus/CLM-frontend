@@ -96,6 +96,9 @@ export default function CreateCubeForm ({
             </MUIFormControl>
           </MUIDialogContent>
           <MUIDialogActions>
+            <WarningButton onClick={toggleOpen}>
+              Cancel
+            </WarningButton>
             <MUIButton
               color="primary"
               size="small"
@@ -104,9 +107,6 @@ export default function CreateCubeForm ({
             >
               Create!
             </MUIButton>
-            <WarningButton onClick={toggleOpen}>
-              Cancel
-            </WarningButton>
           </MUIDialogActions>
         </form>
       }

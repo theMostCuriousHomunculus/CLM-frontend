@@ -43,15 +43,25 @@ export default function ContextualizedDeckPage() {
     mainboard {
       _id
       back_image
+      cmc
       image
+      mana_cost
       name
+      scryfall_id
+      set
+      type_line
     }
     name
     sideboard {
       _id
       back_image
+      cmc
       image
+      mana_cost
       name
+      scryfall_id
+      set
+      type_line
     }
   `;
   const { loading, sendRequest } = useRequest();

@@ -16,6 +16,8 @@ export const AccountContext = createContext({
   createMatch: () => null,
   deleteCube: () => null,
   deleteDeck: () => null,
+  // deleteEvent: () => null,
+  // deleteMatch: () => null,
   editAccount: () => null,
   fetchAccountByID: () => null
 });
