@@ -14,23 +14,22 @@ import MUITableRow from '@material-ui/core/TableRow';
 
 import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
+import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 export default function MatchCard ({
-  events,
-  matches,
   pageClasses
 }) {
 
   const accountId = useParams().accountId;
-  const authentication = React.useContext(AuthenticationContext);
+  const { accountState: { matches } } = React.useContext(AccountContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const [showMatchForm, setShowMatchForm] = React.useState(false);
 
   return (
     <React.Fragment>
-      {accountId === authentication.userId &&
+      {accountId === userId &&
         <CreateMatchForm
-          events={events}
           open={showMatchForm}
           toggleOpen={() => setShowMatchForm(prevState => !prevState)}
         />
@@ -63,14 +62,19 @@ export default function MatchCard ({
                           }
                         </Link>
                       </MUITableCell>
-                      <MUITableCell>
-                        <Link to ={`/event/${match.event._id}`}>
-                          {match.event.name}
-                        </Link>
-                      </MUITableCell>
-                      <MUITableCell>
-                        {new Date(parseInt(match.event.createdAt)).toLocaleString()}
-                      </MUITableCell>
+                      {match.event &&
+                        // TODO: clean this up
+                        <React.Fragment>
+                          <MUITableCell>
+                            <Link to ={`/event/${match.event._id}`}>
+                              {match.event.name}
+                            </Link>
+                          </MUITableCell>
+                          <MUITableCell>
+                            {new Date(parseInt(match.event.createdAt)).toLocaleString()}
+                          </MUITableCell>
+                        </React.Fragment>
+                      }
                     </MUITableRow>
                   );
                 })}
@@ -78,16 +82,15 @@ export default function MatchCard ({
             </MUITable>
           </MUITableContainer>
         </MUICardContent>
-        {accountId === authentication.userId &&
+        {accountId === userId &&
           <MUICardActions>
             <MUIButton
               color="primary"
-              disabled={events.length === 0}
               onClick={() => setShowMatchForm(true)}
               size="small"
               variant="contained"
             >
-              {events.length === 0 ? 'You must finish an event before creating a match!' : 'Create a Match'}
+              Create a Match
             </MUIButton>
           </MUICardActions>
         }

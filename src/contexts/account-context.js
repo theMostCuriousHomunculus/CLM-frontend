@@ -46,6 +46,11 @@ export default function ContextualizedAccountPage() {
     buds {
       _id
       avatar
+      decks {
+        _id
+        format
+        name
+      }
       name
     }
     cubes {
@@ -232,7 +237,7 @@ export default function ContextualizedAccountPage() {
     });
   }, [history, sendRequest]);
 
-  const createMatch = React.useCallback(async function (event, eventID, playerIDs) {
+  const createMatch = React.useCallback(async function (event, deckIDs, eventID, playerIDs) {
     event.preventDefault();
 
     await sendRequest({
@@ -247,7 +252,8 @@ export default function ContextualizedAccountPage() {
             mutation {
               ${this.operation}(
                 input: {
-                  eventID: "${eventID}",
+                  deckIDs: [${deckIDs.map(dckID => '"' + dckID + '"')}],
+                  ${eventID ? 'eventID: "' + eventID + '",\n' : ''}
                   playerIDs: [${playerIDs.map(plrID => '"' + plrID + '"')}]
                 }
               ) {
