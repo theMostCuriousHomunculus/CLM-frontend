@@ -24,14 +24,16 @@ export const AccountContext = createContext({
 
 export default function ContextualizedAccountPage() {
 
+  const accountID = useParams().accountId;
   const history = useHistory();
   const { userId } = React.useContext(AuthenticationContext);
   const [accountState, setAccountState] = React.useState({
-    _id: useParams().accountId,
+    _id: accountID,
     avatar: '',
     buds: [],
     cubes: [],
     decks: [],
+    email: '',
     events: [],
     matches: [],
     name: '...',
@@ -78,6 +80,7 @@ export default function ContextualizedAccountPage() {
       format
       name
     }
+    email
     events {
       _id
       createdAt
@@ -157,7 +160,7 @@ export default function ContextualizedAccountPage() {
     });
   }, [history, sendRequest]);
 
-  const createDeck = React.useCallback(async function (event, description, format, name) {
+  const createDeck = React.useCallback(async function (event, description, existingListID, format, name) {
     event.preventDefault();
 
     await sendRequest({
@@ -173,6 +176,7 @@ export default function ContextualizedAccountPage() {
               ${this.operation}(
                 input: {
                   description: "${description}",
+                  ${existingListID ? 'existingListID: "' + existingListID + '",\n' : ''}
                   ${format ? 'format: ' + format + ',\n' : ''}
                   name: "${name}"
                 }
@@ -274,7 +278,7 @@ export default function ContextualizedAccountPage() {
 
   const deleteDeck = React.useCallback(async function (deckID) {
     await sendRequest({
-      headers: { AccountID: accountState._id, DeckID: deckID },
+      headers: { DeckID: deckID },
       operation: 'deleteDeck',
       get body() {
         return {
@@ -286,7 +290,7 @@ export default function ContextualizedAccountPage() {
         }
       }
     });
-  }, [accountState._id, sendRequest]);
+  }, [sendRequest]);
 
   const editAccount = React.useCallback(async function (changes) {
     await sendRequest({
@@ -328,7 +332,7 @@ export default function ContextualizedAccountPage() {
         return {
           query: `
             query {
-              ${this.operation}(_id: "${accountState._id}") {
+              ${this.operation}(_id: "${accountID}") {
                 ${accountQuery}
               }
             }
@@ -336,7 +340,7 @@ export default function ContextualizedAccountPage() {
         }
       }
     });
-  }, [accountQuery, accountState._id, sendRequest]);
+  }, [accountQuery, accountID, sendRequest]);
 
   return (
     <AccountContext.Provider

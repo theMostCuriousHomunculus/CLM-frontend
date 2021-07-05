@@ -83,9 +83,10 @@ export default function Account () {
           <MUICardHeader
             avatar={<Avatar alt={accountState.name} size='large' src={accountState.avatar} />}
             className={classes.cardHeader}
-            title={accountId === userId ?
+            title={
               <MUITextField
                 autoComplete="off"
+                disabled={accountId !== userId}
                 inputProps={{ onBlur: event => editAccount(`name: "${event.target.value}"`) }}
                 label="Account Name"
                 margin="dense"
@@ -102,10 +103,7 @@ export default function Account () {
                 type="text"
                 value={accountState.name}
                 variant="outlined"
-              /> :
-              <MUITypography variant="h2">
-                {accountState.name}
-              </MUITypography>
+              />
             }
             subheader={accountId === userId &&
               <MUITypography color="textSecondary" variant="subtitle1">

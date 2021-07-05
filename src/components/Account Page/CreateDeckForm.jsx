@@ -8,6 +8,7 @@ import MUIFormControl from '@material-ui/core/FormControl';
 import MUIInputLabel from '@material-ui/core/InputLabel';
 import MUISelect from '@material-ui/core/Select';
 import MUITextField from '@material-ui/core/TextField';
+import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
@@ -30,18 +31,19 @@ export default function CreateCubeForm ({
 
   const classes = useStyles();
   const { loading, createDeck } = React.useContext(AccountContext);
+  const [deckID, setDeckID] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [format, setFormat] = React.useState();
   const [name, setName] = React.useState('');
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
-      <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
+      <MUIDialogTitle>Create A New Deck</MUIDialogTitle>
       {loading ?
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
         </MUIDialogContent> :
-        <form onSubmit={event => createDeck(event, description, format, name)}>
+        <form onSubmit={event => createDeck(event, description, deckID, format, name)}>
           <MUIDialogContent style={{ height: 'max-content' }}>
             <MUITextField
               autoComplete="off"
@@ -94,11 +96,22 @@ export default function CreateCubeForm ({
                 <option value="Vintage">Vintage</option>
               </MUISelect>
             </MUIFormControl>
+
+            <MUITypography variant="subtitle1" style={{ margin: '16px 0 8px 0'}}>Already have a deck list on Scryfall.com?</MUITypography>
+            <MUITextField
+              autoComplete="off"
+              fullWidth
+              label="Scyfall Deck ID"
+              margin="dense"
+              onChange={event => setDeckID(event.target.value)}
+              required={false}
+              style={{ marginBottom: '12px', marginTop: '16px' }}
+              type="text"
+              value={deckID}
+              variant="outlined"
+            />
           </MUIDialogContent>
           <MUIDialogActions>
-            <WarningButton onClick={toggleOpen}>
-              Cancel
-            </WarningButton>
             <MUIButton
               color="primary"
               size="small"
@@ -107,6 +120,9 @@ export default function CreateCubeForm ({
             >
               Create!
             </MUIButton>
+            <WarningButton onClick={toggleOpen}>
+              Cancel
+            </WarningButton>
           </MUIDialogActions>
         </form>
       }
