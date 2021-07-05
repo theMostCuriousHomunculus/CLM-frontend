@@ -4,11 +4,11 @@ import MUIGrid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { monoColors } from '../../constants/color-objects';
-import { ReactComponent as WhiteManaSymbol } from '../../svgs/white-mana-symbol.svg';
-import { ReactComponent as BlueManaSymbol } from '../../svgs/blue-mana-symbol.svg';
-import { ReactComponent as BlackManaSymbol } from '../../svgs/black-mana-symbol.svg';
-import { ReactComponent as RedManaSymbol } from '../../svgs/red-mana-symbol.svg';
-import { ReactComponent as GreenManaSymbol } from '../../svgs/green-mana-symbol.svg';
+import { ReactComponent as WManaSymbol } from '../../svgs/W-mana-symbol.svg';
+import { ReactComponent as UManaSymbol } from '../../svgs/U-mana-symbol.svg';
+import { ReactComponent as BManaSymbol } from '../../svgs/B-mana-symbol.svg';
+import { ReactComponent as RManaSymbol } from '../../svgs/R-mana-symbol.svg';
+import { ReactComponent as GManaSymbol } from '../../svgs/G-mana-symbol.svg';
 
 const useStyles = makeStyles({
   B: {
@@ -52,23 +52,23 @@ export default function ColorCheckboxes ({
   const colorObj = {
     "W": {
       "checked": colorIdentity.includes("W"),
-      "icon": <WhiteManaSymbol className={classes.manaSymbol} />
+      "icon": <WManaSymbol className={classes.manaSymbol} />
     },
     "U": {
       "checked": colorIdentity.includes("U"),
-      "icon": <BlueManaSymbol className={classes.manaSymbol} />
+      "icon": <UManaSymbol className={classes.manaSymbol} />
     },
     "B": {
       "checked": colorIdentity.includes("B"),
-      "icon": <BlackManaSymbol className={classes.manaSymbol} />
+      "icon": <BManaSymbol className={classes.manaSymbol} />
     },
     "R": {
       "checked": colorIdentity.includes("R"),
-      "icon": <RedManaSymbol className={classes.manaSymbol} />
+      "icon": <RManaSymbol className={classes.manaSymbol} />
     },
     "G": {
       "checked": colorIdentity.includes("G"),
-      "icon": <GreenManaSymbol className={classes.manaSymbol} />
+      "icon": <GManaSymbol className={classes.manaSymbol} />
     }
   };
 

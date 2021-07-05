@@ -2,12 +2,12 @@ import React from 'react';
 import MUICard from '@material-ui/core/Card';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIGrid from '@material-ui/core/Grid';
 import MUITypography from '@material-ui/core/Typography';
 
 import customSort from '../../functions/custom-sort';
 import specificCardType from '../../functions/specific-card-type';
-import HoverPreview from '../miscellaneous/HoverPreview';
-import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
+import PlaysetDisplay from './PlaysetDisplay';
 import { DeckContext } from '../../contexts/deck-context';
 
 export default function DeckDisplay () {
@@ -15,46 +15,64 @@ export default function DeckDisplay () {
   const { deckState } = React.useContext(DeckContext);
 
   return (
-    <div style={{ display: 'flex' }}>
+    <MUIGrid container spacing={0}>
       {['Mainboard', 'Sideboard'].map(component => (
-        <MUICard style={{ width: '50%' }}>
-          <MUICardHeader title={`${component} (${deckState[component.toLowerCase()].length})`} />
-          <MUICardContent>
-            {["Land", "Creature", "Planeswalker", "Artifact", "Enchantment", "Instant", "Sorcery"].map(function (type) {
-              const group = customSort(deckState[component.toLocaleLowerCase()], ['cmc', 'name'])
-                .filter(card => specificCardType(card.type_line) === type);
-              const condensedGroup = [];
+        <MUIGrid item key={component} xs={12} md={6}>
+          <MUICard>
+            <MUICardHeader title={`${component} (${deckState[component.toLowerCase()].length})`} />
+            <MUICardContent>
+              {["Land", "Creature", "Planeswalker", "Artifact", "Enchantment", "Instant", "Sorcery"].map(function (type) {
+                const group = customSort(deckState[component.toLocaleLowerCase()], ['cmc', 'name', 'set'])
+                  .filter(card => specificCardType(card.type_line) === type);
+                const condensedGroup = [];
 
-              for (const card of group) {
-                const existingCopies = condensedGroup.find(abstraction => abstraction.card.scryfall_id === card.scryfall_id);
-                if (existingCopies) {
-                  existingCopies.numberOfCopies++;
-                } else {
-                  condensedGroup.push({ card, numberOfCopies: 1 });
+                for (const card of group) {
+                  const existingCopies = condensedGroup.find(abstraction => abstraction.card.scryfall_id === card.scryfall_id);
+                  if (existingCopies) {
+                    existingCopies.copies.push(card._id);
+                  } else {
+                    condensedGroup.push({
+                      card: {
+                        back_image: card.back_image,
+                        cmc: card.cmc,
+                        collector_number: card.collector_number,
+                        color_identity: card.color_identity,
+                        image: card.image,
+                        keywords: card.keywords,
+                        mana_cost: card.mana_cost,
+                        mtgo_id: card.mtgo_id,
+                        name: card.name,
+                        oracle_id: card.oracle_id,
+                        scryfall_id: card.scryfall_id,
+                        set: card.set,
+                        set_name: card.set_name,
+                        tcgplayer_id: card.tcgplayer_id,
+                        tokens: card.tokens,
+                        type_line: card.type_line
+                      },
+                      copies: [card._id]
+                    });
+                  }
                 }
-              }
 
-              return (
-                group.length > 0 &&
-                <React.Fragment >
-                  <MUITypography key={`${component}-${type}`} variant="subtitle1">{`${type} (${group.length})`}</MUITypography>
-                  {condensedGroup.map(playset => (
-                    <MUITypography key={playset.card._id} variant="body1" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <HoverPreview back_image={playset.card.back_image} image={playset.card.image}>
-                        <span style={{ marginLeft: 16 }}>{`${playset.numberOfCopies}X - ${playset.card.name}`}</span>
-                      </HoverPreview>
-                      <span>
-                        {playset.card.set.toUpperCase()}
-                        {playset.card.mana_cost}
-                      </span>
-                    </MUITypography>
-                  ))}
-                </React.Fragment>
-              );
-            })}
-          </MUICardContent>
-        </MUICard>
+                return (
+                  group.length > 0 &&
+                  <React.Fragment key={`${component}-${type}`}>
+                    <MUITypography variant="subtitle1">{`${type} (${group.length})`}</MUITypography>
+                    {condensedGroup.map(playset => (
+                      <PlaysetDisplay
+                        component={component.toLowerCase()}
+                        key={playset.card.scryfall_id}
+                        playset={playset}
+                      />
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+            </MUICardContent>
+          </MUICard>
+        </MUIGrid>
       ))}
-    </div>
+    </MUIGrid>
   );
 };

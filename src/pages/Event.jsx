@@ -149,7 +149,23 @@ export default function Event () {
     return client.dispose;
   }, [authentication.token, eventID, sendRequest]);
 
-  const addBasics = React.useCallback(async function (numberOfCopies, scryfallID) {
+  const addBasics = React.useCallback(async function ({
+    cmc,
+    collector_number,
+    color_identity,
+    image,
+    keywords,
+    mana_cost,
+    mtgo_id,
+    name,
+    oracle_id,
+    tcgplayer_id,
+    scryfall_id,
+    set,
+    set_name,
+    tokens,
+    type_line
+  }, component, numberOfCopies) {
     await sendRequest({
       headers: { EventID: eventID },
       operation: 'addBasics',
@@ -159,8 +175,25 @@ export default function Event () {
             mutation {
               ${this.operation}(
                 input: {
-                  numberOfCopies: ${numberOfCopies},
-                  scryfallID: "${scryfallID}"
+                  card: {
+                    cmc: ${cmc},
+                    collector_number: ${collector_number},
+                    color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
+                    image: "${image}",
+                    keywords: [${keywords.map(kw => '"' + kw + '"')}],
+                    mana_cost: "${mana_cost}",
+                    ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',\n' : ''}
+                    name: "${name}",
+                    oracle_id: "${oracle_id}",
+                    ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',\n' : ''} 
+                    scryfall_id: "${scryfall_id}",
+                    set: "${set}",
+                    set_name: "${set_name}",
+                    tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],
+                    type_line: "${type_line}"
+                  },
+                  component: ${component},
+                  numberOfCopies: ${numberOfCopies}
                 }
               ) {
                 _id
@@ -332,7 +365,7 @@ export default function Event () {
 
           {tabNumber === 1 &&
             <PicksDisplay
-              addBasics={addBasics}
+              addBasics={cardData => addBasics(cardData, 'mainboard', 1)}
               moveCard={onMoveCard}
               onSortEnd={onSortEnd}
               player={me}
@@ -347,7 +380,7 @@ export default function Event () {
 
           <MUIPaper style={{ overflow: 'hidden' }}>
             <PicksDisplay
-              addBasics={addBasics}
+              addBasics={cardData => addBasics(cardData, 'mainboard', 1)}
               moveCard={onMoveCard}
               onSortEnd={onSortEnd}
               player={me}

@@ -77,7 +77,7 @@ export default function Deck () {
             <div style={{ padding: 4 }}>
               <MUITypography variant="subtitle1">Add Basic Lands to Deck</MUITypography>
             </div>
-            <BasicLandAdder submitFunction={() => null} />
+            <BasicLandAdder submitFunction={cardData => addCardsToDeck(cardData, 'mainboard', 1)} />
           </MUIPaper>
         </React.Fragment>
       }

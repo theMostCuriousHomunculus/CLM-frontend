@@ -12,7 +12,7 @@ export const DeckContext = createContext({
   addCardsToDeck: () => null,
   editDeck: () => null,
   fetchDeckByID: () => null,
-  removeCardFromDeck: () => null,
+  removeCardsFromDeck: () => null,
   toggleMainboardSideboard: () => null
 });
 
@@ -31,6 +31,28 @@ export default function ContextualizedDeckPage() {
     name: '',
     sideboard: []
   });
+  const cardQuery = `
+    _id
+    back_image
+    cmc
+    collector_number
+    color_identity
+    image
+    keywords
+    mana_cost
+    mtgo_id
+    name
+    oracle_id
+    scryfall_id
+    set
+    set_name
+    tcgplayer_id
+    tokens {
+      name
+      scryfall_id
+    }
+    type_line
+  `;
   const deckQuery = `
     _id
     creator {
@@ -41,27 +63,11 @@ export default function ContextualizedDeckPage() {
     description
     format
     mainboard {
-      _id
-      back_image
-      cmc
-      image
-      mana_cost
-      name
-      scryfall_id
-      set
-      type_line
+      ${cardQuery}
     }
     name
     sideboard {
-      _id
-      back_image
-      cmc
-      image
-      mana_cost
-      name
-      scryfall_id
-      set
-      type_line
+      ${cardQuery}
     }
   `;
   const { loading, sendRequest } = useRequest();
@@ -168,15 +174,20 @@ export default function ContextualizedDeckPage() {
     });
   }, [deckQuery, deckState._id, sendRequest]);
 
-  const removeCardFromDeck = React.useCallback(async function (cardID) {
+  const removeCardsFromDeck = React.useCallback(async function (cardIDs, component) {
     await sendRequest({
       headers: { DeckID: deckState._id },
-      operation: 'removeCardFromDeck',
+      operation: 'removeCardsFromDeck',
       get body() {
         return {
           query: `
             mutation {
-              ${this.operation}(cardID: "${cardID}") {
+              ${this.operation}(
+                input: {
+                  cardIDs: [${cardIDs.map(cardID => '"' + cardID + '"')}],
+                  component: ${component}
+                }
+              ) {
                 _id
               }
             }
@@ -214,7 +225,7 @@ export default function ContextualizedDeckPage() {
         addCardsToDeck,
         editDeck,
         fetchDeckByID,
-        removeCardFromDeck,
+        removeCardsFromDeck,
         toggleMainboardSideboard
       }}
     >

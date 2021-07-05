@@ -4,7 +4,7 @@ import orange from '@material-ui/core/colors/orange';
 import yellow from '@material-ui/core/colors/yellow';
 
 const defaultTheme = createMuiTheme();
-const backgroundColor = `#f7f7f7`;
+const backgroundColor = `#efefef`;
 
 const theme = createMuiTheme({
   ...defaultTheme,
