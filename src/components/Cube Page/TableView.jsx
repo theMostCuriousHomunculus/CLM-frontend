@@ -11,6 +11,15 @@ import specificCardType from '../../functions/specific-card-type';
 import theme from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import { monoColors, multiColors } from '../../constants/color-objects';
+import { generalCardTypes, specificCardTypes } from '../../constants/type-objects';
+import { ReactComponent as MagicSVG } from '../../svgs/magic.svg';
+
+const black = monoColors.find(color => color.name === "Black").hex;
+const blue = monoColors.find(color => color.name === "Blue").hex;
+const colorless = monoColors.find(color => color.name === "Colorless").hex;
+const green = monoColors.find(color => color.name === "Green").hex;
+const red = monoColors.find(color => color.name === "Red").hex;
+const white = monoColors.find(color => color.name === "White").hex;
 
 const useStyles = makeStyles({
   basicCard: {
@@ -29,20 +38,15 @@ const useStyles = makeStyles({
     }
   },
   black: {
-    backgroundColor: monoColors.find((color) => color.name === "Black").hex
+    backgroundColor: black
   },
   blue: {
-    backgroundColor: monoColors.find((color) => color.name === "Blue").hex
-  },
-  cardContent: {
-    paddingTop: 2
+    backgroundColor: blue
   },
   cardHeader: {
     paddingBottom: 2,
-    textAlign: 'center',
     '& *': {
-      fontWeight: 'bold',
-      lineHeight: 1.1
+      fontWeight: 'bold'
     }
   },
   cmcBlock: {
@@ -56,16 +60,52 @@ const useStyles = makeStyles({
     textAlign: 'center'
   },
   colorless: {
-    backgroundColor: monoColors.find((color) => color.name === "Colorless").hex
+    backgroundColor: colorless
   },
   green: {
-    backgroundColor: monoColors.find((color) => color.name === "Green").hex
+    backgroundColor: green
   },
   multicolor: {
     backgroundColor: '#efef8f'
   },
+  azorius: {
+    background: `linear-gradient(-45deg, ${white}, ${blue})`
+  },
+  boros: {
+    background: `linear-gradient(-45deg, ${red}, ${white})`
+  },
+  dimir: {
+    background: `linear-gradient(-45deg, ${blue}, ${black})`
+  },
+  golgari: {
+    background: `linear-gradient(-45deg, ${black}, ${green})`
+  },
+  gruul: {
+    background: `linear-gradient(-45deg, ${red}, ${green})`
+  },
+  izzet: {
+    background: `linear-gradient(-45deg, ${blue}, ${red})`
+  },
+  orzhov: {
+    background: `linear-gradient(-45deg, ${white}, ${black})`
+  },
+  rakdos: {
+    background: `linear-gradient(-45deg, ${black}, ${red})`
+  },
+  simic: {
+    background: `linear-gradient(-45deg, ${green}, ${blue})`
+  },
+  selesnya: {
+    background: `linear-gradient(-45deg, ${green}, ${white})`
+  },
+  multicolorCardContent: {
+    padding: 0
+  },
+  multicolorSection: {
+    padding: 8
+  },
   red: {
-    backgroundColor: monoColors.find((color) => color.name === "Red").hex
+    backgroundColor: red
   },
   tableViewMainContainer: {
     display: 'flex',
@@ -77,7 +117,7 @@ const useStyles = makeStyles({
     textAlign: 'center'
   },
   white: {
-    backgroundColor: monoColors.find((color) => color.name === "White").hex
+    backgroundColor: white
   }  
 });
 
@@ -87,7 +127,6 @@ export default function TableView ({
 }) {
 
   const classes = useStyles();
-  const costs = [0, 1, 2, 3, 4, 5, 6, 7];
 
   return (
     <div className={classes.tableViewMainContainer}>
@@ -96,23 +135,24 @@ export default function TableView ({
         return (
           <MUICard className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`} key={`table-${color.name}`}>
             <MUICardHeader
+              avatar={React.cloneElement(color.svg, { style: { height: 32, width: 32 } })}
               className={classes.cardHeader}
-              title={color.name}
-              subheader={`(${cards_color.length})`}
+              title={<MUITypography variant="h5">({cards_color.length})</MUITypography>}
             />
-            <MUICardContent className={classes.cardContent}>
-              {["Creature", "Planeswalker", "Instant", "Sorcery", "Enchantment", "Artifact", "Land", "???"].map(function (type) {
-                const cards_color_type = cards_color.filter(card => specificCardType(card.type_line) === type);
+            <MUICardContent>
+              {specificCardTypes.map(function (type) {
+                const cards_color_type = cards_color.filter(card => specificCardType(card.type_line) === type.name);
                 return (
-                  <React.Fragment key={type}>
+                  <React.Fragment key={type.name}>
                     {cards_color_type.length > 0 &&
                       <React.Fragment>
                         <MUITypography className={classes.typeText} variant="subtitle1">
-                          {`${type} (${cards_color_type.length})`}
+                          {React.cloneElement(type.svg, { style: { height: 20, marginRight: 8, width: 20 }})}
+                          {`${type.name} (${cards_color_type.length})`}
                         </MUITypography>
                         <div className={classes.cmcBlock}>
-                          {costs.map(function (cost) {
-                            const cards_color_type_cost = cards_color_type.filter(card => card.cmc === cost || (cost === 7 && card.cmc > cost));
+                          {[...Array(16).keys()].map(function (cost) {
+                            const cards_color_type_cost = cards_color_type.filter(card => card.cmc === cost);
                             return (
                               <React.Fragment key={cost}>
                                 {cards_color_type_cost.length > 0 &&
@@ -149,26 +189,29 @@ export default function TableView ({
       })}
       <MUICard className={classes.multicolor + ' ' + classes.basicCard}>
         <MUICardHeader
+          avatar={<MagicSVG style={{ height: 32, width: 32 }} />}
           className={classes.cardHeader}
-          title="Multicolor"
-          subheader={`(${cards.filter(card => card.color_identity.length > 1).length})`}
+          title={<MUITypography variant="h5">({cards.filter(card => card.color_identity.length > 1).length})</MUITypography>}
         />
-        <MUICardContent className={classes.cardContent}>
+        <MUICardContent className={classes.multicolorCardContent}>
           {multiColors.map(function (color) {
             const cards_color = cards.filter(card => card.color_identity.toString() === color.color_identity);
             return (
               <React.Fragment key={color.name}>
                 {cards_color.length > 0 &&
-                  <div>
+                  <div className={`${classes[color.name.toLowerCase()]} ${classes.multicolorSection}`}>
                     <MUITypography className={classes.colorComboText} variant="subtitle1">
+                      {color.svg && React.cloneElement(color.svg, { style: { height: 24, marginRight: 8, width: 24 } })}
                       {`${color.name} (${cards_color.length})`}
                     </MUITypography>
-                    {["Creature", "Non-Creature", "Land"].map(function (value) {
-                      const cards_color_type = cards_color.filter(card => value === generalCardType(card.type_line));
+                    {generalCardTypes.map(function (type) {
+                      const cards_color_type = cards_color.filter(card => type.name === generalCardType(card.type_line));
                       return (
-                        <div key={`${color.name}-${value}`}>
+                        cards_color_type.length > 0 &&
+                        <div key={`${color.name}-${type.name}`}>
                           <MUITypography style={{ fontStyle: 'italic', textAlign: 'center' }} variant="subtitle1">
-                            {value}
+                            {React.cloneElement(type.svg, { style: { height: 20, marginRight: 8, width: 20 }})}
+                            {type.name}
                           </MUITypography>
                           {customSort(cards_color_type, ['cmc']).map(function (card, index) {
                             return (

@@ -5,11 +5,9 @@ import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
+import MUIFormControl from '@material-ui/core/FormControl';
+import MUIInputLabel from '@material-ui/core/InputLabel';
+import MUISelect from '@material-ui/core/Select';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -27,29 +25,6 @@ const useStyles = makeStyles({
   cardContent: {
     display: 'flex',
     justifyContent: 'space-between'
-  },
-  cardHeader: {
-    justifyContent: 'space-between',
-    '& .MuiCardHeader-content': {
-      width: 'unset'
-    },
-    '& .MuiCardHeader-action': {
-      display: 'flex',
-      flexDirection: 'row',
-      flexGrow: 2,
-      justifyContent: 'space-between',
-      margin: 0
-    }
-  },
-  list: {
-    padding: 0
-  },
-  listContainer: {
-    flexGrow: 1
-  },
-  rotationSizeField: {
-    margin: '0 8px 0 8px',
-    width: '33%'
   }
 });
 
@@ -64,11 +39,9 @@ export default function ComponentInfo ({
 
   const classes = useStyles();
   const cubeID = useParams().cubeId;
-  const [componentAnchorEl, setComponentAnchorEl] = React.useState(null);
   const [componentName, setComponentName] = React.useState(component.name);
   const [componentSize, setComponentSize] = React.useState(component.size);
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
-  const [viewAnchorEl, setViewAnchorEl] = React.useState(null);
   const { sendRequest } = useRequest();
 
   async function deleteComponent () {
@@ -118,15 +91,13 @@ export default function ComponentInfo ({
     }
   }
 
-  const handleComponentMenuItemClick = ({ _id, name, size }) => {
-    setDisplay(prevState => ({
-      ...prevState,
-      activeComponentID: _id
-    }));
-    setComponentName(name);
-    setComponentSize(size);
-    setComponentAnchorEl(null);
-  };
+  React.useEffect(() => {
+    setComponentName(component.name);
+  }, [component.name]);
+
+  React.useEffect(() => {
+    setComponentSize(component.size);
+  }, [component.size]);
 
   async function submitComponentChanges () {
     if (Number.isInteger(parseInt(componentSize))) {
@@ -189,13 +160,11 @@ export default function ComponentInfo ({
     
       <MUICard>
         <MUICardHeader
-          className={classes.cardHeader}
           disableTypography={true}
-          title={(editable &&
-            display.activeComponentID !== 'mainboard' &&
-            display.activeComponentID !== 'sideboard') ?
+          title={
             <MUITextField
               autoComplete="off"
+              disabled={!editable || display.activeComponentID === 'mainboard' || display.activeComponentID === 'sideboard'}
               inputProps={{
                 onBlur: submitComponentChanges
               }}
@@ -205,87 +174,45 @@ export default function ComponentInfo ({
               type="text"
               value={componentName}
               variant="outlined"
-            /> :
-            <MUITypography variant="subtitle1">{component.name}</MUITypography>
+            />
           }
           action={
-            <React.Fragment>
-              <div className={classes.listContainer}>
-                <MUIList className={classes.list} component="nav">
-                  <MUIListItem
-                    button
-                    aria-haspopup="true"
-                    aria-controls="lock-menu"
-                    onClick={(event) => setComponentAnchorEl(event.currentTarget)}
-                  >
-                    <MUIListItemText
-                      primary="Viewing"
-                      secondary={component.name}
-                    />
-                  </MUIListItem>
-                </MUIList>
-                <MUIMenu
-                  id="component-selector"
-                  anchorEl={componentAnchorEl}
-                  keepMounted
-                  open={Boolean(componentAnchorEl)}
-                  onClose={() => setComponentAnchorEl(null)}
+            <MUIFormControl variant="outlined">
+              <MUIInputLabel htmlFor="component-selector">Format</MUIInputLabel>
+              <MUISelect
+                fullWidth
+                label="Viewing"
+                margin="dense"
+                native
+                onChange={event => {
+                  setDisplay(prevState => ({
+                    ...prevState,
+                    activeComponentID: event.target.value
+                  }));
+                }}
+                value={display.activeComponentID}
+                variant="outlined"
+                inputProps={{
+                  id: 'component-selector'
+                }}
+              >
+              {[
+                { _id: 'mainboard', name: 'Mainboard' },
+                { _id: 'sideboard', name: 'Sideboard' },
+                ...modules,
+                ...rotations
+              ].map(component => (
+                <option
+                  key={component._id}
+                  selected={display.activeComponentID === component._id}
+                  value={component._id}
                 >
-                  {[
-                    { _id: 'mainboard', name: 'Mainboard' },
-                    { _id: 'sideboard', name: 'Sideboard' },
-                    ...modules,
-                    ...rotations
-                  ].map(component => (
-                    <MUIMenuItem
-                      key={component._id}
-                      onClick={() => handleComponentMenuItemClick({ _id: component._id, name: component.name, size: component.size })}
-                      selected={display.activeComponentID === component._id}
-                    >
-                      {component.name}
-                    </MUIMenuItem>
-                  ))}
-                </MUIMenu>
-              </div>
-              <div className={classes.listContainer}>
-                <MUIList className={classes.list} component="nav">
-                  <MUIListItem
-                    button
-                    aria-haspopup="true"
-                    aria-controls="lock-menu"
-                    onClick={(event) => setViewAnchorEl(event.currentTarget)}
-                  >
-                    <MUIListItemText
-                      primary="Display"
-                      secondary={display.view}
-                    />
-                  </MUIListItem>
-                </MUIList>
-                <MUIMenu
-                  id="view-selector"
-                  anchorEl={viewAnchorEl}
-                  keepMounted
-                  open={Boolean(viewAnchorEl)}
-                  onClose={() => setViewAnchorEl(null)}
-                >
-                  {["Curve"/*, "List"*/, "Table"].map(option => (
-                    <MUIMenuItem
-                      key={option}
-                      onClick={() => {
-                        setDisplay(prevState => ({
-                          ...prevState,
-                          view: option
-                        }));
-                        setViewAnchorEl(null);
-                      }}
-                      selected={option === display.view}
-                    >
-                      {option}
-                    </MUIMenuItem>
-                  ))}
-                </MUIMenu>
-              </div>
-            </React.Fragment>
+                  {component.name}
+                </option>
+              ))}
+                
+              </MUISelect>
+            </MUIFormControl>
           }
         />
 
@@ -301,10 +228,10 @@ export default function ComponentInfo ({
             </MUIButton>
           }
 
-          {editable && Number.isInteger(component.size) &&
+          {Number.isInteger(component.size) &&
             <MUITextField
-              className={classes.rotationSizeField}
-              label="Size"
+              disabled={!editable}
+              label="Rotation Size"
               inputProps={{
                 max: component.maxSize,
                 min: 0,
@@ -317,10 +244,6 @@ export default function ComponentInfo ({
               value={componentSize}
               variant="outlined"
             />
-          }
-
-          {!editable && Number.isInteger(component.size) &&
-            <MUITypography variant="subtitle1">Rotation Size: {component.size}</MUITypography>
           }
 
           {editable && display.activeComponentID !== 'mainboard' && display.activeComponentID !== 'sideboard' &&

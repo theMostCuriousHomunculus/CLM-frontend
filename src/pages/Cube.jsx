@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import useRequest from '../hooks/request-hook';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeInfo from '../components/Cube Page/CubeInfo';
-import CurveView from '../components/Cube Page/CurveView';
+// import CurveView from '../components/Cube Page/CurveView';
 import EditCardModal from '../components/Cube Page/EditCardModal';
 // import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -38,7 +38,7 @@ export default function Cube () {
   const [display, setDisplay] = React.useState({
     activeComponentID: 'mainboard',
     filter: '',
-    view: 'Table'
+    // view: 'Table'
   });
   const editable = cube.creator._id === authentication.userId;
   const [selectedCard, setSelectedCard] = React.useState();
@@ -321,7 +321,7 @@ export default function Cube () {
         />
 
         {editable &&
-          <MUIPaper style={{ padding: '0 4px' }}>
+          <MUIPaper style={{ padding: '0 4px', position: 'sticky', top: 4 }}>
             <ScryfallRequest
               buttonText="Add it!"
               labelText={`Add a card to ${component.name}`}
@@ -329,9 +329,9 @@ export default function Cube () {
             />
           </MUIPaper>
         }
-        {display.view === 'Curve' && <CurveView cards={component.displayedCards} setSelectedCard={setSelectedCard} />}
+        {/*display.view === 'Curve' && <CurveView cards={component.displayedCards} setSelectedCard={setSelectedCard} />*/}
         {/*display.view === 'List' && <ListView cards={component.displayedCards} editCard={editCard} />*/}
-        {display.view === 'Table' && <TableView cards={component.displayedCards} setSelectedCard={setSelectedCard} />}
+        <TableView cards={component.displayedCards} setSelectedCard={setSelectedCard} />
 
       </React.Fragment>
   );

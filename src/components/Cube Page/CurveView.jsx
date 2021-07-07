@@ -10,12 +10,12 @@ import cardType from '../../functions/specific-card-type';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import { monoColors, multiColors } from '../../constants/color-objects';
 
-const black = monoColors.find((color) => color.name === "Black").hex;
-const blue = monoColors.find((color) => color.name === "Blue").hex;
-const colorless = monoColors.find((color) => color.name === "Colorless").hex;
-const green = monoColors.find((color) => color.name === "Green").hex;
-const red = monoColors.find((color) => color.name === "Red").hex;
-const white = monoColors.find((color) => color.name === "White").hex;
+const black = monoColors.find(color => color.name === "Black").hex;
+const blue = monoColors.find(color => color.name === "Blue").hex;
+const colorless = monoColors.find(color => color.name === "Colorless").hex;
+const green = monoColors.find(color => color.name === "Green").hex;
+const red = monoColors.find(color => color.name === "Red").hex;
+const white = monoColors.find(color => color.name === "White").hex;
 
 const useStyles = makeStyles({
   azorius: {
