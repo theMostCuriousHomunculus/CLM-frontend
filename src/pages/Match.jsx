@@ -88,6 +88,7 @@ export default function Match () {
     name: null,
     origin: null,
     owner: null,
+    tokens: [],
     visibility: []
   });
   const [zoneName, setZoneName] = React.useState(null);

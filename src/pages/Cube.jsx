@@ -5,13 +5,11 @@ import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
+import CubeDisplay from '../components/Cube Page/CubeDisplay';
 import CubeInfo from '../components/Cube Page/CubeInfo';
-// import CurveView from '../components/Cube Page/CurveView';
 import EditCardModal from '../components/Cube Page/EditCardModal';
-// import ListView from '../components/Cube Page/ListView';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
-import TableView from '../components/Cube Page/TableView';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 export default function Cube () {
@@ -37,8 +35,7 @@ export default function Cube () {
   // this state is directly manipulated by the user; all presentational
   const [display, setDisplay] = React.useState({
     activeComponentID: 'mainboard',
-    filter: '',
-    // view: 'Table'
+    filter: ''
   });
   const editable = cube.creator._id === authentication.userId;
   const [selectedCard, setSelectedCard] = React.useState();
@@ -331,7 +328,7 @@ export default function Cube () {
         }
         {/*display.view === 'Curve' && <CurveView cards={component.displayedCards} setSelectedCard={setSelectedCard} />*/}
         {/*display.view === 'List' && <ListView cards={component.displayedCards} editCard={editCard} />*/}
-        <TableView cards={component.displayedCards} setSelectedCard={setSelectedCard} />
+        <CubeDisplay cards={component.displayedCards} setSelectedCard={setSelectedCard} />
 
       </React.Fragment>
   );

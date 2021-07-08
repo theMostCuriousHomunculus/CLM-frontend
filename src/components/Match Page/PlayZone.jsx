@@ -93,6 +93,7 @@ export default function PlayZone ({
                         name: card.name,
                         origin: 'hand',
                         owner: card.owner._id,
+                        tokens: card.tokens,
                         visibility: card.visibility
                       });
                     }}
@@ -138,6 +139,7 @@ export default function PlayZone ({
                       name: card.name,
                       origin: 'battlefield',
                       owner: card.owner._id,
+                      tokens: card.tokens,
                       visibility: card.visibility
                     });
                   }}
@@ -244,6 +246,7 @@ export default function PlayZone ({
                         name: card.name,
                         origin: 'battlefield',
                         owner: card.owner._id,
+                        tokens: card.tokens,
                         visibility: card.visibility
                       });
                     }}
@@ -276,6 +279,7 @@ export default function PlayZone ({
                       name: card.name,
                       origin: 'battlefield',
                       owner: card.owner._id,
+                      tokens: card.tokens,
                       visibility: card.visibility
                     });
                   }}
@@ -329,6 +333,7 @@ export default function PlayZone ({
                       name: card.name,
                       origin: 'hand',
                       owner: card.owner._id,
+                      tokens: card.tokens,
                       visibility: card.visibility
                     });
                   }}

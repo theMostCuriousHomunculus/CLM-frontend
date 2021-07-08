@@ -36,6 +36,7 @@ export default function ZoneInspectionDialogue ({
                   isCopyToken: card.isCopyToken,
                   origin: zoneName,
                   owner: card.owner._id,
+                  tokens: card.tokens,
                   visibility: card.visibility
                 });
               }}

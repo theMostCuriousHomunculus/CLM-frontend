@@ -225,6 +225,10 @@ export default function ContextualizedMatchPage() {
         owner {
           _id
         }
+        tokens {
+          name
+          scryfall_id
+        }
         visibility {
           _id
         }

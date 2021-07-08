@@ -16,6 +16,7 @@ export default function CardMenu ({
     matchState: { players },
     changeFaceDownImage,
     createCopies,
+    createTokens,
     destroyCopyToken,
     gainControlOfCard,
     revealCard,
@@ -34,6 +35,7 @@ export default function CardMenu ({
       name: null,
       origin: null,
       owner: null,
+      tokens: [],
       visibility: []
     })
   }, [setRightClickedCard]);
@@ -74,6 +76,7 @@ export default function CardMenu ({
     clearRightClickedCard();
   }
 
+  const [createTokensAnchorEl, setCreateTokensAnchorEl] = React.useState();
   const [faceDownImageAnchorEl, setFaceDownImageAnchorEl] = React.useState();
   const [moveToAnchorEl, setMoveToAnchorEl] = React.useState();
 
@@ -107,6 +110,17 @@ export default function CardMenu ({
                 Create Copies
               </MUIMenuItem>
             }
+            <MUIMenuItem
+              onClick={() => {
+                setCreateTokensAnchorEl(rightClickedCard.anchorElement);
+                setRightClickedCard(prevState => ({
+                  ...prevState,
+                  anchorElement: null
+                }));
+              }}
+            >
+              Create Tokens
+            </MUIMenuItem>
             {/**/}
             <MUIMenuItem
               onClick={() => {
@@ -227,6 +241,20 @@ export default function CardMenu ({
         <MUIMenuItem onClick={() => handleChangeFaceDownImage('standard')}>
           Standard
         </MUIMenuItem>
+      </MUIMenu>
+
+      <MUIMenu
+        anchorEl={createTokensAnchorEl}
+        keepMounted
+        open={Boolean(createTokensAnchorEl)}
+        onClose={() => setCreateTokensAnchorEl(null)}
+        style={{ zIndex: 2147483647 }}
+      >
+        {rightClickedCard.tokens.map(token => (
+          <MUIMenuItem onClick={() => createTokens(1, token.scryfall_id)}>
+            {token.name}
+          </MUIMenuItem>
+        ))}
       </MUIMenu>
     </React.Fragment>
   );
