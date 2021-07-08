@@ -7,8 +7,59 @@ import Match from '../pages/Match';
 export const MatchContext = createContext({
   loading: false,
   matchQuery: '',
-  matchState: null,
+  matchState: {
+    _id: null,
+    game_winners: [],
+    log: [],
+    players: [
+      {
+        account: {
+          _id: null,
+          avatar: null,
+          name: null
+        },
+        battlefield: [],
+        energy: null,
+        exile: [],
+        graveyard: [],
+        hand: [],
+        library: [],
+        life: null,
+        mainboard: [],
+        poison: null,
+        sideboard: [],
+        temporary: []
+      },
+      {
+        account: {
+          _id: null,
+          avatar: null,
+          name: null
+        },
+        battlefield: [],
+        energy: null,
+        exile: [],
+        graveyard: [],
+        hand: [],
+        library: [],
+        life: null,
+        mainboard: [],
+        poison: null,
+        sideboard: [],
+        temporary: []
+      }
+    ],
+    stack: []
+  },
+  numberInputDialogInfo: {
+    buttonText: null,
+    defaultValue: null,
+    inputLabel: null,
+    title: null,
+    updateFunction: null
+  },
   setMatchState: () => null,
+  setNumberInputDialogInfo: () => null,
   adjustEnergyCounters: () => null,
   adjustLifeTotal: () => null,
   adjustPoisonCounters: () => null,
@@ -79,6 +130,13 @@ export default function ContextualizedMatchPage() {
       }
     ],
     stack: []
+  });
+  const [numberInputDialogInfo, setNumberInputDialogInfo] = React.useState({
+    buttonText: null,
+    defaultValue: null,
+    inputLabel: null,
+    title: null,
+    updateFunction: null
   });
   const matchQuery = `
     _id
@@ -427,7 +485,7 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
-  // TODO Implement
+  // waiting for response from scryfall developers regarding all_parts field
   const createTokens = React.useCallback(async function (numberOfTokens, scryfallID) {
     await sendRequest({
       headers: { MatchID: matchState._id },
@@ -438,7 +496,7 @@ export default function ContextualizedMatchPage() {
             mutation {
               ${this.operation}(
                 input: {
-                  numberOfCopies: ${numberOfTokens},
+                  numberOfTokens: ${numberOfTokens},
                   scryfallID: "${scryfallID}"
                 }
               ) {
@@ -806,7 +864,9 @@ export default function ContextualizedMatchPage() {
         loading,
         matchQuery,
         matchState,
+        numberInputDialogInfo,
         setMatchState,
+        setNumberInputDialogInfo,
         adjustEnergyCounters,
         adjustLifeTotal,
         adjustPoisonCounters,

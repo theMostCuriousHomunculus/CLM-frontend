@@ -8,12 +8,13 @@ import yellow from '@material-ui/core/colors/yellow';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Avatar from '../miscellaneous/Avatar';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { MatchContext } from '../../contexts/match-context';
 import { ReactComponent as EnergySymbol } from '../../svgs/energy.svg';
 import { ReactComponent as PoisonSymbol } from '../../svgs/poison.svg';
 
 const useStyles = makeStyles({
   avatarContainer: {
-    cursor: 'move',
     position: 'absolute',
     zIndex: 2147483646
   },
@@ -50,6 +51,89 @@ export default function PlayerInfo ({
   const avatarRef = React.useRef();
   const classes = useStyles();
   const [dragging, setDragging] = React.useState(false);
+  const { userId } = React.useContext(AuthenticationContext);
+  const {
+    adjustEnergyCounters,
+    adjustLifeTotal,
+    adjustPoisonCounters,
+    setNumberInputDialogInfo
+  } = React.useContext(MatchContext);
+
+  React.useEffect(() => {
+
+    function energyBadgeClickListner () {
+      setClickedPlayer({
+        _id: null,
+        anchorElement: null,
+        position: null
+      });
+      setNumberInputDialogInfo({
+        buttonText: "Update",
+        defaultValue: player.energy,
+        inputLabel: "Energy",
+        title: "Update Your Energy Counters",
+        updateFunction: updatedValue => adjustEnergyCounters(updatedValue)
+      });
+    }
+
+    function lifeBadgeClickListner () {
+      setClickedPlayer({
+        _id: null,
+        anchorElement: null,
+        position: null
+      });
+      setNumberInputDialogInfo({
+        buttonText: "Update",
+        defaultValue: player.life,
+        inputLabel: "Life",
+        title: "Update Your Life Total",
+        updateFunction: updatedValue => adjustLifeTotal(updatedValue)
+      });
+    }
+
+    function poisonBadgeClickListner () {
+      setClickedPlayer({
+        _id: null,
+        anchorElement: null,
+        position: null
+      });
+      setNumberInputDialogInfo({
+        buttonText: "Update",
+        defaultValue: player.poison,
+        inputLabel: "Poison",
+        title: "Update Your Poison Counters",
+        updateFunction: updatedValue => adjustPoisonCounters(updatedValue)
+      });
+    }
+
+    if (avatarRef.current && userId === player.account._id) {
+      const energyBadge = avatarRef.current.getElementsByClassName("MuiBadge-anchorOriginBottomRightCircle")[0];
+      const lifeBadge = avatarRef.current.getElementsByClassName("MuiBadge-anchorOriginTopRightCircle")[0];
+      const poisonBadge = avatarRef.current.getElementsByClassName("MuiBadge-anchorOriginTopLeftCircle")[0];
+      
+      energyBadge.addEventListener("click", energyBadgeClickListner);
+      lifeBadge.addEventListener("click", lifeBadgeClickListner);
+      poisonBadge.addEventListener("click", poisonBadgeClickListner);
+
+      return () => {
+        energyBadge.removeEventListener("click", energyBadgeClickListner);
+        lifeBadge.removeEventListener("click", lifeBadgeClickListner);
+        poisonBadge.removeEventListener("click", poisonBadgeClickListner);
+      }
+    }
+  }, [
+    adjustEnergyCounters,
+    adjustLifeTotal,
+    adjustPoisonCounters,
+    avatarRef,
+    player.account._id,
+    player.energy,
+    player.life,
+    player.poison,
+    setClickedPlayer,
+    setNumberInputDialogInfo,
+    userId
+  ]);
 
   return (
     <Draggable
@@ -75,7 +159,7 @@ export default function PlayerInfo ({
         setDragging(false);
       }}
     >
-      <span className={classes.avatarContainer} id={`${position}-avatar`} ref={avatarRef}>
+      <span className={classes.avatarContainer} ref={avatarRef}>
         <MUIBadge
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           badgeContent={
@@ -109,7 +193,12 @@ export default function PlayerInfo ({
               overlap='circle'
               showZero
             >
-              <Avatar alt={player.account.name} size='large' src={player.account.avatar} />
+              <Avatar
+                alt={player.account.name}
+                id={`${position}-avatar`}
+                size='large' src={player.account.avatar}
+                style={{ cursor: 'move' }}
+              />
             </MUIBadge>
           </MUIBadge>
         </MUIBadge>

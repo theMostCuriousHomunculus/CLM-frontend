@@ -6,17 +6,17 @@ import { AuthenticationContext } from '../../contexts/authentication-context';
 import { MatchContext } from '../../contexts/match-context';
 
 export default function PlayerMenu ({
-  bottomPlayer,
   clickedPlayer,
   displayedZones,
   setClickedPlayer,
   setDisplayedZones,
-  setNumberInputDialogInfo,
   setZoneName
 }) {
 
   const authentication = React.useContext(AuthenticationContext);
-  const { adjustEnergyCounters, adjustLifeTotal, adjustPoisonCounters } = React.useContext(MatchContext);
+  const {
+    viewZone
+  } = React.useContext(MatchContext);
 
   return (
     <MUIMenu
@@ -30,68 +30,6 @@ export default function PlayerMenu ({
       })}
       style={{ zIndex: 2147483647 }}
     >
-
-      {clickedPlayer._id === authentication.userId &&
-        <div>
-          <MUIMenuItem
-            onClick={() => {
-              setClickedPlayer({
-                _id: null,
-                anchorElement: null,
-                position: null
-              });
-              setNumberInputDialogInfo({
-                buttonText: "Update",
-                defaultValue: bottomPlayer.energy,
-                inputLabel: "Energy",
-                title: "Update Your Energy Counters",
-                updateFunction: updatedValue => adjustEnergyCounters(updatedValue)
-              });
-            }}
-          >
-            Adjust Energy Counters
-          </MUIMenuItem>
-
-          <MUIMenuItem
-            onClick={() => {
-              setClickedPlayer({
-                _id: null,
-                anchorElement: null,
-                position: null
-              });
-              setNumberInputDialogInfo({
-                buttonText: "Update",
-                defaultValue: bottomPlayer.life,
-                inputLabel: "Life",
-                title: "Update Your Life Total",
-                updateFunction: updatedValue => adjustLifeTotal(updatedValue)
-              });
-            }}
-          >
-            Adjust Life Total
-          </MUIMenuItem>
-          <MUIMenuItem
-            onClick={() => {
-              setClickedPlayer({
-                _id: null,
-                anchorElement: null,
-                position: null
-              });
-              setNumberInputDialogInfo({
-                buttonText: "Update",
-                defaultValue: bottomPlayer.poison,
-                inputLabel: "Poison",
-                title: "Update Your Poison Counters",
-                updateFunction: updatedValue => adjustPoisonCounters(updatedValue)
-              });
-            }}
-          >
-            Adjust Poison Counters
-          </MUIMenuItem>
-          <hr/>
-        </div>
-      }
-
       <MUIMenuItem
         onClick={() => {
 
@@ -199,6 +137,18 @@ export default function PlayerMenu ({
       >
         {clickedPlayer.position === 'bottom' && (displayedZones.bottomLibrary ? "Hide Library" : "Inspect Library")}
         {clickedPlayer.position === 'top' && (displayedZones.topLibrary ? "Hide Library" : "Inspect Library")}
+      </MUIMenuItem>
+      <MUIMenuItem
+        onClick={async () => {
+          await viewZone(clickedPlayer._id, 'library');
+          setClickedPlayer(prevState => ({
+            ...prevState,
+            anchorElement: null
+          }));
+          setZoneName('library');
+        }}
+      >
+        Search Library
       </MUIMenuItem>
 
       {clickedPlayer._id === authentication.userId &&

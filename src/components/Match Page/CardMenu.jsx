@@ -7,13 +7,13 @@ import { MatchContext } from '../../contexts/match-context';
 
 export default function CardMenu ({
   rightClickedCard,
-  setNumberInputDialogInfo,
   setRightClickedCard
 }) {
 
   const { userId } = React.useContext(AuthenticationContext);
   const {
     matchState: { players },
+    setNumberInputDialogInfo,
     changeFaceDownImage,
     createCopies,
     createTokens,
@@ -110,17 +110,19 @@ export default function CardMenu ({
                 Create Copies
               </MUIMenuItem>
             }
-            <MUIMenuItem
-              onClick={() => {
-                setCreateTokensAnchorEl(rightClickedCard.anchorElement);
-                setRightClickedCard(prevState => ({
-                  ...prevState,
-                  anchorElement: null
-                }));
-              }}
-            >
-              Create Tokens
-            </MUIMenuItem>
+            {rightClickedCard.tokens.length > 0 &&
+              <MUIMenuItem
+                onClick={() => {
+                  setCreateTokensAnchorEl(rightClickedCard.anchorElement);
+                  setRightClickedCard(prevState => ({
+                    ...prevState,
+                    anchorElement: null
+                  }));
+                }}
+              >
+                Create Tokens
+              </MUIMenuItem>
+            }
             {/**/}
             <MUIMenuItem
               onClick={() => {

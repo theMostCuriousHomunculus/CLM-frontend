@@ -46,18 +46,13 @@ export default function Match () {
     topLibrary: true
   });
   const [helpDisplayed, setHelpDisplayed] = React.useState(false);
-  const [numberInputDialogInfo, setNumberInputDialogInfo] = React.useState({
-    buttonText: null,
-    defaultValue: null,
-    inputLabel: null,
-    title: null,
-    updateFunction: null
-  });
   const {
     loading,
     matchQuery,
     matchState,
+    numberInputDialogInfo,
     setMatchState,
+    setNumberInputDialogInfo,
     concedeGame,
     drawCard,
     fetchMatchByID,
@@ -172,7 +167,7 @@ export default function Match () {
       return () => document.removeEventListener("keydown", handleHotKeys);
     }
 
-  }, [concedeGame, drawCard, rollDice, shuffleLibrary, tapUntapCards, participant, bottomPlayer.battlefield]);
+  }, [bottomPlayer.battlefield, concedeGame, drawCard, participant, setNumberInputDialogInfo, rollDice, shuffleLibrary, tapUntapCards]);
 
   return (
     loading ?
@@ -214,7 +209,6 @@ export default function Match () {
 
       <CardMenu
         rightClickedCard={rightClickedCard}
-        setNumberInputDialogInfo={setNumberInputDialogInfo}
         setRightClickedCard={setRightClickedCard}
       />
 
@@ -224,7 +218,6 @@ export default function Match () {
         displayedZones={displayedZones}
         setClickedPlayer={setClickedPlayer}
         setDisplayedZones={setDisplayedZones}
-        setNumberInputDialogInfo={setNumberInputDialogInfo}
         setZoneName={setZoneName}
       />
 
