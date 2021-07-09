@@ -69,10 +69,6 @@ export default function Cube () {
       set
       set_name
       tcgplayer_id
-      tokens {
-        name
-        scryfall_id
-      }
       type_line
     `;
 

@@ -47,10 +47,6 @@ export default function ContextualizedDeckPage() {
     set
     set_name
     tcgplayer_id
-    tokens {
-      name
-      scryfall_id
-    }
     type_line
   `;
   const deckQuery = `
