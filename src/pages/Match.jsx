@@ -12,7 +12,7 @@ import MatchLog from '../components/Match Page/MatchLog';
 import NumberInputDialog from '../components/miscellaneous/NumberInputDialog';
 import PlayerMenu from '../components/Match Page/PlayerMenu';
 import PlayZone from '../components/Match Page/PlayZone';
-import ScryfallTokenSearch from '../components/Match Page/ScryfallTokenSearch';
+import ScryfallTokenSearchDialog from '../components/Match Page/ScryfallTokenSearchDialog';
 import TheStack from '../components/Match Page/TheStack';
 import ZoneInspectionDialog from '../components/Match Page/ZoneInspectionDialog';
 import { AuthenticationContext } from '../contexts/authentication-context';
@@ -86,6 +86,7 @@ export default function Match () {
     owner: null,
     visibility: []
   });
+  const [tokenDialogOpen, setTokenDialogOpen] = React.useState(false);
   const [zoneName, setZoneName] = React.useState(null);
 
   React.useEffect(function () {
@@ -153,6 +154,10 @@ export default function Match () {
 
       if (event.altKey && event.shiftKey && event.key === 'S') {
         shuffleLibrary();
+      }
+
+      if (event.altKey && event.shiftKey && event.key === 'T') {
+        setTokenDialogOpen(true);
       }
 
       if (event.altKey && event.shiftKey && event.key === 'U') {
@@ -225,7 +230,7 @@ export default function Match () {
         <TheStack setRightClickedCard={setRightClickedCard} />
       }
 
-      <ScryfallTokenSearch />
+      <ScryfallTokenSearchDialog closeDialog={() => setTokenDialogOpen(false)} openDialog={tokenDialogOpen} />
 
       <div className={classes.matchScreenFlexContainer}>
         <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>

@@ -175,10 +175,6 @@ export default function ContextualizedMatchPage() {
         targets {
           _id
         }
-        tokens {
-          name
-          scryfall_id
-        }
         visibility {
           _id
         }
@@ -208,10 +204,6 @@ export default function ContextualizedMatchPage() {
         targets {
           _id
         }
-        tokens {
-          name
-          scryfall_id
-        }
         visibility {
           _id
         }
@@ -236,10 +228,6 @@ export default function ContextualizedMatchPage() {
         targets {
           _id
         }
-        tokens {
-          name
-          scryfall_id
-        }
         visibility {
           _id
         }
@@ -261,10 +249,6 @@ export default function ContextualizedMatchPage() {
         targets {
           _id
         }
-        tokens {
-          name
-          scryfall_id
-        }
         visibility {
           _id
         }
@@ -282,10 +266,6 @@ export default function ContextualizedMatchPage() {
         name
         owner {
           _id
-        }
-        tokens {
-          name
-          scryfall_id
         }
         visibility {
           _id
@@ -352,10 +332,6 @@ export default function ContextualizedMatchPage() {
       }
       targets {
         _id
-      }
-      tokens {
-        name
-        scryfall_id
       }
       visibility {
         _id
@@ -485,7 +461,7 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
-  const createTokens = React.useCallback(async function (numberOfTokens, scryfallID) {
+  const createTokens = React.useCallback(async function ({ back_image, image, name }, numberOfTokens) {
     await sendRequest({
       headers: { MatchID: matchState._id },
       operation: 'createTokens',
@@ -495,8 +471,12 @@ export default function ContextualizedMatchPage() {
             mutation {
               ${this.operation}(
                 input: {
-                  numberOfTokens: ${numberOfTokens},
-                  scryfallID: "${scryfallID}"
+                  token: {
+                    ${back_image ? 'back_image: "' + back_image + '",\n' : ''}
+                    image: "${image}",
+                    name: "${name}"
+                  },
+                  numberOfTokens: ${numberOfTokens}
                 }
               ) {
                 _id
@@ -833,7 +813,7 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
-  // TODO: Implement
+  // TODO: Expand
   const viewZone = React.useCallback(async function (controllerID, zone) {
     await sendRequest({
       headers: { MatchID: matchState._id },
