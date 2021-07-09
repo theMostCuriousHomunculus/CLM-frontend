@@ -10,12 +10,13 @@ import Intermission from '../components/Match Page/Intermission';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MatchLog from '../components/Match Page/MatchLog';
 import NumberInputDialog from '../components/miscellaneous/NumberInputDialog';
+import PlayerMenu from '../components/Match Page/PlayerMenu';
 import PlayZone from '../components/Match Page/PlayZone';
+import ScryfallTokenSearch from '../components/Match Page/ScryfallTokenSearch';
 import TheStack from '../components/Match Page/TheStack';
 import ZoneInspectionDialog from '../components/Match Page/ZoneInspectionDialog';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { MatchContext } from '../contexts/match-context';
-import PlayerMenu from '../components/Match Page/PlayerMenu';
 
 const useStyles = makeStyles({
   matchScreenFlexContainer: {
@@ -83,7 +84,6 @@ export default function Match () {
     name: null,
     origin: null,
     owner: null,
-    tokens: [],
     visibility: []
   });
   const [zoneName, setZoneName] = React.useState(null);
@@ -224,6 +224,8 @@ export default function Match () {
       {matchState.stack.length > 0 &&
         <TheStack setRightClickedCard={setRightClickedCard} />
       }
+
+      <ScryfallTokenSearch />
 
       <div className={classes.matchScreenFlexContainer}>
         <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>

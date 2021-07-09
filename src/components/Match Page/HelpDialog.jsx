@@ -22,6 +22,7 @@ export default function HelpDialog ({
         <MUITypography variant="body1">Alt + Shift + D = Draw a card.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + R = Roll dice.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + S = Shuffle your library.</MUITypography>
+        <MUITypography variant="body1">Alt + Shift + T = Create tokens.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + U = Untap all your tapped cards on the battlefield.</MUITypography>
       </MUIDialogContent>
       <MUIDialogActions>

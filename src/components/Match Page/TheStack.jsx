@@ -48,7 +48,6 @@ export default function TheStack ({ setRightClickedCard }) {
                   name: card.name,
                   origin: 'stack',
                   owner: card.owner._id,
-                  tokens: card.tokens,
                   visibility: card.visibility
                 });
               }}

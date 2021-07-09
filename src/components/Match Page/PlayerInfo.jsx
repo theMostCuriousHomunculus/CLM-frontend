@@ -119,7 +119,7 @@ export default function PlayerInfo ({
         energyBadge.removeEventListener("click", energyBadgeClickListner);
         lifeBadge.removeEventListener("click", lifeBadgeClickListner);
         poisonBadge.removeEventListener("click", poisonBadgeClickListner);
-      }
+      };
     }
   }, [
     adjustEnergyCounters,

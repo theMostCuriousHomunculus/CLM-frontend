@@ -485,7 +485,6 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
-  // waiting for response from scryfall developers regarding all_parts field
   const createTokens = React.useCallback(async function (numberOfTokens, scryfallID) {
     await sendRequest({
       headers: { MatchID: matchState._id },

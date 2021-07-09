@@ -73,7 +73,6 @@ export default function VerticalCollapsableZone ({
               name: card.name,
               origin: zone.toLowerCase(),
               owner: card.owner._id,
-              tokens: card.tokens,
               visibility: card.visibility
             });
           }}
