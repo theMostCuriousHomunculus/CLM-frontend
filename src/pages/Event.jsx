@@ -8,7 +8,7 @@ import { createClient } from 'graphql-ws';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
-import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
+// import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -45,7 +45,7 @@ export default function Event () {
   });
   const [tabNumber, setTabNumber] = React.useState(0);
   const me = event.players.find(plr => plr.account._id === authentication.userId);
-  const others = event.players.filter(plr => plr.account._id !== authentication.userId);
+  // const others = event.players.filter(plr => plr.account._id !== authentication.userId);
 
   React.useEffect(function () {
 
@@ -376,7 +376,7 @@ export default function Event () {
 
       {event.finished &&
         <React.Fragment>
-          <CardPoolDownloadLinks me={me} others={others} />
+          {/*<CardPoolDownloadLinks me={me} others={others} />*/}
 
           <MUIPaper style={{ overflow: 'hidden' }}>
             <PicksDisplay
