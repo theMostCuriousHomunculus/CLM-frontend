@@ -142,9 +142,6 @@ export default function ScryfallRequest ({
             set: print.set,
             set_name: print.set_name,
             tcgplayer_id: print.tcgplayer_id,
-            tokens: print.all_parts ?
-              print.all_parts.filter(part => part.component === 'token').map(part => ({ name: part.name, scryfall_id: part.id })) :
-              [],
             type_line
           });
         }));

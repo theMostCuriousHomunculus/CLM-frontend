@@ -47,7 +47,6 @@ export default function DeckDisplay () {
                         set: card.set,
                         set_name: card.set_name,
                         tcgplayer_id: card.tcgplayer_id,
-                        tokens: card.tokens,
                         type_line: card.type_line
                       },
                       copies: [card._id]

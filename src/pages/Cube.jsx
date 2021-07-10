@@ -177,7 +177,6 @@ export default function Cube () {
     set,
     set_name,
     tcgplayer_id,
-    tokens,
     type_line
   }) {
     await sendRequest({
@@ -205,7 +204,6 @@ export default function Cube () {
                     set: "${set}",
                     set_name: "${set_name}",
                     ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',' : ''}
-                    tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],
                     type_line: "${type_line}"
                   }
                 }

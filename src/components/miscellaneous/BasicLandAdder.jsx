@@ -45,7 +45,6 @@ export default function BasicLandAdder ({ submitFunction }) {
                 set: print.set,
                 set_name: print.set_name,
                 tcgplayer_id: print.tcgplayer_id,
-                tokens: [],
                 type_line: print.type_line
               })));
             } else {

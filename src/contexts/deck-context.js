@@ -83,7 +83,6 @@ export default function ContextualizedDeckPage() {
     scryfall_id,
     set,
     set_name,
-    tokens,
     type_line
   }, component, numberOfCopies) {
     await sendRequest({
@@ -110,7 +109,6 @@ export default function ContextualizedDeckPage() {
                     scryfall_id: "${scryfall_id}",
                     set: "${set}",
                     set_name: "${set_name}",
-                    tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],
                     type_line: "${type_line}"
                   },
                   component: ${component},
