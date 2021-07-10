@@ -6,7 +6,6 @@ import SortableList from './SortableList';
 
 export default function PicksDisplay ({
   addBasics,
-  moveCard,
   onSortEnd,
   player
 }) {
@@ -24,9 +23,7 @@ export default function PicksDisplay ({
         cards={player.mainboard}
         distance={2}
         fromCollection={"mainboard"}
-        moveCard={moveCard}
         onSortEnd={onSortEnd}
-        otherCollections={["sideboard", "chaff"]}
       >
       </SortableList>
 
@@ -37,22 +34,7 @@ export default function PicksDisplay ({
         cards={player.sideboard}
         distance={2}
         fromCollection={"sideboard"}
-        moveCard={moveCard}
         onSortEnd={onSortEnd}
-        otherCollections={["mainboard", "chaff"]}
-      >
-      </SortableList>
-
-      <MUITypography variant="h3">Chaff</MUITypography>
-      <MUITypography variant="subtitle1">The crap you aren't gunna use</MUITypography>
-      <SortableList
-        axis="xy"
-        cards={player.chaff}
-        distance={2}
-        fromCollection={"chaff"}
-        moveCard={moveCard}
-        onSortEnd={onSortEnd}
-        otherCollections={["mainboard", "sideboard"]}
       >
       </SortableList>
     </React.Fragment>

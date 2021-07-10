@@ -8,31 +8,32 @@ import { createClient } from 'graphql-ws';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
+import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
+import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import PicksDisplay from '../components/Event Page/PicksDisplay';
+// import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 export default function Event () {
 
-  const authentication = React.useContext(AuthenticationContext);
+  const { token, userId } = React.useContext(AuthenticationContext);
   const eventID = useParams().eventId;
   const { loading, sendRequest } = useRequest();
   const [event, setEvent] = React.useState({
     finished: false,
     host: {},
-    name: '',
+    name: null,
     players: [{
       account: {
-        _id: authentication.userId,
-        avatar: '',
-        name: ''
+        _id: userId,
+        avatar: null,
+        name: '...'
       },
-      chaff: [],
-      current_pack: null,
+      current_pack: [],
       mainboard: [],
       sideboard: []
     }]
@@ -44,53 +45,53 @@ export default function Event () {
     name: null
   });
   const [tabNumber, setTabNumber] = React.useState(0);
-  const me = event.players.find(plr => plr.account._id === authentication.userId);
-  const others = event.players.filter(plr => plr.account._id !== authentication.userId);
+  const me = event.players.find(plr => plr.account._id === userId);
+  const others = event.players.filter(plr => plr.account._id !== userId);
+
+  const cardQuery = `
+    _id
+    back_image
+    cmc
+    collector_number
+    color_identity
+    image
+    keywords
+    mana_cost
+    mtgo_id
+    name
+    oracle_id
+    scryfall_id
+    set
+    set_name
+    tcgplayer_id
+    type_line
+  `;
+  const eventQuery = `
+    _id
+    finished
+    host {
+      _id
+    }
+    name
+    players {
+      account {
+        _id
+        avatar
+        name
+      }
+      current_pack {
+        ${cardQuery}
+      }
+      mainboard {
+        ${cardQuery}
+      }
+      sideboard {
+        ${cardQuery}
+      }
+    }
+  `;
 
   React.useEffect(function () {
-
-    const desiredEventInfo = `
-      _id
-      finished
-      host {
-        _id
-      }
-      name
-      players {
-        account {
-          _id
-          avatar
-          name
-        }
-        chaff {
-          _id
-          back_image
-          image
-          mtgo_id
-          name
-        }
-        current_pack {
-          _id
-          back_image
-          image
-          name
-        }
-        mainboard {
-          _id
-          back_image
-          image
-          mtgo_id
-          name
-        }
-        sideboard {
-          _id
-          back_image
-          image
-          mtgo_id
-          name
-        }
-      }
-    `;
 
     async function initialize () {
       await sendRequest({
@@ -104,7 +105,7 @@ export default function Event () {
             query: `
               query {
                 ${this.operation} {
-                  ${desiredEventInfo}
+                  ${eventQuery}
                 }
               }
             `
@@ -117,7 +118,7 @@ export default function Event () {
 
     const client = createClient({
       connectionParams: {
-        authToken: authentication.token,
+        authToken: token,
         eventID
       },
       url: process.env.REACT_APP_GRAPHQL_WS_URL
@@ -132,7 +133,7 @@ export default function Event () {
         client.subscribe({
           query: `subscription {
             subscribeEvent {
-              ${desiredEventInfo}
+              ${eventQuery}
             }
           }`
         },
@@ -147,7 +148,7 @@ export default function Event () {
     subscribe(result => console.log(result), error => console.log(error));
 
     return client.dispose;
-  }, [authentication.token, eventID, sendRequest]);
+  }, [token, eventID, eventQuery, sendRequest]);
 
   const addBasics = React.useCallback(async function ({
     cmc,
@@ -163,7 +164,6 @@ export default function Event () {
     scryfall_id,
     set,
     set_name,
-    tokens,
     type_line
   }, component, numberOfCopies) {
     await sendRequest({
@@ -189,7 +189,6 @@ export default function Event () {
                     scryfall_id: "${scryfall_id}",
                     set: "${set}",
                     set_name: "${set_name}",
-                    tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],
                     type_line: "${type_line}"
                   },
                   component: ${component},
@@ -205,19 +204,18 @@ export default function Event () {
     });
   }, [sendRequest, eventID]);
 
-  async function onMoveCard (cardID, destination, origin) {
+  const removeBasics = React.useCallback(async function (cardIDs, component) {
     await sendRequest({
       headers: { EventID: eventID },
-      operation: 'moveCard',
+      operation: 'removeBasics',
       get body() {
         return {
           query: `
             mutation {
               ${this.operation}(
                 input: {
-                  cardID: "${cardID}"
-                  destination: ${destination}
-                  origin: ${origin}
+                  cardIDs: [${cardIDs.map(cardID => '"' + cardID + '"')}],
+                  component: ${component}
                 }
               ) {
                 _id
@@ -226,8 +224,26 @@ export default function Event () {
           `
         }
       }
+    })
+  }, [eventID, sendRequest]);
+
+  const toggleMainboardSideboardEvent = React.useCallback(async function (cardID) {
+    await sendRequest({
+      headers: { EventID: eventID },
+      operation: 'toggleMainboardSideboardEvent',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(cardID: "${cardID}") {
+                _id
+              }
+            }
+          `
+        }
+      }
     });
-  }
+  }, [eventID, sendRequest]);
 
   async function onSelectCard (cardID) {
     await sendRequest({
@@ -317,7 +333,7 @@ export default function Event () {
       />
 
       {!event.finished &&
-        <MUIPaper style={{ overflow: 'hidden' }}>
+        <React.Fragment>
           <MUITabs
             indicatorColor="primary"
             onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
@@ -331,7 +347,7 @@ export default function Event () {
 
           {tabNumber === 0 &&
             me.current_pack &&
-            <React.Fragment>
+            <MUIPaper>
               <MUITypography variant="h3">Select a Card to Draft</MUITypography>
               <SortableList
                 axis="xy"
@@ -347,12 +363,12 @@ export default function Event () {
                 onSortEnd={onSortEnd}
                 otherCollections={[]}
               />
-            </React.Fragment>
+            </MUIPaper>
           }
 
           {tabNumber === 0 &&
             !me.current_pack &&
-            <React.Fragment>
+            <MUIPaper>
               <MUITypography variant="h3">Other drafters are still making their picks...</MUITypography>
               <MUITypography variant="body1">
                 Yell at them to hurry up!
@@ -360,32 +376,35 @@ export default function Event () {
               <MUITypography variant="body1">
                 While you're waiting, review the picks you've already made.
               </MUITypography>
-            </React.Fragment>
+            </MUIPaper>
           }
 
           {tabNumber === 1 &&
-            <PicksDisplay
-              addBasics={cardData => addBasics(cardData, 'mainboard', 1)}
-              moveCard={onMoveCard}
-              onSortEnd={onSortEnd}
-              player={me}
-            />
+            <React.Fragment>
+              <BasicLandAdder submitFunction={cardData => addBasics(cardData, 'mainboard', 1)} />
+              <DeckDisplay
+                add={addBasics}
+                authorizedID={me.account._id}
+                deck={{ mainboard: me.mainboard, sideboard: me.sideboard }}
+                remove={removeBasics}
+                toggle={toggleMainboardSideboardEvent}
+              />
+            </React.Fragment>
           }
-        </MUIPaper>
+        </React.Fragment>
       }
 
       {event.finished &&
         <React.Fragment>
           <CardPoolDownloadLinks me={me} others={others} />
-
-          <MUIPaper style={{ overflow: 'hidden' }}>
-            <PicksDisplay
-              addBasics={cardData => addBasics(cardData, 'mainboard', 1)}
-              moveCard={onMoveCard}
-              onSortEnd={onSortEnd}
-              player={me}
-            />
-          </MUIPaper>
+          <BasicLandAdder submitFunction={cardData => addBasics(cardData, 'mainboard', 1)} />
+          <DeckDisplay
+            add={addBasics}
+            authorizedID={me.account._id}
+            deck={{ mainboard: me.mainboard, sideboard: me.sideboard }}
+            remove={removeBasics}
+            toggle={toggleMainboardSideboardEvent}
+          />
         </React.Fragment>
       }
     </React.Fragment>

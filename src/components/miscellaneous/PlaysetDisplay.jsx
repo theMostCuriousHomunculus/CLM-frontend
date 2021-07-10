@@ -1,16 +1,18 @@
 import React from 'react';
 import MUIIconButton from '@material-ui/core/IconButton';
 import MUISwapHorizIcon from '@material-ui/icons/SwapHoriz'
+import MUISwapVertIcon from '@material-ui/icons/SwapVert';
 import MUITextField from '@material-ui/core/TextField';
 import MUITooltip from '@material-ui/core/Tooltip';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { useMediaQuery } from '@material-ui/core';
+import { useParams } from 'react-router';
 
 import theme, { backgroundColor } from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { DeckContext } from '../../contexts/deck-context';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -25,17 +27,15 @@ const useStyles = makeStyles({
 });
 
 export default function PlaysetDisplay ({
+  add,
+  authorizedID,
   component,
-  playset: { card, copies }
+  playset: { card, copies },
+  remove,
+  toggle
 }) {
 
   const { userId } = React.useContext(AuthenticationContext);
-  const {
-    deckState: { creator },
-    addCardsToDeck,
-    removeCardsFromDeck,
-    toggleMainboardSideboard
-  } = React.useContext(DeckContext);
   const classes = useStyles();
   const [updatedCount, setUpdatedCount] = React.useState(copies.length);
 
@@ -46,9 +46,9 @@ export default function PlaysetDisplay ({
   function handleChangeNumberOfCopies () {
 
     if (copies.length < updatedCount) {
-      addCardsToDeck(card, component, updatedCount - copies.length);
+      add(card, component, updatedCount - copies.length);
     } else if (copies.length > updatedCount) {
-      removeCardsFromDeck(copies.slice(updatedCount), component);
+      remove(copies.slice(updatedCount), component);
     } else {
       // don't do anything; no changes
     }
@@ -59,7 +59,7 @@ export default function PlaysetDisplay ({
     <div style={{ alignItems: 'center', display: 'flex' }}>
       <MUITextField
         autoComplete="off"
-        disabled={creator._id !== userId}
+        disabled={(useParams().eventId && !card.type_line.includes('Basic')) || authorizedID !== userId}
         inputProps={{
           min: 0,
           onBlur: handleChangeNumberOfCopies,
@@ -84,10 +84,14 @@ export default function PlaysetDisplay ({
         <MUITooltip title={`Move One to ${component === 'mainboard' ? 'Sideboard' : 'Mainboard'}`}>
           <MUIIconButton
             className={classes.iconButton}
-            onClick={() => toggleMainboardSideboard(copies[0])}
+            onClick={() => toggle(copies[0])}
             size="small"
+            style={{ alignSelf: 'center' }}
           >
-            <MUISwapHorizIcon />
+            {useMediaQuery(theme.breakpoints.up('md')) ?
+              <MUISwapHorizIcon /> :
+              <MUISwapVertIcon />
+            }
           </MUIIconButton>
         </MUITooltip>
         <MUITypography

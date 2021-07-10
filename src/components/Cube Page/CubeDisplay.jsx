@@ -12,6 +12,7 @@ import theme from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import { monoColors, multiColors } from '../../constants/color-objects';
 import { generalCardTypes, specificCardTypes } from '../../constants/type-objects';
+import { CubeContext } from '../../contexts/cube-context';
 import { ReactComponent as MagicSVG } from '../../svgs/magic.svg';
 
 const black = monoColors.find(color => color.name === "Black").hex;
@@ -121,17 +122,17 @@ const useStyles = makeStyles({
   }  
 });
 
-export default function TableView ({
-  cards,
+export default function CubeDisplay ({
   setSelectedCard
 }) {
 
   const classes = useStyles();
+  const { activeComponentState: { displayedCards } } = React.useContext(CubeContext);
 
   return (
     <div className={classes.tableViewMainContainer}>
       {monoColors.map(function (color) {
-        const cards_color = cards.filter(card => card.color_identity.toString() === color.color_identity);
+        const cards_color = displayedCards.filter(card => card.color_identity.toString() === color.color_identity);
         return (
           <MUICard className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`} key={`table-${color.name}`}>
             <MUICardHeader
@@ -191,11 +192,11 @@ export default function TableView ({
         <MUICardHeader
           avatar={<MagicSVG style={{ height: 32, width: 32 }} />}
           className={classes.cardHeader}
-          title={<MUITypography variant="h5">({cards.filter(card => card.color_identity.length > 1).length})</MUITypography>}
+          title={<MUITypography variant="h5">({displayedCards.filter(card => card.color_identity.length > 1).length})</MUITypography>}
         />
         <MUICardContent className={classes.multicolorCardContent}>
           {multiColors.map(function (color) {
-            const cards_color = cards.filter(card => card.color_identity.toString() === color.color_identity);
+            const cards_color = displayedCards.filter(card => card.color_identity.toString() === color.color_identity);
             return (
               <React.Fragment key={color.name}>
                 {cards_color.length > 0 &&

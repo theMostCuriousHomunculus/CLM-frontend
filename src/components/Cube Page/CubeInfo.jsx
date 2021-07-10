@@ -5,45 +5,25 @@ import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
 
-import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { CubeContext } from '../../contexts/cube-context';
 
-export default function CubeInfo ({
-  creator,
-  description,
-  editable,
-  name
-}) {
+export default function CubeInfo () {
 
-  const descriptionRef = React.useRef();
-  const cubeID = useParams().cubeId;
-  const nameRef = React.useRef();
-  const { sendRequest } = useRequest();
+  const { userId } = React.useContext(AuthenticationContext);
+  const { cubeState: { creator, description, name }, editCube } = React.useContext(CubeContext);
+  const [descriptionInput, setDescriptionInput] = React.useState(description);
+  const [nameInput, setNameInput] = React.useState(name);
 
-  async function editCube () {
-    await sendRequest({
-      headers: { CubeID: cubeID },
-      operation: 'editCube',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                input: {
-                  description: "${descriptionRef.current.value}",
-                  name: "${nameRef.current.value}"
-                }
-              ) {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }
+  React.useEffect(() => {
+    setDescriptionInput(description);
+  }, [description]);
+
+  React.useEffect(() => {
+    setNameInput(name);
+  }, [name]);
 
   return (
     <MUICard>
@@ -52,12 +32,13 @@ export default function CubeInfo ({
         title={
           <MUITextField
             defaultValue={name}
-            disabled={!editable}
-            inputProps={{ onBlur: editCube }}
-            inputRef={nameRef}
+            disabled={userId !== creator._id}
+            inputProps={{ onBlur: () => editCube(descriptionInput, nameInput) }}
             label="Cube Name"
             margin="dense"
+            onChange={event => setNameInput(event.target.value)}
             type="text"
+            value={nameInput}
             variant="outlined"
           />
         }
@@ -71,14 +52,15 @@ export default function CubeInfo ({
       <MUICardContent>
         <MUITextField
           defaultValue={description}
-          disabled={!editable}
+          disabled={userId !== creator._id}
           fullWidth={true}
-          inputProps={{ onBlur: editCube }}
-          inputRef={descriptionRef}
+          inputProps={{ onBlur: () => editCube(descriptionInput, nameInput) }}
           label="Cube Description"
           margin="dense"
           multiline
+          onChange={event => setDescriptionInput(event.target.value)}
           rows={2}
+          value={descriptionInput}
           variant="outlined"
         />       
       </MUICardContent>

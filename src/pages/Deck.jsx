@@ -1,10 +1,9 @@
 import React from 'react';
 import { createClient } from 'graphql-ws';
 import MUIPaper from '@material-ui/core/Paper';
-import MUITypography from '@material-ui/core/Typography';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
-import DeckDisplay from '../components/Deck Page/DeckDisplay';
+import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import DeckInfo from '../components/Deck Page/DeckInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -14,7 +13,16 @@ import { DeckContext } from '../contexts/deck-context';
 export default function Deck () {
 
   const { token, userId } = React.useContext(AuthenticationContext);
-  const { loading, deckQuery, deckState, setDeckState, addCardsToDeck, fetchDeckByID } = React.useContext(DeckContext);
+  const {
+    loading,
+    deckQuery,
+    deckState,
+    setDeckState,
+    addCardsToDeck,
+    fetchDeckByID,
+    removeCardsFromDeck,
+    toggleMainboardSideboardDeck
+  } = React.useContext(DeckContext);
 
   React.useEffect(function () {
 
@@ -73,16 +81,17 @@ export default function Deck () {
             />
           </MUIPaper>
 
-          <MUIPaper style={{ padding: '0 4px' }}>
-            <div style={{ padding: 4 }}>
-              <MUITypography variant="subtitle1">Add Basic Lands to Deck</MUITypography>
-            </div>
-            <BasicLandAdder submitFunction={cardData => addCardsToDeck(cardData, 'mainboard', 1)} />
-          </MUIPaper>
+          <BasicLandAdder submitFunction={cardData => addCardsToDeck(cardData, 'mainboard', 1)} />
         </React.Fragment>
       }
 
-      <DeckDisplay />
+      <DeckDisplay
+        add={addCardsToDeck}
+        authorizedID={deckState.creator._id}
+        deck={{ mainboard: deckState.mainboard, sideboard: deckState.sideboard }}
+        remove={removeCardsFromDeck}
+        toggle={toggleMainboardSideboardDeck}
+      />
     </React.Fragment>
   );
 };

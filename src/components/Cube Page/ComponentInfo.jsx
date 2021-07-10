@@ -11,11 +11,11 @@ import MUISelect from '@material-ui/core/Select';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router';
 
-import useRequest from '../../hooks/request-hook';
 import CreateComponentForm from './CreateComponentForm';
 import WarningButton from '../miscellaneous/WarningButton';
+import { AuthenticationContext } from '../../contexts/authentication-context';
+import { CubeContext } from '../../contexts/cube-context';
 
 const useStyles = makeStyles({
   cardActions: {
@@ -29,122 +29,33 @@ const useStyles = makeStyles({
 });
 
 export default function ComponentInfo ({
-  component,
-  display,
-  editable,
   modules,
-  rotations,
-  setDisplay
+  rotations
 }) {
 
   const classes = useStyles();
-  const cubeID = useParams().cubeId;
-  const [componentName, setComponentName] = React.useState(component.name);
-  const [componentSize, setComponentSize] = React.useState(component.size);
+  const { userId } = React.useContext(AuthenticationContext);
+  const {
+    activeComponentState,
+    cubeState: { creator },
+    displayState,
+    setDisplayState,
+    deleteModule,
+    deleteRotation,
+    editModule,
+    editRotation
+  } = React.useContext(CubeContext);
+  const [nameInput, setNameInput] = React.useState(activeComponentState.name);
+  const [sizeInput, setSizeInput] = React.useState(activeComponentState.size);
   const [dialogIsOpen, setDialogIsOpen] = React.useState(false);
-  const { sendRequest } = useRequest();
-
-  async function deleteComponent () {
-    if (Number.isInteger(parseInt(componentSize))) {
-      await sendRequest({
-        callback: () => {
-          setComponentName('Mainboard');
-          setComponentSize(null);
-          setDisplay(prevState => ({
-            ...prevState,
-            activeComponentID: 'mainboard'
-          }));
-        },
-        headers: { CubeID: cubeID },
-        operation: 'deleteRotation',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(_id: "${display.activeComponentID}")
-              }
-            `
-          }
-        }
-      });
-    } else {
-      await sendRequest({
-        callback: () => {
-          setComponentName('Mainboard');
-          setDisplay(prevState => ({
-            ...prevState,
-            activeComponentID: 'mainboard'
-          }));
-        },
-        headers: { CubeID: cubeID },
-        operation: 'deleteModule',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(_id: "${display.activeComponentID}")
-              }
-            `
-          }
-        }
-      });
-    }
-  }
 
   React.useEffect(() => {
-    setComponentName(component.name);
-  }, [component.name]);
+    setNameInput(activeComponentState.name);
+  }, [activeComponentState.name]);
 
   React.useEffect(() => {
-    setComponentSize(component.size);
-  }, [component.size]);
-
-  async function submitComponentChanges () {
-    if (Number.isInteger(parseInt(componentSize))) {
-      await sendRequest({
-        headers: { CubeID: cubeID },
-        operation: 'editRotation',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  input: {
-                    rotationID: "${display.activeComponentID}",
-                    name: "${componentName}",
-                    size: ${componentSize}
-                  }
-                ) {
-                  _id
-                }
-              }
-            `
-          }
-        }
-      });
-    } else {
-      await sendRequest({
-        headers: { CubeID: cubeID },
-        operation: 'editModule',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  input: {
-                    moduleID: "${display.activeComponentID}",
-                    name: "${componentName}"
-                  }
-                ) {
-                  _id
-                }
-              }
-            `
-          }
-        }
-      });
-    }
-  }
+    setSizeInput(activeComponentState.size);
+  }, [activeComponentState.size]);
 
   return (
     // i'm not sure i should have the createcomponentform dialog here instead of in the cube page directly.  i am sure that i should not be using the muicard component tho; muipaper or something else would be much more appropriate
@@ -152,9 +63,8 @@ export default function ComponentInfo ({
 
       <CreateComponentForm
         open={dialogIsOpen}
-        setComponentName={setComponentName}
-        setComponentSize={setComponentSize}
-        setDisplay={setDisplay}
+        setNameInput={setNameInput}
+        setSizeInput={setSizeInput}
         toggleOpen={() => setDialogIsOpen(prevState => !prevState)}
       />
     
@@ -164,15 +74,17 @@ export default function ComponentInfo ({
           title={
             <MUITextField
               autoComplete="off"
-              disabled={!editable || display.activeComponentID === 'mainboard' || display.activeComponentID === 'sideboard'}
+              disabled={userId !== creator._id || ['mainboard', 'sideboard'].includes(activeComponentState._id)}
               inputProps={{
-                onBlur: submitComponentChanges
+                onBlur: Number.isInteger(activeComponentState.size) ?
+                  () => editRotation(nameInput, sizeInput) :
+                  () => editModule(nameInput)
               }}
               label="Active Component"
               margin="dense"
-              onChange={event => setComponentName(event.target.value)}
+              onChange={event => setNameInput(event.target.value)}
               type="text"
-              value={componentName}
+              value={nameInput}
               variant="outlined"
             />
           }
@@ -185,12 +97,12 @@ export default function ComponentInfo ({
                 margin="dense"
                 native
                 onChange={event => {
-                  setDisplay(prevState => ({
+                  setDisplayState(prevState => ({
                     ...prevState,
                     activeComponentID: event.target.value
                   }));
                 }}
-                value={display.activeComponentID}
+                value={activeComponentState._id}
                 variant="outlined"
                 inputProps={{
                   id: 'component-selector'
@@ -201,13 +113,13 @@ export default function ComponentInfo ({
                 { _id: 'sideboard', name: 'Sideboard' },
                 ...modules,
                 ...rotations
-              ].map(component => (
+              ].map(cmpnt => (
                 <option
-                  key={component._id}
-                  selected={display.activeComponentID === component._id}
-                  value={component._id}
+                  key={cmpnt._id}
+                  selected={activeComponentState._id === cmpnt._id}
+                  value={cmpnt._id}
                 >
-                  {component.name}
+                  {cmpnt.name}
                 </option>
               ))}
                 
@@ -217,7 +129,7 @@ export default function ComponentInfo ({
         />
 
         <MUICardContent className={classes.cardContent}>
-          {editable &&
+          {userId === creator._id &&
             <MUIButton
               color="primary"
               onClick={() => setDialogIsOpen(true)}
@@ -228,34 +140,40 @@ export default function ComponentInfo ({
             </MUIButton>
           }
 
-          {Number.isInteger(component.size) &&
+          {Number.isInteger(activeComponentState.size) &&
             <MUITextField
-              disabled={!editable}
+              disabled={userId !== creator._id}
               label="Rotation Size"
               inputProps={{
-                max: component.maxSize,
+                max: activeComponentState.maxSize,
                 min: 0,
-                onBlur: submitComponentChanges,
+                onBlur: editRotation(nameInput, sizeInput),
                 step: 1
               }}
               margin="dense"
-              onChange={event => setComponentSize(event.target.value)}
+              onChange={event => setSizeInput(event.target.value)}
               type="number"
-              value={componentSize}
+              value={sizeInput}
               variant="outlined"
             />
           }
 
-          {editable && display.activeComponentID !== 'mainboard' && display.activeComponentID !== 'sideboard' &&
-            <WarningButton onClick={deleteComponent} startIcon={<MUIDeleteForeverIcon />}>
-              Delete this {Number.isInteger(component.size) ? 'Rotation' : 'Module'}
+          {userId === creator._id && !['mainboard', 'sideboard'].includes(activeComponentState._id) &&
+            <WarningButton
+              onClick={Number.isInteger(activeComponentState.size) ?
+                () => deleteRotation(setNameInput, setSizeInput) :
+                () => deleteModule(setNameInput)
+              }
+              startIcon={<MUIDeleteForeverIcon />}
+            >
+              Delete this {Number.isInteger(activeComponentState.size) ? 'Rotation' : 'Module'}
             </WarningButton>
           }
         </MUICardContent>
 
         <MUICardActions className={classes.cardActions}>
           <MUITypography variant="subtitle1">
-            Matches: <strong>{component.displayedCards.length}</strong>
+            Matches: <strong>{activeComponentState.displayedCards.length}</strong>
           </MUITypography>
           <MUITextField
             autoComplete="off"
@@ -264,13 +182,13 @@ export default function ComponentInfo ({
             margin="dense"
             onChange={event => {
               event.persist();
-              setDisplay(prevState => ({
+              setDisplayState(prevState => ({
                 ...prevState,
                 filter: event.target.value
               }));
             }}
             type="text"
-            value={display.filter}
+            value={displayState.filter}
             variant="outlined"
           />
         </MUICardActions>

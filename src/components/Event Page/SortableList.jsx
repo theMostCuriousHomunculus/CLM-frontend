@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default SortableContainer(({ cards, clickFunction, fromCollection, moveCard, otherCollections }) => {
+export default SortableContainer(({ cards, clickFunction, fromCollection }) => {
 
   const classes = useStyles();
 
@@ -23,11 +23,8 @@ export default SortableContainer(({ cards, clickFunction, fromCollection, moveCa
           card={card}
           clickFunction={clickFunction}
           collection={fromCollection}
-          fromCollection={fromCollection}
           index={index}
           key={card._id}
-          moveCard={moveCard}
-          otherCollections={otherCollections}
         >
         </SortableCard>
       ))}

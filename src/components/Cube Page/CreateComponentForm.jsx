@@ -14,15 +14,16 @@ import { useParams } from 'react-router-dom';
 
 import useRequest from '../../hooks/request-hook';
 import WarningButton from '../miscellaneous/WarningButton';
+import { CubeContext } from '../../contexts/cube-context';
 
 export default function CreateComponentForm ({
   open,
-  setComponentName,
-  setComponentSize,
-  setDisplay,
+  setNameInput,
+  setSizeInput,
   toggleOpen
 }) {
 
+  const { setDisplayState } = React.useContext(CubeContext);
   const cubeID = useParams().cubeId;
   const { sendRequest } = useRequest();
   const nameInput = React.useRef();
@@ -32,12 +33,12 @@ export default function CreateComponentForm ({
     if (newComponentType === 'module') {
       await sendRequest({
         callback: (data) => {
-          setDisplay(prevState => ({
+          setDisplayState(prevState => ({
             ...prevState,
             activeComponentID: data.modules[data.modules.length - 1]._id
           }));
-          setComponentName(nameInput.current.value);
-          setComponentSize(null);
+          setNameInput(nameInput.current.value);
+          setSizeInput(null);
           toggleOpen();
         },
         headers: {
@@ -63,12 +64,12 @@ export default function CreateComponentForm ({
     if (newComponentType === 'rotation') {
       await sendRequest({
         callback: (data) => {
-          setDisplay(prevState => ({
+          setDisplayState(prevState => ({
             ...prevState,
             activeComponentID: data.rotations[data.rotations.length - 1]._id
           }));
-          setComponentName(nameInput.current.value);
-          setComponentSize(0);
+          setNameInput(nameInput.current.value);
+          setSizeInput(0);
           toggleOpen();
         },
         headers: {

@@ -8,7 +8,9 @@ import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemText from '@material-ui/core/ListItemText'
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
+import MUIPaper from '@material-ui/core/Paper';
 import MUISelect from '@material-ui/core/Select';
+import MUITypography from '@material-ui/core/Typography';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
@@ -45,7 +47,6 @@ export default function BasicLandAdder ({ submitFunction }) {
                 set: print.set,
                 set_name: print.set_name,
                 tcgplayer_id: print.tcgplayer_id,
-                tokens: [],
                 type_line: print.type_line
               })));
             } else {
@@ -79,118 +80,123 @@ export default function BasicLandAdder ({ submitFunction }) {
   }, [sendRequest]);
 
   return (
-    <MUIGrid alignItems="center" container justify="space-between" spacing={1}>
-      <MUIGrid container item xs={6} md={3}>
-        <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
-          <MUIInputLabel htmlFor="basic-land-name-selector">Basic Land Name</MUIInputLabel>
-          <MUISelect
-            label="Basic Land Name"
-            margin="dense"
-            native
-            onChange={event => setBasicLandName(event.target.value)}
-            value={basicLandName}
-            variant="outlined"
-            inputProps={{
-              id: 'basic-land-name-selector',
-              name: 'basic-land-name'
-            }}
+    <MUIPaper style={{ padding: '0 4px' }}>
+      <div style={{ padding: 4 }}>
+        <MUITypography variant="subtitle1">Add Basic Lands to Deck</MUITypography>
+      </div>
+      <MUIGrid alignItems="center" container justify="space-between" spacing={1}>
+        <MUIGrid container item xs={6} md={3}>
+          <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
+            <MUIInputLabel htmlFor="basic-land-name-selector">Basic Land Name</MUIInputLabel>
+            <MUISelect
+              label="Basic Land Name"
+              margin="dense"
+              native
+              onChange={event => setBasicLandName(event.target.value)}
+              value={basicLandName}
+              variant="outlined"
+              inputProps={{
+                id: 'basic-land-name-selector',
+                name: 'basic-land-name'
+              }}
+            >
+              <option value="plains">Plains</option>
+              <option value="island">Island</option>
+              <option value="swamp">Swamp</option>
+              <option value="mountain">Mountain</option>
+              <option value="forest">Forest</option>
+              <option value="wastes">Wastes</option>
+            </MUISelect>
+          </MUIFormControl>
+        </MUIGrid>
+        
+        <MUIGrid container item xs={6} md={3}>
+          <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
+            <MUIInputLabel htmlFor="set-name-selector">Set Name</MUIInputLabel>
+            <MUISelect
+              label="Set Name"
+              margin="dense"
+              native
+              onChange={event => setChosenSetName(event.target.value)}
+              value={chosenSetName}
+              variant="outlined"
+              inputProps={{
+                id: 'set-name-selector',
+                name: 'set-name'
+              }}
+            >
+              {availableSets.length === 0 ?
+                <option value="">Could not fetch sets from Scryfall...</option> :
+                availableSets.map(set => (
+                  <option key={set.code} value={set.code}>{set.name}</option>
+                ))
+              }
+            </MUISelect>
+          </MUIFormControl>
+        </MUIGrid>
+
+        <MUIGrid item xs={6} md={3}>
+          <MUIList component="nav" dense={true} style={{ flexGrow: 1 }}>
+            <MUIListItem
+              button
+              aria-haspopup="true"
+              aria-controls="lock-menu"
+              onClick={event => setAnchorEl(event.currentTarget)}
+            >
+              <MUIListItemText
+                primary="Selected Printing"
+                secondary={chosenPrint.collector_number}
+              />
+            </MUIListItem>
+          </MUIList>
+          <MUIMenu
+            id="printing"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
           >
-            <option value="plains">Plains</option>
-            <option value="island">Island</option>
-            <option value="swamp">Swamp</option>
-            <option value="mountain">Mountain</option>
-            <option value="forest">Forest</option>
-            <option value="wastes">Wastes</option>
-          </MUISelect>
-        </MUIFormControl>
-      </MUIGrid>
-      
-      <MUIGrid container item xs={6} md={3}>
-        <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
-          <MUIInputLabel htmlFor="set-name-selector">Set Name</MUIInputLabel>
-          <MUISelect
-            label="Set Name"
-            margin="dense"
-            native
-            onChange={event => setChosenSetName(event.target.value)}
-            value={chosenSetName}
-            variant="outlined"
-            inputProps={{
-              id: 'set-name-selector',
-              name: 'set-name'
-            }}
-          >
-            {availableSets.length === 0 ?
-              <option value="">Could not fetch sets from Scryfall...</option> :
-              availableSets.map(set => (
-                <option key={set.code} value={set.code}>{set.name}</option>
+            {availablePrints.length === 0 ?
+              <MUIMenuItem
+                onClick={() => {
+                  setChosenPrint({ scryfall_id: null });
+                  setAnchorEl(null);
+                }}
+                value=''
+              >
+                No printings available from this set
+              </MUIMenuItem> :
+              availablePrints.map(print => (
+                <span key={print.id}>
+                  <HoverPreview image={print.image}>
+                    <MUIMenuItem
+                      onClick={() => {
+                        setChosenPrint(print);
+                        setAnchorEl(null);
+                      }}
+                      selected={print.scryfall_id === chosenPrint.scryfall_id}
+                      value={print.id}
+                    >
+                      {print.collector_number}
+                    </MUIMenuItem>
+                  </HoverPreview>
+                </span>
               ))
             }
-          </MUISelect>
-        </MUIFormControl>
-      </MUIGrid>
+          </MUIMenu>
+        </MUIGrid>
 
-      <MUIGrid item xs={6} md={3}>
-        <MUIList component="nav" dense={true} style={{ flexGrow: 1 }}>
-          <MUIListItem
-            button
-            aria-haspopup="true"
-            aria-controls="lock-menu"
-            onClick={event => setAnchorEl(event.currentTarget)}
+        <MUIGrid container item justify="flex-end" xs={6} md={3}>
+          <MUIButton
+            color="primary"
+            onClick={() => submitFunction(chosenPrint)}
+            size="small"
+            variant="contained"
           >
-            <MUIListItemText
-              primary="Selected Printing"
-              secondary={chosenPrint.collector_number}
-            />
-          </MUIListItem>
-        </MUIList>
-        <MUIMenu
-          id="printing"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          {availablePrints.length === 0 ?
-            <MUIMenuItem
-              onClick={() => {
-                setChosenPrint({ scryfall_id: null });
-                setAnchorEl(null);
-              }}
-              value=''
-            >
-              No printings available from this set
-            </MUIMenuItem> :
-            availablePrints.map(print => (
-              <span key={print.id}>
-                <HoverPreview image={print.image}>
-                  <MUIMenuItem
-                    onClick={() => {
-                      setChosenPrint(print);
-                      setAnchorEl(null);
-                    }}
-                    selected={print.scryfall_id === chosenPrint.scryfall_id}
-                    value={print.id}
-                  >
-                    {print.collector_number}
-                  </MUIMenuItem>
-                </HoverPreview>
-              </span>
-            ))
-          }
-        </MUIMenu>
+            Add To Deck
+          </MUIButton>
+        </MUIGrid>
       </MUIGrid>
-
-      <MUIGrid container item justify="flex-end" xs={6} md={3}>
-        <MUIButton
-          color="primary"
-          onClick={() => submitFunction(chosenPrint)}
-          size="small"
-          variant="contained"
-        >
-          Add To Deck
-        </MUIButton>
-      </MUIGrid>
-    </MUIGrid>
+    </MUIPaper>
   );
 };

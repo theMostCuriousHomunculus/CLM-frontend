@@ -8,7 +8,7 @@ export default function CardPoolDownloadLinks ({ me, others }) {
     return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
   }, "");
 
-  const unUsedCardsString = me.chaff.concat(me.sideboard).reduce(function (a, c) {
+  const unUsedCardsString = me.sideboard.reduce(function (a, c) {
     return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
   }, "");
 
@@ -26,25 +26,35 @@ export default function CardPoolDownloadLinks ({ me, others }) {
       {others.map(function (plr) {
         const cardpool = [];
 
-        if (plr.mainboard) cardpool.push(...plr.mainboard);
+        if (plr.mainboard.length > 0) {
+          for (const card of plr.mainboard) {
+            cardpool.push(card);
+          }
+        }
 
-        if (plr.sideboard) cardpool.push(...plr.sideboard);
+        if (plr.sideboard.length > 0) {
+          for (const card of plr.sideboard) {
+            cardpool.push(card);
+          }
+        }
 
-        if (plr.chaff) cardpool.push(...plr.chaff);
-
-        return (
-          <MUITypography key={plr.account._id} variant="body1">
-            <CSVLink
-              data={cardpool.reduce(function (a, c) {
-                return a + " ,1," + c + ", , , , ,No,0\n";
-              }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n")}
-              filename={`${plr.account.name}.csv`}
-              target="_blank"
-            >
-              Download {plr.account.name}'s card pool in CSV format for MTGO play!
-            </CSVLink>
-          </MUITypography>
-        );
+        if (cardpool.length > 0) {
+          return (
+            <MUITypography key={plr.account._id} variant="body1">
+              <CSVLink
+                data={cardpool.reduce(function (a, c) {
+                  return a + " ,1," + c.mtgo_id + ", , , , ,No,0\n";
+                }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n")}
+                filename={`${plr.account.name}.csv`}
+                target="_blank"
+              >
+                Download {plr.account.name}'s card pool in CSV format for MTGO play!
+              </CSVLink>
+            </MUITypography>
+          );
+        } else {
+          return null
+        }
       })}
     </div>
   );

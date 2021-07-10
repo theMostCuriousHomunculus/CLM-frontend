@@ -7,13 +7,25 @@ import Deck from '../pages/Deck';
 export const DeckContext = createContext({
   loading: false,
   deckQuery: '',
-  deckState: null,
+  deckState: {
+    _id: null,
+    creator: {
+      _id: null,
+      avatar: null,
+      name: null
+    },
+    description: null,
+    format: null,
+    mainboard: [],
+    name: null,
+    sideboard: []
+  },
   setDeckState: () => null,
   addCardsToDeck: () => null,
   editDeck: () => null,
   fetchDeckByID: () => null,
   removeCardsFromDeck: () => null,
-  toggleMainboardSideboard: () => null
+  toggleMainboardSideboardDeck: () => null
 });
 
 export default function ContextualizedDeckPage() {
@@ -83,7 +95,6 @@ export default function ContextualizedDeckPage() {
     scryfall_id,
     set,
     set_name,
-    tokens,
     type_line
   }, component, numberOfCopies) {
     await sendRequest({
@@ -110,7 +121,6 @@ export default function ContextualizedDeckPage() {
                     scryfall_id: "${scryfall_id}",
                     set: "${set}",
                     set_name: "${set_name}",
-                    tokens: [${tokens.map(token => '{\nname: "' + token.name + '",\nscryfall_id: "' + token.scryfall_id + '"\n}')}],
                     type_line: "${type_line}"
                   },
                   component: ${component},
@@ -193,10 +203,10 @@ export default function ContextualizedDeckPage() {
     });
   }, [deckState._id, sendRequest]);
 
-  const toggleMainboardSideboard = React.useCallback(async function (cardID) {
+  const toggleMainboardSideboardDeck = React.useCallback(async function (cardID) {
     await sendRequest({
       headers: { DeckID: deckState._id },
-      operation: 'toggleMainboardSideboard',
+      operation: 'toggleMainboardSideboardDeck',
       get body() {
         return {
           query: `
@@ -222,7 +232,7 @@ export default function ContextualizedDeckPage() {
         editDeck,
         fetchDeckByID,
         removeCardsFromDeck,
-        toggleMainboardSideboard
+        toggleMainboardSideboardDeck
       }}
     >
       <Deck />

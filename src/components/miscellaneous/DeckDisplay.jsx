@@ -8,21 +8,24 @@ import MUITypography from '@material-ui/core/Typography';
 import customSort from '../../functions/custom-sort';
 import specificCardType from '../../functions/specific-card-type';
 import PlaysetDisplay from './PlaysetDisplay';
-import { DeckContext } from '../../contexts/deck-context';
 
-export default function DeckDisplay () {
-
-  const { deckState } = React.useContext(DeckContext);
+export default function DeckDisplay ({
+  add,
+  authorizedID,
+  deck,
+  remove,
+  toggle
+}) {
 
   return (
     <MUIGrid container spacing={0}>
       {['Mainboard', 'Sideboard'].map(component => (
         <MUIGrid item key={component} xs={12} md={6}>
           <MUICard>
-            <MUICardHeader title={`${component} (${deckState[component.toLowerCase()].length})`} />
+            <MUICardHeader title={`${component} (${deck[component.toLowerCase()].length})`} />
             <MUICardContent>
               {["Land", "Creature", "Planeswalker", "Artifact", "Enchantment", "Instant", "Sorcery"].map(function (type) {
-                const group = customSort(deckState[component.toLocaleLowerCase()], ['cmc', 'name', 'set'])
+                const group = customSort(deck[component.toLocaleLowerCase()], ['cmc', 'name', 'set'])
                   .filter(card => specificCardType(card.type_line) === type);
                 const condensedGroup = [];
 
@@ -47,7 +50,6 @@ export default function DeckDisplay () {
                         set: card.set,
                         set_name: card.set_name,
                         tcgplayer_id: card.tcgplayer_id,
-                        tokens: card.tokens,
                         type_line: card.type_line
                       },
                       copies: [card._id]
@@ -61,9 +63,13 @@ export default function DeckDisplay () {
                     <MUITypography variant="subtitle1">{`${type} (${group.length})`}</MUITypography>
                     {condensedGroup.map(playset => (
                       <PlaysetDisplay
+                        add={add}
+                        authorizedID={authorizedID}
                         component={component.toLowerCase()}
                         key={playset.card.scryfall_id}
                         playset={playset}
+                        remove={remove}
+                        toggle={toggle}
                       />
                     ))}
                   </React.Fragment>
