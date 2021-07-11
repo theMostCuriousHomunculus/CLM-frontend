@@ -10,9 +10,7 @@ import MUIFormLabel from '@material-ui/core/FormLabel';
 import MUIRadio from '@material-ui/core/Radio';
 import MUIRadioGroup from '@material-ui/core/RadioGroup';
 import MUITextField from '@material-ui/core/TextField';
-import { useParams } from 'react-router-dom';
 
-import useRequest from '../../hooks/request-hook';
 import WarningButton from '../miscellaneous/WarningButton';
 import { CubeContext } from '../../contexts/cube-context';
 
@@ -23,73 +21,17 @@ export default function CreateComponentForm ({
   toggleOpen
 }) {
 
-  const { setDisplayState } = React.useContext(CubeContext);
-  const cubeID = useParams().cubeId;
-  const { sendRequest } = useRequest();
-  const nameInput = React.useRef();
+  const { createModule, createRotation } = React.useContext(CubeContext);
+  const [newNameInput, setNewNameInput] = React.useState();
   const [newComponentType, setNewComponentType] = React.useState('module');
 
   async function addComponent () {
     if (newComponentType === 'module') {
-      await sendRequest({
-        callback: (data) => {
-          setDisplayState(prevState => ({
-            ...prevState,
-            activeComponentID: data.modules[data.modules.length - 1]._id
-          }));
-          setNameInput(nameInput.current.value);
-          setSizeInput(null);
-          toggleOpen();
-        },
-        headers: {
-          CubeID: cubeID
-        },
-        operation: 'createModule',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(name: "${nameInput.current.value}") {
-                  modules {
-                    _id
-                  }
-                }
-              }
-            `
-          }
-        }
-      });
+      await createModule(newNameInput, setNameInput, setSizeInput, toggleOpen);
     }
 
     if (newComponentType === 'rotation') {
-      await sendRequest({
-        callback: (data) => {
-          setDisplayState(prevState => ({
-            ...prevState,
-            activeComponentID: data.rotations[data.rotations.length - 1]._id
-          }));
-          setNameInput(nameInput.current.value);
-          setSizeInput(0);
-          toggleOpen();
-        },
-        headers: {
-          CubeID: cubeID
-        },
-        operation: 'createRotation',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(name: "${nameInput.current.value}") {
-                  rotations {
-                    _id
-                  }
-                }
-              }
-            `
-          }
-        }
-      });
+      await createRotation(newNameInput, setNameInput, setSizeInput, toggleOpen);
     }
   }
 
@@ -102,11 +44,12 @@ export default function CreateComponentForm ({
           autoComplete="off"
           autoFocus
           fullWidth
-          inputRef={nameInput}
           label="New Component Name"
           margin="dense"
+          onChange={event => setNewNameInput(event.target.value)}
           required={true}
           type="text"
+          value={newNameInput}
           variant="outlined"
         />
 

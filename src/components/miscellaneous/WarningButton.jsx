@@ -16,6 +16,7 @@ const useStyles = makeStyles({
 
 export default function WarningButton ({
   children,
+  fullWidth,
   onClick,
   startIcon
 }) {
@@ -23,6 +24,7 @@ export default function WarningButton ({
   return (
     <MUIButton
       className={useStyles().warningButton}
+      fullWidth={!!fullWidth}
       onClick={onClick}
       size="small"
       startIcon={startIcon}

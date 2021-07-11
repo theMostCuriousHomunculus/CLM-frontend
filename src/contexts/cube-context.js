@@ -35,6 +35,8 @@ export const CubeContext = createContext({
   setCubeState: () => null,
   setDisplayState: () => null,
   addCardToCube: () => null,
+  createModule: () => null,
+  createRotation: () => null,
   deleteCard: () => null,
   deleteModule: () => null,
   deleteRotation: () => null,
@@ -213,6 +215,69 @@ export default function ContextualizedCubePage () {
       }
     });
   }, [activeComponentState._id, cubeState._id, sendRequest]);
+
+  const createModule = React.useCallback(async function (name, setNameInput, setSizeInput, toggleOpen) {
+    await sendRequest({
+      callback: (data) => {
+        setDisplayState(prevState => ({
+          ...prevState,
+          activeComponentID: data.modules[data.modules.length - 1]._id
+        }));
+        setNameInput(data.modules[data.modules.length - 1].name);
+        setSizeInput(null);
+        toggleOpen();
+      },
+      headers: {
+        CubeID: cubeState._id
+      },
+      operation: 'createModule',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(name: "${name}") {
+                modules {
+                  _id
+                  name
+                }
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [cubeState._id, sendRequest]);
+
+  const createRotation = React.useCallback(async function (name, setNameInput, setSizeInput, toggleOpen) {
+    await sendRequest({
+      callback: (data) => {
+        setDisplayState(prevState => ({
+          ...prevState,
+          activeComponentID: data.rotations[data.rotations.length - 1]._id
+        }));
+        setNameInput(data.rotations[data.rotations.length - 1].name);
+        setSizeInput(data.rotations[data.rotations.length - 1].size);
+        toggleOpen();
+      },
+      headers: { CubeID: cubeState._id },
+      operation: 'createRotation',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(name: "${name}") {
+                rotations {
+                  _id
+                  name
+                  size
+                }
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [cubeState._id, sendRequest]);
 
   const deleteCard = React.useCallback(async function (cardID, destinationID) {
     await sendRequest({
@@ -407,6 +472,8 @@ export default function ContextualizedCubePage () {
         setCubeState,
         setDisplayState,
         addCardToCube,
+        createModule,
+        createRotation,
         deleteCard,
         deleteModule,
         deleteRotation,

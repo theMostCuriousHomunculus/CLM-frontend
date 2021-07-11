@@ -79,6 +79,7 @@ export const MatchContext = createContext({
   rollDice: () => null,
   shuffleLibrary: () => null,
   tapUntapCards: () => null,
+  toggleMainboardSideboardMatch: () => null,
   transferCard: () => null,
   turnCard: () => null,
   viewCard: () => null,
@@ -278,7 +279,11 @@ export default function ContextualizedMatchPage() {
         cmc
         back_image
         image
+        mana_cost
         name
+        scryfall_id
+        set
+        type_line
         visibility {
           _id
         }
@@ -288,7 +293,11 @@ export default function ContextualizedMatchPage() {
         back_image
         cmc
         image
+        mana_cost
         name
+        scryfall_id
+        set
+        type_line
         visibility {
           _id
         }
@@ -738,6 +747,24 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
+  const toggleMainboardSideboardMatch = React.useCallback(async function (cardID) {
+    await sendRequest({
+      headers: { MatchID: matchState._id },
+      operation: 'toggleMainboardSideboardMatch',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(cardID: "${cardID}") {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [matchState._id, sendRequest]);
+
   // TODO: Improve
   const transferCard = React.useCallback(async function (cardID, destinationZone, originZone, reveal, shuffle, index) {
     await sendRequest({
@@ -865,6 +892,7 @@ export default function ContextualizedMatchPage() {
         rollDice,
         shuffleLibrary,
         tapUntapCards,
+        toggleMainboardSideboardMatch,
         transferCard,
         turnCard,
         viewCard,

@@ -7,7 +7,6 @@ import MUIDialogTitle from '@material-ui/core/DialogTitle';
 import MUITextField from '@material-ui/core/TextField';
 
 import WarningButton from './WarningButton';
-import { isNumber } from 'lodash';
 
 export default function NumberInputDialogue ({
   buttonText,
@@ -22,7 +21,7 @@ export default function NumberInputDialogue ({
 
   return (
     <MUIDialog
-      open={isNumber(defaultValue)}
+      open={Number.isInteger(defaultValue)}
       onClose={close}
     >
       <MUIDialogTitle>{title}</MUIDialogTitle>

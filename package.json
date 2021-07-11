@@ -13,12 +13,9 @@
     "@types/react": "^17.0.13",
     "@types/react-dom": "^17.0.8",
     "array-move": "^3.0.1",
-    "axios": "^0.21.1",
     "firebase": "^7.22.0",
     "graphql-ws": "^4.5.0",
     "js-cookie": "^2.2.1",
-    "json2mq": "^0.2.0",
-    "lodash": "^4.17.21",
     "react": "^16.13.1",
     "react-csv": "^2.0.3",
     "react-dom": "^16.13.1",
@@ -26,9 +23,7 @@
     "react-markdown": "^4.3.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
-    "react-sortable-hoc": "^1.11.0",
-    "react-virtualized-auto-sizer": "^1.0.4",
-    "react-window": "^1.8.6"
+    "react-sortable-hoc": "^1.11.0"
   },
   "scripts": {
     "start": "react-scripts start",

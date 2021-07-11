@@ -232,14 +232,14 @@ export default function Match () {
 
       <ScryfallTokenSearchDialog closeDialog={() => setTokenDialogOpen(false)} openDialog={tokenDialogOpen} />
 
-      <div className={classes.matchScreenFlexContainer}>
-        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-          <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
-            <MUIHelpOutlineIcon />
-          </MUIIconButton>
-        </div>
+      {matchState.players.every(plr => plr.mainboard.length === 0) ?
+        <div className={classes.matchScreenFlexContainer}>
+          <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+            <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
+              <MUIHelpOutlineIcon />
+            </MUIIconButton>
+          </div>
 
-        {matchState.players.every(plr => plr.mainboard.length === 0) ?
           <PlayZone
             bottomPlayer={bottomPlayer}
             displayedZones={displayedZones}
@@ -247,12 +247,12 @@ export default function Match () {
             setClickedPlayer={setClickedPlayer}
             setRightClickedCard={setRightClickedCard}
             topPlayer={topPlayer}
-          /> :
-          <Intermission />
-        }
+          />
 
-        <MatchLog />
-      </div>
+          <MatchLog />
+        </div> :
+        <Intermission />
+      }
     </React.Fragment>
   );
 };

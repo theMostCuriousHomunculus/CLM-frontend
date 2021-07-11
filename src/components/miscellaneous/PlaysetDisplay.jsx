@@ -41,7 +41,10 @@ export default function PlaysetDisplay ({
 
   React.useEffect(() => {
     setUpdatedCount(copies.length);
-  }, [copies.length])
+  }, [copies.length]);
+
+  const isMatch = !!useParams().matchId;
+  const isEvent = !!useParams().eventId;
 
   function handleChangeNumberOfCopies () {
 
@@ -59,7 +62,7 @@ export default function PlaysetDisplay ({
     <div style={{ alignItems: 'center', display: 'flex' }}>
       <MUITextField
         autoComplete="off"
-        disabled={(useParams().eventId && !card.type_line.includes('Basic')) || authorizedID !== userId}
+        disabled={isMatch || (isEvent && !card.type_line.includes('Basic')) || authorizedID !== userId}
         inputProps={{
           min: 0,
           onBlur: handleChangeNumberOfCopies,
