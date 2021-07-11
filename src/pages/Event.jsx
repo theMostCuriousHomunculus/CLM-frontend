@@ -14,7 +14,6 @@ import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import InfoSection from '../components/Event Page/InfoSection';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-// import PicksDisplay from '../components/Event Page/PicksDisplay';
 import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/authentication-context';
 

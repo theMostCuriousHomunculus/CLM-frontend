@@ -104,7 +104,6 @@ export default function Cube () {
             />
           </MUIPaper>
         }
-        {/*display.view === 'List' && <ListView cards={component.displayedCards} editCard={editCard} />*/}
         <CubeDisplay setSelectedCard={setSelectedCard} />
 
       </React.Fragment>
