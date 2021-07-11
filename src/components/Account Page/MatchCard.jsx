@@ -43,6 +43,7 @@ export default function MatchCard ({
               <MUITableHead>
                 <MUITableRow>
                   <MUITableCell>Players</MUITableCell>
+                  <MUITableCell>Decks</MUITableCell>
                   <MUITableCell>Event</MUITableCell>
                   <MUITableCell>Date</MUITableCell>
                 </MUITableRow>
@@ -62,19 +63,27 @@ export default function MatchCard ({
                           }
                         </Link>
                       </MUITableCell>
-                      {match.event &&
-                        // TODO: clean this up
-                        <React.Fragment>
-                          <MUITableCell>
-                            <Link to ={`/event/${match.event._id}`}>
-                              {match.event.name}
-                            </Link>
-                          </MUITableCell>
-                          <MUITableCell>
-                            {new Date(parseInt(match.event.createdAt)).toLocaleString()}
-                          </MUITableCell>
-                        </React.Fragment>
-                      }
+                      <MUITableCell>
+                        <span style={{ display: 'flex', flexDirection: 'column' }}>
+                          {match.decks &&
+                            match.decks.map(deck => (
+                              <Link key={deck._id} to={`/deck/${deck._id}`}>
+                                {deck.name} / {deck.format}
+                              </Link>
+                            ))
+                          }
+                        </span>
+                      </MUITableCell>
+                      <MUITableCell>
+                        {match.event &&
+                          <Link to={`/event/${match.event._id}`}>
+                            {match.event.name}
+                          </Link>
+                        }
+                      </MUITableCell>
+                      <MUITableCell>
+                        {new Date(parseInt(match.createdAt)).toLocaleString()}
+                      </MUITableCell>
                     </MUITableRow>
                   );
                 })}

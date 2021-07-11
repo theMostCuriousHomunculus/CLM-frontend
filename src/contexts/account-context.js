@@ -105,13 +105,18 @@ export default function ContextualizedAccountPage() {
     }
     matches {
       _id
+      createdAt
       cube {
         _id
         name
       }
+      decks {
+        _id
+        format
+        name
+      }
       event {
         _id
-        createdAt
         name
       }
       players {
