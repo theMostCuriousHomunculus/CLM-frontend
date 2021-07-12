@@ -6,28 +6,29 @@ import MUIGrid from '@material-ui/core/Grid';
 import { Link } from 'react-router-dom';
 
 import Avatar from '../miscellaneous/Avatar';
+import { EventContext } from '../../contexts/event-context';
 
-export default function InfoSection ({ name, players }) {
+export default function InfoSection () {
+
+  const { eventState: { name, players } } = React.useContext(EventContext);
 
   return (
     <MUICard>
       <MUICardHeader title={name} />
       <MUICardContent>
         <MUIGrid container justify="space-around" spacing={0}>
-          {players.map(account => (
+          {players.map(player => (
             <MUIGrid
               container
               item
               justify="center"
-              key={account._id}
+              key={player.account._id}
               xs={6}
-              sm={4}
-              md={3}
-              lg={2}
-              xl={1}
+              sm={3}
+              md={1}
             >
-              <Link to={`/account/${account._id}`}>
-                <Avatar alt={account.name} size='small' src={account.avatar} />
+              <Link to={`/account/${player.account._id}`}>
+                <Avatar alt={player.account.name} size='small' src={player.account.avatar} />
               </Link>
             </MUIGrid>
           ))}

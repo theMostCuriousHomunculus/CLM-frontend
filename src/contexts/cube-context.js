@@ -7,10 +7,10 @@ import Cube from '../pages/Cube';
 export const CubeContext = createContext({
   loading: false,
   activeComponentState: {
-    _id: null,
+    _id: 'mainbaord',
     displayedCards: [],
     maxSize: null,
-    name: null,
+    name: 'Mainboard',
     size: null
   },
   cubeQuery: '',
@@ -30,7 +30,7 @@ export const CubeContext = createContext({
   },
   displayState: {
     activeComponentID: null,
-    filter: null
+    filter: ''
   },
   setCubeState: () => null,
   setDisplayState: () => null,
@@ -50,10 +50,10 @@ export const CubeContext = createContext({
 export default function ContextualizedCubePage () {
 
   const [activeComponentState, setActiveComponentState] = React.useState({
-    _id: null,
+    _id: 'mainboard',
     displayedCards: [],
     maxSize: null,
-    name: null,
+    name: 'Mainboard',
     size: null
   });
   const [cubeState, setCubeState] = React.useState({

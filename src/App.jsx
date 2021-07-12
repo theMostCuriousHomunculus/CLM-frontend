@@ -14,11 +14,11 @@ import { ErrorContext } from './contexts/error-context';
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const ContextualizedCubePage = React.lazy(() => import('./contexts/cube-context'));
-const Event = React.lazy(() => import('./pages/Event'));
-const Home = React.lazy(() => import('./pages/Home'));
+const ContextualizedEventPage = React.lazy(() => import('./contexts/event-context'));
 const ContextualizedAccountPage = React.lazy(() => import ('./contexts/account-context'));
 const ContextualizedDeckPage = React.lazy(() => import('./contexts/deck-context'));
 const ContextualizedMatchPage = React.lazy(() => import('./contexts/match-context'));
+const Home = React.lazy(() => import('./pages/Home'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
 
@@ -128,7 +128,7 @@ export default function App() {
                   <ContextualizedDeckPage />
                 </Route>
                 <Route path='/event/:eventId'>
-                  <Event />
+                  <ContextualizedEventPage />
                 </Route>
                 <Route path='/match/:matchId'>
                   <ContextualizedMatchPage />

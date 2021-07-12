@@ -5,38 +5,34 @@ import MUITabs from '@material-ui/core/Tabs';
 import MUITypography from '@material-ui/core/Typography';
 import arrayMove from 'array-move';
 import { createClient } from 'graphql-ws';
-import { useParams } from 'react-router-dom';
 
-import useRequest from '../hooks/request-hook';
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../components/miscellaneous/DeckDisplay';
-import InfoSection from '../components/Event Page/InfoSection';
+import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/authentication-context';
+import { EventContext } from '../contexts/event-context';
 
 export default function Event () {
 
   const { token, userId } = React.useContext(AuthenticationContext);
-  const eventID = useParams().eventId;
-  const { loading, sendRequest } = useRequest();
-  const [event, setEvent] = React.useState({
-    finished: false,
-    host: {},
-    name: null,
-    players: [{
-      account: {
-        _id: userId,
-        avatar: null,
-        name: '...'
-      },
-      current_pack: [],
-      mainboard: [],
-      sideboard: []
-    }]
-  });
+  const {
+    loading,
+    eventQuery,
+    eventState,
+    myState,
+    setEventState,
+    setMyState,
+    addBasics,
+    fetchEventByID,
+    removeBasics,
+    selectCard,
+    toggleMainboardSideboardEvent
+  } = React.useContext(EventContext);
+
   const [selectedCard, setSelectedCard] = React.useState({
     _id: null,
     image: null,
@@ -44,73 +40,12 @@ export default function Event () {
     name: null
   });
   const [tabNumber, setTabNumber] = React.useState(0);
-  const me = event.players.find(plr => plr.account._id === userId);
-  const others = event.players.filter(plr => plr.account._id !== userId);
-
-  const cardQuery = `
-    _id
-    back_image
-    cmc
-    collector_number
-    color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
-    name
-    oracle_id
-    scryfall_id
-    set
-    set_name
-    tcgplayer_id
-    type_line
-  `;
-  const eventQuery = `
-    _id
-    finished
-    host {
-      _id
-    }
-    name
-    players {
-      account {
-        _id
-        avatar
-        name
-      }
-      current_pack {
-        ${cardQuery}
-      }
-      mainboard {
-        ${cardQuery}
-      }
-      sideboard {
-        ${cardQuery}
-      }
-    }
-  `;
+  const others = eventState.players.filter(plr => plr.account._id !== userId);
 
   React.useEffect(function () {
 
     async function initialize () {
-      await sendRequest({
-        callback: (data) => {
-          setEvent(data);
-        },
-        headers: { EventID: eventID },
-        operation: 'fetchEventByID',
-        get body() {
-          return {
-            query: `
-              query {
-                ${this.operation} {
-                  ${eventQuery}
-                }
-              }
-            `
-          }
-        }
-      });
+      await fetchEventByID();
     }
 
     initialize();
@@ -118,14 +53,14 @@ export default function Event () {
     const client = createClient({
       connectionParams: {
         authToken: token,
-        eventID
+        eventID: eventState._id
       },
       url: process.env.REACT_APP_GRAPHQL_WS_URL
     });
 
     async function subscribe () {
       function onNext(update) {
-        setEvent(update.data.subscribeEvent);
+        setEventState(update.data.subscribeEvent);
       }
 
       await new Promise((resolve, reject) => {
@@ -147,152 +82,14 @@ export default function Event () {
     subscribe(result => console.log(result), error => console.log(error));
 
     return client.dispose;
-  }, [token, eventID, eventQuery, sendRequest]);
+  }, [token, eventState._id, eventQuery, fetchEventByID, setEventState]);
 
-  const addBasics = React.useCallback(async function ({
-    cmc,
-    collector_number,
-    color_identity,
-    image,
-    keywords,
-    mana_cost,
-    mtgo_id,
-    name,
-    oracle_id,
-    tcgplayer_id,
-    scryfall_id,
-    set,
-    set_name,
-    type_line
-  }, component, numberOfCopies) {
-    await sendRequest({
-      headers: { EventID: eventID },
-      operation: 'addBasics',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                input: {
-                  card: {
-                    cmc: ${cmc},
-                    collector_number: ${collector_number},
-                    color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
-                    image: "${image}",
-                    keywords: [${keywords.map(kw => '"' + kw + '"')}],
-                    mana_cost: "${mana_cost}",
-                    ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',\n' : ''}
-                    name: "${name}",
-                    oracle_id: "${oracle_id}",
-                    ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',\n' : ''} 
-                    scryfall_id: "${scryfall_id}",
-                    set: "${set}",
-                    set_name: "${set_name}",
-                    type_line: "${type_line}"
-                  },
-                  component: ${component},
-                  numberOfCopies: ${numberOfCopies}
-                }
-              ) {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }, [sendRequest, eventID]);
-
-  const removeBasics = React.useCallback(async function (cardIDs, component) {
-    await sendRequest({
-      headers: { EventID: eventID },
-      operation: 'removeBasics',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                input: {
-                  cardIDs: [${cardIDs.map(cardID => '"' + cardID + '"')}],
-                  component: ${component}
-                }
-              ) {
-                _id
-              }
-            }
-          `
-        }
-      }
-    })
-  }, [eventID, sendRequest]);
-
-  const toggleMainboardSideboardEvent = React.useCallback(async function (cardID) {
-    await sendRequest({
-      headers: { EventID: eventID },
-      operation: 'toggleMainboardSideboardEvent',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(cardID: "${cardID}") {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }, [eventID, sendRequest]);
-
-  async function onSelectCard (cardID) {
-    await sendRequest({
-      headers: { EventID: eventID },
-      operation: 'selectCard',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(_id: "${cardID}") {
-                _id
-              }
-            }
-          `
-        }
-      }
-    });
-  }
-
-  async function onSortEnd ({ collection, newIndex, oldIndex }) {
+  function onSortEnd ({ collection, newIndex, oldIndex }) {
     if (newIndex !== oldIndex) {
-      const meIndex = event.players.indexOf(me);
-      setEvent(prevState => ({
+      setMyState(prevState => ({
         ...prevState,
-        players: prevState.players.slice(0, meIndex).concat([{
-          ...me,
-          [collection]: arrayMove(me[collection], oldIndex, newIndex)
-        }]).concat(prevState.players.slice(meIndex + 1))
+        [collection]: arrayMove(prevState[collection], oldIndex, newIndex)
       }));
-      await sendRequest({
-        headers: { EventID: eventID },
-        operation: 'sortCard',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  input: {
-                    collection: ${collection}
-                    newIndex: ${newIndex}
-                    oldIndex: ${oldIndex}
-                  }
-                ) {
-                  _id
-                }
-              }
-            `
-          }
-        }
-      });
     }
   }
 
@@ -301,7 +98,7 @@ export default function Event () {
     <React.Fragment>
       <ConfirmationDialog
         confirmHandler={() => {
-          onSelectCard(selectedCard._id);
+          selectCard(selectedCard._id);
           setSelectedCard({
             _id: null,
             image: null,
@@ -326,16 +123,14 @@ export default function Event () {
         </div>
       </ConfirmationDialog>
 
-      <InfoSection
-        name={event.name}
-        players={event.players.map(plr => plr.account)}
-      />
+      <EventInfo />
 
-      {!event.finished &&
+      {!eventState.finished &&
         <React.Fragment>
           <MUITabs
             indicatorColor="primary"
             onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
+            style={{ margin: 4 }}
             textColor="primary"
             value={tabNumber}
             variant="fullWidth"
@@ -345,28 +140,27 @@ export default function Event () {
           </MUITabs>
 
           {tabNumber === 0 &&
-            me.current_pack &&
+            myState.current_pack &&
             <MUIPaper>
               <MUITypography variant="h3">Select a Card to Draft</MUITypography>
               <SortableList
                 axis="xy"
-                cards={me.current_pack}
+                cards={myState.current_pack}
                 clickFunction={cardData => setSelectedCard({
                   _id: cardData._id,
                   back_image: cardData.back_image,
                   image: cardData.image,
                   name: cardData.name
                 })}
+                collection="current_pack"
                 distance={2}
-                fromCollection="current_pack"
                 onSortEnd={onSortEnd}
-                otherCollections={[]}
               />
             </MUIPaper>
           }
 
           {tabNumber === 0 &&
-            !me.current_pack &&
+            !myState.current_pack &&
             <MUIPaper>
               <MUITypography variant="h3">Other drafters are still making their picks...</MUITypography>
               <MUITypography variant="body1">
@@ -383,8 +177,8 @@ export default function Event () {
               <BasicLandAdder submitFunction={cardData => addBasics(cardData, 'mainboard', 1)} />
               <DeckDisplay
                 add={addBasics}
-                authorizedID={me.account._id}
-                deck={{ mainboard: me.mainboard, sideboard: me.sideboard }}
+                authorizedID={myState.account._id}
+                deck={{ mainboard: myState.mainboard, sideboard: myState.sideboard }}
                 remove={removeBasics}
                 toggle={toggleMainboardSideboardEvent}
               />
@@ -393,14 +187,14 @@ export default function Event () {
         </React.Fragment>
       }
 
-      {event.finished &&
+      {eventState.finished &&
         <React.Fragment>
-          <CardPoolDownloadLinks me={me} others={others} />
+          <CardPoolDownloadLinks me={myState} others={others} />
           <BasicLandAdder submitFunction={cardData => addBasics(cardData, 'mainboard', 1)} />
           <DeckDisplay
             add={addBasics}
-            authorizedID={me.account._id}
-            deck={{ mainboard: me.mainboard, sideboard: me.sideboard }}
+            authorizedID={myState.account._id}
+            deck={{ mainboard: myState.mainboard, sideboard: myState.sideboard }}
             remove={removeBasics}
             toggle={toggleMainboardSideboardEvent}
           />

@@ -90,7 +90,7 @@ export default function ComponentInfo ({
           }
           action={
             <MUIFormControl variant="outlined">
-              <MUIInputLabel htmlFor="component-selector">Format</MUIInputLabel>
+              <MUIInputLabel htmlFor="component-selector">Viewing</MUIInputLabel>
               <MUISelect
                 fullWidth
                 label="Viewing"
@@ -116,7 +116,6 @@ export default function ComponentInfo ({
               ].map(cmpnt => (
                 <option
                   key={cmpnt._id}
-                  selected={activeComponentState._id === cmpnt._id}
                   value={cmpnt._id}
                 >
                   {cmpnt.name}

@@ -31,7 +31,6 @@ export default function CubeInfo () {
         avatar={<Avatar alt={creator.name} size='large' src={creator.avatar} />}
         title={
           <MUITextField
-            defaultValue={name}
             disabled={userId !== creator._id}
             inputProps={{ onBlur: () => editCube(descriptionInput, nameInput) }}
             label="Cube Name"
@@ -51,7 +50,6 @@ export default function CubeInfo () {
 
       <MUICardContent>
         <MUITextField
-          defaultValue={description}
           disabled={userId !== creator._id}
           fullWidth={true}
           inputProps={{ onBlur: () => editCube(descriptionInput, nameInput) }}
