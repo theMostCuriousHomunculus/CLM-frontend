@@ -57,6 +57,7 @@ export default function Match () {
     concedeGame,
     drawCard,
     fetchMatchByID,
+    mulligan,
     rollDice,
     shuffleLibrary,
     tapUntapCards
@@ -142,6 +143,10 @@ export default function Match () {
         drawCard();
       }
 
+      if (event.altKey && event.shiftKey && event.key === 'M') {
+        mulligan();
+      }
+
       if (event.altKey && event.shiftKey && event.key === 'R') {
         setNumberInputDialogInfo({
           buttonText: "Roll",
@@ -172,7 +177,17 @@ export default function Match () {
       return () => document.removeEventListener("keydown", handleHotKeys);
     }
 
-  }, [bottomPlayer.battlefield, concedeGame, drawCard, participant, setNumberInputDialogInfo, rollDice, shuffleLibrary, tapUntapCards]);
+  }, [
+    bottomPlayer.battlefield,
+    concedeGame,
+    drawCard,
+    mulligan,
+    participant,
+    rollDice,
+    setNumberInputDialogInfo,
+    shuffleLibrary,
+    tapUntapCards
+  ]);
 
   return (
     loading ?

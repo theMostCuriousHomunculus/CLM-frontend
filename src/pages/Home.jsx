@@ -46,11 +46,11 @@ export default function Home () {
       <MUICardActions>
         <MUIButton
           color="primary"
-          onClick={() => history.push('/cube/5f1f5ada77df260017b063bc')}
+          onClick={() => history.push('/cube/60e4a02d0347dc0017bfab0e')}
           size="small"
           variant="contained"
         >
-          Check Out Casey's MTGO Cube!
+          Casey's Cube
         </MUIButton>
       </MUICardActions>
     </MUICard>

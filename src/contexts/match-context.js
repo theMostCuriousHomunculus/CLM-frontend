@@ -74,6 +74,7 @@ export const MatchContext = createContext({
   flipCard: () => null,
   flipCoin: () => null,
   gainControlOfCard: () => null,
+  mulligan: () => null,
   ready: () => null,
   revealCard: () => null,
   rollDice: () => null,
@@ -648,6 +649,24 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
+  const mulligan = React.useCallback(async function () {
+    await sendRequest({
+      headers: { MatchID: matchState._id },
+      operation: 'mulligan',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation} {
+                _id
+              }
+            }
+          `
+        }
+      }
+    })
+  }, [matchState._id, sendRequest]);
+
   const ready = React.useCallback(async function () {
     await sendRequest({
       headers: { MatchID: matchState._id },
@@ -887,6 +906,7 @@ export default function ContextualizedMatchPage() {
         flipCard,
         flipCoin,
         gainControlOfCard,
+        mulligan,
         ready,
         revealCard,
         rollDice,
