@@ -2,6 +2,7 @@ import React from 'react';
 import MUIMenu from '@material-ui/core/Menu';
 import MUIMenuItem from '@material-ui/core/MenuItem';
 
+import CountersDialog from './CountersDialog';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { MatchContext } from '../../contexts/match-context';
 
@@ -74,11 +75,23 @@ export default function CardMenu ({
     clearRightClickedCard();
   }
 
+  const [counterDialogOpen, setCounterDialogOpen] = React.useState(false);
   const [faceDownImageAnchorEl, setFaceDownImageAnchorEl] = React.useState();
   const [moveToAnchorEl, setMoveToAnchorEl] = React.useState();
 
   return (
     <React.Fragment>
+      <CountersDialog
+        cardID={rightClickedCard._id}
+        cardName={rightClickedCard.name}
+        close={() => {
+          clearRightClickedCard();
+          setCounterDialogOpen(false);
+        }}
+        open={counterDialogOpen}
+        zone={rightClickedCard.origin}
+      />
+
       <MUIMenu
         anchorEl={rightClickedCard.anchorElement}
         keepMounted
@@ -101,6 +114,17 @@ export default function CardMenu ({
               }}
             >
               Move Card to...
+            </MUIMenuItem>
+            <MUIMenuItem
+              onClick={() => {
+                setCounterDialogOpen(true);
+                setRightClickedCard(prevState => ({
+                  ...prevState,
+                  anchorElement: null
+                }));
+              }}
+            >
+              Adjust Counters
             </MUIMenuItem>
             {['battlefield', 'stack'].includes(rightClickedCard.origin) &&
               <MUIMenuItem onClick={handleCreateCopies}>

@@ -1,8 +1,12 @@
 import React from 'react';
 import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
+import MUIBadge from '@material-ui/core/Badge';
 import MUIIconButton from '@material-ui/core/IconButton';
 import MUIPaper from '@material-ui/core/Paper';
 import MUITooltip from '@material-ui/core/Tooltip';
+import MUITypography from '@material-ui/core/Typography';
+import lightGreen from '@material-ui/core/colors/lightGreen';
+import deepOrange from '@material-ui/core/colors/deepOrange';
 import { makeStyles } from '@material-ui/core/styles';
 
 import theme from '../../theme';
@@ -28,6 +32,7 @@ export default function MagicCard ({
   const {
     _id,
     back_image,
+    counters,
     face_down,
     face_down_image,
     flipped,
@@ -97,6 +102,38 @@ export default function MagicCard ({
   }
 
   const useStyles = makeStyles({
+    counterBadge: {
+      '& > .MuiBadge-badge': {
+        transform: 'translate(12px, -12px)'
+      }
+    },
+    counterContainer: {
+      padding: '12px 12px 4px 4px'
+    },
+    countersContainer: {
+      alignContent: 'space-between',
+      display: 'flex',
+      flexWrap: 'wrap',
+      height: '100%',
+      justifyContent: 'space-between',
+      left: 0,
+      overflowY: 'auto',
+      position: 'absolute',
+      top: 0
+    },
+    counterIcon: {
+      background: '#afafaf',
+      borderRadius: '100%',
+      height: 24,
+      position: 'relative',
+      width: 24
+    },
+    counterLabel: {
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)'
+    },
     flipButton: {
       background: theme.palette.primary.main,
       color: '#ffffff',
@@ -131,20 +168,47 @@ export default function MagicCard ({
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {hoverPreview ?
+      {hoverPreview &&
         <HoverPreview back_image={back_image} image={image}>
           <div
+            className={classes.countersContainer}
             id={`hover-${_id}`}
             onClick={event => {
               clickFunction(cardData);
               event.stopPropagation();
             }}
-            style={{ height: '100%', width: '100%' }}
           >
-            {children}
+            {counters && counters.map(counter => {
+              const style = {};
+              if (counter.counterType === '+1/+1') style.backgroundColor = lightGreen[500];
+              if (counter.counterType === '-1/-1') style.backgroundColor = deepOrange[500];
+              return (
+                <div className={classes.counterContainer} key={counter.counterType}>
+                  <MUIBadge
+                    badgeContent={counter.counterAmount}
+                    className={classes.counterBadge}
+                    color="primary"
+                    overlap="circle"
+                  >
+                    <MUITooltip title={counter.counterType}>
+                      <div
+                        className={classes.counterIcon}
+                        style={style}
+                      >
+                        <MUITypography
+                          className={classes.counterLabel}
+                          variant="caption"
+                        >
+                          {counter.counterType[0].toUpperCase()}
+                        </MUITypography>
+                      </div>
+                    </MUITooltip>
+                  </MUIBadge>
+                </div>
+              )
+            })}
           </div>
-        </HoverPreview> :
-        children
+        </HoverPreview>
       }
       {back_image &&
         <MUITooltip title="Flip Card">

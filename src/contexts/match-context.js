@@ -60,6 +60,7 @@ export const MatchContext = createContext({
   },
   setMatchState: () => null,
   setNumberInputDialogInfo: () => null,
+  adjustCounters: () => null,
   adjustEnergyCounters: () => null,
   adjustLifeTotal: () => null,
   adjustPoisonCounters: () => null,
@@ -349,6 +350,31 @@ export default function ContextualizedMatchPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+
+  const adjustCounters = React.useCallback(async function (cardID, counterAmount, counterType, zone) {
+    await sendRequest({
+      headers: { MatchID: matchState._id },
+      operation: 'adjustCounters',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}(
+                input: {
+                  cardID: "${cardID}",
+                  counterAmount: ${counterAmount},
+                  counterType: "${counterType}",
+                  zone: ${zone}
+                }
+              ) {
+                _id
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [matchState._id, sendRequest]);
 
   const adjustEnergyCounters = React.useCallback(async function (energy) {
     await sendRequest({
@@ -892,6 +918,7 @@ export default function ContextualizedMatchPage() {
         numberInputDialogInfo,
         setMatchState,
         setNumberInputDialogInfo,
+        adjustCounters,
         adjustEnergyCounters,
         adjustLifeTotal,
         adjustPoisonCounters,

@@ -13,7 +13,6 @@ export default SortableElement(({ card, clickFunction }) => {
       clickFunction={clickFunction}
       flipHandler={() => setFlipped(prevState => !prevState)}
       style={{ cursor: 'grab', margin: 4 }}
-    >
-    </MagicCard>
+    />
   );
 });
