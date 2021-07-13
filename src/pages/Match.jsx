@@ -50,8 +50,10 @@ export default function Match () {
   const {
     loading,
     matchQuery,
+    bottomPlayerState,
     matchState,
     numberInputDialogInfo,
+    topPlayerState,
     setMatchState,
     setNumberInputDialogInfo,
     concedeGame,
@@ -62,20 +64,7 @@ export default function Match () {
     shuffleLibrary,
     tapUntapCards
   } = React.useContext(MatchContext);
-  const participant = matchState.players.some(plr => plr.account._id === userId);
-  const bottomPlayer = participant ?
-    matchState.players.find(plr => plr.account._id === userId) :
-    matchState.players[0];
-  let topPlayer;
-  
-  if (participant && matchState.players.length === 2) {
-    topPlayer = matchState.players.find(plr => plr.account._id !== userId);
-  } else if (!participant && matchState.players.length === 2) {
-    topPlayer = matchState.players[1];
-  } else {
-    topPlayer = null;
-  }
-
+  const participant = bottomPlayerState.account._id === userId;
   const [rightClickedCard, setRightClickedCard] = React.useState({
     _id: null,
     anchorElement: null,
@@ -166,7 +155,7 @@ export default function Match () {
       }
 
       if (event.altKey && event.shiftKey && event.key === 'U') {
-        tapUntapCards(bottomPlayer.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
+        tapUntapCards(bottomPlayerState.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
       }
 
     }
@@ -178,7 +167,7 @@ export default function Match () {
     }
 
   }, [
-    bottomPlayer.battlefield,
+    bottomPlayerState.battlefield,
     concedeGame,
     drawCard,
     mulligan,
@@ -222,7 +211,7 @@ export default function Match () {
             position: null
           });
         }}
-        player={clickedPlayer.position === 'top' ? topPlayer : bottomPlayer}
+        player={clickedPlayer.position === 'top' ? topPlayerState : bottomPlayerState}
         setRightClickedCard={setRightClickedCard}
         zoneName={zoneName}
       />
@@ -233,7 +222,6 @@ export default function Match () {
       />
 
       <PlayerMenu
-        bottomPlayer={bottomPlayer}
         clickedPlayer={clickedPlayer}
         displayedZones={displayedZones}
         setClickedPlayer={setClickedPlayer}
@@ -256,12 +244,10 @@ export default function Match () {
           </div>
 
           <PlayZone
-            bottomPlayer={bottomPlayer}
             displayedZones={displayedZones}
             participant={participant}
             setClickedPlayer={setClickedPlayer}
             setRightClickedCard={setRightClickedCard}
-            topPlayer={topPlayer}
           />
 
           <MatchLog />

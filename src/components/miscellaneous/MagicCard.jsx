@@ -14,7 +14,6 @@ import HoverPreview from './HoverPreview';
 
 export default function MagicCard ({
   cardData,
-  children,
   clickFunction = () => null,
   customStyle,
   flipHandler,
@@ -119,7 +118,8 @@ export default function MagicCard ({
       left: 0,
       overflowY: 'auto',
       position: 'absolute',
-      top: 0
+      top: 0,
+      width: '100%'
     },
     counterIcon: {
       background: '#afafaf',

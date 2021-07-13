@@ -30,8 +30,7 @@ const useStyles = makeStyles({
   columnFlex: {
     display: 'flex',
     flex: '1 1 0',
-    flexDirection: 'column',
-    minWidth: 0,
+    minHeight: 0,
     position: 'relative'
   },
   handContainer: {
@@ -44,7 +43,8 @@ const useStyles = makeStyles({
   rowFlex: {
     display: 'flex',
     flex: '1 1 0',
-    minHeight: 0
+    flexDirection: 'column',
+    minWidth: 0
   },
   playZoneContainer: {
     display: 'flex',
@@ -55,66 +55,64 @@ const useStyles = makeStyles({
 });
 
 export default function PlayZone ({
-  bottomPlayer,
   displayedZones,
   participant,
   setClickedPlayer,
-  setRightClickedCard,
-  topPlayer
+  setRightClickedCard
 }) {
 
+  const { bottomPlayerState, topPlayerState, dragCard, flipCard, tapUntapCards } = React.useContext(MatchContext);
   const battlefieldRef = React.useRef();
   const classes = useStyles();
-  const topZIndex = Math.max(...bottomPlayer.battlefield.map(crd => crd.z_index)) + 1;
-  const { dragCard, flipCard, tapUntapCards } = React.useContext(MatchContext);
+  const topZIndex = Math.max(...bottomPlayerState.battlefield.map(crd => crd.z_index)) + 1;
 
   return (
     <div className={classes.playZoneContainer}>
-      {topPlayer &&
+      {topPlayerState &&
         <div id="top-player" className={classes.columnFlex}>
-          {displayedZones.topHand &&
-            <div className={classes.handContainer}>
-              {topPlayer.hand.map(card => {
-                return (
-                  <MagicCard
-                    cardData={card}
-                    customStyle={matchCard}
-                    flipHandler={() => null}
-                    hoverPreview={!!card.image}
-                    key={card._id}
-                    rightClickFunction={(event) => {
-                      event.preventDefault();
-                      setRightClickedCard({
-                        _id: card._id,
-                        anchorElement: event.currentTarget,
-                        controller: card.controller._id,
-                        face_down: card.face_down,
-                        isCopyToken: card.isCopyToken,
-                        name: card.name,
-                        origin: 'hand',
-                        owner: card.owner._id,
-                        visibility: card.visibility
-                      });
-                    }}
-                  />
-                );
-              })}
-            </div>
+          {displayedZones.topLibrary &&
+            <VerticalCollapsableZone
+              customStyle={matchCard}
+              iconColor={blue[500]}
+              iconElement={<LibrarySymbol />}
+              player={topPlayerState}
+              setRightClickedCard={setRightClickedCard}
+              zone="Library"
+            />
           }
 
           <div className={classes.rowFlex}>
-            {displayedZones.topLibrary &&
-              <VerticalCollapsableZone
-                customStyle={matchCard}
-                iconColor={blue[500]}
-                iconElement={<LibrarySymbol />}
-                player={topPlayer}
-                setRightClickedCard={setRightClickedCard}
-                zone="Library"
-              />
+            {displayedZones.topHand &&
+              <div className={classes.handContainer}>
+                {topPlayerState.hand.map(card => {
+                  return (
+                    <MagicCard
+                      cardData={card}
+                      customStyle={matchCard}
+                      flipHandler={() => null}
+                      hoverPreview={!!card.image}
+                      key={card._id}
+                      rightClickFunction={(event) => {
+                        event.preventDefault();
+                        setRightClickedCard({
+                          _id: card._id,
+                          anchorElement: event.currentTarget,
+                          controller: card.controller._id,
+                          face_down: card.face_down,
+                          isCopyToken: card.isCopyToken,
+                          name: card.name,
+                          origin: 'hand',
+                          owner: card.owner._id,
+                          visibility: card.visibility
+                        });
+                      }}
+                    />
+                  );
+                })}
+              </div>
             }
             <div className={classes.battlefieldContainer} style={{ transform: 'rotate(180deg)' }}>
-              {topPlayer.battlefield.map(card => (
+              {topPlayerState.battlefield.map(card => (
                 <MagicCard
                   cardData={card}
                   customStyle={{
@@ -144,30 +142,32 @@ export default function PlayZone ({
                 />
               ))}
             </div>
-            {displayedZones.topGraveyard &&
-              <VerticalCollapsableZone
-                customStyle={matchCard}
-                iconColor="#888888"
-                iconElement={<GraveyardSymbol />}
-                player={topPlayer}
-                setRightClickedCard={setRightClickedCard}
-                zone="Graveyard"
-              />
-            }
-            {displayedZones.topExile &&
-              <VerticalCollapsableZone
-                customStyle={matchCard}
-                iconColor={orange[500]}
-                iconElement={<MUIClearIcon htmlColor="white" />}
-                player={topPlayer}
-                setRightClickedCard={setRightClickedCard}
-                zone="Exile"
-              />
-            }
           </div>
 
+          {displayedZones.topGraveyard &&
+            <VerticalCollapsableZone
+              customStyle={matchCard}
+              iconColor="#888888"
+              iconElement={<GraveyardSymbol />}
+              player={topPlayerState}
+              setRightClickedCard={setRightClickedCard}
+              zone="Graveyard"
+            />
+          }
+
+          {displayedZones.topExile &&
+            <VerticalCollapsableZone
+              customStyle={matchCard}
+              iconColor={orange[500]}
+              iconElement={<MUIClearIcon htmlColor="white" />}
+              player={topPlayerState}
+              setRightClickedCard={setRightClickedCard}
+              zone="Exile"
+            />
+          }
+
           <PlayerInfo
-            player={topPlayer}
+            player={topPlayerState}
             position="top"
             setClickedPlayer={setClickedPlayer}
           />
@@ -175,22 +175,20 @@ export default function PlayZone ({
       }
 
       <div id="bottom-player" className={classes.columnFlex}>
+        {displayedZones.bottomLibrary &&
+          <VerticalCollapsableZone
+            customStyle={matchCard}
+            iconColor={blue[500]}
+            iconElement={<LibrarySymbol />}
+            player={bottomPlayerState}
+            setRightClickedCard={setRightClickedCard}
+            zone="Library"
+          />
+        }
         <div className={classes.rowFlex}>
-
-          {displayedZones.bottomLibrary &&
-            <VerticalCollapsableZone
-              customStyle={matchCard}
-              iconColor={blue[500]}
-              iconElement={<LibrarySymbol />}
-              player={bottomPlayer}
-              setRightClickedCard={setRightClickedCard}
-              zone="Library"
-            />
-          }
-
           {participant ?
             <div className={classes.battlefieldContainer} id="bottom-player-battlefield" ref={battlefieldRef}>
-              {battlefieldRef.current && bottomPlayer.battlefield.map(card => (
+              {battlefieldRef.current && bottomPlayerState.battlefield.map(card => (
                 <Draggable
                   bounds="#bottom-player-battlefield"
                   handle={`#drag-${card._id}`}
@@ -252,7 +250,7 @@ export default function PlayZone ({
               ))}
             </div> :
             <div className={classes.battlefieldContainer}>
-              {bottomPlayer.battlefield.map(card => (
+              {bottomPlayerState.battlefield.map(card => (
                 <MagicCard
                   cardData={card}
                   customStyle={{
@@ -284,62 +282,61 @@ export default function PlayZone ({
             </div>
           }
 
-          {displayedZones.bottomGraveyard &&
-            <VerticalCollapsableZone
-              customStyle={matchCard}
-              iconColor="#888888"
-              iconElement={<GraveyardSymbol />}
-              player={bottomPlayer}
-              setRightClickedCard={setRightClickedCard}
-              zone="Graveyard"
-            />
+          {displayedZones.bottomHand &&
+            <div className={classes.handContainer}>
+              {bottomPlayerState.hand.map(card => {
+                return (
+                  <MagicCard
+                    cardData={card}
+                    customStyle={matchCard}
+                    flipHandler={participant ? () => flipCard(card._id, 'hand') : () => null}
+                    hoverPreview={!!card.image}
+                    key={card._id}
+                    rightClickFunction={(event) => {
+                      event.preventDefault();
+                      setRightClickedCard({
+                        _id: card._id,
+                        anchorElement: event.currentTarget,
+                        controller: card.controller._id,
+                        face_down: card.face_down,
+                        isCopyToken: card.isCopyToken,
+                        name: card.name,
+                        origin: 'hand',
+                        owner: card.owner._id,
+                        visibility: card.visibility
+                      });
+                    }}
+                  />
+                );
+              })}
+            </div>
           }
-
-          {displayedZones.bottomExile &&
-            <VerticalCollapsableZone
-              customStyle={matchCard}
-              iconColor={orange[500]}
-              iconElement={<MUIClearIcon htmlColor="white" />}
-              player={bottomPlayer}
-              setRightClickedCard={setRightClickedCard}
-              zone="Exile"
-            />
-          }
-
         </div>
-        
-        {displayedZones.bottomHand &&
-          <div className={classes.handContainer}>
-            {bottomPlayer.hand.map(card => {
-              return (
-                <MagicCard
-                  cardData={card}
-                  customStyle={matchCard}
-                  flipHandler={participant ? () => flipCard(card._id, 'hand') : () => null}
-                  hoverPreview={!!card.image}
-                  key={card._id}
-                  rightClickFunction={(event) => {
-                    event.preventDefault();
-                    setRightClickedCard({
-                      _id: card._id,
-                      anchorElement: event.currentTarget,
-                      controller: card.controller._id,
-                      face_down: card.face_down,
-                      isCopyToken: card.isCopyToken,
-                      name: card.name,
-                      origin: 'hand',
-                      owner: card.owner._id,
-                      visibility: card.visibility
-                    });
-                  }}
-                />
-              );
-            })}
-          </div>
+
+        {displayedZones.bottomGraveyard &&
+          <VerticalCollapsableZone
+            customStyle={matchCard}
+            iconColor="#888888"
+            iconElement={<GraveyardSymbol />}
+            player={bottomPlayerState}
+            setRightClickedCard={setRightClickedCard}
+            zone="Graveyard"
+          />
+        }
+
+        {displayedZones.bottomExile &&
+          <VerticalCollapsableZone
+            customStyle={matchCard}
+            iconColor={orange[500]}
+            iconElement={<MUIClearIcon htmlColor="white" />}
+            player={bottomPlayerState}
+            setRightClickedCard={setRightClickedCard}
+            zone="Exile"
+          />
         }
 
         <PlayerInfo
-          player={bottomPlayer}
+          player={bottomPlayerState}
           position="bottom"
           setClickedPlayer={setClickedPlayer}
         />

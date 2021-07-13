@@ -3,10 +3,29 @@ import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import Match from '../pages/Match';
+import { AuthenticationContext } from './authentication-context';
 
 export const MatchContext = createContext({
   loading: false,
   matchQuery: '',
+  bottomPlayerState: {
+    account: {
+      _id: null,
+      avatar: null,
+      name: null
+    },
+    battlefield: [],
+    energy: null,
+    exile: [],
+    graveyard: [],
+    hand: [],
+    library: [],
+    life: null,
+    mainboard: [],
+    poison: null,
+    sideboard: [],
+    temporary: []
+  },
   matchState: {
     _id: null,
     game_winners: [],
@@ -58,6 +77,25 @@ export const MatchContext = createContext({
     title: null,
     updateFunction: null
   },
+  topPlayerState: {
+    account: {
+      _id: null,
+      avatar: null,
+      name: null
+    },
+    battlefield: [],
+    energy: null,
+    exile: [],
+    graveyard: [],
+    hand: [],
+    library: [],
+    life: null,
+    mainboard: [],
+    poison: null,
+    sideboard: [],
+    temporary: []
+  },
+  setBottomPlayerState: () => null,
   setMatchState: () => null,
   setNumberInputDialogInfo: () => null,
   adjustCounters: () => null,
@@ -90,6 +128,7 @@ export const MatchContext = createContext({
 
 export default function ContextualizedMatchPage() {
 
+  const { userId } = React.useContext(AuthenticationContext);
   const [matchState, setMatchState] = React.useState({
     _id: useParams().matchId,
     game_winners: [],
@@ -141,6 +180,8 @@ export default function ContextualizedMatchPage() {
     title: null,
     updateFunction: null
   });
+  const [bottomPlayerState, setBottomPlayerState] = React.useState(matchState.players[0]);
+  const [topPlayerState, setTopPlayerState] = React.useState(matchState.players[1]);
   const matchQuery = `
     _id
     game_winners {
@@ -312,8 +353,8 @@ export default function ContextualizedMatchPage() {
         }
         face_down_image
         image
-        index
         isCopyToken
+        library_position
         name
         owner {
           _id
@@ -350,6 +391,26 @@ export default function ContextualizedMatchPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+
+  React.useEffect(() => {
+    // this allows a more smooth drag and drop experience
+    const me = matchState.players.find(player => player.account._id === userId);
+
+    if (me) {
+      if (JSON.stringify(bottomPlayerState) !== JSON.stringify(me)) setBottomPlayerState(me);
+
+      const opponent = matchState.players.find(player => player.account._id !== userId);
+
+      if (JSON.stringify(topPlayerState) !== JSON.stringify(opponent)) setTopPlayerState(opponent);
+    }
+
+    if (!me) {
+      setBottomPlayerState(matchState.players[0]);
+      setTopPlayerState(matchState.players[1]);
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchState, userId]);
 
   const adjustCounters = React.useCallback(async function (cardID, counterAmount, counterType, zone) {
     await sendRequest({
@@ -914,8 +975,11 @@ export default function ContextualizedMatchPage() {
       value={{
         loading,
         matchQuery,
+        bottomPlayerState,
         matchState,
         numberInputDialogInfo,
+        topPlayerState,
+        setBottomPlayerState,
         setMatchState,
         setNumberInputDialogInfo,
         adjustCounters,
