@@ -558,7 +558,7 @@ export default function ContextualizedMatchPage() {
     });
   }, [matchState._id, sendRequest]);
 
-  const createTokens = React.useCallback(async function ({ back_image, image, name }, numberOfTokens) {
+  const createTokens = React.useCallback(async function ({ back_image, image, name, scryfall_id }, numberOfTokens) {
     await sendRequest({
       headers: { MatchID: matchState._id },
       operation: 'createTokens',
@@ -571,7 +571,8 @@ export default function ContextualizedMatchPage() {
                   token: {
                     ${back_image ? 'back_image: "' + back_image + '",\n' : ''}
                     image: "${image}",
-                    name: "${name}"
+                    name: "${name}",
+                    scryfall_id: "${scryfall_id}"
                   },
                   numberOfTokens: ${numberOfTokens}
                 }

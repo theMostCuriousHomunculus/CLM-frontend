@@ -118,7 +118,8 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
     createTokens({
       back_image: chosenCard.back_image,
       image: chosenCard.image,
-      name: chosenCard.name
+      name: chosenCard.name,
+      scryfall_id: chosenCard.scryfall_id
     }, numberOfTokens);
     setChosenCard(null);
     setNumberOfTokens(1);

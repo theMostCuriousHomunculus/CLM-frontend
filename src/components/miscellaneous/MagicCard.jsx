@@ -15,21 +15,20 @@ import HoverPreview from './HoverPreview';
 export default function MagicCard ({
   cardData,
   clickFunction = () => null,
-  customStyle,
-  flipHandler,
+  // customStyle,
+  flipHandler = () => null,
   hoverPreview,
   rightClickFunction = () => null,
   // for Draggable wrapped cards
-  style,
-  className,
-  onMouseDown,
-  onMouseUp,
-  onTouchStart,
-  onTouchEnd
+  // style,
+  // className,
+  // onMouseDown,
+  // onMouseUp,
+  // onTouchStart,
+  // onTouchEnd
 }) {
 
   const {
-    _id,
     back_image,
     counters,
     face_down,
@@ -59,13 +58,15 @@ export default function MagicCard ({
   let css = {
     backgroundImage: `url(${displayedImage})`,
     backgroundSize: 'cover',
-    borderRadius: 8,
-    height: 264,
+    // borderRadius: 8,
+    // height: 264,
+    height: '100%',
     justifyContent: 'space-between',
     margin: 0,
     padding: 0,
     position: 'relative',
-    width: 189
+    // width: 189
+    width: '100%'
   };
 
   if (face_down) {
@@ -154,25 +155,25 @@ export default function MagicCard ({
 
   return (
     <MUIPaper
-      className={`${classes.magicCard}${className ? ' ' + className : ''}`}
-      id={`drag-${_id}`}
+      // className={`${classes.magicCard}${className ? ' ' + className : ''}`}
+      className={classes.magicCard}
       onClick={() => clickFunction(cardData)}
       onContextMenu={event => rightClickFunction(event)}
       style={{
-        ...customStyle,
-        ...style,
-        transform: `${ style && style.transform ? style.transform : ''}${tapped ? ' rotate(90deg)' : ''}`
+        // ...customStyle,
+        // ...style,
+        // transform: `${/* style && style.transform ? style.transform : ''*/}${tapped ? ' rotate(90deg)' : ''}`
+        transform: tapped ? 'rotate(90deg)' : undefined
       }}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
+      // onMouseDown={onMouseDown}
+      // onMouseUp={onMouseUp}
+      // onTouchStart={onTouchStart}
+      // onTouchEnd={onTouchEnd}
     >
       {hoverPreview &&
         <HoverPreview back_image={back_image} image={image}>
           <div
             className={classes.countersContainer}
-            id={`hover-${_id}`}
             onClick={event => {
               clickFunction(cardData);
               event.stopPropagation();
