@@ -175,7 +175,8 @@ function DraggableCard ({
     transform: transform && !isDragging ?
       CSS.Translate.toString(transform) :
       `translate(-${window.pageXOffset}px, -${window.pageYOffset}px)`,
-    width: 86
+    width: 86,
+    zIndex: isDragging ? 1000 : card.index
   };
   console.log(transform);
 

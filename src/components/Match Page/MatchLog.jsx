@@ -2,6 +2,8 @@ import React from 'react';
 import MUICard from '@material-ui/core/Card';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUICardContent from '@material-ui/core/CardContent';
+import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import MUIIconButton from '@material-ui/core/IconButton';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -24,14 +26,21 @@ const useStyles = makeStyles({
   }
 });
 
-export default function MatchLog () {
+export default function MatchLog ({ setHelpDisplayed }) {
 
   const classes = useStyles();
   const { matchState: { log } } = React.useContext(MatchContext);
 
   return (
     <MUICard className={classes.card}>
-      <MUICardHeader title="Match Log" />
+      <MUICardHeader
+        avatar={
+          <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
+            <MUIHelpOutlineIcon />
+          </MUIIconButton>
+        }
+        title={<MUITypography variant="h5">Match Log</MUITypography>}
+      />
       <MUICardContent className={classes.cardContent}>
         {log.map((val, index, array) => array[array.length - 1 - index]).map((update, index, array) => {
           return (

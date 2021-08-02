@@ -210,6 +210,7 @@ export default function ContextualizedMatchPage() {
         face_down_image
         flipped
         image
+        index
         isCopyToken
         name
         owner {
@@ -224,7 +225,6 @@ export default function ContextualizedMatchPage() {
         }
         x_coordinate
         y_coordinate
-        z_index
       }
       energy
       exile {
@@ -241,6 +241,7 @@ export default function ContextualizedMatchPage() {
         face_down_image
         flipped
         image
+        index
         name
         owner {
           _id
@@ -265,6 +266,7 @@ export default function ContextualizedMatchPage() {
         face_down_image
         flipped
         image
+        index
         name
         owner {
           _id
@@ -286,6 +288,7 @@ export default function ContextualizedMatchPage() {
         face_down_image
         flipped
         image
+        index
         name
         owner {
           _id
@@ -307,6 +310,7 @@ export default function ContextualizedMatchPage() {
         face_down_image
         flipped
         image
+        index
         name
         owner {
           _id
@@ -353,8 +357,8 @@ export default function ContextualizedMatchPage() {
         }
         face_down_image
         image
+        index
         isCopyToken
-        library_position
         name
         owner {
           _id
@@ -377,6 +381,7 @@ export default function ContextualizedMatchPage() {
       face_down
       face_down_image
       image
+      index
       isCopyToken
       name
       owner {
@@ -609,7 +614,7 @@ export default function ContextualizedMatchPage() {
     })
   }, [matchState._id, sendRequest])
 
-  const dragCard = React.useCallback(async function (cardID, xCoordinate, yCoordinate, zIndex) {
+  const dragCard = React.useCallback(async function (cardID, xCoordinate, yCoordinate) {
     await sendRequest({
       headers: { MatchID: matchState._id },
       operation: 'dragCard',
@@ -621,8 +626,7 @@ export default function ContextualizedMatchPage() {
                 input: {
                   cardID: "${cardID}",
                   xCoordinate: ${xCoordinate},
-                  yCoordinate: ${yCoordinate},
-                  zIndex: ${zIndex}
+                  yCoordinate: ${yCoordinate}
                 }
               ) {
                 _id

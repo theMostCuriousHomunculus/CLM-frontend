@@ -1,6 +1,4 @@
 import React from 'react';
-import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import MUIIconButton from '@material-ui/core/IconButton';
 import { createClient } from 'graphql-ws';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -237,12 +235,6 @@ export default function Match () {
 
       {matchState.players.every(plr => plr.mainboard.length === 0) ?
         <div className={classes.matchScreenFlexContainer}>
-          <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-            <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
-              <MUIHelpOutlineIcon />
-            </MUIIconButton>
-          </div>
-
           <PlayZone
             displayedZones={displayedZones}
             participant={participant}
@@ -250,7 +242,7 @@ export default function Match () {
             setRightClickedCard={setRightClickedCard}
           />
 
-          <MatchLog />
+          <MatchLog setHelpDisplayed={setHelpDisplayed} />
         </div> :
         <Intermission />
       }

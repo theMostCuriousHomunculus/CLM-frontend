@@ -159,6 +159,7 @@ export default function PlayZone ({
           if (overID in prevState) {
             // We're at the root droppable of a container
             newIndex = overCards.length + 1;
+            // newIndex = 0;
           } else {
             const isBelowLastItem =
               over &&
@@ -215,7 +216,7 @@ export default function PlayZone ({
             }).concat(prevState.battlefield.slice(activeIndex + 1))
         });
       });
-    } else if (overZoneName && overZoneName !== 'battlefield') {
+    } else if (!!overZoneName) {
       const activeIndex = bottomPlayerState[activeZoneName].findIndex(card => card._id === activeID);
       const overIndex = bottomPlayerState[overZoneName].findIndex(card => card._id === overID);
   

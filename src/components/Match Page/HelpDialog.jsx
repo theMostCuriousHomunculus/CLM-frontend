@@ -18,12 +18,13 @@ export default function HelpDialog ({
     >
       <MUIDialogTitle>Match Hot Keys</MUIDialogTitle>
       <MUIDialogContent>
-        <MUITypography variant="body1">Alt + Shift + C = Concede from game and begin sideboarding.</MUITypography>
+        <MUITypography variant="body1">Alt + Shift + C = Concede game and begin sideboarding.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + D = Draw a card.</MUITypography>
+        <MUITypography variant="body1">Alt + Shift + M = Mulligan / Reset and draw 7.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + R = Roll dice.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + S = Shuffle your library.</MUITypography>
         <MUITypography variant="body1">Alt + Shift + T = Create tokens.</MUITypography>
-        <MUITypography variant="body1">Alt + Shift + U = Untap all your tapped cards on the battlefield.</MUITypography>
+        <MUITypography variant="body1">Alt + Shift + U = Untap all your cards.</MUITypography>
       </MUIDialogContent>
       <MUIDialogActions>
         <MUIButton

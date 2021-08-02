@@ -92,6 +92,7 @@ export default function Event () {
       }));
     }
   }
+  console.log(myState);
 
   return (loading ?
     <LoadingSpinner /> :
