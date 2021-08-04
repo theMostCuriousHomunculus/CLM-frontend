@@ -178,7 +178,6 @@ function DraggableCard ({
     width: 86,
     zIndex: isDragging ? 1000 : card.index
   };
-  console.log(transform);
 
   return (
     <div ref={setNodeRef} style={style} { ...attributes } { ...listeners }>

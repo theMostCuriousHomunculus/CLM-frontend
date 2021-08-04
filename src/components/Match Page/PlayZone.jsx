@@ -13,8 +13,19 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-// import { restrictToHorizontalAxis, restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
+// import {
+  // restrictToFirstScrollableAncestor,
+  // restrictToHorizontalAxis,
+  // restrictToParentElement,
+  // restrictToVerticalAxis,
+  // restrictToWindowEdges,
+// } from '@dnd-kit/modifiers';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+// import {
+//   getEventCoordinates,
+//   isTouchEvent,
+//   isMouseEvent,
+// } from '@dnd-kit/utilities';
 
 import MagicCard from '../miscellaneous/MagicCard';
 // import PlayerInfo from './PlayerInfo';
@@ -93,6 +104,7 @@ export default function PlayZone ({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+  const bottomZoneRef = React.useRef();
   const [clonedState, setClonedState] = React.useState();
   const [draggingCard, setDraggingCard] = React.useState();
 
@@ -159,7 +171,6 @@ export default function PlayZone ({
           if (overID in prevState) {
             // We're at the root droppable of a container
             newIndex = overCards.length + 1;
-            // newIndex = 0;
           } else {
             const isBelowLastItem =
               over &&
@@ -230,6 +241,75 @@ export default function PlayZone ({
 
     setDraggingCard(null);
   }
+
+  // https://github.com/clauderic/dnd-kit/blob/master/packages/modifiers/src/utilities/restrictToBoundingRect.ts
+  function restrictToBoundingRect (transform, rect, boundingRect) {
+    const value = { ...transform };
+  
+    if (rect.top + transform.y <= boundingRect.top) {
+      value.y = boundingRect.top - rect.top;
+    } else if (
+      rect.bottom + transform.y >=
+      boundingRect.top + boundingRect.height
+    ) {
+      value.y = boundingRect.top + boundingRect.height - rect.bottom;
+    }
+  
+    if (rect.left + transform.x <= boundingRect.left) {
+      value.x = boundingRect.left - rect.left;
+    } else if (
+      rect.right + transform.x >=
+      boundingRect.left + boundingRect.width
+    ) {
+      value.x = boundingRect.left + boundingRect.width - rect.right;
+    }
+  
+    return value;
+  }
+
+  function restrictToBottomZone (args) {
+    const { activeNodeRect, transform } = args;
+
+    if (!activeNodeRect) return transform;
+
+    const bottomZoneDimensions = bottomZoneRef.current.getBoundingClientRect();
+
+    return restrictToBoundingRect(transform, activeNodeRect, {
+      bottom: bottomZoneDimensions.bottom,
+      height: bottomZoneDimensions.height + bottomZoneRef.current.offsetTop - bottomZoneDimensions.y,
+      left: bottomZoneDimensions.left,
+      // offsetLeft: bottomZoneRef.current.offsetLeft,
+      // offsetTop: bottomZoneRef.current.offsetTop,
+      right: bottomZoneDimensions.right,
+      top: bottomZoneDimensions.top - bottomZoneRef.current.offsetTop + bottomZoneDimensions.y,
+      width: bottomZoneDimensions.width
+    });
+  }
+
+  // https://github.com/clauderic/dnd-kit/blob/master/packages/modifiers/src/snapCenterToCursor.ts
+  // function snapCenterToCursor({
+  //   activatorEvent,
+  //   activeNodeRect,
+  //   transform,
+  // }) {
+  //   if (
+  //     activeNodeRect &&
+  //     activatorEvent &&
+  //     (isTouchEvent(activatorEvent) || isMouseEvent(activatorEvent))
+  //   ) {
+  //     const activatorCoordinates = getEventCoordinates(activatorEvent);
+  //     const offsetX = activatorCoordinates.x - activeNodeRect.left;
+  //     const offsetY = activatorCoordinates.y - activeNodeRect.top;
+  
+  //     return {
+  //       ...transform,
+  //       x: transform.x + offsetX - activeNodeRect.width / 2,
+  //       y: transform.y + offsetY - activeNodeRect.height / 2,
+  //     };
+  //   }
+  
+  //   return transform;
+  // }
 
   return (
     <div className={classes.playZoneContainer}>
@@ -355,15 +435,24 @@ export default function PlayZone ({
 
       {/*<div className={classes.columnFlex}></div>*/}
 
-      <div id="bottom-player" className={classes.columnFlex}>
+      <div id="bottom-player" className={classes.columnFlex} ref={bottomZoneRef}>
         <DndContext
-          sensors={sensors}
+          autoScroll={{
+            canScroll(element) {
+              if (element === document.scrollingElement) {
+                return false;
+              } else {
+                return true;
+              }
+            }
+          }}
           collisionDetection={rectIntersection}
-          // modifiers={[restrictToParentElement, restrictToVerticalAxis]}
+          modifiers={[restrictToBottomZone]}
           onDragCancel={handleDragCancel}
           onDragEnd={handleDragEnd}
           onDragOver={handleDragOver}
           onDragStart={handleDragStart}
+          sensors={sensors}
         >
           <VerticalZone
             iconColor={blue[500]}
