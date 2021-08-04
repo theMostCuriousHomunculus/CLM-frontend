@@ -26,13 +26,13 @@ export default function CardPoolDownloadLinks ({ me, others }) {
       {others.map(function (plr) {
         const cardpool = [];
 
-        if (plr.mainboard.length > 0) {
+        if (plr.mainboard) {
           for (const card of plr.mainboard) {
             cardpool.push(card);
           }
         }
 
-        if (plr.sideboard.length > 0) {
+        if (plr.sideboard) {
           for (const card of plr.sideboard) {
             cardpool.push(card);
           }
