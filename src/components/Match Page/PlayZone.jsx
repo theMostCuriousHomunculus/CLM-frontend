@@ -19,13 +19,14 @@ import {
   // restrictToParentElement,
   // restrictToVerticalAxis,
   // restrictToWindowEdges,
+//   snapCenterToCursor
 // } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-// import {
-//   getEventCoordinates,
-//   isTouchEvent,
-//   isMouseEvent,
-// } from '@dnd-kit/utilities';
+import {
+  // getEventCoordinates,
+  isTouchEvent,
+  isMouseEvent,
+} from '@dnd-kit/utilities';
 
 import MagicCard from '../miscellaneous/MagicCard';
 // import PlayerInfo from './PlayerInfo';
@@ -286,30 +287,25 @@ export default function PlayZone ({
     });
   }
 
-  // https://github.com/clauderic/dnd-kit/blob/master/packages/modifiers/src/snapCenterToCursor.ts
-  // function snapCenterToCursor({
-  //   activatorEvent,
-  //   activeNodeRect,
-  //   transform,
-  // }) {
-  //   if (
-  //     activeNodeRect &&
-  //     activatorEvent &&
-  //     (isTouchEvent(activatorEvent) || isMouseEvent(activatorEvent))
-  //   ) {
-  //     const activatorCoordinates = getEventCoordinates(activatorEvent);
-  //     const offsetX = activatorCoordinates.x - activeNodeRect.left;
-  //     const offsetY = activatorCoordinates.y - activeNodeRect.top;
+  function accountForPageScroll (args) {
+    const { activatorEvent, transform } = args;
+
+    if (
+      activatorEvent &&
+      (isTouchEvent(activatorEvent) || isMouseEvent(activatorEvent))
+    ) {
   
-  //     return {
-  //       ...transform,
-  //       x: transform.x + offsetX - activeNodeRect.width / 2,
-  //       y: transform.y + offsetY - activeNodeRect.height / 2,
-  //     };
-  //   }
-  
-  //   return transform;
-  // }
+      return {
+        ...transform,
+        x: transform.x,
+        y: transform.y
+          + bottomZoneRef.current.getBoundingClientRect().top
+          - bottomZoneRef.current.offsetTop
+      };
+    }
+
+    return transform;
+  }
 
   return (
     <div className={classes.playZoneContainer}>
@@ -447,7 +443,7 @@ export default function PlayZone ({
             }
           }}
           collisionDetection={rectIntersection}
-          modifiers={[restrictToBottomZone]}
+          modifiers={[accountForPageScroll, restrictToBottomZone]}
           onDragCancel={handleDragCancel}
           onDragEnd={handleDragEnd}
           onDragOver={handleDragOver}
