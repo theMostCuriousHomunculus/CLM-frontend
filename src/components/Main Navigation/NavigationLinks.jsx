@@ -3,6 +3,7 @@ import MUIAccountCircleIcon from '@material-ui/icons/AccountCircle';
 import MUIAllInclusiveIcon from '@material-ui/icons/AllInclusive';
 import MUIChatOutlinedIcon from '@material-ui/icons/ChatOutlined';
 import MUIExitToAppIcon from '@material-ui/icons/ExitToApp';
+import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import MUIHomeIcon from '@material-ui/icons/Home';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
@@ -51,6 +52,11 @@ export default function NavigationLinks ({
       onClick: () => history.push('/blog')
     },
     {
+      icon: <MUIHelpOutlineIcon />,
+      name: "What's Classy?",
+      onClick: () => history.push('/classy')
+    },
+    {
       icon: <MUIAllInclusiveIcon />,
       name: "Resources",
       onClick: () => history.push('/resources')
@@ -72,6 +78,11 @@ export default function NavigationLinks ({
       icon: <MUIChatOutlinedIcon />,
       name: "Blog",
       onClick: () => history.push('/blog')
+    },
+    {
+      icon: <MUIHelpOutlineIcon />,
+      name: "What's Classy?",
+      onClick: () => history.push('/classy')
     },
     {
       icon: <MUIAllInclusiveIcon />,

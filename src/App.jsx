@@ -13,6 +13,7 @@ import { ErrorContext } from './contexts/error-context';
 
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
+const Classy = React.lazy(() => import('./pages/Classy'));
 const ContextualizedCubePage = React.lazy(() => import('./contexts/cube-context'));
 const ContextualizedEventPage = React.lazy(() => import('./contexts/event-context'));
 const ContextualizedAccountPage = React.lazy(() => import ('./contexts/account-context'));
@@ -120,6 +121,9 @@ export default function App() {
                 </Route>
                 <Route path='/blog'>
                   <Blog />
+                </Route>
+                <Route path='/classy'>
+                  <Classy />
                 </Route>
                 <Route path='/cube/:cubeId'>
                   <ContextualizedCubePage />
