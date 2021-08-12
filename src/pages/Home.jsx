@@ -19,9 +19,9 @@ export default function Home () {
     'Provides a simple UI to create and manage Magic the Gathering cubes with innovative, exclusive features termed "modules" and "rotations"',
     'Allows you to connect with your friends by sending and receiving bud requests',
     'Allows you and your buds to draft your cubes in real time or generate sealed pools',
-    'Provides a simple deck building tool for both limited decks you assemble through draft or seald here on CLM and for various constructed formats',
+    'Provides a simple deck building tool for both limited decks you assemble on CLM and for various constructed formats',
     'Allows you to play matches with your buds in real time using either decks from a limited event or constructed decks stored on CLM',
-    `Introduces "Classy", an independently managed, constructed format intended to be a brewers paradise with a very large card pool but free from Magic's most opressive cards`
+    `Introduces "Classy", an independently managed, constructed format and brewer's paradise`
   ];
 
   return (

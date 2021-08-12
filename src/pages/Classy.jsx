@@ -11,7 +11,23 @@ import MUIListItemText from '@material-ui/core/ListItemText';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core';
 
+import theme from '../theme';
+
 const useStyles = makeStyles({
+  multiColumnList: {
+    [theme.breakpoints.up('sm')]: {
+      columnCount: 2
+    },
+    [theme.breakpoints.up('md')]: {
+      columnCount: 3
+    },
+    [theme.breakpoints.up('lg')]: {
+      columnCount: 4
+    },
+    [theme.breakpoints.up('xl')]: {
+      columnCount: 5
+    }
+  },
   paragraph: {
     textIndent: 16
   }
@@ -45,7 +61,9 @@ export default function Classy() {
     'Cloudpost',
     'Commandeer',
     'Crashing Footfalls',
+    'Dakmor Salvage',
     'Dark Depths',
+    'Darkblast ',
     'Darksteel Relic',
     'Dig Through Time',
     'Disrupting Shoal',
@@ -74,7 +92,11 @@ export default function Classy() {
     'Glacial Floodplain',
     'Glimpse of Nature',
     'Glimpse of Tomorrow',
+    'Golgari Brownscale',
     'Golgari Grave Troll',
+    'Golgari Thug',
+    'Grave-Shell Scarab',
+    'Greater Mossdog',
     'Grief',
     'Gyruda, Doom of Depths',
     'Hangarback Walker',
@@ -91,6 +113,7 @@ export default function Classy() {
     'Keruga, the Macrosage',
     'Kite Shield',
     'Krark-Clan Ironworks',
+    'Life from the Loam',
     'Living End',
     'Lotus Bloom',
     'Lurrus of the Dream-Den',
@@ -100,13 +123,18 @@ export default function Classy() {
     'Mindbreak Trap',
     'Mine Collapse',
     `Mishra's Bauble`,
+    'Moldervine Cloak',
     'Mouth of Ronom',
     'Mox Amber',
     'Mox Opal',
     'Mox Tantalite',
+    'Mutagenic Growth',
     'Mycosynth Lattice',
     'Mystic Sanctuary',
+    'Necroplasm',
+    'Nightmare Void',
     'Nourishing Shoal',
+    'Noxious Revival',
     'Obosh, the Preypiercer',
     'Oko, Thief of Crowns',
     'Once Upon a Time',
@@ -115,6 +143,7 @@ export default function Classy() {
     'Pact of Negation',
     'Pact of the Titan',
     'Paradise Mantle',
+    'Postmortem Lunge',
     'Profane Tutor',
     'Ravenous Trap',
     'Restore Balance',
@@ -123,6 +152,8 @@ export default function Classy() {
     'Rite of Flame',
     'Scrying Sheets',
     `Sensei's Divining Top`,
+    'Shambling Shell',
+    'Shenanigans',
     'Shimmerdrift Vale',
     'Shining Shoal',
     'Sickening Shoal',
@@ -142,6 +173,7 @@ export default function Classy() {
     'Soul Spike',
     'Spellbook',
     'Spidersilk Net',
+    'Stinkweed Imp',
     'Stonecoil Serpent',
     'Subtlety',
     'Sulfurous Mire',
@@ -189,7 +221,7 @@ export default function Classy() {
             Cards whose mana cost can be reduced to 0 by satisfying certain conditions, such as <a href="https://scryfall.com/card/mm2/215/frogmite" rel="noreferrer" target="_blank">Frogmite</a>, or paying alternative costs such as <a href="https://scryfall.com/card/m15/11/ephemeral-shields" rel="noreferrer" target="_blank">Ephemeral Shields</a> are allowed, so long as those alternative costs typically require a mana investment (it is possible your opponent cast <a href="https://scryfall.com/card/m21/116/necromentia" rel="noreferrer" target="_blank">Necromentia</a> leaving you with 3 zombie tokens which you could use to cast <a href="https://scryfall.com/card/m11/92/demon-of-deaths-gate" rel="noreferrer" target="_blank">Demon of Death's Gate</a>, but since there are no free spells allowed in the Classy format, you generally would have spent mana on the three creatures you are sacrificing).  Therefore, the "Force of" cycle from <a href="https://scryfall.com/sets/mh1?order=set" rel="noreferrer" target="_blank">Modern Horizons</a> and the "Evoke Elemental" cycle from <a href="https://scryfall.com/sets/mh2?order=set" rel="noreferrer" target="_blank">Modern Horizons 2</a> are NOT classy because their alternative costs require the exiling of cards from your hand, which means, in all likelihood, no mana has yet been invested in them.
           </MUITypography>
           <MUITypography className={classes.paragraph} paragraph={true} variant="body2">
-            Another gray area concerns cards which can recur from the graveyard without paying any mana, such as <a href="https://scryfall.com/card/ima/82/bloodghast" rel="noreferrer" target="_blank">Bloodghast</a>.  When graveyard enablers have been too good, modern has been dominated by fast, unfair graveyard decks such as Dredge and Izzet Phoenix.  Since the banning of <a href="https://scryfall.com/card/uma/128/faithless-looting" rel="noreferrer" target="_blank">Faithless Looting</a>, these decks have completely fallen out of favor.  That suggests recursive creatures are often not the problem, but rather cards which too easily enable players to abuse their graveyards.  Extracting value from the graveyard is something many decks seek to do and can really make you feel like a naughty boy.  It is not my desire to preclude players from playing such cards; only that all decks seek to play by the "normal" rules of the game (casting spells, playing to the board, etc...).  Recursive cards are classy.
+            Another gray area concerns cards which can recur from the graveyard without paying any mana, such as <a href="https://scryfall.com/card/ima/82/bloodghast" rel="noreferrer" target="_blank">Bloodghast</a>.  When graveyard enablers have been too good, modern has been dominated by fast, unfair graveyard decks such as dredge and Izzet phoenix.  Since the banning of <a href="https://scryfall.com/card/uma/128/faithless-looting" rel="noreferrer" target="_blank">Faithless Looting</a>, these decks have completely fallen out of favor.  That suggests recursive creatures are often not the problem, but rather cards which too easily enable players to abuse their graveyards.  Extracting value from the graveyard is something many decks seek to do and can really make you feel like a naughty boy.  It is not my desire to preclude players from playing such cards; only that all decks seek to play by the "normal" rules of the game (casting spells, playing to the board, etc...).  Recursive cards are classy.
           </MUITypography>
           <MUITypography align="center" variant="subtitle1">No Companions.</MUITypography>
           <MUITypography className={classes.paragraph} paragraph={true} variant="body2">
@@ -203,7 +235,15 @@ export default function Classy() {
             Tier 0 cards are creatures more often than not.  For example, in Modern, <a href="https://scryfall.com/card/m21/59/opt" rel="noreferrer" target="_blank">Opt</a> is the most ubiquitous one mana blue cantrip, but I don't believe that makes it tier 0.  There simply aren't many options for this sort of effect.  To be exact, as of writing this (August 2021), there are 14 one mana blue instants legal in Modern that draw a card, and Opt is the only one that offers card selection.  If Opt wasn't legal, I don't think decks would start playing <a href="https://scryfall.com/card/cn2/110/fleeting-distraction" rel="noreferrer" target="_blank">Fleeting Distraction</a> or <a href="https://scryfall.com/card/tpr/79/whispers-of-the-muse" rel="noreferrer" target="_blank">Whispers of the Muse</a>.  Those cards just aren't good enough for Modern.  <a href="https://scryfall.com/card/jmp/185/thought-scour" rel="noreferrer" target="_blank">Thought Scour</a> and <a href="https://scryfall.com/card/uma/81/visions-of-beyond" rel="noreferrer" target="_blank">Visions of Beyond</a> do see play in more niche decks, but the bottom line is that Opt just doesn't have a lot of competition.  It is not a busted card that feels miserable to have played against you.  It is a reasonably costed card for the effect it provides.  Decks that are interested in that sort of effect will play it (at least until Midnight Hunt comes out, and then <a href="https://scryfall.com/card/mid/44/consider" rel="noreferrer" target="_blank">Consider</a> will probably replace it in most decks), but decks don't go out of their way to include it.  People don't splash blue just so they can run Opt, which, when that is happening, is another indication of a tier 0 card (such as when all sorts of decks were splashing green in order to play <a href="https://scryfall.com/card/eld/197/oko-thief-of-crowns" rel="noreferrer" target="_blank">Oko, Thief of Crowns</a> before it was finally banned).
           </MUITypography>
           <MUITypography className={classes.paragraph} paragraph={true} variant="body2">
-            Next let's consider <a href="https://scryfall.com/card/mh2/121/dragons-rage-channeler" rel="noreferrer" target="_blank">Dragon's Rage Channeler</a> (DRC), a new card from Modern Horizons 2.  For a single red mana, you get a 1/1 body which lets you surveil any time you cast a non-creature spell.  And if you have 4 or more card types in your graveyard, it gets +2/+2, flying and must attack each combat if able.  After MH2 released, DRC became an instant staple of blue-red, Grixis and Rakdos decks and is also seeing play in Jeskai and Jund builds as well.  These decks were all very solid before DRC, most at or near the top of the metagame.  In terms of it's body, as soon as it was spoiled, it was drawing comparisons to <a href="https://scryfall.com/card/isd/51/delver-of-secrets-insectile-aberration" rel="noreferrer" target="_blank">Delver of Secrets</a>, which only 3 years ago was named by ChannelFireball the 46th best Magic card of all time, and the 7th best creature (<a href="https://strategy.channelfireball.com/all-strategy/tag/top-100-cards/" rel="noreferrer" target="blank">watch the videos here</a>).  DRC blows that card out of the water.  It offers you card selection on every non-creature spell you cast and, unless your opponent has out <a href="https://scryfall.com/card/a25/32/rest-in-peace" rel="noreferrer" target="_blank">Rest in Peace</a> or something, can more reliably be "turned on" than Delver.  At it's core, DRC is a cheap, aggressive, red creature, of which there are dozens only a step behind DRC in terms of their ability to damage your opponent.  Several of them were good enough to see significant Modern play right up until DRC became legal and I am positive that should Wizards of the Coast ever admit DRC was too pushed and ban it, those cards would immediately see, not just play, but considerable success, once again.  So to recap, not only is DRC the best in its class at reliably getting in for damage, it also offers superb card selection, which is huge because one of the ways aggressive decks can lose is by drawing too many lands, and is something which no other red one drop offers at all (even in the inferior version of surveil, scry), AND it helps decks abuse the graveyard by freely putting cards there from your library.  The card does so much more than just about every other red one drop, with the exception of another card introduced in Modern Horizons 2 (<a href="https://scryfall.com/card/mh2/138/ragavan-nimble-pilferer" rel="noreferrer" target="_blank">Ragavan, Nimble Pilferer</a>).  Yes, it does die to removal but so do all other red one drops.  DRC simply does too much, which makes deck building and brewing less interesting.  It is to aggressive decks what <a href="https://scryfall.com/card/thb/229/uro-titan-of-natures-wrath" rel="noreferrer" target="_blank">Uro, Titan of Nature's Wrath</a> was to control decks before it was finally banned.  Cards like this homogenize decks and are NOT classy.
+            Next let's consider <a href="https://scryfall.com/card/mh2/121/dragons-rage-channeler" rel="noreferrer" target="_blank">Dragon's Rage Channeler</a> (DRC), a new card from Modern Horizons 2.  For a single red mana, you get a 1/1 body which lets you surveil any time you cast a non-creature spell.  And if you have 4 or more card types in your graveyard, it gets +2/+2, flying and must attack each combat if able.  After MH2 released, DRC became an instant staple of blue-red, Grixis and Rakdos decks and is also seeing play in Jeskai and Jund builds as well.  These decks were all very solid before DRC, most at or near the top of the metagame.  In terms of it's body, as soon as it was spoiled, it was drawing comparisons to <a href="https://scryfall.com/card/isd/51/delver-of-secrets-insectile-aberration" rel="noreferrer" target="_blank">Delver of Secrets</a>, which only 3 years ago was named by ChannelFireball the 46th best Magic card of all time, and the 7th best creature (you can watch the videos <a href="https://strategy.channelfireball.com/all-strategy/tag/top-100-cards/" rel="noreferrer" target="blank">here</a>).  DRC blows Delver out of the water.  It offers you card selection on every non-creature spell you cast and, unless your opponent has out <a href="https://scryfall.com/card/a25/32/rest-in-peace" rel="noreferrer" target="_blank">Rest in Peace</a> or something, can more reliably be "turned on" than Delver.  At it's core, DRC is a cheap, aggressive, red creature, of which there are dozens only a step behind DRC in terms of their ability to damage your opponent.  Several of them were good enough to see significant Modern play right up until DRC became legal and I am positive that should Wizards of the Coast ever admit DRC was too pushed and ban it, those cards would immediately see, not just play, but considerable success, once again.  So to recap, not only is DRC the best in its class at reliably getting in for damage, it also offers superb card selection, which is huge because one of the ways aggressive decks can lose is by drawing too many lands, and card selection is something which no other red one drop offers at all (even in the inferior version of surveil, scry), AND it helps decks abuse the graveyard by freely putting cards there from your library.  The card does so much more than just about every other red one drop, with the exception of another card introduced in Modern Horizons 2 (<a href="https://scryfall.com/card/mh2/138/ragavan-nimble-pilferer" rel="noreferrer" target="_blank">Ragavan, Nimble Pilferer</a>).  Yes, it does die to removal but so do all other red one drops.  And it is hard to make the argument that a one drop which must be answered quickly or else it will provide loads of value is a reasonable and fair Magic card.  DRC simply does too much, which makes deck building and brewing less interesting.  It is to aggressive decks what <a href="https://scryfall.com/card/thb/229/uro-titan-of-natures-wrath" rel="noreferrer" target="_blank">Uro, Titan of Nature's Wrath</a> was to control decks before it was finally banned.  Cards like this homogenize decks and are NOT classy.
+          </MUITypography>
+          <MUITypography align="center" variant="subtitle1">No Snow.</MUITypography>
+          <MUITypography className={classes.paragraph} paragraph={true} variant="body2">
+            I have always thought snow was so lame.  Other than the fact that two cards now exist (<a href="https://scryfall.com/card/mh2/77/break-the-ice" rel="noreferrer" target="_blank">Break the Ice</a> and <a href="https://scryfall.com/card/khm/21/reidane-god-of-the-worthy-valkmira-protectors-shield" rel="noreferrer" target="_blank">Reidane, God of the Worthy</a>), which don't even see any play because they are pretty narrow and not even that strong as hate cards, snow basic lands are just strict upgrades to basic lands.  They function the exact same way; they just have the word "snow" on them.  So although there is essentially no downside to playing snow basics, there is upside as you get access to cards like <a href="https://scryfall.com/card/khm/79/blood-on-the-snow" rel="noreferrer" target="_blank">Blood on the Snow</a>.  There are also only a few different printings of snow basics, which means your choices for art are limited.  Which is a shame because there is so much cool artwork on basic lands.  My format, my rules; snow is NOT classy.
+          </MUITypography>
+          <MUITypography align="center" variant="subtitle1">No Dredge.</MUITypography>
+          <MUITypography className={classes.paragraph} paragraph={true} variant="body2">
+            Dredge is just a super busted mechanic.  It is a 10 on Mark Rosewater's storm scale (you can read more about that <a href="https://mtg.fandom.com/wiki/Storm_Scale" rel="noreferrer" target="_blank">here</a>), which basically means Wizards of the Coast knows that it was a mistake to ever print.  If you look at a dredge deck, cards with the dredge mechanic are terrible Magic cards, but the fact that they have the dredge mechanic makes them busted as graveyard enablers.  Dredge decks do not seek to play normal games of Magic or even cast many of the spells in their deck.  Dredge cards are NOT classy.
           </MUITypography>
         </React.Fragment>,
       title: 'Core Values and Guiding Principles'
@@ -223,7 +263,7 @@ export default function Classy() {
           <MUITypography className={classes.paragraph} paragraph={true} variant="body2">
             In order to maintain a fair, interesting and balanced environment, in line with the ideals of the Classy format, a banned list is necessary.  This banned list is independent of the banned list for the Modern format.  Notable cards which are currently banned in Modern but are legal in Classy are <a href="https://scryfall.com/card/mm2/129/splinter-twin" rel="noreferrer" target="_blank">Splinter Twin</a> and <a href="https://scryfall.com/card/cmr/84/preordain" rel="noreferrer" target="_blank">Preordain</a>.  Keep in mind that many of these cards are on the list not for power level concerns, but for violating one of the hard rules of the format, such as <a href="https://scryfall.com/card/war/3/ugins-conjurant" rel="noreferrer" target="_blank">Ugin's Conjurant</a>.  The following cards are NOT classy:
           </MUITypography>
-          <MUIList>
+          <MUIList className={classes.multiColumnList}>
             {bannedCards.map((card, index) => (
               <MUIListItem>
                 <MUIListItemText disableTypography={true}>
