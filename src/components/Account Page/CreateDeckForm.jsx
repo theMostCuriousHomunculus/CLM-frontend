@@ -88,6 +88,7 @@ export default function CreateCubeForm ({
                 }}
               >
                 <option value={undefined}>Freeform</option>
+                <option value="Classy">Classy</option>
                 <option value="Legacy">Legacy</option>
                 <option value="Modern">Modern</option>
                 <option value="Pauper">Pauper</option>
