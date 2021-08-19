@@ -9,6 +9,7 @@ import MUICardActions from '@material-ui/core/CardActions';
 import MUISyncIcon from '@material-ui/icons/Sync';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
+import rehypeRaw from 'rehype-raw';
 import { createClient } from 'graphql-ws';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -249,9 +250,9 @@ export default function BlogPost () {
           mutation {
             ${operation}(
               input: {
-                body: "${blogPost.body}",
+                body: """${blogPost.body}""",
                 image: "${blogPost.image}",
-                subtitle: "${blogPost.subtitle}"
+                subtitle: "${blogPost.subtitle}",
                 title: "${blogPost.title}"
               }
             ) {
@@ -390,7 +391,7 @@ export default function BlogPost () {
                     variant="outlined"
                   /> :
                   <article className={classes.article}>
-                    <ReactMarkdown escapeHtml={false} source={blogPost.body} />
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]} children={blogPost.body} />
                   </article>
                 }
               </MUICardContent>
@@ -414,7 +415,7 @@ export default function BlogPost () {
               />
               <MUICardContent>
                 <article className={classes.article}>
-                  <ReactMarkdown escapeHtml={false} source={blogPost.body} />
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]} children={blogPost.body} />
                 </article>
               </MUICardContent>
             </React.Fragment>

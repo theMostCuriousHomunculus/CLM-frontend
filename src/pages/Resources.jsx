@@ -17,8 +17,20 @@ export default function Resources () {
       platform: 'YouTube'
     },
     {
+      description: 'Limited Resources is a place to learn about and improve at Magic: the Gathering with an emphasis on Limited play.',
+      link: 'https://www.youtube.com/c/LimitedResourcesPodcast/featured',
+      name: 'Limited Resources',
+      platform: 'YouTube'
+    },
+    {
+      description: `A channel dedicated to talkin' about the best game ever created - Magic: The Gathering.`,
+      link: 'https://www.youtube.com/c/MiloDaGreat1/featured',
+      name: 'Milo the Gathering',
+      platform: 'YouTube'
+    },
+    {
       description: 'Path to Cube is dedicated to providing current and relevant content relating to cube and it’s ever growing popularity among Magic players.',
-      link: 'https://pathtocube.com/',
+      link: 'https://soundcloud.com/user-184099770',
       name: 'Path to Cube',
       platform: 'Podcast'
     }
