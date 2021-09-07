@@ -16,16 +16,21 @@ import MUITypography from '@material-ui/core/Typography';
 
 import CreateEventForm from './CreateEventForm';
 import Avatar from '../miscellaneous/Avatar';
+import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 export default function EventAccordion ({
-  buds,
-  cubes,
-  events,
   pageClasses
 }) {
 
   const accountId = useParams().accountId;
+  const {
+    accountState: {
+      buds,
+      cubes,
+      events
+    }
+  } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
   const [showEventForm, setShowEventForm] = React.useState(false);
 
@@ -46,15 +51,16 @@ export default function EventAccordion ({
           aria-controls="event-content"
           id="event-header"
         >
-          <MUITypography variant="h5">Events</MUITypography>
+          <MUITypography>Events ({events.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails>
-          <MUITableContainer className={pageClasses.tableContainer}>
+          <MUITableContainer>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Host</MUITableCell>
+                  <MUITableCell>Other Players</MUITableCell>
                   <MUITableCell>Date</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
@@ -66,9 +72,16 @@ export default function EventAccordion ({
                         <Link to={`/event/${event._id}`}>{event.name}</Link>
                       </MUITableCell>
                       <MUITableCell>
-                        <Link to ={`/account/${event.host._id}`}>
+                        <Link to={`/account/${event.host._id}`}>
                           <Avatar alt={event.host.name} size='small' src={event.host.avatar} />
                         </Link>
+                      </MUITableCell>
+                      <MUITableCell style={{ display: 'flex' }}>
+                        {event.players.filter(player => player.account._id !== event.host._id).map(player => (
+                          <Link key={player.account._id} to={`/account/${player.account._id}`}>
+                            <Avatar alt={player.account.name} size='small' src={player.account.avatar} />
+                          </Link>
+                        ))}
                       </MUITableCell>
                       <MUITableCell>
                         {new Date(parseInt(event.createdAt)).toLocaleString()}

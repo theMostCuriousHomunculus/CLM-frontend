@@ -15,23 +15,11 @@ import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
 import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 
-import ConfirmationDialogue from '../miscellaneous/ConfirmationDialog';
+import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import CreateCubeForm from './CreateCubeForm';
-import theme, { backgroundColor } from '../../theme';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-
-const useStyles = makeStyles({
-  iconButton: {
-    background: theme.palette.secondary.main,
-    color: backgroundColor,
-    '&:hover': {
-      background: theme.palette.secondary.dark
-    }
-  }
-});
 
 export default function CubeAccordion ({
   pageClasses
@@ -39,14 +27,13 @@ export default function CubeAccordion ({
 
   const { accountState: { _id, cubes }, deleteCube } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
-  const classes = useStyles();
   const [cubeToDelete, setCubeToDelete] = React.useState({ _id: null, name: null })
   const [showCubeForm, setShowCubeForm] = React.useState(false);
 
   return (
     <React.Fragment>
 
-      <ConfirmationDialogue
+      <ConfirmationDialog
         confirmHandler={() => {
           deleteCube(cubeToDelete._id);
           setCubeToDelete({ _id: null, name: null });
@@ -58,7 +45,7 @@ export default function CubeAccordion ({
         <MUITypography variant="body1">
           This action cannot be undone.  You may want to export your list first.
         </MUITypography>
-      </ConfirmationDialogue>
+      </ConfirmationDialog>
 
       <CreateCubeForm
         open={showCubeForm}
@@ -71,10 +58,10 @@ export default function CubeAccordion ({
           aria-controls="cube-content"
           id="cube-header"
         >
-          <MUITypography variant="h5">Cubes</MUITypography>
+          <MUITypography>Cubes ({cubes.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails>
-          <MUITableContainer className={pageClasses.tableContainer}>
+          <MUITableContainer>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
@@ -97,7 +84,7 @@ export default function CubeAccordion ({
                     {_id === userId &&
                       <MUITableCell>
                         <MUIIconButton
-                          className={classes.iconButton}
+                          className={pageClasses.iconButton}
                           onClick={() => setCubeToDelete({ _id: cube._id, name: cube.name })}
                           size="small"
                         >

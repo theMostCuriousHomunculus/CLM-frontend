@@ -43,14 +43,14 @@ export default function MatchAccordion ({
           aria-controls="match-content"
           id="match-header"
         >
-          <MUITypography variant="h5">Matches</MUITypography>
+          <MUITypography>Matches ({matches.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails>
-          <MUITableContainer className={pageClasses.tableContainer}>
+          <MUITableContainer>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
-                  <MUITableCell>Players</MUITableCell>
+                  <MUITableCell>Opponent</MUITableCell>
                   <MUITableCell>Decks</MUITableCell>
                   <MUITableCell>Event</MUITableCell>
                   <MUITableCell>Date</MUITableCell>
@@ -58,17 +58,18 @@ export default function MatchAccordion ({
               </MUITableHead>
               <MUITableBody>
                 {matches.map(function (match) {
+                  const opponent = match.players.find(player => player.account._id !== accountId);
+
                   return (
                     <MUITableRow key={match._id}>
                       <MUITableCell>
-                        <Link to={`/match/${match._id}`} style={{ alignItems: 'center', display: 'flex' }}>
-                          <Avatar alt={match.players[0].account.name} size='small' src={match.players[0].account.avatar} style={{ marginRight: 16 }} />
-                          {match.players[1] &&
-                            <React.Fragment>
-                              <span> — VERSUS — </span>
-                              <Avatar alt={match.players[1].account.name} size='small' src={match.players[1].account.avatar} style={{ marginLeft: 16 }} />
-                            </React.Fragment>
-                          }
+                        <Link to={`/match/${match._id}`}>
+                          <Avatar
+                            alt={opponent.account.name}
+                            size='small'
+                            src={opponent.account.avatar}
+                            style={{ marginRight: 16 }}
+                          />
                         </Link>
                       </MUITableCell>
                       <MUITableCell>

@@ -15,23 +15,11 @@ import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
 import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 
-import ConfirmationDialogue from '../miscellaneous/ConfirmationDialog';
+import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import CreateDeckForm from './CreateDeckForm';
-import theme, { backgroundColor } from '../../theme';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-
-const useStyles = makeStyles({
-  iconButton: {
-    background: theme.palette.secondary.main,
-    color: backgroundColor,
-    '&:hover': {
-      background: theme.palette.secondary.dark
-    }
-  }
-});
 
 export default function DeckAccordion ({
   pageClasses
@@ -39,14 +27,13 @@ export default function DeckAccordion ({
 
   const { accountState: { _id, decks }, deleteDeck } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
-  const classes = useStyles();
   const [deckToDelete, setDeckToDelete] = React.useState({ _id: null, name: null })
   const [showDeckForm, setShowDeckForm] = React.useState(false);
 
   return (
     <React.Fragment>
 
-      <ConfirmationDialogue
+      <ConfirmationDialog
         confirmHandler={() => {
           deleteDeck(deckToDelete._id);
           setDeckToDelete({ _id: null, name: null });
@@ -58,7 +45,7 @@ export default function DeckAccordion ({
         <MUITypography variant="body1">
           This action cannot be undone.  You may want to export your list first.
         </MUITypography>
-      </ConfirmationDialogue>
+      </ConfirmationDialog>
 
       <CreateDeckForm
         open={showDeckForm}
@@ -71,10 +58,10 @@ export default function DeckAccordion ({
           aria-controls="deck-content"
           id="deck-header"
         >
-          <MUITypography variant="h5">Decks</MUITypography>
+          <MUITypography>Decks ({decks.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails>
-          <MUITableContainer className={pageClasses.tableContainer}>
+          <MUITableContainer>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
@@ -97,7 +84,7 @@ export default function DeckAccordion ({
                     {_id === userId &&
                       <MUITableCell>
                         <MUIIconButton
-                          className={classes.iconButton}
+                          className={pageClasses.iconButton}
                           onClick={() => setDeckToDelete({ _id: deck._id, name: deck.name })}
                           size="small"
                         >

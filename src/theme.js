@@ -13,7 +13,26 @@ const theme = createMuiTheme({
       root: {
         '&$expanded': {
           margin: 4,
-        },
+        }
+      }
+    },
+    MuiAccordionActions: {
+      root: {
+        marginTop: 8,
+        padding: 0
+      }
+    },
+    MuiAccordionDetails: {
+      root: {
+        padding: 0
+      }
+    },
+    MuiAccordionSummary: {
+      content: {
+        margin: 0
+      },
+      root: {
+        padding: '0 4px'
       }
     },
     MuiAppBar: {
