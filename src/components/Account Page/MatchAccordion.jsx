@@ -1,23 +1,25 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import MUIAccordion from '@material-ui/core/Accordion';
+import MUIAccordionActions from '@material-ui/core/AccordionActions';
+import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
+import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
 import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MUITable from '@material-ui/core/Table';
 import MUITableBody from '@material-ui/core/TableBody';
 import MUITableCell from '@material-ui/core/TableCell';
 import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
+import MUITypography from '@material-ui/core/Typography';
 
 import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function MatchCard ({
+export default function MatchAccordion ({
   pageClasses
 }) {
 
@@ -35,9 +37,15 @@ export default function MatchCard ({
         />
       }
       
-      <MUICard>
-        <MUICardHeader title="Matches" />
-        <MUICardContent>
+      <MUIAccordion>
+        <MUIAccordionSummary
+          expandIcon={<MUIExpandMoreIcon />}
+          aria-controls="match-content"
+          id="match-header"
+        >
+          <MUITypography variant="h5">Matches</MUITypography>
+        </MUIAccordionSummary>
+        <MUIAccordionDetails>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
@@ -90,9 +98,10 @@ export default function MatchCard ({
               </MUITableBody>
             </MUITable>
           </MUITableContainer>
-        </MUICardContent>
+        </MUIAccordionDetails>
+
         {accountId === userId &&
-          <MUICardActions>
+          <MUIAccordionActions>
             <MUIButton
               color="primary"
               onClick={() => setShowMatchForm(true)}
@@ -101,9 +110,11 @@ export default function MatchCard ({
             >
               Create a Match
             </MUIButton>
-          </MUICardActions>
+          </MUIAccordionActions>
         }
-      </MUICard>
+
+      </MUIAccordion>
+
     </React.Fragment>
   );
 };

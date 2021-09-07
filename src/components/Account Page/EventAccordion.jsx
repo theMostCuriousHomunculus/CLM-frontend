@@ -1,22 +1,24 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import MUIAccordion from '@material-ui/core/Accordion';
+import MUIAccordionActions from '@material-ui/core/AccordionActions';
+import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
+import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
 import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
+import MUIExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MUITable from '@material-ui/core/Table';
 import MUITableBody from '@material-ui/core/TableBody';
 import MUITableCell from '@material-ui/core/TableCell';
 import MUITableContainer from '@material-ui/core/TableContainer';
 import MUITableHead from '@material-ui/core/TableHead';
 import MUITableRow from '@material-ui/core/TableRow';
+import MUITypography from '@material-ui/core/Typography';
 
 import CreateEventForm from './CreateEventForm';
 import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function EventCard ({
+export default function EventAccordion ({
   buds,
   cubes,
   events,
@@ -24,12 +26,12 @@ export default function EventCard ({
 }) {
 
   const accountId = useParams().accountId;
-  const authentication = React.useContext(AuthenticationContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const [showEventForm, setShowEventForm] = React.useState(false);
 
   return (
     <React.Fragment>
-      {accountId === authentication.userId && cubes.length > 0 &&
+      {accountId === userId && cubes.length > 0 &&
         <CreateEventForm
           buds={buds}
           cubes={cubes}
@@ -38,9 +40,15 @@ export default function EventCard ({
         />
       }
       
-      <MUICard>
-        <MUICardHeader title="Events" />
-        <MUICardContent>
+      <MUIAccordion>
+        <MUIAccordionSummary
+          expandIcon={<MUIExpandMoreIcon />}
+          aria-controls="event-content"
+          id="event-header"
+        >
+          <MUITypography variant="h5">Events</MUITypography>
+        </MUIAccordionSummary>
+        <MUIAccordionDetails>
           <MUITableContainer className={pageClasses.tableContainer}>
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
@@ -71,9 +79,10 @@ export default function EventCard ({
               </MUITableBody>
             </MUITable>
           </MUITableContainer>
-        </MUICardContent>
-        {accountId === authentication.userId &&
-          <MUICardActions>
+        </MUIAccordionDetails>
+
+        {accountId === userId &&
+          <MUIAccordionActions>
             <MUIButton
               color="primary"
               disabled={cubes.length === 0}
@@ -83,9 +92,11 @@ export default function EventCard ({
             >
               {cubes.length === 0 ? 'You must create a cube before hosting an event!' : 'Host an Event'}
             </MUIButton>
-          </MUICardActions>
+          </MUIAccordionActions>
         }
-      </MUICard>
+
+      </MUIAccordion>
+    
     </React.Fragment>
   );
 };

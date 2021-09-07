@@ -9,6 +9,13 @@ const backgroundColor = `#efefef`;
 const theme = createMuiTheme({
   ...defaultTheme,
   overrides: {
+    MuiAccordion: {
+      root: {
+        '&$expanded': {
+          margin: 4,
+        },
+      }
+    },
     MuiAppBar: {
       root: {
         margin: 0,

@@ -1,32 +1,50 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import MUIAccordion from '@material-ui/core/Accordion';
+import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
+import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
+import MUIBadge from '@material-ui/core/Badge';
 import MUIButton from '@material-ui/core/Button';
 import MUICard from '@material-ui/core/Card';
 import MUICardActions from '@material-ui/core/CardActions';
 import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIGrid from '@material-ui/core/Grid';
+import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import MUIExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
+import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
 import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import customSort from '../functions/custom-sort';
-import BudRequests from '../components/Account Page/BudRequests';
-import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
-import CubeCard from '../components/Account Page/CubeCard';
-import DeckCard from '../components/Account Page/DeckCard';
 import Avatar from '../components/miscellaneous/Avatar';
+import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
+import CubeAccordion from '../components/Account Page/CubeAccordion';
+import DeckAccordion from '../components/Account Page/DeckAccordion';
+import EventAccordion from '../components/Account Page/EventAccordion';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import MatchAccordion from '../components/Account Page/MatchAccordion';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
-import EventCard from '../components/Account Page/EventCard';
-import MatchCard from '../components/Account Page/MatchCard';
-import WarningButton from '../components/miscellaneous/WarningButton';
 import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
 const useStyles = makeStyles({
+  badge: {
+    '& > .MuiBadge-badge': {
+      borderRadius: '100%',
+      color: 'white',
+      cursor: 'pointer',
+      height: 28,
+      padding: 4,
+      width: 28
+    }
+  },
+  badgeIcon: {
+    height: 20,
+    width: 20
+  },
   cardHeader: {
     alignItems: 'stretch',
     display: 'flex'
@@ -38,7 +56,7 @@ const useStyles = makeStyles({
     minWidth: 350
   },
   tableContainer: {
-    height: '40vh'
+    maxHeight: 'calc(100vh - 8px)'
   }
 });
 
@@ -46,7 +64,24 @@ export default function Account () {
 
   const accountId = useParams().accountId;
   const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
-  const { loading, accountState, setAccountState, editAccount, fetchAccountByID } = React.useContext(AccountContext);
+  const {
+    loading,
+    accountState: {
+      avatar,
+      buds,
+      cubes,
+      // decks,
+      email,
+      events,
+      matches,
+      name,
+      received_bud_requests,
+      sent_bud_requests
+    },
+    setAccountState,
+    editAccount,
+    fetchAccountByID
+  } = React.useContext(AccountContext);
   const classes = useStyles();
   const [budToDelete, setBudToDelete] = React.useState({ _id: null, avatar: null, name: null })
 
@@ -81,7 +116,7 @@ export default function Account () {
 
         <MUICard>
           <MUICardHeader
-            avatar={<Avatar alt={accountState.name} size='large' src={accountState.avatar} />}
+            avatar={<Avatar alt={name} size='large' src={avatar} />}
             className={classes.cardHeader}
             title={
               <MUITextField
@@ -101,13 +136,13 @@ export default function Account () {
                   width: 300
                 }}
                 type="text"
-                value={accountState.name}
+                value={name}
                 variant="outlined"
               />
             }
             subheader={accountId === userId &&
               <MUITypography color="textSecondary" variant="subtitle1">
-                {accountState.email}
+                {email}
               </MUITypography>
             }
           />
@@ -122,9 +157,9 @@ export default function Account () {
           }
           {isLoggedIn &&
             accountId !== userId &&
-            accountState.buds.filter(bud => bud._id === userId).length === 0 &&
-            accountState.received_bud_requests.filter(request => request._id === userId).length === 0 &&
-            accountState.sent_bud_requests.filter(request => request._id === userId).length === 0 &&
+            buds.filter(bud => bud._id === userId).length === 0 &&
+            received_bud_requests.filter(request => request._id === userId).length === 0 &&
+            sent_bud_requests.filter(request => request._id === userId).length === 0 &&
             // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
             <MUICardActions>
               <MUIButton
@@ -139,56 +174,140 @@ export default function Account () {
           }
         </MUICard>
 
-        <MUIGrid container spacing={0}>
-          <MUIGrid item xs={12} md={6}>
-            <CubeCard pageClasses={classes} />
-          </MUIGrid>
+        <CubeAccordion pageClasses={classes} />
 
-          <MUIGrid item xs={12} md={6}>
-            <DeckCard pageClasses={classes} />
-          </MUIGrid>
+        <DeckAccordion pageClasses={classes} />
 
-          <MUIGrid item xs={12} md={6}>
-            <EventCard
-              buds={accountState.buds}
-              cubes={accountState.cubes}
-              events={accountState.events}
-              pageClasses={classes}
-            />
-          </MUIGrid>
+        <EventAccordion
+          buds={buds}
+          cubes={cubes}
+          events={events}
+          pageClasses={classes}
+        />
 
-          <MUIGrid item xs={12} md={6}>
-            <MatchCard
-              events={accountState.events}
-              matches={accountState.matches}
-              pageClasses={classes}
-            />
-          </MUIGrid>
+        <MatchAccordion
+          events={events}
+          matches={matches}
+          pageClasses={classes}
+        />
 
-          <MUIGrid item xs={12} sm={6} md={4}>
-            <MUICard>
-              <MUICardHeader title="Buds" />
-              <MUIList>
-                {customSort(accountState.buds, ['name']).map(bud => (
-                  <MUIListItem key={bud._id} style={{ justifyContent: 'space-between' }}>
+        <MUIAccordion>
+          <MUIAccordionSummary
+            expandIcon={<MUIExpandMoreIcon />}
+            aria-controls="bud-content"
+            id="bud-header"
+          >
+            <MUITypography variant="h5">Buds</MUITypography>
+          </MUIAccordionSummary>
+          <MUIAccordionDetails>
+            <MUIList style={{ display: 'flex' }}>
+              {customSort(buds, ['name']).map(bud => (
+                <MUIListItem key={bud._id}>
+                  {accountId === userId ?
+                    <MUIBadge
+                      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                      badgeContent={<MUIDeleteForeverIcon className={classes.badgeIcon} />}
+                      className={classes.badge}
+                      color="secondary"
+                      onClick={event => {
+                        if (event.target.closest('span').classList.contains("MuiBadge-colorSecondary")) {
+                          setBudToDelete(bud);
+                        }
+                      }}
+                      overlap="circle"
+                      style={{ transform: 'translate(20px, 20px)' }}
+                    >
+                      <Link to={`/account/${bud._id}`}>
+                        <Avatar alt={bud.name} size='small' src={bud.avatar} />
+                      </Link>
+                    </MUIBadge> :
                     <Link to={`/account/${bud._id}`}>
                       <Avatar alt={bud.name} size='small' src={bud.avatar} />
                     </Link>
-                    {accountId === userId &&
-                      <WarningButton onClick={() => setBudToDelete(bud)}>
-                        Un-Bud
-                      </WarningButton>
-                    }
-                  </MUIListItem>
-                ))}
-              </MUIList>
-            </MUICard>
-          </MUIGrid>
+                  }
+                </MUIListItem>
+              ))}
+            </MUIList>
+          </MUIAccordionDetails>
+        </MUIAccordion>
 
-          {accountId === userId &&
-            <BudRequests />
-          }
-        </MUIGrid>
+        {accountId === userId &&
+          <React.Fragment>
+            <MUIAccordion>
+              <MUIAccordionSummary
+                expandIcon={<MUIExpandMoreIcon />}
+                aria-controls="aspiring-bud-content"
+                id="aspiring-bud-header"
+              >
+                <MUITypography variant="h5">Aspring Buds</MUITypography>
+              </MUIAccordionSummary>
+              <MUIAccordionDetails>
+                <MUIList style={{ display: 'flex' }}>
+                  {received_bud_requests.map(function (request) {
+                    return (
+                      <MUIListItem key={request._id}>
+                        <MUIBadge
+                          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                          badgeContent={<MUINotInterestedIcon className={classes.badgeIcon} />}
+                          className={classes.badge}
+                          color="secondary"
+                          onClick={event => {
+                            if (event.target.closest('span').classList.contains("MuiBadge-colorSecondary")) {
+                              editAccount(`action: "reject",\nother_user_id: "${request._id}"`);
+                            }
+                          }}
+                          overlap="circle"
+                          style={{ transform: 'translate(20px, 20px)' }}
+                        >
+                          <MUIBadge
+                            anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                            badgeContent={<MUIPersonAddIcon className={classes.badgeIcon} />}
+                            className={classes.badge}
+                            color="primary"
+                            onClick={event => {
+                              if (event.target.closest('span').classList.contains("MuiBadge-colorPrimary")) {
+                                editAccount(`action: "accept",\nother_user_id: "${request._id}"`);
+                              }
+                            }}
+                            overlap="circle"
+                          >
+                            <Link to={`/account/${request._id}`}>
+                              <Avatar alt={request.name} size='small' src={request.avatar} />
+                            </Link>
+                          </MUIBadge>
+                        </MUIBadge>
+                      </MUIListItem>
+                    );
+                  })}
+                </MUIList>
+              </MUIAccordionDetails>
+            </MUIAccordion>
+
+            <MUIAccordion>
+              <MUIAccordionSummary
+                expandIcon={<MUIExpandMoreIcon />}
+                aria-controls="pending-bud-content"
+                id="pending-bud-header"
+              >
+                <MUITypography variant="h5">Pending Buds</MUITypography>
+              </MUIAccordionSummary>
+              <MUIAccordionDetails>
+                <MUIList style={{ display: 'flex' }}>
+                  {sent_bud_requests.map(function (request) {
+                    return (
+                      <MUIListItem key={request._id}>
+                        <Link to={`/account/${request._id}`}>
+                          <Avatar alt={request.name} size='small' src={request.avatar} />
+                        </Link>
+                      </MUIListItem>
+                    );
+                  })}
+                </MUIList>
+              </MUIAccordionDetails>
+            </MUIAccordion>
+          </React.Fragment>
+        }
+
       </React.Fragment>
   );
 };
