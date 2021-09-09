@@ -3,7 +3,6 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import Account from '../pages/Account';
-import { AuthenticationContext } from './authentication-context';
 
 export const AccountContext = createContext({
   loading: false,
@@ -26,7 +25,6 @@ export default function ContextualizedAccountPage() {
 
   const accountID = useParams().accountId;
   const history = useHistory();
-  const { userId } = React.useContext(AuthenticationContext);
   const [accountState, setAccountState] = React.useState({
     _id: accountID,
     avatar: '',
@@ -46,6 +44,11 @@ export default function ContextualizedAccountPage() {
     buds {
       _id
       avatar
+      buds {
+        _id
+        avatar
+        name
+      }
       decks {
         _id
         format
@@ -306,14 +309,7 @@ export default function ContextualizedAccountPage() {
   const editAccount = React.useCallback(async function (changes) {
     await sendRequest({
       callback: (data) => {
-        if (changes.includes('send')) {
-          setAccountState(prevState => ({
-            ...prevState,
-            received_bud_requests: [...prevState.received_bud_requests, { _id: userId }]
-          }));
-        } else {
-          setAccountState(data);
-        }
+        setAccountState(data);
       },
       operation: 'editAccount',
       get body() {
@@ -332,7 +328,7 @@ export default function ContextualizedAccountPage() {
         }
       }
     });
-  }, [accountQuery, sendRequest, userId]);
+  }, [accountQuery, sendRequest]);
 
   const fetchAccountByID = React.useCallback(async function () {
     await sendRequest({

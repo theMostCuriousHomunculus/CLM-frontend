@@ -37,6 +37,7 @@ const useStyles = makeStyles({
   },
   budList: {
     display: 'flex',
+    flexWrap: 'wrap',
     '& > .MuiListItem-root': {
       width: 'fit-content'
     }
@@ -49,7 +50,37 @@ export default function BudAccordion () {
   const classes = useStyles();
   const { accountState: { buds, received_bud_requests, sent_bud_requests }, editAccount } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
-  const [budToDelete, setBudToDelete] = React.useState({ _id: null, avatar: null, name: null })
+  const [budToDelete, setBudToDelete] = React.useState({ _id: null, avatar: null, name: null });
+  const [potentialBuds, setPotentialBuds] = React.useState([]);
+
+  React.useEffect(() => {
+    const pbObject = {};
+
+    for (const bud of buds) {
+      for (const budsBud of bud.buds) {
+        if (pbObject[budsBud._id]) {
+          pbObject[budsBud._id].priority++;
+        } else {
+          pbObject[budsBud._id] = {
+            avatar: budsBud.avatar,
+            name: budsBud.name,
+            priority: 1
+          };
+        }
+      }
+    };
+
+    setPotentialBuds(Object.entries(pbObject)
+      .sort((a, b) => b[1].priority - a[1].priority)
+      .map(pb => ({ _id: pb[0], avatar: pb[1].avatar, name: pb[1].name }))
+      .filter(pb => !buds
+        .map(bud => bud._id)
+        .concat([accountId])
+        .concat(received_bud_requests.map(req => req._id))
+        .concat(sent_bud_requests.map(req => req._id))
+        .includes(pb._id)));
+
+  }, [accountId, buds, received_bud_requests, sent_bud_requests]);
 
   return (
     <React.Fragment>
@@ -128,6 +159,32 @@ export default function BudAccordion () {
                       <Link to={`/account/${request._id}`}>
                         <Avatar alt={request.name} size='large' src={request.avatar} />
                       </Link>
+                    </MUIListItem>
+                  );
+                })}
+              </MUIList>
+
+              <MUIListSubheader component="div" id="potential-buds">Potential</MUIListSubheader>
+              <MUIList className={classes.budList}>
+                {potentialBuds.map(function (pb) {
+                  return (
+                    <MUIListItem key={pb._id}>
+                      <MUIBadge
+                        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        badgeContent={<MUIPersonAddIcon className={classes.badgeIcon} />}
+                        className={classes.badge}
+                        color="primary"
+                        onClick={event => {
+                          if (event.target.closest('span').classList.contains("MuiBadge-colorPrimary")) {
+                            editAccount(`action: "send",\nother_user_id: "${pb._id}"`);
+                          }
+                        }}
+                        overlap="circle"
+                      >
+                        <Link to={`/account/${pb._id}`}>
+                          <Avatar alt={pb.name} size='large' src={pb.avatar} />
+                        </Link>
+                      </MUIBadge>
                     </MUIListItem>
                   );
                 })}

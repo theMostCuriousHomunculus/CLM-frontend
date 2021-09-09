@@ -117,7 +117,7 @@ export default function Account () {
             <MUICardActions>
               <MUIButton
                 color="primary"
-                onClick={() => editAccount(`action: "send",\nother_user_id: "${accountId}"`)}
+                onClick={() => editAccount(`action: "send",\nother_user_id: "${accountId}",\nreturn_other: true`)}
                 size="small"
                 variant="contained"
               >
