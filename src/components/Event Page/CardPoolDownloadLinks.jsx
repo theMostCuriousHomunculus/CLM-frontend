@@ -5,11 +5,11 @@ import { CSVLink } from 'react-csv';
 export default function CardPoolDownloadLinks ({ me, others }) {
 
   const usedCardsString = me.mainboard.reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
+    return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
   }, "");
 
   const unUsedCardsString = me.sideboard.reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
+    return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
   }, "");
 
   return (

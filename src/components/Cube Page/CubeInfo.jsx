@@ -1,9 +1,11 @@
 import React from 'react';
 import MUICard from '@material-ui/core/Card';
+import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
+import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
 import Avatar from '../miscellaneous/Avatar';
@@ -13,7 +15,18 @@ import { CubeContext } from '../../contexts/cube-context';
 export default function CubeInfo () {
 
   const { userId } = React.useContext(AuthenticationContext);
-  const { cubeState: { creator, description, name }, editCube } = React.useContext(CubeContext);
+  const {
+    cubeState: {
+      creator,
+      description,
+      mainboard,
+      modules,
+      name,
+      rotations,
+      sideboard
+    },
+    editCube
+  } = React.useContext(CubeContext);
   const [descriptionInput, setDescriptionInput] = React.useState(description);
   const [nameInput, setNameInput] = React.useState(name);
 
@@ -24,6 +37,17 @@ export default function CubeInfo () {
   React.useEffect(() => {
     setNameInput(name);
   }, [name]);
+
+  const mainboardString = mainboard.reduce(function (a, c) {
+    return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
+  }, "");
+
+  const sideboardString = modules.map(module => module.cards).flat()
+    .concat(rotations.map(rotation => rotation.cards).flat())
+    .concat(sideboard)
+    .reduce(function (a, c) {
+      return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
+    }, "");
 
   return (
     <MUICard>
@@ -62,6 +86,18 @@ export default function CubeInfo () {
           variant="outlined"
         />       
       </MUICardContent>
+
+      <MUICardActions>
+        <MUITypography variant="body1">
+          <CSVLink
+            data={`Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n${mainboardString}${sideboardString}`}
+            filename={`${name}.csv`}
+            target="_blank"
+          >
+            Export Cube List to CSV
+          </CSVLink>
+        </MUITypography>
+      </MUICardActions>
     </MUICard>
   );
 };
