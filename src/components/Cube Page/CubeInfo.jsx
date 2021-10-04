@@ -8,6 +8,7 @@ import MUITypography from '@material-ui/core/Typography';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
+import generateCSVList from '../../functions/generate-csv-list';
 import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { CubeContext } from '../../contexts/cube-context';
@@ -37,17 +38,6 @@ export default function CubeInfo () {
   React.useEffect(() => {
     setNameInput(name);
   }, [name]);
-
-  const mainboardString = mainboard.reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
-  }, "");
-
-  const sideboardString = modules.map(module => module.cards).flat()
-    .concat(rotations.map(rotation => rotation.cards).flat())
-    .concat(sideboard)
-    .reduce(function (a, c) {
-      return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
-    }, "");
 
   return (
     <MUICard>
@@ -90,7 +80,12 @@ export default function CubeInfo () {
       <MUICardActions>
         <MUITypography variant="body1">
           <CSVLink
-            data={`Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n${mainboardString}${sideboardString}`}
+            data={generateCSVList(
+              mainboard,
+              modules.map(module => module.cards).flat()
+                .concat(rotations.map(rotation => rotation.cards).flat())
+                .concat(sideboard)
+            )}
             filename={`${name}.csv`}
             target="_blank"
           >

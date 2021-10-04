@@ -1,5 +1,6 @@
 import React from 'react';
 import MUICard from '@material-ui/core/Card';
+import MUICardActions from '@material-ui/core/CardActions';
 import MUICardContent from '@material-ui/core/CardContent';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUIFormControl from '@material-ui/core/FormControl';
@@ -9,14 +10,16 @@ import MUITextField from '@material-ui/core/TextField';
 import MUITypography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
 
+import generateCSVList from '../../functions/generate-csv-list';
 import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { DeckContext } from '../../contexts/deck-context';
+import { CSVLink } from 'react-csv';
 
 export default function DeckInfo () {
 
   const { userId } = React.useContext(AuthenticationContext);
-  const { deckState: { creator, description, format, name }, editDeck } = React.useContext(DeckContext);
+  const { deckState: { creator, description, format, mainboard, name, sideboard }, editDeck } = React.useContext(DeckContext);
   const [descriptionInput, setDescriptionInput] = React.useState(description);
   const [nameInput, setNameInput] = React.useState(name);
 
@@ -84,6 +87,18 @@ export default function DeckInfo () {
           variant="outlined"
         />      
       </MUICardContent>
+
+      <MUICardActions>
+        <MUITypography variant="body1">
+          <CSVLink
+          data={generateCSVList(mainboard, sideboard)}
+          filename={`${name}.csv`}
+          target="_blank"
+          >
+            Export Deck List to CSV
+          </CSVLink>
+        </MUITypography>
+      </MUICardActions>
     </MUICard>
   );
 };

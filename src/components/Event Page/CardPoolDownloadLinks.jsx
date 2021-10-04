@@ -2,21 +2,18 @@ import React from 'react';
 import MUITypography from '@material-ui/core/Typography';
 import { CSVLink } from 'react-csv';
 
+import generateCSVList from '../../functions/generate-csv-list';
+
 export default function CardPoolDownloadLinks ({ me, others }) {
-
-  const usedCardsString = me.mainboard.reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,No,0\n` : a;
-  }, "");
-
-  const unUsedCardsString = me.sideboard.reduce(function (a, c) {
-    return c && c.mtgo_id ? `${a}"${c.name.split(' // ')[0]}",1,${c.mtgo_id}, , , , ,Yes,0\n` : a;
-  }, "");
 
   return (
     <div style={{ margin: 4 }}>
       <MUITypography variant="body1">
         <CSVLink
-          data={`Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n${usedCardsString}${unUsedCardsString}`}
+          data={generateCSVList(
+            me.mainboard,
+            me.sideboard
+          )}
           filename={`${me.account.name}.csv`}
           target="_blank"
         >
