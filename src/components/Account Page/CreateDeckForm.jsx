@@ -74,11 +74,9 @@ export default function CreateCubeForm ({
               <MUISelect
                 fullWidth
                 label="Format"
-                margin="dense"
                 native
                 onChange={event => setFormat(event.target.value)}
                 value={format}
-                variant="outlined"
                 inputProps={{
                   id: 'format-selector'
                 }}

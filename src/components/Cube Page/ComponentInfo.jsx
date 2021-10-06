@@ -93,7 +93,6 @@ export default function ComponentInfo () {
               <MUISelect
                 fullWidth
                 label="Viewing"
-                margin="dense"
                 native
                 onChange={event => {
                   setDisplayState(prevState => ({

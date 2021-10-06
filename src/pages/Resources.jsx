@@ -55,6 +55,12 @@ export default function Resources () {
       link: 'https://www.mtggoldfish.com/',
       name: 'MTGGoldfish',
       platform: 'Web Site'
+    },
+    {
+      description: "'The 540', a Magic: The Gathering podcast from Star City Games, features Justin Parnell and Ryan Overturf discussing their favorite Magic format of all time — Cube!",
+      link: 'https://www.youtube.com/playlist?list=PL5d1KNNFArSNcPm8nmlDOuFpe6u3QYYAL',
+      name: 'The 540',
+      platform: 'YouTube'
     }
   ];
   

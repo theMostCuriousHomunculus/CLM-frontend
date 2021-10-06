@@ -90,11 +90,9 @@ export default function BasicLandAdder ({ submitFunction }) {
             <MUIInputLabel htmlFor="basic-land-name-selector">Basic Land Name</MUIInputLabel>
             <MUISelect
               label="Basic Land Name"
-              margin="dense"
               native
               onChange={event => setBasicLandName(event.target.value)}
               value={basicLandName}
-              variant="outlined"
               inputProps={{
                 id: 'basic-land-name-selector',
                 name: 'basic-land-name'
@@ -115,11 +113,9 @@ export default function BasicLandAdder ({ submitFunction }) {
             <MUIInputLabel htmlFor="set-name-selector">Set Name</MUIInputLabel>
             <MUISelect
               label="Set Name"
-              margin="dense"
               native
               onChange={event => setChosenSetName(event.target.value)}
               value={chosenSetName}
-              variant="outlined"
               inputProps={{
                 id: 'set-name-selector',
                 name: 'set-name'

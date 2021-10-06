@@ -8,6 +8,7 @@ const theme = createTheme({
     MuiAccordion: {
       styleOverrides: {
         root: {
+          borderRadius: 4,
           '&.Mui-expanded': {
             margin: 4,
           }
@@ -130,6 +131,13 @@ const theme = createTheme({
         }
       }
     },
+    MuiListSubheader: {
+      styleOverrides: {
+        root: {
+          backgroundColor
+        }
+      }
+    },
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -137,6 +145,11 @@ const theme = createTheme({
           margin: 4,
           padding: 8
         }
+      }
+    },
+    MuiSelect: {
+      defaultProps: {
+        size: 'small'
       }
     },
     MuiTableCell: {

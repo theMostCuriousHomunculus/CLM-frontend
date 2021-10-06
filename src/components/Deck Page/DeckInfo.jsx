@@ -33,11 +33,9 @@ export default function DeckInfo () {
               disabled={creator._id !== userId}
               fullWidth
               label="Format"
-              margin="dense"
               native
               onChange={event => editDeck(descriptionInput, event.target.value, nameInput)}
               value={format}
-              variant="outlined"
               inputProps={{
                 id: 'format-selector'
               }}
