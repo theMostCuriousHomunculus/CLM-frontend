@@ -101,6 +101,7 @@ export default function Cube () {
             />
           </MUIPaper>
         }
+        
         <CubeDisplay setSelectedCard={setSelectedCard} />
 
       </React.Fragment>
