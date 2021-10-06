@@ -6,7 +6,7 @@ import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
-import { useMediaQuery } from '@material-ui/core';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useParams } from 'react-router';
 
 import theme, { backgroundColor } from '../../theme';
