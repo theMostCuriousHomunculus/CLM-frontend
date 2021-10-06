@@ -1,14 +1,14 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
-import MUIGrid from '@material-ui/core/Grid';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
-import MUITextField from '@material-ui/core/TextField';
-import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
+import MUIButton from '@mui/material/Button';
+import MUICircularProgress from '@mui/material/CircularProgress';
+import MUIGrid from '@mui/material/Grid';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
+import MUITextField from '@mui/material/TextField';
+import { Autocomplete as MUIAutocomplete } from '@mui/lab';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
@@ -165,7 +165,7 @@ export default function ScryfallRequest ({
   }
 
   return (
-    <MUIGrid alignItems="center" container justify="flex-end" spacing={1}>
+    <MUIGrid alignItems="center" container justifyContent="flex-end" spacing={1}>
 
       <MUIGrid item xs={12} md={6} lg={5}>
         <MUIAutocomplete
@@ -189,12 +189,10 @@ export default function ScryfallRequest ({
               {...params}
               inputRef={cardSearchInput}
               label={labelText}
-              margin="dense"
               onKeyUp={(event) => {
                 clearTimeout(timer);
                 scryfallCardSearch(event);
               }}
-              variant="outlined"
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -249,7 +247,7 @@ export default function ScryfallRequest ({
       </MUIGrid>
 
       <MUIGrid item xs={12} lg={2} style={{ textAlign: "right" }}>
-        <MUIButton color="primary" onClick={submitForm} size="small" variant="contained">
+        <MUIButton onClick={submitForm}>
           {buttonText}
         </MUIButton>
       </MUIGrid>

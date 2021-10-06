@@ -1,13 +1,13 @@
 import React from 'react';
-import MUIAutorenewIcon from '@material-ui/icons/Autorenew';
-import MUIBadge from '@material-ui/core/Badge';
-import MUIIconButton from '@material-ui/core/IconButton';
-import MUIPaper from '@material-ui/core/Paper';
-import MUITooltip from '@material-ui/core/Tooltip';
-import MUITypography from '@material-ui/core/Typography';
-import lightGreen from '@material-ui/core/colors/lightGreen';
-import deepOrange from '@material-ui/core/colors/deepOrange';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIAutorenewIcon from '@mui/icons-material/Autorenew';
+import MUIBadge from '@mui/material/Badge';
+import MUIIconButton from '@mui/material/IconButton';
+import MUIPaper from '@mui/material/Paper';
+import MUITooltip from '@mui/material/Tooltip';
+import MUITypography from '@mui/material/Typography';
+import lightGreen from '@mui/material/colors/lightGreen';
+import deepOrange from '@mui/material/colors/deepOrange';
+import { makeStyles } from '@mui/styles';
 
 import theme from '../../theme';
 import HoverPreview from './HoverPreview';
@@ -188,7 +188,7 @@ export default function MagicCard ({
                     badgeContent={counter.counterAmount}
                     className={classes.counterBadge}
                     color="primary"
-                    overlap="circle"
+                    overlap="circular"
                   >
                     <MUITooltip title={counter.counterType}>
                       <div

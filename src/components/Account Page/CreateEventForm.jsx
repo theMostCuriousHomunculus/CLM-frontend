@@ -1,24 +1,24 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUICheckbox from '@material-ui/core/Checkbox';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIFormControlLabel from '@material-ui/core/FormControlLabel';
-import MUIFormGroup from '@material-ui/core/FormGroup';
-import MUIFormLabel from '@material-ui/core/FormLabel';
-import MUIGrid from '@material-ui/core/Grid';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
-import MUISwitch from '@material-ui/core/Switch';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUICheckbox from '@mui/material/Checkbox';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIFormGroup from '@mui/material/FormGroup';
+import MUIFormLabel from '@mui/material/FormLabel';
+import MUIGrid from '@mui/material/Grid';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
+import MUISwitch from '@mui/material/Switch';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
@@ -93,12 +93,10 @@ export default function CreateEventForm ({
               autoFocus
               fullWidth
               label="Event Name"
-              margin="dense"
               onChange={event => setEventName(event.target.value)}
               required={true}
               type="text"
               value={eventName}
-              variant="outlined"
             />
 
             <MUIList component="nav">
@@ -242,7 +240,6 @@ export default function CreateEventForm ({
                   fullWidth
                   InputProps={{ inputProps: { min: 1 } }}
                   label="Cards per Pack"
-                  margin="dense"
                   onBlur={() => {
                     if (cardsPerPack === '') {
                       setCardsPerPack(1);
@@ -252,7 +249,6 @@ export default function CreateEventForm ({
                   required={true}
                   type="number"
                   value={cardsPerPack}
-                  variant="outlined"
                 />
               </MUIGrid>
 
@@ -266,7 +262,6 @@ export default function CreateEventForm ({
                   fullWidth
                   InputProps={{ inputProps: { min: 1 } }}
                   label="Packs per Player"
-                  margin="dense"
                   onBlur={() => {
                     if (packsPerPlayer === '') {
                       setPacksPerPlayer(1);
@@ -276,7 +271,6 @@ export default function CreateEventForm ({
                   required={true}
                   type="number"
                   value={packsPerPlayer}
-                  variant="outlined"
                 />
               </MUIGrid>
             </MUIGrid>
@@ -287,12 +281,7 @@ export default function CreateEventForm ({
               Cancel
             </WarningButton>
 
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
-            >
+            <MUIButton type="submit">
               Create!
             </MUIButton>
           </MUIDialogActions>

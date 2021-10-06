@@ -1,7 +1,7 @@
 import React from 'react';
-import MUIAvatar from '@material-ui/core/Avatar';
-import MUITooltip from '@material-ui/core/Tooltip';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIAvatar from '@mui/material/Avatar';
+import MUITooltip from '@mui/material/Tooltip';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   large: {

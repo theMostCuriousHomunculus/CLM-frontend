@@ -1,13 +1,13 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIInputLabel from '@material-ui/core/InputLabel';
-import MUISelect from '@material-ui/core/Select';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIInputLabel from '@mui/material/InputLabel';
+import MUISelect from '@mui/material/Select';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
 
 import generateCSVList from '../../functions/generate-csv-list';
@@ -59,11 +59,9 @@ export default function DeckInfo () {
             disabled={creator._id !== userId}
             inputProps={{ onBlur: () => editDeck(descriptionInput, format, nameInput) }}
             label="Deck Name"
-            margin="dense"
             onChange={event => setNameInput(event.target.value)}
             type="text"
             value={nameInput}
-            variant="outlined"
           />
         }
         subheader={
@@ -79,12 +77,10 @@ export default function DeckInfo () {
           fullWidth={true}
           inputProps={{ onBlur: () => editDeck(descriptionInput, format, nameInput) }}
           label="Deck Description"
-          margin="dense"
           multiline
           onChange={event => setDescriptionInput(event.target.value)}
           rows={2}
           value={descriptionInput}
-          variant="outlined"
         />      
       </MUICardContent>
 

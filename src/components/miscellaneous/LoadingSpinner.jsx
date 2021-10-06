@@ -1,6 +1,6 @@
 import React from 'react';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
+import MUICircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   loadingContainer: {

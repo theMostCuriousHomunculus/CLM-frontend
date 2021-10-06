@@ -1,10 +1,10 @@
 import React from 'react';
-import MUIBadge from '@material-ui/core/Badge';
-import MUISvgIcon from '@material-ui/core/SvgIcon';
-import MUITooltip from '@material-ui/core/Tooltip';
+import MUIBadge from '@mui/material/Badge';
+import MUISvgIcon from '@mui/material/SvgIcon';
+import MUITooltip from '@mui/material/Tooltip';
 import arrayMove from 'array-move';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import MagicCard from '../miscellaneous/MagicCard';
 import { AuthenticationContext } from '../../contexts/authentication-context';

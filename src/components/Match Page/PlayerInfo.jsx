@@ -1,11 +1,11 @@
 import React from 'react';
 import Draggable from 'react-draggable';
-import MUIBadge from '@material-ui/core/Badge';
-import MUIFavoriteIcon from '@material-ui/icons/Favorite';
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
-import yellow from '@material-ui/core/colors/yellow';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIBadge from '@mui/material/Badge';
+import MUIFavoriteIcon from '@mui/icons-material/Favorite';
+import green from '@mui/material/colors/green';
+import red from '@mui/material/colors/red';
+import yellow from '@mui/material/colors/yellow';
+import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import { AuthenticationContext } from '../../contexts/authentication-context';
@@ -168,7 +168,7 @@ export default function PlayerInfo ({
             </React.Fragment>
           }
           className={classes.energyBadge}
-          overlap='circle'
+          overlap='circular'
           showZero
         >
           <MUIBadge
@@ -179,7 +179,7 @@ export default function PlayerInfo ({
               </React.Fragment>
             }
             className={classes.lifeBadge}
-            overlap='circle'
+            overlap='circular'
             showZero
           >
             <MUIBadge
@@ -190,7 +190,7 @@ export default function PlayerInfo ({
                 </React.Fragment>
               }
               className={classes.poisonBadge}
-              overlap='circle'
+              overlap='circular'
               showZero
             >
               <Avatar

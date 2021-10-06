@@ -1,9 +1,9 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
 
 import MagicCard from '../miscellaneous/MagicCard';
 
@@ -46,10 +46,7 @@ export default function ZoneInspectionDialogue ({
       <MUIDialogActions>
         <MUIButton
           autoFocus
-          color="primary"
           onClick={close}
-          size="small"
-          variant="contained"
         >
           Back To Match
         </MUIButton>

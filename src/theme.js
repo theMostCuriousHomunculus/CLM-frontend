@@ -1,131 +1,168 @@
-import { createMuiTheme } from '@material-ui/core/styles';
-import deepPurple from '@material-ui/core/colors/deepPurple';
-import orange from '@material-ui/core/colors/orange';
-import yellow from '@material-ui/core/colors/yellow';
+import { createTheme } from '@mui/material/styles';
+import { deepPurple, orange, yellow } from '@mui/material/colors';
 
-const defaultTheme = createMuiTheme();
 const backgroundColor = `#efefef`;
 
-const theme = createMuiTheme({
-  ...defaultTheme,
-  overrides: {
+const theme = createTheme({
+  components: {
     MuiAccordion: {
-      root: {
-        '&$expanded': {
-          margin: 4,
+      styleOverrides: {
+        root: {
+          '&.Mui-expanded': {
+            margin: 4,
+          }
         }
       }
     },
     MuiAccordionActions: {
-      root: {
-        marginTop: 8,
-        padding: 0
+      styleOverrides: {
+        root: {
+          marginTop: 8,
+          padding: 0
+        }
       }
     },
     MuiAccordionDetails: {
-      root: {
-        padding: 0
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
       }
     },
     MuiAccordionSummary: {
-      content: {
-        margin: 0
-      },
-      root: {
-        padding: '0 4px'
+      styleOverrides: {
+        content: {
+          margin: 0
+        },
+        root: {
+          padding: '0 4px'
+        }
       }
     },
     MuiAppBar: {
-      root: {
-        margin: 0,
-        padding: 0
+      styleOverrides: {
+        root: {
+          margin: 0,
+          padding: 0
+        }
+      }
+    },
+    MuiButton: {
+      defaultProps: {
+        size: 'small',
+        variant: 'contained'
       }
     },
     MuiCard: {
-      root: {
-        padding: 0
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
       }
     },
     MuiCardActions: {
-      root: {
-        flexDirection: 'row-reverse',
-        justifyContent: 'space-between',
-        padding: 8
-      },
-      spacing: {
-        '& > :not(:first-child)': {
-          marginLeft: 0
+      styleOverrides: {
+        root: {
+          flexDirection: 'row-reverse',
+          justifyContent: 'space-between',
+          padding: 8
+        },
+        spacing: {
+          '& > :not(:first-child)': {
+            marginLeft: 0
+          }
         }
       }
     },
     MuiCardContent: {
-      root: {
-        padding: 8
+      styleOverrides: {
+        root: {
+          padding: 8
+        }
       }
     },
     MuiCardHeader: {
-      action: {
-        marginLeft: 8,
-        marginRight: 0,
-        marginTop: 0
-      },
-      content: {
-        wordBreak: 'break-word'
-      },
-      root: {
-        padding: 8
+      styleOverrides: {
+        action: {
+          marginLeft: 8,
+          marginRight: 0,
+          marginTop: 0
+        },
+        content: {
+          wordBreak: 'break-word'
+        },
+        root: {
+          padding: 8
+        }
       }
     },
     MuiCardMedia: {
-      root: {
-        padding: '56.25% 0 0 0',
-        width: '100%'
+      styleOverrides: {
+        root: {
+          padding: '56.25% 0 0 0',
+          width: '100%'
+        }
       }
     },
     MuiDialogActions: {
-      root: {
-        flexDirection: 'row-reverse',
-        justifyContent: 'space-between',
-        padding: 8
-      },
-      spacing: {
-        '& > :not(:first-child)': {
-          marginLeft: 0
+      styleOverrides: {
+        root: {
+          flexDirection: 'row-reverse',
+          justifyContent: 'space-between',
+          padding: 8
+        },
+        spacing: {
+          '& > :not(:first-child)': {
+            marginLeft: 0
+          }
         }
       }
     },
     MuiGrid: {
-      container: {
-        margin: '0 !important',
-        width: '100% !important'
-      },
-      item: {
-        margin: 0,
-        padding: 0
+      styleOverrides: {
+        container: {
+          margin: '0 !important',
+          width: '100% !important'
+        },
+        item: {
+          margin: 0,
+          padding: 0
+        }
       }
     },
     MuiPaper: {
-      root: {
-        backgroundColor: backgroundColor,
-        margin: 4,
-        padding: 8
+      styleOverrides: {
+        root: {
+          backgroundColor: backgroundColor,
+          margin: 4,
+          padding: 8
+        }
       }
     },
     MuiTableCell: {
-      head: {
-        color: orange[500],
-      },
-      root: {
-        padding: '4px 8px 4px 8px'
-      },
-      stickyHeader: {
-        backgroundColor: deepPurple[500]
+      styleOverrides: {
+        head: {
+          color: orange[500],
+        },
+        root: {
+          padding: '4px 8px 4px 8px'
+        },
+        stickyHeader: {
+          backgroundColor: deepPurple[500]
+        }
       }
     },
     MuiTabs: {
-      root: {
-        backgroundColor: orange,
-        borderRadius: 4
+      styleOverrides: {
+        root: {
+          backgroundColor: orange,
+          borderRadius: 4
+        }
+      }
+    },
+    MuiTextField: {
+      defaultProps: {
+        size: 'small'
       }
     }
   },

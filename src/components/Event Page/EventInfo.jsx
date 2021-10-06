@@ -1,8 +1,8 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIGrid from '@material-ui/core/Grid';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIGrid from '@mui/material/Grid';
 import { Link } from 'react-router-dom';
 
 import Avatar from '../miscellaneous/Avatar';
@@ -16,12 +16,12 @@ export default function InfoSection () {
     <MUICard>
       <MUICardHeader title={name} />
       <MUICardContent>
-        <MUIGrid container justify="space-around" spacing={0}>
+        <MUIGrid container justifyContent="space-around" spacing={0}>
           {players.map(player => (
             <MUIGrid
               container
               item
-              justify="center"
+              justifyContent="center"
               key={player.account._id}
               xs={6}
               sm={3}

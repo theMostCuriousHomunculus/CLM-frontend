@@ -1,17 +1,17 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
-import MUITextField from '@material-ui/core/TextField';
-import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
+import MUIButton from '@mui/material/Button';
+import MUICircularProgress from '@mui/material/CircularProgress';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
+import MUITextField from '@mui/material/TextField';
+import { Autocomplete as MUIAutocomplete } from '@mui/lab';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from '../miscellaneous/HoverPreview';
@@ -154,12 +154,10 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
               {...params}
               inputRef={cardSearchInput}
               label="Search for Tokens"
-              margin="dense"
               onKeyUp={(event) => {
                 clearTimeout(timer);
                 scryfallCardSearch(event);
               }}
-              variant="outlined"
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -225,15 +223,16 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
             step: 1
           }}
           label="Number of Tokens"
-          margin="dense"
           onChange={event => setNumberOfTokens(parseInt(event.target.value))}
           type="number"
           value={numberOfTokens}
-          variant="outlined"
         />
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton color="primary" fullWidth={true} onClick={submitForm} size="small" variant="contained">
+        <MUIButton
+          fullWidth={true}
+          onClick={submitForm}
+        >
           {`Create Token${numberOfTokens === 1 ? '' : 's'}!`}
         </MUIButton>
       </MUIDialogActions>

@@ -1,6 +1,6 @@
 import React from 'react';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles'
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles'
 
 import theme from '../../theme';
 

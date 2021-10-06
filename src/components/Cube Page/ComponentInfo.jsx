@@ -1,16 +1,16 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIInputLabel from '@material-ui/core/InputLabel';
-import MUISelect from '@material-ui/core/Select';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIInputLabel from '@mui/material/InputLabel';
+import MUISelect from '@mui/material/Select';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import CreateComponentForm from './CreateComponentForm';
 import WarningButton from '../miscellaneous/WarningButton';
@@ -28,16 +28,17 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ComponentInfo ({
-  modules,
-  rotations
-}) {
+export default function ComponentInfo () {
 
   const classes = useStyles();
   const { userId } = React.useContext(AuthenticationContext);
   const {
     activeComponentState,
-    cubeState: { creator },
+    cubeState: {
+      creator,
+      modules,
+      rotations
+    },
     displayState,
     setDisplayState,
     deleteModule,
@@ -81,11 +82,9 @@ export default function ComponentInfo ({
                   () => editModule(nameInput)
               }}
               label="Active Component"
-              margin="dense"
               onChange={event => setNameInput(event.target.value)}
               type="text"
               value={nameInput}
-              variant="outlined"
             />
           }
           action={
@@ -103,7 +102,6 @@ export default function ComponentInfo ({
                   }));
                 }}
                 value={activeComponentState._id}
-                variant="outlined"
                 inputProps={{
                   id: 'component-selector'
                 }}
@@ -111,8 +109,8 @@ export default function ComponentInfo ({
               {[
                 { _id: 'mainboard', name: 'Mainboard' },
                 { _id: 'sideboard', name: 'Sideboard' },
-                ...modules,
-                ...rotations
+                ...modules.map(module => ({ _id: module._id, name: module.name })),
+                ...rotations.map(rotation => ({ _id: rotation._id, name: rotation.name, size: rotation.size }))
               ].map(cmpnt => (
                 <option
                   key={cmpnt._id}
@@ -129,12 +127,7 @@ export default function ComponentInfo ({
 
         <MUICardContent className={classes.cardContent}>
           {userId === creator._id &&
-            <MUIButton
-              color="primary"
-              onClick={() => setDialogIsOpen(true)}
-              size="small"
-              variant="contained"
-            >
+            <MUIButton onClick={() => setDialogIsOpen(true)}>
               Create a New Component
             </MUIButton>
           }
@@ -149,11 +142,9 @@ export default function ComponentInfo ({
                 onBlur: editRotation(nameInput, sizeInput),
                 step: 1
               }}
-              margin="dense"
               onChange={event => setSizeInput(event.target.value)}
               type="number"
               value={sizeInput}
-              variant="outlined"
             />
           }
 
@@ -178,7 +169,6 @@ export default function ComponentInfo ({
             autoComplete="off"
             fullWidth
             label="Filter by keywords, name or type"
-            margin="dense"
             onChange={event => {
               event.persist();
               setDisplayState(prevState => ({
@@ -188,7 +178,6 @@ export default function ComponentInfo ({
             }}
             type="text"
             value={displayState.filter}
-            variant="outlined"
           />
         </MUICardActions>
       </MUICard>

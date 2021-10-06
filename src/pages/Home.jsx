@@ -1,16 +1,16 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import MUIArrowRightIcon from '@material-ui/icons/ArrowRight';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemIcon from '@material-ui/core/ListItemIcon';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUITypography from '@material-ui/core/Typography';
+import MUIArrowRightIcon from '@mui/icons-material/ArrowRight';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemIcon from '@mui/material/ListItemIcon';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUITypography from '@mui/material/Typography';
 
 export default function Home () {
 
@@ -45,12 +45,7 @@ export default function Home () {
         </MUIList>
       </MUICardContent>
       <MUICardActions>
-        <MUIButton
-          color="primary"
-          onClick={() => history.push('/cube/60e4a02d0347dc0017bfab0e')}
-          size="small"
-          variant="contained"
-        >
+        <MUIButton onClick={() => history.push('/cube/60e4a02d0347dc0017bfab0e')}>
           Casey's Cube
         </MUIButton>
       </MUICardActions>

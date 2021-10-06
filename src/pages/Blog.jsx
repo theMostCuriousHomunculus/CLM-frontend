@@ -1,14 +1,14 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUICardMedia from '@material-ui/core/CardMedia';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICreateIcon from '@material-ui/icons/Create';
-import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import MUIGrid from '@material-ui/core/Grid';
-import MUITypography from '@material-ui/core/Typography';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUICardMedia from '@mui/material/CardMedia';
+import MUICardActions from '@mui/material/CardActions';
+import MUICreateIcon from '@mui/icons-material/Create';
+import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import MUIGrid from '@mui/material/Grid';
+import MUITypography from '@mui/material/Typography';
 
 import useRequest from '../hooks/request-hook';
 import Avatar from '../components/miscellaneous/Avatar';
@@ -114,11 +114,8 @@ export default function Blog () {
                 />
                 <MUICardActions>
                   <MUIButton
-                    color="primary"
                     onClick={() => history.push('/blog/new-post')}
-                    size="small"
                     startIcon={<MUICreateIcon />}
-                    variant="contained"
                   >
                     Write
                   </MUIButton>
@@ -138,12 +135,7 @@ export default function Blog () {
                   image={blogPost.image}
                 />
                 <MUICardActions>
-                  <MUIButton
-                    color="primary"
-                    onClick={() => history.push(`/blog/${blogPost._id}`)}
-                    size="small"
-                    variant="contained"
-                  >
+                  <MUIButton onClick={() => history.push(`/blog/${blogPost._id}`)}>
                     Read
                   </MUIButton>
                   {blogPost.author._id === authentication.userId &&

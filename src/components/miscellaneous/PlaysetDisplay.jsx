@@ -1,11 +1,11 @@
 import React from 'react';
-import MUIIconButton from '@material-ui/core/IconButton';
-import MUISwapHorizIcon from '@material-ui/icons/SwapHoriz'
-import MUISwapVertIcon from '@material-ui/icons/SwapVert';
-import MUITextField from '@material-ui/core/TextField';
-import MUITooltip from '@material-ui/core/Tooltip';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIIconButton from '@mui/material/IconButton';
+import MUISwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import MUISwapVertIcon from '@mui/icons-material/SwapVert';
+import MUITextField from '@mui/material/TextField';
+import MUITooltip from '@mui/material/Tooltip';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 import { useMediaQuery } from '@material-ui/core';
 import { useParams } from 'react-router';
 
@@ -72,7 +72,6 @@ export default function PlaysetDisplay ({
             paddingTop: 4
           }
         }}
-        margin="dense"
         onChange={event => setUpdatedCount(event.target.value)}
         style={{
           marginLeft: 16,
@@ -81,7 +80,6 @@ export default function PlaysetDisplay ({
         }}
         type="number"
         value={updatedCount}
-        variant="outlined"
       />
       <div style={{ display: 'flex', flexGrow: 1 }}>
         <MUITooltip title={`Move One to ${component === 'mainboard' ? 'Sideboard' : 'Mainboard'}`}>

@@ -1,9 +1,9 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIGrid from '@material-ui/core/Grid';
-import MUITypography from '@material-ui/core/Typography';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIGrid from '@mui/material/Grid';
+import MUITypography from '@mui/material/Typography';
 
 import customSort from '../../functions/custom-sort';
 import specificCardType from '../../functions/specific-card-type';

@@ -1,8 +1,8 @@
 import React from 'react';
-import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import MUIIconButton from '@material-ui/core/IconButton';
+import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import MUIIconButton from '@mui/material/IconButton';
 import { createClient } from 'graphql-ws';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import CardMenu from '../components/Match Page/CardMenu';
 import HelpDialog from '../components/Match Page/HelpDialog';

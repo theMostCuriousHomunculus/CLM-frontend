@@ -1,18 +1,18 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import MUIAccordion from '@material-ui/core/Accordion';
-import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
-import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
-import MUIBadge from '@material-ui/core/Badge';
-import MUIDeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import MUIExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListSubheader from '@material-ui/core/ListSubheader';
-import MUINotInterestedIcon from '@material-ui/icons/NotInterested';
-import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIAccordion from '@mui/material/Accordion';
+import MUIAccordionDetails from '@mui/material/AccordionDetails';
+import MUIAccordionSummary from '@mui/material/AccordionSummary';
+import MUIBadge from '@mui/material/Badge';
+import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import MUIExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListSubheader from '@mui/material/ListSubheader';
+import MUINotInterestedIcon from '@mui/icons-material/NotInterested';
+import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import customSort from '../../functions/custom-sort';
 import Avatar from '../miscellaneous/Avatar';
@@ -127,7 +127,7 @@ export default function BudAccordion () {
                             editAccount(`action: "reject",\nother_user_id: "${request._id}"`);
                           }
                         }}
-                        overlap="circle"
+                        overlap="circular"
                       >
                         <MUIBadge
                           anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
@@ -139,7 +139,7 @@ export default function BudAccordion () {
                               editAccount(`action: "accept",\nother_user_id: "${request._id}"`);
                             }
                           }}
-                          overlap="circle"
+                          overlap="circular"
                         >
                           <Link to={`/account/${request._id}`}>
                             <Avatar alt={request.name} size='large' src={request.avatar} />
@@ -179,7 +179,7 @@ export default function BudAccordion () {
                             editAccount(`action: "send",\nother_user_id: "${pb._id}"`);
                           }
                         }}
-                        overlap="circle"
+                        overlap="circular"
                       >
                         <Link to={`/account/${pb._id}`}>
                           <Avatar alt={pb.name} size='large' src={pb.avatar} />
@@ -207,7 +207,7 @@ export default function BudAccordion () {
                         setBudToDelete(bud);
                       }
                     }}
-                    overlap="circle"
+                    overlap="circular"
                   >
                     <Link to={`/account/${bud._id}`}>
                       <Avatar alt={bud.name} size='large' src={bud.avatar} />

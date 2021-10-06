@@ -1,12 +1,12 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIGrid from '@material-ui/core/Grid';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/styles';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIGrid from '@mui/material/Grid';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   resourceHyperlink: {
@@ -82,10 +82,7 @@ export default function Resources () {
             <MUICardActions>
               <MUIButton
                 className={classes.resourceHyperlink}
-                color="primary"
                 href={resource.link}
-                size="small"
-                variant="contained"
               >
                 Learn More
               </MUIButton>

@@ -1,12 +1,12 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
@@ -46,19 +46,16 @@ export default function CreateCubeForm ({
               autoFocus
               fullWidth
               label="Cube Name"
-              margin="dense"
               onChange={event => setName(event.target.value)}
               required={true}
               type="text"
               value={name}
-              variant="outlined"
             />
 
             <MUITextField
               autoComplete="off"
               fullWidth
               label="Cube Description"
-              margin="dense"
               multiline
               onChange={event => setDescription(event.target.value)}
               required={false}
@@ -66,7 +63,6 @@ export default function CreateCubeForm ({
               style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
               value={description}
-              variant="outlined"
             />
 
             <MUITypography variant="body1">
@@ -77,25 +73,18 @@ export default function CreateCubeForm ({
               autoComplete="off"
               fullWidth
               label="24 character ID from cubecobra URL"
-              margin="dense"
               onChange={event => setCobraID(event.target.value)}
               required={false}
               style={{ marginTop: '8px' }}
               type="text"
               value={cobraID}
-              variant="outlined"
             />
           </MUIDialogContent>
           <MUIDialogActions>
             <WarningButton onClick={toggleOpen}>
               Cancel
             </WarningButton>
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
-            >
+            <MUIButton type="submit">
               Create!
             </MUIButton>
           </MUIDialogActions>

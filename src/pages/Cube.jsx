@@ -1,5 +1,5 @@
 import React from 'react';
-import MUIPaper from '@material-ui/core/Paper';
+import MUIPaper from '@mui/material/Paper';
 import { createClient } from 'graphql-ws';
 
 import ComponentInfo from '../components/Cube Page/ComponentInfo';
@@ -90,10 +90,7 @@ export default function Cube () {
 
         <CubeInfo />
 
-        <ComponentInfo
-          modules={cubeState.modules.map(module => ({ _id: module._id, name: module.name }))}
-          rotations={cubeState.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name, size: rotation.size }))}
-        />
+        <ComponentInfo />
 
         {editable &&
           <MUIPaper style={{ padding: '0 4px', position: 'sticky', top: 4 }}>

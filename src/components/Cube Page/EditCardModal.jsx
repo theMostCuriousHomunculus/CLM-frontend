@@ -1,10 +1,10 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIGrid from '@material-ui/core/Grid';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIGrid from '@mui/material/Grid';
 
 import ChangePrintMenu from './ChangePrintMenu';
 import WarningButton from '../miscellaneous/WarningButton';
@@ -92,12 +92,7 @@ export default function EditCardModal ({
             </MUIGrid>
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
-            >
+            <MUIButton type="submit">
               Submit Changes
             </MUIButton>
             <WarningButton onClick={clear} type="button">Discard Changes</WarningButton>

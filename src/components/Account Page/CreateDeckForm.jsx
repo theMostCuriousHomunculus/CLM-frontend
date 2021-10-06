@@ -1,15 +1,15 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIInputLabel from '@material-ui/core/InputLabel';
-import MUISelect from '@material-ui/core/Select';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIInputLabel from '@mui/material/InputLabel';
+import MUISelect from '@mui/material/Select';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
@@ -50,19 +50,16 @@ export default function CreateCubeForm ({
               autoFocus
               fullWidth
               label="Deck Name"
-              margin="dense"
               onChange={event => setName(event.target.value)}
               required={true}
               type="text"
               value={name}
-              variant="outlined"
             />
 
             <MUITextField
               autoComplete="off"
               fullWidth
               label="Deck Description"
-              margin="dense"
               multiline
               onChange={event => setDescription(event.target.value)}
               required={false}
@@ -70,7 +67,6 @@ export default function CreateCubeForm ({
               style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
               value={description}
-              variant="outlined"
             />
 
             <MUIFormControl variant="outlined">
@@ -103,22 +99,15 @@ export default function CreateCubeForm ({
               autoComplete="off"
               fullWidth
               label="Scyfall Deck ID"
-              margin="dense"
               onChange={event => setDeckID(event.target.value)}
               required={false}
               style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
               value={deckID}
-              variant="outlined"
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
-            >
+            <MUIButton type="submit">
               Create!
             </MUIButton>
             <WarningButton onClick={toggleOpen}>

@@ -1,16 +1,16 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIGrid from '@material-ui/core/Grid';
-import MUIInputLabel from '@material-ui/core/InputLabel';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText'
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
-import MUIPaper from '@material-ui/core/Paper';
-import MUISelect from '@material-ui/core/Select';
-import MUITypography from '@material-ui/core/Typography';
+import MUIButton from '@mui/material/Button';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIGrid from '@mui/material/Grid';
+import MUIInputLabel from '@mui/material/InputLabel';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemText from '@mui/material/ListItemText'
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
+import MUIPaper from '@mui/material/Paper';
+import MUISelect from '@mui/material/Select';
+import MUITypography from '@mui/material/Typography';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
@@ -84,7 +84,7 @@ export default function BasicLandAdder ({ submitFunction }) {
       <div style={{ padding: 4 }}>
         <MUITypography variant="subtitle1">Add Basic Lands to Deck</MUITypography>
       </div>
-      <MUIGrid alignItems="center" container justify="space-between" spacing={1}>
+      <MUIGrid alignItems="center" container justifyContent="space-between" spacing={1}>
         <MUIGrid container item xs={6} md={3}>
           <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
             <MUIInputLabel htmlFor="basic-land-name-selector">Basic Land Name</MUIInputLabel>
@@ -186,13 +186,8 @@ export default function BasicLandAdder ({ submitFunction }) {
           </MUIMenu>
         </MUIGrid>
 
-        <MUIGrid container item justify="flex-end" xs={6} md={3}>
-          <MUIButton
-            color="primary"
-            onClick={() => submitFunction(chosenPrint)}
-            size="small"
-            variant="contained"
-          >
+        <MUIGrid container item justifyContent="flex-end" xs={6} md={3}>
+          <MUIButton onClick={() => submitFunction(chosenPrint)}>
             Add To Deck
           </MUIButton>
         </MUIGrid>

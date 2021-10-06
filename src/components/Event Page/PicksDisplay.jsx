@@ -1,5 +1,5 @@
 import React from 'react';
-import MUITypography from '@material-ui/core/Typography';
+import MUITypography from '@mui/material/Typography';
 
 import BasicLandAdder from '../miscellaneous/BasicLandAdder';
 import SortableList from './SortableList';

@@ -1,5 +1,5 @@
 import React from 'react';
-import MUITypography from '@material-ui/core/Typography';
+import MUITypography from '@mui/material/Typography';
 import { CSVLink } from 'react-csv';
 
 import generateCSVList from '../../functions/generate-csv-list';

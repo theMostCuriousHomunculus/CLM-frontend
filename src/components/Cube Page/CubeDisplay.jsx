@@ -1,9 +1,11 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+// import MUIImageList from '@mui/material/ImageList';
+// import MUIImageListItem from '@mui/material/ImageListItem';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import customSort from '../../functions/custom-sort';
 import generalCardType from '../../functions/general-card-type';
@@ -240,5 +242,16 @@ export default function CubeDisplay ({
         </MUICardContent>
       </MUICard>
     </div>
+    // <MUIImageList cols={5} rowHeight={264} sx={{ width: 961 }}>
+    //   {displayedCards.map(card => (
+    //     <MUIImageListItem key={card._id}>
+    //       <img
+    //         alt={card.name}
+    //         src={card.image}
+    //         style={{ height: 264, width: 189 }}
+    //       />
+    //     </MUIImageListItem>
+    //   ))}
+    // </MUIImageList>
   );
 };

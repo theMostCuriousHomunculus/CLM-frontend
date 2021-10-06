@@ -1,7 +1,7 @@
 import React from 'react';
-import MUICheckbox from '@material-ui/core/Checkbox';
-import MUIGrid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
+import MUICheckbox from '@mui/material/Checkbox';
+import MUIGrid from '@mui/material/Grid';
+import { makeStyles } from '@mui/styles';
 
 import { monoColors } from '../../constants/color-objects';
 import { ReactComponent as WManaSymbol } from '../../svgs/W-mana-symbol.svg';
@@ -84,7 +84,7 @@ export default function ColorCheckboxes ({
   }
 
   return (
-    <MUIGrid container justify="space-around">
+    <MUIGrid container justifyContent="space-around">
       {Array.from(Object.keys(colorObj)).map(color => (
         <MUIGrid className={classes.colorCheckboxContainer} item key={color} xs={4}>
           <MUICheckbox

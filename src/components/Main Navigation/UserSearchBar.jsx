@@ -1,10 +1,11 @@
 import React from 'react';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
-import MUISearchIcon from '@material-ui/icons/Search';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
-import { Autocomplete as MUIAutocomplete } from '@material-ui/lab';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import MUICircularProgress from '@mui/material/CircularProgress';
+import MUISearchIcon from '@mui/icons-material/Search';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
+import { Autocomplete as MUIAutocomplete } from '@mui/lab';
+import { alpha } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
 
 import theme from '../../theme';
 import useRequest from '../../hooks/request-hook';
@@ -28,10 +29,10 @@ const useStyles = makeStyles({
   },
   search: {
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
     position: 'relative',
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     '& .MuiAutocomplete-root': {
       [theme.breakpoints.down('sm')]: {
@@ -136,9 +137,7 @@ export default function UserSearchBar ({
             className={classes.input}
             color="secondary"
             label="Search for Other Users!"
-            margin="dense"
             onKeyUp={searchAccounts}
-            variant="outlined"
             InputProps={{
               ...params.InputProps,
               endAdornment: (

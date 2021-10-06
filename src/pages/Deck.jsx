@@ -1,6 +1,6 @@
 import React from 'react';
 import { createClient } from 'graphql-ws';
-import MUIPaper from '@material-ui/core/Paper';
+import MUIPaper from '@mui/material/Paper';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import DeckDisplay from '../components/miscellaneous/DeckDisplay';

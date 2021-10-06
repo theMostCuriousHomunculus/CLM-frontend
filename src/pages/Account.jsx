@@ -1,13 +1,13 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIPersonAddIcon from '@material-ui/icons/PersonAdd';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import theme, { backgroundColor } from '../theme';
 import Avatar from '../components/miscellaneous/Avatar';
@@ -80,7 +80,6 @@ export default function Account () {
                 disabled={accountId !== userId}
                 inputProps={{ onBlur: event => editAccount(`name: "${event.target.value}"`) }}
                 label="Account Name"
-                margin="dense"
                 onChange={(event) => {
                   event.persist();
                   setAccountState(prevState => ({
@@ -90,7 +89,6 @@ export default function Account () {
                 }}
                 type="text"
                 value={name}
-                variant="outlined"
               />
             }
             subheader={accountId === userId &&
@@ -115,12 +113,7 @@ export default function Account () {
             sent_bud_requests.filter(request => request._id === userId).length === 0 &&
             // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
             <MUICardActions>
-              <MUIButton
-                color="primary"
-                onClick={() => editAccount(`action: "send",\nother_user_id: "${accountId}",\nreturn_other: true`)}
-                size="small"
-                variant="contained"
-              >
+              <MUIButton onClick={() => editAccount(`action: "send",\nother_user_id: "${accountId}",\nreturn_other: true`)}>
                 <MUIPersonAddIcon />
               </MUIButton>
             </MUICardActions>

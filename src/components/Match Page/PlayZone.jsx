@@ -1,9 +1,9 @@
 import React from 'react';
 import Draggable from 'react-draggable';
-import MUIClearIcon from '@material-ui/icons/Clear';
-import blue from '@material-ui/core/colors/blue';
-import orange from '@material-ui/core/colors/orange';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIClearIcon from '@mui/icons-material/Clear';
+import blue from '@mui/material/colors/blue';
+import orange from '@mui/material/colors/orange';
+import { makeStyles } from '@mui/styles';
 
 import MagicCard from '../miscellaneous/MagicCard';
 import PlayerInfo from './PlayerInfo';

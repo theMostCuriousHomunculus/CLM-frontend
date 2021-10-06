@@ -1,11 +1,11 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUITextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUITextField from '@mui/material/TextField';
+import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import useRequest from '../../hooks/request-hook';
@@ -170,12 +170,10 @@ export default function AuthenticateForm ({
               autoFocus
               fullWidth
               label="Email Address"
-              margin="dense"
               onChange={(event) => setEmailInput(event.target.value)}
               required={true}
               type="email"
               value={emailInput}
-              variant="outlined"
             />
 
             {mode === 'Register' &&
@@ -183,13 +181,11 @@ export default function AuthenticateForm ({
                 autoComplete="off"
                 fullWidth
                 label="Account Name"
-                margin="dense"
                 onChange={(event) => setNameInput(event.target.value)}
                 required={true}
                 style={{ marginTop: 16 }}
                 type="text"
                 value={nameInput}
-                variant="outlined"
               />
             }
 
@@ -198,31 +194,22 @@ export default function AuthenticateForm ({
                 autoComplete="off"
                 fullWidth
                 label="Password"
-                margin="dense"
                 onChange={(event) => setPasswordInput(event.target.value)}
                 required={true}
                 style={{ marginTop: 16 }}
                 type="password"
                 value={passwordInput}
-                variant="outlined"
               />
             }
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
-            >
+            <MUIButton type="submit">
               {mode}!
             </MUIButton>
             {mode === 'Login' &&
               <MUIButton
                 color="secondary"
                 onClick={() => setMode('Reset Password')}
-                size="small"
-                variant="contained"
               >
                 Forgot Your Password?
               </MUIButton>

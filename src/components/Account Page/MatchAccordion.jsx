@@ -1,18 +1,18 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import MUIAccordion from '@material-ui/core/Accordion';
-import MUIAccordionActions from '@material-ui/core/AccordionActions';
-import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
-import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
-import MUIButton from '@material-ui/core/Button';
-import MUIExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MUITable from '@material-ui/core/Table';
-import MUITableBody from '@material-ui/core/TableBody';
-import MUITableCell from '@material-ui/core/TableCell';
-import MUITableContainer from '@material-ui/core/TableContainer';
-import MUITableHead from '@material-ui/core/TableHead';
-import MUITableRow from '@material-ui/core/TableRow';
-import MUITypography from '@material-ui/core/Typography';
+import MUIAccordion from '@mui/material/Accordion';
+import MUIAccordionActions from '@mui/material/AccordionActions';
+import MUIAccordionDetails from '@mui/material/AccordionDetails';
+import MUIAccordionSummary from '@mui/material/AccordionSummary';
+import MUIButton from '@mui/material/Button';
+import MUIExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MUITable from '@mui/material/Table';
+import MUITableBody from '@mui/material/TableBody';
+import MUITableCell from '@mui/material/TableCell';
+import MUITableContainer from '@mui/material/TableContainer';
+import MUITableHead from '@mui/material/TableHead';
+import MUITableRow from '@mui/material/TableRow';
+import MUITypography from '@mui/material/Typography';
 
 import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
@@ -103,12 +103,7 @@ export default function MatchAccordion ({
 
         {accountId === userId &&
           <MUIAccordionActions>
-            <MUIButton
-              color="primary"
-              onClick={() => setShowMatchForm(true)}
-              size="small"
-              variant="contained"
-            >
+            <MUIButton onClick={() => setShowMatchForm(true)}>
               Create a Match
             </MUIButton>
           </MUIAccordionActions>

@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useHistory, useParams } from 'react-router-dom';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUISyncIcon from '@material-ui/icons/Sync';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUICardActions from '@mui/material/CardActions';
+import MUISyncIcon from '@mui/icons-material/Sync';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
 import rehypeRaw from 'rehype-raw';
 import { createClient } from 'graphql-ws';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import theme, { backgroundColor } from '../theme';
 import useRequest from '../hooks/request-hook';
@@ -303,7 +303,6 @@ export default function BlogPost () {
                   <MUITextField
                     fullWidth
                     label="Title"
-                    margin="dense"
                     onChange={event => {
                       event.persist();
                       setBlogPost(prevState => ({
@@ -313,7 +312,6 @@ export default function BlogPost () {
                     }}
                     type="text"
                     value={blogPost.title}
-                    variant="outlined"
                   />
                 }
                 subheader={
@@ -321,7 +319,6 @@ export default function BlogPost () {
                     <MUITextField
                       fullWidth
                       label="Subtitle"
-                      margin="dense"
                       onChange={event => {
                         event.persist();
                         setBlogPost(prevState => ({
@@ -332,12 +329,10 @@ export default function BlogPost () {
                       style={{ marginTop: 16 }}
                       type="text"
                       value={blogPost.subtitle}
-                      variant="outlined"
                     />
                     <MUITextField
                       fullWidth
                       label="Image"
-                      margin="dense"
                       onChange={event => {
                         event.persist();
                         setBlogPost(prevState => ({
@@ -348,7 +343,6 @@ export default function BlogPost () {
                       style={{ marginTop: 16 }}
                       type="text"
                       value={blogPost.image}
-                      variant="outlined"
                     />
                     <MUITypography color="textSecondary" variant="body2">
                       A work of genius by {blogPost.author.name}.
@@ -364,8 +358,6 @@ export default function BlogPost () {
                   <MUIButton
                     color="secondary"
                     onClick={() => setViewMode(currentViewMode => currentViewMode === 'Edit' ? 'Live' : 'Edit')}
-                    size="small"
-                    variant="contained"
                   >
                     {viewMode === 'Edit' ? 'Switch to Live View' : 'Switch to Edit View'}
                   </MUIButton>
@@ -376,7 +368,6 @@ export default function BlogPost () {
                   <MUITextField
                     fullWidth
                     label="Body"
-                    margin="dense"
                     multiline
                     onChange={event => {
                       event.persist();
@@ -388,7 +379,6 @@ export default function BlogPost () {
                     rows={20}
                     type="text"
                     value={blogPost.body}
-                    variant="outlined"
                   /> :
                   <article className={classes.article}>
                     <ReactMarkdown rehypePlugins={[rehypeRaw]} children={blogPost.body} />
@@ -396,12 +386,7 @@ export default function BlogPost () {
                 }
               </MUICardContent>
               <MUICardActions>
-                <MUIButton
-                  color="primary"
-                  type="submit"
-                  size="small"
-                  variant="contained"
-                >
+                <MUIButton type="submit">
                   {blogPostID === 'new-post' ? 'Publish' : <MUISyncIcon />}
                 </MUIButton>
               </MUICardActions>
@@ -440,13 +425,11 @@ export default function BlogPost () {
                     autoComplete="off"
                     fullWidth
                     inputRef={newComment}
-                    margin="dense"
                     multiline
                     rows={2}
                     type="text"
-                    variant="outlined"
                   />
-                  <MUIButton color="primary" fullWidth={false} size="small" type="submit" variant="contained">
+                  <MUIButton type="submit">
                     Preach!
                   </MUIButton>
                 </form>

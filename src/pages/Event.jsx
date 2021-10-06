@@ -1,8 +1,8 @@
 import React from 'react';
-import MUIPaper from '@material-ui/core/Paper';
-import MUITab from '@material-ui/core/Tab';
-import MUITabs from '@material-ui/core/Tabs';
-import MUITypography from '@material-ui/core/Typography';
+import MUIPaper from '@mui/material/Paper';
+import MUITab from '@mui/material/Tab';
+import MUITabs from '@mui/material/Tabs';
+import MUITypography from '@mui/material/Typography';
 import arrayMove from 'array-move';
 import { createClient } from 'graphql-ws';
 

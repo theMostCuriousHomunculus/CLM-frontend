@@ -1,9 +1,9 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUICard from '@mui/material/Card';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUICardContent from '@mui/material/CardContent';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import { MatchContext } from '../../contexts/match-context';
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import MUIButton from '@material-ui/core/Button';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUITextField from '@material-ui/core/TextField';
+import MUIButton from '@mui/material/Button';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUITextField from '@mui/material/TextField';
 
 import useRequest from '../hooks/request-hook';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
@@ -74,39 +74,28 @@ export default function PasswordReset () {
                 fullWidth
                 inputRef={emailInput}
                 label="Email Address"
-                margin="dense"
                 required={true}
                 type="email"
-                variant="outlined"
               />
               <MUITextField
                 fullWidth
                 inputRef={passwordInput}
                 label="New Password"
-                margin="dense"
                 required={true}
                 type="password"
-                variant="outlined"
               />
               <MUITextField
                 fullWidth
                 inputRef={confirmPasswordInput}
                 label="Confirm New Password"
-                margin="dense"
                 required={true}
                 type="password"
-                variant="outlined"
               />
             </React.Fragment>
           }
         </MUICardContent>
         <MUICardActions>
-          <MUIButton
-            color="primary"
-            size="small"
-            type="submit"
-            variant="contained"
-          >
+          <MUIButton type="submit">
             Submit!
           </MUIButton>
         </MUICardActions>

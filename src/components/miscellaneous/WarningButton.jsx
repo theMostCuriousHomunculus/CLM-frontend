@@ -1,6 +1,6 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import { makeStyles } from '@mui/styles';
 
 import theme from '../../theme';
 
@@ -26,9 +26,7 @@ export default function WarningButton ({
       className={useStyles().warningButton}
       fullWidth={!!fullWidth}
       onClick={onClick}
-      size="small"
       startIcon={startIcon}
-      variant="contained"
     >
       {children}
     </MUIButton>

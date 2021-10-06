@@ -1,6 +1,6 @@
 import React from 'react';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
 
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { MatchContext } from '../../contexts/match-context';

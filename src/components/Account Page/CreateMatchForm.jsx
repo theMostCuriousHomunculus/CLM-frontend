@@ -1,21 +1,21 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIFormControlLabel from '@material-ui/core/FormControlLabel';
-import MUIFormLabel from '@material-ui/core/FormLabel';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
-import MUIRadio from '@material-ui/core/Radio';
-import MUIRadioGroup from '@material-ui/core/RadioGroup';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIFormLabel from '@mui/material/FormLabel';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
+import MUIRadio from '@mui/material/Radio';
+import MUIRadioGroup from '@mui/material/RadioGroup';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
@@ -221,12 +221,7 @@ export default function CreateMatchForm ({
 
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton
-              color="primary"
-              size="small"
-              type="submit"
-              variant="contained"
-            >
+            <MUIButton type="submit">
               Whoop that Ass!
             </MUIButton>
             <WarningButton onClick={toggleOpen}>

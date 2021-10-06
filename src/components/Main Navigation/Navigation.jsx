@@ -1,10 +1,10 @@
 import React from 'react';
-import MUIAppBar from '@material-ui/core/AppBar';
-import MUIDrawer from '@material-ui/core/Drawer';
-import MUIToolbar from '@material-ui/core/Toolbar';
-import MUITypography from '@material-ui/core/Typography';
-import MUIMenuIcon from '@material-ui/icons/Menu';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIAppBar from '@mui/material/AppBar';
+import MUIDrawer from '@mui/material/Drawer';
+import MUIToolbar from '@mui/material/Toolbar';
+import MUITypography from '@mui/material/Typography';
+import MUIMenuIcon from '@mui/icons-material/Menu';
+import { makeStyles } from '@mui/styles';
 import { withRouter } from 'react-router-dom';
 
 import AuthenticateForm from './AuthenticateForm';

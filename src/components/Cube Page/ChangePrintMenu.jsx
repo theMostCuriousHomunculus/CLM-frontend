@@ -1,10 +1,10 @@
 import React from 'react';
-import MUICircularProgress from '@material-ui/core/CircularProgress';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUIMenu from '@material-ui/core/Menu';
-import MUIMenuItem from '@material-ui/core/MenuItem';
+import MUICircularProgress from '@mui/material/CircularProgress';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUIMenu from '@mui/material/Menu';
+import MUIMenuItem from '@mui/material/MenuItem';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from '../miscellaneous/HoverPreview';

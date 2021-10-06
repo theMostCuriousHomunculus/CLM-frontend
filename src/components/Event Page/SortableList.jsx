@@ -1,6 +1,6 @@
 import React from 'react';
 import { SortableContainer } from 'react-sortable-hoc';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import SortableCard from './SortableCard';
 

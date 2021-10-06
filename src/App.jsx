@@ -1,7 +1,7 @@
 import React from 'react';
 import Cookies from 'js-cookie';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 import useRequest from './hooks/request-hook';
 import ErrorDialog from './components/miscellaneous/ErrorDialog';

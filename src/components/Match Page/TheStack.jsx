@@ -1,8 +1,8 @@
 import React from 'react';
 import Draggable from 'react-draggable';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
 
 import theme from '../../theme';
 import MagicCard from '../miscellaneous/MagicCard';

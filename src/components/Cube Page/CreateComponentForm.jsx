@@ -1,15 +1,15 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUIFormControl from '@material-ui/core/FormControl';
-import MUIFormControlLabel from '@material-ui/core/FormControlLabel';
-import MUIFormLabel from '@material-ui/core/FormLabel';
-import MUIRadio from '@material-ui/core/Radio';
-import MUIRadioGroup from '@material-ui/core/RadioGroup';
-import MUITextField from '@material-ui/core/TextField';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIFormLabel from '@mui/material/FormLabel';
+import MUIRadio from '@mui/material/Radio';
+import MUIRadioGroup from '@mui/material/RadioGroup';
+import MUITextField from '@mui/material/TextField';
 
 import WarningButton from '../miscellaneous/WarningButton';
 import { CubeContext } from '../../contexts/cube-context';
@@ -45,12 +45,10 @@ export default function CreateComponentForm ({
           autoFocus
           fullWidth
           label="New Component Name"
-          margin="dense"
           onChange={event => setNewNameInput(event.target.value)}
           required={true}
           type="text"
           value={newNameInput}
-          variant="outlined"
         />
 
         <MUIFormControl component="fieldset" required={true} style={{ marginTop: 8 }}>
@@ -67,7 +65,7 @@ export default function CreateComponentForm ({
 
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton color="primary" onClick={addComponent} size="small" variant="contained">
+        <MUIButton onClick={addComponent}>
           Create!
         </MUIButton>
         <WarningButton onClick={toggleOpen}>

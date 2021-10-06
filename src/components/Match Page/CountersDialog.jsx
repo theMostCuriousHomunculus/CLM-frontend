@@ -1,10 +1,10 @@
 import React from 'react';
-import MUIButton from '@material-ui/core/Button';
-import MUIDialog from '@material-ui/core/Dialog';
-import MUIDialogActions from '@material-ui/core/DialogActions';
-import MUIDialogContent from '@material-ui/core/DialogContent';
-import MUIDialogTitle from '@material-ui/core/DialogTitle';
-import MUITextField from '@material-ui/core/TextField';
+import MUIButton from '@mui/material/Button';
+import MUIDialog from '@mui/material/Dialog';
+import MUIDialogActions from '@mui/material/DialogActions';
+import MUIDialogContent from '@mui/material/DialogContent';
+import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUITextField from '@mui/material/TextField';
 
 import { MatchContext } from '../../contexts/match-context';
 
@@ -36,12 +36,10 @@ export default function CountersDialog ({
             autoFocus
             fullWidth
             label="Type"
-            margin="dense"
             onChange={event => setCounterType(event.target.value)}
             required={true}
             type="text"
             value={counterType}
-            variant="outlined"
           />
           <MUITextField
             autoComplete="off"
@@ -50,21 +48,14 @@ export default function CountersDialog ({
               min: 0
             }}
             label="Amount"
-            margin="dense"
             onChange={event => setCounterAmount(event.target.value)}
             required={true}
             type="number"
             value={counterAmount}
-            variant="outlined"
           />
         </MUIDialogContent>
         <MUIDialogActions>
-          <MUIButton
-            color="primary"
-            size="small"
-            type="submit"
-            variant="contained"
-          >
+          <MUIButton type="submit">
             Adjust
           </MUIButton>
         </MUIDialogActions>

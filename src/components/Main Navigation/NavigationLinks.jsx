@@ -1,15 +1,15 @@
 import React from 'react';
-import MUIAccountCircleIcon from '@material-ui/icons/AccountCircle';
-import MUIAllInclusiveIcon from '@material-ui/icons/AllInclusive';
-import MUIChatOutlinedIcon from '@material-ui/icons/ChatOutlined';
-import MUIExitToAppIcon from '@material-ui/icons/ExitToApp';
-import MUIHelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import MUIHomeIcon from '@material-ui/icons/Home';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemIcon from '@material-ui/core/ListItemIcon';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import { makeStyles } from '@material-ui/core/styles';
+import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
+import MUIAllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import MUIExitToAppIcon from '@mui/icons-material/ExitToApp';
+import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import MUIHomeIcon from '@mui/icons-material/Home';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemIcon from '@mui/material/ListItemIcon';
+import MUIListItemText from '@mui/material/ListItemText';
+import { makeStyles } from '@mui/styles';
 
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';

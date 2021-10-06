@@ -1,10 +1,10 @@
 import React from 'react';
-import MUICard from '@material-ui/core/Card';
-import MUICardActions from '@material-ui/core/CardActions';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUITextField from '@material-ui/core/TextField';
-import MUITypography from '@material-ui/core/Typography';
+import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUITextField from '@mui/material/TextField';
+import MUITypography from '@mui/material/Typography';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
@@ -48,11 +48,9 @@ export default function CubeInfo () {
             disabled={userId !== creator._id}
             inputProps={{ onBlur: () => editCube(descriptionInput, nameInput) }}
             label="Cube Name"
-            margin="dense"
             onChange={event => setNameInput(event.target.value)}
             type="text"
             value={nameInput}
-            variant="outlined"
           />
         }
         subheader={
@@ -68,12 +66,10 @@ export default function CubeInfo () {
           fullWidth={true}
           inputProps={{ onBlur: () => editCube(descriptionInput, nameInput) }}
           label="Cube Description"
-          margin="dense"
           multiline
           onChange={event => setDescriptionInput(event.target.value)}
           rows={2}
           value={descriptionInput}
-          variant="outlined"
         />       
       </MUICardContent>
 

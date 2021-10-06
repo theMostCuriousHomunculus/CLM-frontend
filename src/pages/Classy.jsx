@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import MUIArrowRightIcon from '@material-ui/icons/ArrowRight';
-import MUICard from '@material-ui/core/Card';
-import MUICardContent from '@material-ui/core/CardContent';
-import MUICardHeader from '@material-ui/core/CardHeader';
-import MUIList from '@material-ui/core/List';
-import MUIListItem from '@material-ui/core/ListItem';
-import MUIListItemIcon from '@material-ui/core/ListItemIcon';
-import MUIListItemText from '@material-ui/core/ListItemText';
-import MUITypography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core';
+import MUIArrowRightIcon from '@mui/icons-material/ArrowRight';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIList from '@mui/material/List';
+import MUIListItem from '@mui/material/ListItem';
+import MUIListItemIcon from '@mui/material/ListItemIcon';
+import MUIListItemText from '@mui/material/ListItemText';
+import MUITypography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 
 import theme from '../theme';
 
