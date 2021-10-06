@@ -1,4 +1,5 @@
 import React from 'react';
+import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUIButton from '@mui/material/Button';
 import MUICircularProgress from '@mui/material/CircularProgress';
 import MUIGrid from '@mui/material/Grid';
@@ -8,7 +9,6 @@ import MUIListItemText from '@mui/material/ListItemText';
 import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
 import MUITextField from '@mui/material/TextField';
-import { Autocomplete as MUIAutocomplete } from '@mui/lab';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
@@ -26,7 +26,6 @@ export default function ScryfallRequest ({
   const [timer, setTimer] = React.useState();
   const [cardSearchResults, setCardSearchResults] = React.useState([]);
   const [chosenCard, setChosenCard] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
 
   const scryfallCardSearch = React.useCallback(event => {
     event.persist();
@@ -167,22 +166,23 @@ export default function ScryfallRequest ({
   return (
     <MUIGrid alignItems="center" container justifyContent="flex-end" spacing={1}>
 
-      <MUIGrid item xs={12} md={6} lg={5}>
+      <MUIGrid
+        item
+        xs={12}
+        md={6}
+        lg={5}
+      >
         <MUIAutocomplete
           clearOnBlur={false}
           clearOnEscape={true}
           getOptionLabel={(option) => option.name}
-          getOptionSelected={(option, value) => option.oracle_id === value.oracle_id}
           id="card-search-input"
           loading={loading}
           onChange={function (event, value, reason) {
-            if (reason === 'select-option') {
+            if (reason === 'selectOption') {
               scryfallPrintSearch(value.oracle_id);
             }
           }}
-          onClose={() => setOpen(false)}
-          onOpen={() => setOpen(true)}
-          open={open}
           options={cardSearchResults}
           renderInput={params => (
             <MUITextField
@@ -208,11 +208,15 @@ export default function ScryfallRequest ({
       </MUIGrid>
 
       <MUIGrid item xs={12} md={6} lg={5}>
-        <MUIList component="nav" dense={true}>
+        <MUIList
+          component="nav"
+          dense={true}
+        >
           <MUIListItem
-            button
             aria-haspopup="true"
             aria-controls="lock-menu"
+            button
+            id="scryfall-print-selector"
             onClick={event => setAnchorEl(event.currentTarget)}
           >
             <MUIListItemText
@@ -224,29 +228,39 @@ export default function ScryfallRequest ({
         <MUIMenu
           id="printing"
           anchorEl={anchorEl}
-          keepMounted
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
+          MenuListProps={{
+            'aria-labelledby': 'scryfall-print-selector',
+            role: 'listbox',
+          }}
         >
           {availablePrintings.map((option, index) => (
-            <span key={option.scryfall_id}>
-              <HoverPreview back_image={option.back_image} image={option.image}>
-                <MUIMenuItem
-                  onClick={() => {
-                    setChosenCard({ ...availablePrintings[index] });
-                    setAnchorEl(null);
-                  }}
-                  selected={option.scryfall_id === chosenCard.scryfall_id}
-                >
-                  {`${option.set_name} - ${option.collector_number}`}
-                </MUIMenuItem>
-              </HoverPreview>
-            </span>
+            <HoverPreview
+              back_image={option.back_image}
+              image={option.image}
+              key={option.scryfall_id}
+            >
+              <MUIMenuItem
+                onClick={() => {
+                  setChosenCard({ ...availablePrintings[index] });
+                  setAnchorEl(null);
+                }}
+                selected={option.scryfall_id === chosenCard.scryfall_id}
+              >
+                {`${option.set_name} - ${option.collector_number}`}
+              </MUIMenuItem>
+            </HoverPreview>
           ))}
         </MUIMenu>
       </MUIGrid>
 
-      <MUIGrid item xs={12} lg={2} style={{ textAlign: "right" }}>
+      <MUIGrid
+        item
+        xs={12}
+        lg={2}
+        style={{ textAlign: "right" }}
+      >
         <MUIButton onClick={submitForm}>
           {buttonText}
         </MUIButton>

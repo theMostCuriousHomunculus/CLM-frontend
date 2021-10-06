@@ -1,9 +1,9 @@
 import React from 'react';
+import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUICircularProgress from '@mui/material/CircularProgress';
 import MUISearchIcon from '@mui/icons-material/Search';
 import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
-import { Autocomplete as MUIAutocomplete } from '@mui/lab';
 import { alpha } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 
@@ -77,7 +77,7 @@ export default function UserSearchBar ({
 }) {
 
   const { loading, sendRequest } = useRequest();
-  const [open, setOpen] = React.useState(false);
+  // const [open, setOpen] = React.useState(false);
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
 
@@ -118,18 +118,14 @@ export default function UserSearchBar ({
         clearOnBlur={false}
         clearOnEscape={true}
         getOptionLabel={(option) => option.name}
-        getOptionSelected={(option, value) => option.name === value.name}
         loading={loading}
         onChange={function (event, value, reason) {
-          if (reason === 'select-option') {
+          if (reason === 'selectOption') {
             history.push(`/account/${value._id}`);
             setUserSearchResults([]);
             setDrawerOpen(false);
           }
         }}
-        onClose={() => setOpen(false)}
-        onOpen={() => setOpen(true)}
-        open={open}
         options={userSearchResults}
         renderInput={(params) => (
           <MUITextField
@@ -149,12 +145,21 @@ export default function UserSearchBar ({
             }}
           />
         )}
-        renderOption={(option) => {
+        renderOption={(props, option) => {
           return (
-            <div className={classes.option}>
-              <Avatar alt={option.name} size='small' src={option.avatar} />
-              <MUITypography variant="body1">{option.name}</MUITypography>
-            </div>
+            <li
+              className={classes.option}
+              {...props}
+            >
+              <Avatar
+                alt={option.name}
+                size='small'
+                src={option.avatar}
+              />
+              <MUITypography variant="body1">
+                {option.name}
+              </MUITypography>
+            </li>
           );
         }}
       />

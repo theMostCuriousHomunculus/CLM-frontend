@@ -69,7 +69,7 @@ const theme = createTheme({
           padding: 8
         },
         spacing: {
-          '& > :not(:first-child)': {
+          '& > :not(:first-of-type)': {
             marginLeft: 0
           }
         }
@@ -113,7 +113,7 @@ const theme = createTheme({
           padding: 8
         },
         spacing: {
-          '& > :not(:first-child)': {
+          '& > :not(:first-of-type)': {
             marginLeft: 0
           }
         }

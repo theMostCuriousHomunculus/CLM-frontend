@@ -1,4 +1,5 @@
 import React from 'react';
+import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUIButton from '@mui/material/Button';
 import MUICircularProgress from '@mui/material/CircularProgress';
 import MUIDialog from '@mui/material/Dialog';
@@ -11,7 +12,6 @@ import MUIListItemText from '@mui/material/ListItemText';
 import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
 import MUITextField from '@mui/material/TextField';
-import { Autocomplete as MUIAutocomplete } from '@mui/lab';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from '../miscellaneous/HoverPreview';
@@ -27,7 +27,6 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
   const [cardSearchResults, setCardSearchResults] = React.useState([]);
   const [chosenCard, setChosenCard] = React.useState(null);
   const [numberOfTokens, setNumberOfTokens] = React.useState(1);
-  const [open, setOpen] = React.useState(false);
   const [timer, setTimer] = React.useState();
 
   const scryfallCardSearch = React.useCallback(event => {
@@ -137,17 +136,13 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
           clearOnEscape={true}
           fullWidth={true}
           getOptionLabel={option => option.name}
-          getOptionSelected={(option, value) => option.oracle_id === value.oracle_id}
           id="card-search-input"
           loading={loading}
           onChange={function (event, value, reason) {
-            if (reason === 'select-option') {
+            if (reason === 'selectOption') {
               scryfallPrintSearch(value.oracle_id);
             }
           }}
-          onClose={() => setOpen(false)}
-          onOpen={() => setOpen(true)}
-          open={open}
           options={cardSearchResults}
           renderInput={params => (
             <MUITextField
@@ -169,12 +164,17 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
               }}
             />
           )}
-          renderOption={(option, state) => (
-            <div value={option.oracle_id}>
-              <span style={{ marginRight: 8 }}>{option.name}</span>
+          renderOption={(props, option) => (
+            <li
+              value={option.oracle_id}
+              {...props}
+            >
+              <span style={{ marginRight: 8 }}>
+                {option.name}
+              </span>
               {option.keywords.length > 0 && <span style={{ marginRight: 8 }}> - {option.keywords.join(', ')} - </span>}
               {option.powerToughness && <span>{option.powerToughness}</span>}
-            </div>
+            </li>
           )}
         />
 
