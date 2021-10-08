@@ -18,7 +18,8 @@ export default function WarningButton ({
   children,
   fullWidth,
   onClick,
-  startIcon
+  startIcon,
+  ...rest
 }) {
 
   return (
@@ -27,6 +28,7 @@ export default function WarningButton ({
       fullWidth={!!fullWidth}
       onClick={onClick}
       startIcon={startIcon}
+      {...rest}
     >
       {children}
     </MUIButton>

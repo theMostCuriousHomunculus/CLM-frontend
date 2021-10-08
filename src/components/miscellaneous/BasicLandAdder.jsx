@@ -82,12 +82,29 @@ export default function BasicLandAdder ({ submitFunction }) {
   return (
     <MUIPaper style={{ padding: '0 4px' }}>
       <div style={{ padding: 4 }}>
-        <MUITypography variant="subtitle1">Add Basic Lands to Deck</MUITypography>
+        <MUITypography variant="subtitle1">
+          Add Basic Lands to Deck
+        </MUITypography>
       </div>
-      <MUIGrid alignItems="center" container justifyContent="space-between" spacing={1}>
-        <MUIGrid container item xs={6} md={3}>
-          <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
-            <MUIInputLabel htmlFor="basic-land-name-selector">Basic Land Name</MUIInputLabel>
+      <MUIGrid
+        alignItems="center"
+        container
+        justifyContent="space-between"
+        spacing={1}
+      >
+        <MUIGrid
+          container
+          item
+          xs={6}
+          md={3}
+        >
+          <MUIFormControl
+            variant="outlined"
+            style={{ flexGrow: 1 }}
+          >
+            <MUIInputLabel htmlFor="basic-land-name-selector">
+              Basic Land Name
+            </MUIInputLabel>
             <MUISelect
               label="Basic Land Name"
               native
@@ -108,9 +125,19 @@ export default function BasicLandAdder ({ submitFunction }) {
           </MUIFormControl>
         </MUIGrid>
         
-        <MUIGrid container item xs={6} md={3}>
-          <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
-            <MUIInputLabel htmlFor="set-name-selector">Set Name</MUIInputLabel>
+        <MUIGrid
+          container
+          item
+          xs={6}
+          md={3}
+        >
+          <MUIFormControl
+            variant="outlined"
+            style={{ flexGrow: 1 }}
+          >
+            <MUIInputLabel htmlFor="set-name-selector">
+              Set Name
+            </MUIInputLabel>
             <MUISelect
               label="Set Name"
               native
@@ -124,15 +151,28 @@ export default function BasicLandAdder ({ submitFunction }) {
               {availableSets.length === 0 ?
                 <option value="">Could not fetch sets from Scryfall...</option> :
                 availableSets.map(set => (
-                  <option key={set.code} value={set.code}>{set.name}</option>
+                  <option
+                    key={set.code}
+                    value={set.code}
+                  >
+                    {set.name}
+                  </option>
                 ))
               }
             </MUISelect>
           </MUIFormControl>
         </MUIGrid>
 
-        <MUIGrid item xs={6} md={3}>
-          <MUIList component="nav" dense={true} style={{ flexGrow: 1 }}>
+        <MUIGrid
+          item
+          xs={6}
+          md={3}
+        >
+          <MUIList
+            component="nav"
+            dense={true}
+            style={{ flexGrow: 1 }}
+          >
             <MUIListItem
               button
               aria-haspopup="true"
@@ -182,7 +222,13 @@ export default function BasicLandAdder ({ submitFunction }) {
           </MUIMenu>
         </MUIGrid>
 
-        <MUIGrid container item justifyContent="flex-end" xs={6} md={3}>
+        <MUIGrid
+          container
+          item
+          justifyContent="flex-end"
+          xs={6}
+          md={3}
+        >
           <MUIButton onClick={() => submitFunction(chosenPrint)}>
             Add To Deck
           </MUIButton>

@@ -116,9 +116,17 @@ export default function Event () {
         })}
       >
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <img alt={selectedCard.name} src={selectedCard.image} style={{ height: 264 }} />
+          <img
+            alt={selectedCard.name}
+            src={selectedCard.image}
+            style={{ height: 264 }}
+          />
           {selectedCard.back_image &&
-            <img alt={selectedCard.name} src={selectedCard.back_image} style={{ height: 264 }} />
+            <img
+              alt={selectedCard.name}
+              src={selectedCard.back_image}
+              style={{ height: 264 }}
+            />
           }
         </div>
       </ConfirmationDialog>
@@ -162,7 +170,9 @@ export default function Event () {
           {tabNumber === 0 &&
             !myState.current_pack &&
             <MUIPaper>
-              <MUITypography variant="h3">Other drafters are still making their picks...</MUITypography>
+              <MUITypography variant="h3">
+                Other drafters are still making their picks...
+              </MUITypography>
               <MUITypography variant="body1">
                 Yell at them to hurry up!
               </MUITypography>

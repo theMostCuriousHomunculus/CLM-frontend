@@ -297,7 +297,13 @@ export default function BlogPost () {
           {blogPost.author._id === authentication.userId ?
             <form onSubmit={submitBlogPost}>
               <MUICardHeader
-                avatar={<Avatar alt={blogPost.author.name} size='large' src={blogPost.author.avatar} />}
+                avatar={
+                  <Avatar
+                    alt={blogPost.author.name}
+                    size='large'
+                    src={blogPost.author.avatar}
+                  />
+                }
                 className={classes.cardHeader}
                 title={
                   <MUITextField
@@ -344,11 +350,17 @@ export default function BlogPost () {
                       type="text"
                       value={blogPost.image}
                     />
-                    <MUITypography color="textSecondary" variant="body2">
+                    <MUITypography
+                      color="textSecondary"
+                      variant="body2"
+                    >
                       A work of genius by {blogPost.author.name}.
                     </MUITypography>
                     {blogPost.updatedAt &&
-                      <MUITypography color="textSecondary" variant="body2">
+                      <MUITypography
+                        color="textSecondary"
+                        variant="body2"
+                      >
                         Last updated {new Date(parseInt(blogPost.updatedAt)).toLocaleString()}.
                       </MUITypography>
                     }
@@ -393,14 +405,23 @@ export default function BlogPost () {
             </form> :
             <React.Fragment>
               <MUICardHeader
-                avatar={<Avatar alt={blogPost.author.name} size='large' src={blogPost.author.avatar} />}
+                avatar={
+                  <Avatar
+                    alt={blogPost.author.name}
+                    size='large'
+                    src={blogPost.author.avatar}
+                  />
+                }
                 className={classes.cardHeader}
                 title={blogPost.title}
                 subheader={blogPost.subtitle}
               />
               <MUICardContent>
                 <article className={classes.article}>
-                  <ReactMarkdown rehypePlugins={[rehypeRaw]} children={blogPost.body} />
+                  <ReactMarkdown
+                    rehypePlugins={[rehypeRaw]}
+                    children={blogPost.body}
+                  />
                 </article>
               </MUICardContent>
             </React.Fragment>
@@ -412,15 +433,25 @@ export default function BlogPost () {
             <MUICardHeader title="Community Reaction" />
             <MUICardContent className={classes.commentSection}>
               {blogPost.comments.map((comment, index, array) => array[array.length - 1 - index]).map(comment => (
-                <div key={comment._id} style={{ display: 'flex', margin: '4px 0' }}>
-                  <Avatar alt={comment.author.name} size='small' src={comment.author.avatar} />
+                <div
+                  key={comment._id}
+                  style={{ display: 'flex', margin: '4px 0' }}
+                >
+                  <Avatar
+                    alt={comment.author.name}
+                    size='small'
+                    src={comment.author.avatar}
+                  />
                   <MUITypography variant="body2">{comment.body}</MUITypography>
                 </div>
               ))}
             </MUICardContent>
             {authentication.isLoggedIn &&
               <MUICardActions>
-                <form className={classes.commentForm} onSubmit={submitComment}>
+                <form
+                  className={classes.commentForm}
+                  onSubmit={submitComment}
+                >
                   <MUITextField
                     autoComplete="off"
                     fullWidth

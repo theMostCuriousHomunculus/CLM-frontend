@@ -14,14 +14,18 @@ const useStyles = makeStyles({
   }
 });
 
-export default function LargeAvatar (props) {
+export default function LargeAvatar ({ alt, size, ...rest }) {
 
   const classes = useStyles();
-  const { alt, size, ...rest } = props;
 
   return (
     <MUITooltip title={alt}>
-      <MUIAvatar alt={alt} className={classes[size]} imgProps={{ draggable: false }} {...rest} />
+      <MUIAvatar
+        alt={alt}
+        className={classes[size]}
+        imgProps={{ draggable: false }}
+        {...rest}
+      />
     </MUITooltip>
   );
 };

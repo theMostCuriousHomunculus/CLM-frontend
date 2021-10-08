@@ -237,8 +237,18 @@ export default function Match () {
 
       {matchState.players.every(plr => plr.mainboard.length === 0) ?
         <div className={classes.matchScreenFlexContainer}>
-          <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-            <MUIIconButton aria-label='help' color='primary' onClick={() => setHelpDisplayed(true)}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexShrink: 0
+            }}
+          >
+            <MUIIconButton
+              aria-label='help'
+              color='primary'
+              onClick={() => setHelpDisplayed(true)}
+            >
               <MUIHelpOutlineIcon />
             </MUIIconButton>
           </div>

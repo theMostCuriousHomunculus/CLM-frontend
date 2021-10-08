@@ -29,7 +29,13 @@ export default function TheStack ({ setRightClickedCard }) {
           title="The Stack"
           style={{ color: theme.palette.primary.main, cursor: 'move', textAlign: 'center' }}
         />
-        <MUICardContent style={{ display: 'flex', flexDirection: 'column-reverse', overflowY: 'auto' }}>
+        <MUICardContent
+          style={{
+            display: 'flex',
+            flexDirection: 'column-reverse',
+            overflowY: 'auto'
+          }}
+        >
           {stack.map(card => (
             <MagicCard
               cardData={card}

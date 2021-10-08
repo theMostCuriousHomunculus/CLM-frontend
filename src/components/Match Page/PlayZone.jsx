@@ -69,7 +69,10 @@ export default function PlayZone ({
   return (
     <div className={classes.playZoneContainer}>
       {topPlayerState &&
-        <div id="top-player" className={classes.columnFlex}>
+        <div
+          id="top-player"
+          className={classes.columnFlex}
+        >
           {displayedZones.topLibrary &&
             <VerticalCollapsableZone
               customStyle={matchCard}
@@ -111,7 +114,10 @@ export default function PlayZone ({
                 })}
               </div>
             }
-            <div className={classes.battlefieldContainer} style={{ transform: 'rotate(180deg)' }}>
+            <div
+              className={classes.battlefieldContainer}
+              style={{ transform: 'rotate(180deg)' }}
+            >
               {topPlayerState.battlefield.map(card => (
                 <MagicCard
                   cardData={card}
@@ -187,7 +193,11 @@ export default function PlayZone ({
         }
         <div className={classes.rowFlex}>
           {participant ?
-            <div className={classes.battlefieldContainer} id="bottom-player-battlefield" ref={battlefieldRef}>
+            <div
+              className={classes.battlefieldContainer}
+              id="bottom-player-battlefield"
+              ref={battlefieldRef}
+            >
               {battlefieldRef.current && bottomPlayerState.battlefield.map(card => (
                 <Draggable
                   bounds="#bottom-player-battlefield"

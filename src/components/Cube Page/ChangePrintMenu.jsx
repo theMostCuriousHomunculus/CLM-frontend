@@ -73,7 +73,7 @@ export default function ChangePrintMenu ({
             collector_number: print.collector_number,
             image,
             mtgo_id: print.mtgo_id,
-            scryfall_id: print.scryfall_id,
+            scryfall_id: print.id,
             set: print.set,
             set_name: print.set_name,
             tcgplayer_id: print.tcgplayer_id
@@ -118,10 +118,16 @@ export default function ChangePrintMenu ({
         onClose={() => setAnchorEl(null)}
       >
         {loading ?
-          <MUICircularProgress color="primary" size={20} /> :
+          <MUICircularProgress
+            color="primary"
+            size={20}
+          /> :
           availablePrintings.map((option, index) => (
             <span key={option.scryfall_id}>
-              <HoverPreview back_image={option.back_image} image={option.image}>
+              <HoverPreview
+                back_image={option.back_image}
+                image={option.image}
+              >
                 <MUIMenuItem
                   selected={option.scryfall_id === selectedPrint.scryfall_id}
                   onClick={() => handleMenuItemClick(index)}

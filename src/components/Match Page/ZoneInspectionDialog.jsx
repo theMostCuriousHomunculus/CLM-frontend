@@ -19,7 +19,9 @@ export default function ZoneInspectionDialogue ({
       open={!!zoneName}
       onClose={close}
     >
-      <MUIDialogTitle>{player.account.name}'s {zoneName + (zoneName === 'temporary' ? ' zone' : '')}</MUIDialogTitle>
+      <MUIDialogTitle>
+        {player.account.name}'s {zoneName + (zoneName === 'temporary' ? ' zone' : '')}
+      </MUIDialogTitle>
       <MUIDialogContent style={{ display: 'flex', flexWrap: 'wrap' }}>
         {zoneName && player[zoneName].map(card => {
           return (

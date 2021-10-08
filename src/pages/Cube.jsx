@@ -93,7 +93,13 @@ export default function Cube () {
         <ComponentInfo />
 
         {editable &&
-          <MUIPaper style={{ padding: '0 4px', position: 'sticky', top: 4 }}>
+          <MUIPaper
+            style={{
+              padding: '0 4px',
+              position: 'sticky',
+              top: 4
+            }}
+          >
             <ScryfallRequest
               buttonText="Add it!"
               labelText={`Add a card to ${activeComponentState.name}`}
@@ -101,7 +107,7 @@ export default function Cube () {
             />
           </MUIPaper>
         }
-        
+
         <CubeDisplay setSelectedCard={setSelectedCard} />
 
       </React.Fragment>

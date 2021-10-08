@@ -169,7 +169,10 @@ export default function MagicCard ({
       onTouchEnd={onTouchEnd}
     >
       {hoverPreview &&
-        <HoverPreview back_image={back_image} image={image}>
+        <HoverPreview
+          back_image={back_image}
+          image={image}
+        >
           <div
             className={classes.countersContainer}
             id={`hover-${_id}`}
@@ -183,7 +186,10 @@ export default function MagicCard ({
               if (counter.counterType === '+1/+1') style.backgroundColor = lightGreen[500];
               if (counter.counterType === '-1/-1') style.backgroundColor = deepOrange[500];
               return (
-                <div className={classes.counterContainer} key={counter.counterType}>
+                <div
+                  className={classes.counterContainer}
+                  key={counter.counterType}
+                >
                   <MUIBadge
                     badgeContent={counter.counterAmount}
                     className={classes.counterBadge}

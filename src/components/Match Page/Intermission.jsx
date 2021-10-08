@@ -29,11 +29,13 @@ export default function Intermission () {
           </MUITypography>
         </ConfirmationDialog>
 
-        <div style={{ margin: 4 }}>
-          <WarningButton fullWidth onClick={() => setConfirmationDialogVisible(true)}>
-            Ready!
-          </WarningButton>
-        </div>
+        <WarningButton
+          fullWidth
+          onClick={() => setConfirmationDialogVisible(true)}
+          style={{ margin: 4 }}
+        >
+          Ready!
+        </WarningButton>
 
         <DeckDisplay
           add={() => null}
@@ -44,7 +46,9 @@ export default function Intermission () {
         />
       </React.Fragment> :
       <div>
-        <MUITypography variant='body1'>Players are currently sideboarding.  The match will resume shortly.</MUITypography>
+        <MUITypography variant='body1'>
+          Players are currently sideboarding.  The match will resume shortly.
+        </MUITypography>
       </div>
   );
 };

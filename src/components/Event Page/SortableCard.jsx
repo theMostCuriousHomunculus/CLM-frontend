@@ -12,7 +12,10 @@ export default SortableElement(({ card, clickFunction }) => {
       cardData={{ ...card, flipped }}
       clickFunction={clickFunction}
       flipHandler={() => setFlipped(prevState => !prevState)}
-      style={{ cursor: 'grab', margin: 4 }}
+      style={{
+        cursor: 'grab',
+        margin: 4
+      }}
     />
   );
 });

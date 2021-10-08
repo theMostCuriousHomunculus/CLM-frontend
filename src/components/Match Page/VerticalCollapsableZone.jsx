@@ -56,7 +56,10 @@ const SortableZone = SortableContainer(({
   const { userId } = React.useContext(AuthenticationContext);
 
   return (
-    <div className={classes.collapsableZoneContainer} style={{ minWidth: customStyle.width + 2 }}>
+    <div
+      className={classes.collapsableZoneContainer}
+      style={{ minWidth: customStyle.width + 2 }}
+    >
       {player[zone.toLowerCase()].map((val, index, array) => array[array.length - 1 - index]).map((card, index) => (
         <SortableCard
           card={card}
@@ -70,8 +73,16 @@ const SortableZone = SortableContainer(({
       ))}
       <div className={classes.badgeContainer}>
         <MUITooltip title={zone}>
-          <MUIBadge badgeContent={player[zone.toLowerCase()].length} className={classes.zoneBadge} color='primary' showZero>
-            <MUISvgIcon className={classes.svg} style={{ backgroundColor: iconColor }}>
+          <MUIBadge
+            badgeContent={player[zone.toLowerCase()].length}
+            className={classes.zoneBadge}
+            color='primary'
+            showZero
+          >
+            <MUISvgIcon
+              className={classes.svg}
+              style={{ backgroundColor: iconColor }}
+            >
               {iconElement}
             </MUISvgIcon>
           </MUIBadge>

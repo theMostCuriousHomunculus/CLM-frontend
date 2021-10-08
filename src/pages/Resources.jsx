@@ -77,7 +77,12 @@ export default function Resources () {
           lg={3}
           xl={2}
         >
-          <MUICard style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+          <MUICard
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1 }}
+            >
             <MUICardHeader
               title={resource.name}
               subheader={resource.platform}

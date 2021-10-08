@@ -34,7 +34,13 @@ export default function ErrorDialog ({
     >
       <MUIDialogTitle className={classes.title}>
         <span>Error</span>
-        <MUIWarningRoundedIcon style={{ alignSelf: 'center', color: theme.palette.warning.main, fontSize: 36 }} />
+        <MUIWarningRoundedIcon
+          style={{
+            alignSelf: 'center',
+            color: theme.palette.warning.main,
+            fontSize: 36
+          }}
+        />
       </MUIDialogTitle>
       <MUIDialogContent>
         <MUIDialogContentText>{messages[0]}</MUIDialogContentText>

@@ -97,14 +97,24 @@ export default function PlaysetDisplay ({
         </MUITooltip>
         <MUITypography
           variant="body1"
-          style={{ display: 'inline-flex', flexGrow: 1, justifyContent: 'space-between' }}
+          style={{
+            display: 'inline-flex',
+            flexGrow: 1,
+            justifyContent: 'space-between'
+          }}
         >
-          <HoverPreview back_image={card.back_image} image={card.image}>
+          <HoverPreview
+            back_image={card.back_image}
+            image={card.image}
+          >
             <span>{card.name}</span>
           </HoverPreview>
           <span>
             {card.set.toUpperCase()}
-            <ManaCostSVGs manaCostString={card.mana_cost} size={20} />
+            <ManaCostSVGs
+              manaCostString={card.mana_cost}
+              size={20}
+            />
           </span>
         </MUITypography>
       </div>
