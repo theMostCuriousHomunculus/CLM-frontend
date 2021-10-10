@@ -73,15 +73,14 @@ export default function Deck () {
 
       {deckState.creator._id === userId &&
         <React.Fragment>
-          <MUIPaper style={{ padding: '0 4px' }}>
+          <BasicLandAdder submitFunction={cardData => addCardsToDeck(cardData, 'mainboard', 1)} />
+          <MUIPaper>
             <ScryfallRequest
               buttonText="Add to Deck"
               labelText={`Add a card to ${deckState.name}`}
               onSubmit={cardData => addCardsToDeck(cardData, 'mainboard', 1)}
             />
           </MUIPaper>
-
-          <BasicLandAdder submitFunction={cardData => addCardsToDeck(cardData, 'mainboard', 1)} />
         </React.Fragment>
       }
 

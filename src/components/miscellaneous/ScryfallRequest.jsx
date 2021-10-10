@@ -2,7 +2,6 @@ import React from 'react';
 import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUIButton from '@mui/material/Button';
 import MUICircularProgress from '@mui/material/CircularProgress';
-import MUIGrid from '@mui/material/Grid';
 import MUIList from '@mui/material/List';
 import MUIListItem from '@mui/material/ListItem';
 import MUIListItemText from '@mui/material/ListItemText';
@@ -164,17 +163,22 @@ export default function ScryfallRequest ({
   }
 
   return (
-    <MUIGrid alignItems="center" container justifyContent="flex-end" spacing={1}>
-
-      <MUIGrid
-        item
-        xs={12}
-        md={6}
-        lg={5}
+    <div
+      style={{
+        display: 'flex',
+        flexGrow: 1
+      }}
+    >
+      <div
+        style={{
+          flexGrow: 1,
+          marginRight: 4
+        }}
       >
         <MUIAutocomplete
           clearOnBlur={false}
           clearOnEscape={true}
+          fullWidth
           getOptionLabel={(option) => option.name}
           id="card-search-input"
           loading={loading}
@@ -204,13 +208,18 @@ export default function ScryfallRequest ({
               }}
             />
           )}
+          style={{
+            marginBottom: 8
+          }}
         />
-      </MUIGrid>
 
-      <MUIGrid item xs={12} md={6} lg={5}>
         <MUIList
           component="nav"
           dense={true}
+          style={{
+            marginTop: 8,
+            padding: 0
+          }}
         >
           <MUIListItem
             aria-haspopup="true"
@@ -253,19 +262,14 @@ export default function ScryfallRequest ({
             </HoverPreview>
           ))}
         </MUIMenu>
-      </MUIGrid>
+      </div>
 
-      <MUIGrid
-        item
-        xs={12}
-        lg={2}
-        style={{ textAlign: "right" }}
+      <MUIButton
+        onClick={submitForm}
+        style={{ marginLeft: 4 }}
       >
-        <MUIButton onClick={submitForm}>
-          {buttonText}
-        </MUIButton>
-      </MUIGrid>
-
-    </MUIGrid>
+        {buttonText}
+      </MUIButton>
+    </div>
   );
 };

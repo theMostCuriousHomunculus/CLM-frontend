@@ -95,13 +95,12 @@ export default function Cube () {
         {editable &&
           <MUIPaper
             style={{
-              padding: '0 4px',
               position: 'sticky',
               top: 4
             }}
           >
             <ScryfallRequest
-              buttonText="Add it!"
+              buttonText="Add to Cube"
               labelText={`Add a card to ${activeComponentState.name}`}
               onSubmit={addCardToCube}
             />
