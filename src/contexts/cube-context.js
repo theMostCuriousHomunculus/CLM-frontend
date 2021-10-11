@@ -1,13 +1,14 @@
 import React, { createContext } from 'react';
 import { useParams } from 'react-router-dom';
 
+import populateScryfallData from '../functions/populate-scryfall-data';
 import useRequest from '../hooks/request-hook';
 import Cube from '../pages/Cube';
 
 export const CubeContext = createContext({
   loading: false,
   activeComponentState: {
-    _id: 'mainbaord',
+    _id: 'mainboard',
     displayedCards: [],
     maxSize: null,
     name: 'Mainboard',
@@ -76,20 +77,11 @@ export default function ContextualizedCubePage () {
   });
   const cardQuery = `
     _id
-    back_image
     cmc
-    collector_number
     color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
     name
     oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
     type_line
   `;
   const cubeQuery = `
@@ -162,20 +154,20 @@ export default function ContextualizedCubePage () {
   }, [cubeState, displayState, filterCards]);
 
   const addCardToCube = React.useCallback(async function ({
-    back_image,
+    // back_image,
     cmc,
-    collector_number,
+    // collector_number,
     color_identity,
-    image,
-    keywords,
-    mana_cost,
-    mtgo_id,
+    // image,
+    // keywords,
+    // mana_cost,
+    // mtgo_id,
     name,
     oracle_id,
     scryfall_id,
-    set,
-    set_name,
-    tcgplayer_id,
+    // set,
+    // set_name,
+    // tcgplayer_id,
     type_line
   }) {
     await sendRequest({
@@ -189,20 +181,11 @@ export default function ContextualizedCubePage () {
                 input: {
                   componentID: "${activeComponentState._id}",
                   card: {
-                    ${back_image ? 'back_image: "' + back_image + '",' : ''}
                     cmc: ${cmc},
-                    collector_number: ${collector_number},
                     color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
-                    image: "${image}",
-                    keywords: [${keywords.map(kw => '"' + kw + '"')}],
-                    mana_cost: "${mana_cost}",
-                    ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''}
                     name: "${name}",
                     oracle_id: "${oracle_id}",
                     scryfall_id: "${scryfall_id}",
-                    set: "${set}",
-                    set_name: "${set_name}",
-                    ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',' : ''}
                     type_line: "${type_line}"
                   }
                 }
@@ -443,7 +426,53 @@ export default function ContextualizedCubePage () {
 
   const fetchCubeByID = React.useCallback(async function () {
     await sendRequest({
-      callback: (data) => setCubeState(data),
+      callback: async (data) => {
+
+        const allCards = [];
+
+        for (const card of data.mainboard) {
+          if (!allCards.find(item => item.id === card.scryfall_id)) allCards.push({ id: card.scryfall_id });
+        }
+
+        for (const card of data.sideboard) {
+          if (!allCards.find(item => item.id === card.scryfall_id)) allCards.push({ id: card.scryfall_id });
+        }
+
+        for (const module of data.modules) {
+          for (const card of module) {
+            if (!allCards.find(item => item.id === card.scryfall_id)) allCards.push({ id: card.scryfall_id });
+          }
+        }
+
+        for (const rotation of data.rotations) {
+          for (const card of rotation) {
+            if (!allCards.find(item => item.id === card.scryfall_id)) allCards.push({ id: card.scryfall_id });
+          }
+        }
+
+        // according to scryfall api documentation, "A maximum of 75 card references may be submitted per request."
+        const numberOfScryfallRequests = Math.ceil(allCards.length / 75);
+        const scryfallRequestArrays = [];
+
+        for (let requestNumber = 0; requestNumber < numberOfScryfallRequests; requestNumber++) {
+          scryfallRequestArrays.push(allCards.splice(0, 75));
+        }
+
+        for (let request of scryfallRequestArrays) {
+          await sendRequest({
+            body: {
+              identifiers: request
+            },
+            callback: async scryfallResponse => {
+              for (let scryfallCardObject of scryfallResponse) {
+                await populateScryfallData(data, scryfallCardObject);
+              }
+            },
+            url: 'https://api.scryfall.com/cards/collection'
+          });
+        }
+        setCubeState(data);
+      },
       headers: { CubeID: cubeState._id },
       load: true,
       operation: 'fetchCubeByID',
