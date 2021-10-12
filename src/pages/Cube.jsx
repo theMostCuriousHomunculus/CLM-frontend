@@ -2,9 +2,8 @@ import React from 'react';
 import MUIPaper from '@mui/material/Paper';
 import { createClient } from 'graphql-ws';
 
-import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeDisplay from '../components/Cube Page/CubeDisplay';
-import CubeInfo from '../components/Cube Page/CubeInfo';
+import Dashboard from '../components/Cube Page/Dashboard';
 import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -88,9 +87,9 @@ export default function Cube () {
           />
         }
 
-        <CubeInfo />
+        <Dashboard />
 
-        <ComponentInfo />
+        {/*<ComponentInfo />*/}
 
         {editable &&
           <MUIPaper

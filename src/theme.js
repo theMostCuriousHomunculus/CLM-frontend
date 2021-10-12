@@ -67,11 +67,6 @@ const theme = createTheme({
           flexDirection: 'row-reverse',
           justifyContent: 'space-between',
           padding: 8
-        },
-        spacing: {
-          '& > :not(:first-of-type)': {
-            marginLeft: 0
-          }
         }
       }
     },
@@ -85,6 +80,8 @@ const theme = createTheme({
     MuiCardHeader: {
       styleOverrides: {
         action: {
+          display: 'flex',
+          flexDirection: 'column',
           marginLeft: 8,
           marginRight: 0,
           marginTop: 0

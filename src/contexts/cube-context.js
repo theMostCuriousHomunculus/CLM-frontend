@@ -129,7 +129,7 @@ export default function ContextualizedCubePage () {
     const wordArray = text.split(" ");
     return (
       wordArray.every(word => (
-        card.keywords.map(keyword => keyword.toLowerCase()).includes(word.toLowerCase()) ||
+        card.keywords.join(" ").toLowerCase().includes(word.toLowerCase()) ||
         card.name.toLowerCase().includes(word.toLowerCase()) ||
         card.type_line.toLowerCase().includes(word.toLowerCase())
       ))

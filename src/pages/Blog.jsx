@@ -142,6 +142,7 @@ export default function Blog () {
                     <WarningButton
                       onClick={() => setBlogPostToDelete({ _id: blogPost._id, title: blogPost.title })}
                       startIcon={<MUIDeleteForeverIcon />}
+                      style={{ marginLeft: 0 }}
                     >
                       Delete
                     </WarningButton>
