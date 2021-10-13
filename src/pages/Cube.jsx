@@ -89,8 +89,6 @@ export default function Cube () {
 
         <Dashboard />
 
-        {/*<ComponentInfo />*/}
-
         {editable &&
           <MUIPaper
             style={{
