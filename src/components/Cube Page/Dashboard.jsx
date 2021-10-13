@@ -31,7 +31,7 @@ import { CubeContext } from '../../contexts/cube-context';
 
 export default function Dashboard () {
 
-  const { userId } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
   const {
     activeComponentState,
     cubeState: {
@@ -43,6 +43,7 @@ export default function Dashboard () {
       rotations,
       sideboard
     },
+    cloneCube,
     deleteModule,
     deleteRotation,
     displayState,
@@ -325,11 +326,19 @@ export default function Dashboard () {
               Delete this {Number.isInteger(activeComponentState.size) ? 'Rotation' : 'Module'}
             </WarningButton>
           }
+
+          {isLoggedIn &&
+            <MUIButton onClick={cloneCube}>
+              Clone This Cube
+            </MUIButton>
+          }
+
           {userId === creator._id &&
             <MUIButton onClick={() => setCreateComponentDialogIsOpen(true)}>
               Create a New Component
             </MUIButton>
           }
+
           <MUIButton
             onClick={() => {
               setSamplePack(randomSampleWOReplacement(mainboard, 15));

@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import Cube from '../pages/Cube';
@@ -35,6 +35,7 @@ export const CubeContext = createContext({
   setCubeState: () => null,
   setDisplayState: () => null,
   addCardToCube: () => null,
+  cloneCube: () => null,
   createModule: () => null,
   createRotation: () => null,
   deleteCard: () => null,
@@ -49,6 +50,7 @@ export const CubeContext = createContext({
 
 export default function ContextualizedCubePage () {
 
+  const history = useHistory();
   const [activeComponentState, setActiveComponentState] = React.useState({
     _id: 'mainboard',
     displayedCards: [],
@@ -216,6 +218,28 @@ export default function ContextualizedCubePage () {
     });
   }, [activeComponentState._id, cubeState._id, sendRequest]);
 
+  const cloneCube = React.useCallback(async function () {
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/cube/${data._id}`);
+        setCubeState(data);
+      },
+      headers: { CubeID: cubeState._id },
+      operation: 'cloneCube',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation} {
+                ${cubeQuery}
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [cubeQuery, cubeState._id, history, sendRequest]);
+
   const createModule = React.useCallback(async function (name, setNameInput, setSizeInput, toggleOpen) {
     await sendRequest({
       callback: (data) => {
@@ -227,9 +251,7 @@ export default function ContextualizedCubePage () {
         setSizeInput(null);
         toggleOpen();
       },
-      headers: {
-        CubeID: cubeState._id
-      },
+      headers: { CubeID: cubeState._id },
       operation: 'createModule',
       get body() {
         return {
@@ -472,6 +494,7 @@ export default function ContextualizedCubePage () {
         setCubeState,
         setDisplayState,
         addCardToCube,
+        cloneCube,
         createModule,
         createRotation,
         deleteCard,
