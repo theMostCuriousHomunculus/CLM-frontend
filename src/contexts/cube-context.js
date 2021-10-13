@@ -225,6 +225,7 @@ export default function ContextualizedCubePage () {
         setCubeState(data);
       },
       headers: { CubeID: cubeState._id },
+      load: true,
       operation: 'cloneCube',
       get body() {
         return {

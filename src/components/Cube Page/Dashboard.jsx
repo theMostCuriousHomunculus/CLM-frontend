@@ -329,13 +329,13 @@ export default function Dashboard () {
 
           {isLoggedIn &&
             <MUIButton onClick={cloneCube}>
-              Clone This Cube
+              Clone Cube
             </MUIButton>
           }
 
           {userId === creator._id &&
             <MUIButton onClick={() => setCreateComponentDialogIsOpen(true)}>
-              Create a New Component
+              New Component
             </MUIButton>
           }
 
@@ -345,7 +345,7 @@ export default function Dashboard () {
               setSamplePackDialogIsOpen(true);
             }}
           >
-            See a Sample Pack
+            Sample Pack
           </MUIButton>
         </MUICardActions>
       </MUICard>

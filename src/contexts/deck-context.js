@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import Deck from '../pages/Deck';
@@ -22,6 +22,7 @@ export const DeckContext = createContext({
   },
   setDeckState: () => null,
   addCardsToDeck: () => null,
+  cloneDeck: () => null,
   editDeck: () => null,
   fetchDeckByID: () => null,
   removeCardsFromDeck: () => null,
@@ -30,6 +31,7 @@ export const DeckContext = createContext({
 
 export default function ContextualizedDeckPage() {
 
+  const history = useHistory();
   const [deckState, setDeckState] = React.useState({
     _id: useParams().deckId,
     creator: {
@@ -134,7 +136,30 @@ export default function ContextualizedDeckPage() {
         }
       }
     });
-  }, [deckState._id, sendRequest])
+  }, [deckState._id, sendRequest]);
+
+  const cloneDeck = React.useCallback(async function () {
+    await sendRequest({
+      callback: (data) => {
+        history.push(`/deck/${data._id}`);
+        setDeckState(data);
+      },
+      headers: { DeckID: deckState._id },
+      load: true,
+      operation: 'cloneDeck',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation} {
+                ${deckQuery}
+              }
+            }
+          `
+        }
+      }
+    });
+  }, [deckQuery, deckState._id, history, sendRequest]);
 
   const editDeck = React.useCallback(async function (description, format, name) {
     await sendRequest({
@@ -229,6 +254,7 @@ export default function ContextualizedDeckPage() {
         deckState,
         setDeckState,
         addCardsToDeck,
+        cloneDeck,
         editDeck,
         fetchDeckByID,
         removeCardsFromDeck,
