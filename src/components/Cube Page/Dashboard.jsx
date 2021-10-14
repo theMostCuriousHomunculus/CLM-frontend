@@ -52,19 +52,13 @@ export default function Dashboard () {
     editRotation,
     setDisplayState
   } = React.useContext(CubeContext);
-  const [componentNameInput, setComponentNameInput] = React.useState(activeComponentState.name);
   const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] = React.useState(false);
   const [cubeNameInput, setCubeNameInput] = React.useState(cubeName);
   const [descriptionInput, setDescriptionInput] = React.useState(description);
   const [editingComponentName, setEditingComponentName] = React.useState(false);
   const [samplePack, setSamplePack] = React.useState([]);
-  const [samplePackDialogIsOpen, setSamplePackDialogIsOpen] = React.useState(false);
   const [sizeInput, setSizeInput] = React.useState(activeComponentState.size);
   const componentNameInputRef = React.useRef();
-
-  React.useEffect(() => {
-    setComponentNameInput(activeComponentState.name);
-  }, [activeComponentState.name]);
 
   React.useEffect(() => {
     setCubeNameInput(cubeName);
@@ -81,11 +75,8 @@ export default function Dashboard () {
   return (
     <React.Fragment>
       <MUIDialog
-        onClose={() => {
-          setSamplePackDialogIsOpen(false);
-          setSamplePack([]);
-        }}
-        open={samplePackDialogIsOpen}
+        onClose={() => setSamplePack([])}
+        open={samplePack.length > 0}
       >
         <MUIDialogTitle>Sample Pack from {cubeName}</MUIDialogTitle>
         <MUIDialogContent>
@@ -110,8 +101,6 @@ export default function Dashboard () {
 
       <CreateComponentForm
         open={createComponentDialogIsOpen}
-        setComponentNameInput={setComponentNameInput}
-        setSizeInput={setSizeInput}
         toggleOpen={() => setCreateComponentDialogIsOpen(prevState => !prevState)}
       />
 
@@ -153,7 +142,7 @@ export default function Dashboard () {
                         id: 'component-selector'
                       }}
                     >
-                      <optgroup label="">
+                      <optgroup label="Built-In">
                         <option value="mainboard">Mainboard</option>
                         <option value="sideboard">Sideboard</option>
                       </optgroup>
@@ -188,20 +177,19 @@ export default function Dashboard () {
 
               {editingComponentName &&
                 <MUITextField
+                  defaultValue={activeComponentState.name}
                   label={`${Number.isInteger(activeComponentState.size) ? 'Rotation' : 'Module'} Name`}
                   inputProps={{
                     onBlur: () => {
                       if (Number.isInteger(activeComponentState.size)) {
-                        editRotation(componentNameInput, sizeInput)
+                        editRotation(componentNameInputRef.current.value, sizeInput)
                       } else {
-                        editModule(componentNameInput)
+                        editModule(componentNameInputRef.current.value)
                       }
                       setEditingComponentName(false);
                     }
                   }}
                   inputRef={componentNameInputRef}
-                  onChange={(event) => setComponentNameInput(event.target.value)}
-                  value={componentNameInput}
                 />
               }
 
@@ -212,7 +200,7 @@ export default function Dashboard () {
                   inputProps={{
                     max: activeComponentState.maxSize,
                     min: 0,
-                    onBlur: () => editRotation(componentNameInput, sizeInput),
+                    onBlur: () => editRotation(activeComponentState.name, sizeInput),
                     step: 1
                   }}
                   onChange={event => setSizeInput(event.target.value)}
@@ -318,8 +306,8 @@ export default function Dashboard () {
           {userId === creator._id && !['mainboard', 'sideboard'].includes(activeComponentState._id) &&
             <WarningButton
               onClick={Number.isInteger(activeComponentState.size) ?
-                () => deleteRotation(setComponentNameInput, setSizeInput) :
-                () => deleteModule(setComponentNameInput)
+                deleteRotation :
+                deleteModule
               }
               startIcon={<MUIDeleteForeverIcon />}
             >
@@ -339,12 +327,7 @@ export default function Dashboard () {
             </MUIButton>
           }
 
-          <MUIButton
-            onClick={() => {
-              setSamplePack(randomSampleWOReplacement(mainboard, 15));
-              setSamplePackDialogIsOpen(true);
-            }}
-          >
+          <MUIButton onClick={() => setSamplePack(randomSampleWOReplacement(mainboard, 15))}>
             Sample Pack
           </MUIButton>
         </MUICardActions>

@@ -241,15 +241,13 @@ export default function ContextualizedCubePage () {
     });
   }, [cubeQuery, cubeState._id, history, sendRequest]);
 
-  const createModule = React.useCallback(async function (name, setNameInput, setSizeInput, toggleOpen) {
+  const createModule = React.useCallback(async function (name, toggleOpen) {
     await sendRequest({
       callback: (data) => {
         setDisplayState(prevState => ({
           ...prevState,
           activeComponentID: data.modules[data.modules.length - 1]._id
         }));
-        setNameInput(data.modules[data.modules.length - 1].name);
-        setSizeInput(null);
         toggleOpen();
       },
       headers: { CubeID: cubeState._id },
@@ -271,15 +269,13 @@ export default function ContextualizedCubePage () {
     });
   }, [cubeState._id, sendRequest]);
 
-  const createRotation = React.useCallback(async function (name, setNameInput, setSizeInput, toggleOpen) {
+  const createRotation = React.useCallback(async function (name, toggleOpen) {
     await sendRequest({
       callback: (data) => {
         setDisplayState(prevState => ({
           ...prevState,
           activeComponentID: data.rotations[data.rotations.length - 1]._id
         }));
-        setNameInput(data.rotations[data.rotations.length - 1].name);
-        setSizeInput(data.rotations[data.rotations.length - 1].size);
         toggleOpen();
       },
       headers: { CubeID: cubeState._id },
@@ -324,10 +320,9 @@ export default function ContextualizedCubePage () {
     });
   }, [activeComponentState._id, cubeState._id, sendRequest]);
 
-  const deleteModule = React.useCallback(async function (setNameInput) {
+  const deleteModule = React.useCallback(async function () {
     await sendRequest({
       callback: () => {
-        setNameInput('Mainboard');
         setDisplayState(prevState => ({
           ...prevState,
           activeComponentID: 'mainboard'
@@ -347,11 +342,9 @@ export default function ContextualizedCubePage () {
     });
   }, [activeComponentState._id, cubeState._id, sendRequest]);
 
-  const deleteRotation = React.useCallback(async function (setNameInput, setSizeInput) {
+  const deleteRotation = React.useCallback(async function () {
     await sendRequest({
       callback: () => {
-        setNameInput('Mainboard');
-        setSizeInput(null);
         setDisplayState(prevState => ({
           ...prevState,
           activeComponentID: 'mainboard'

@@ -16,8 +16,6 @@ import { CubeContext } from '../../contexts/cube-context';
 
 export default function CreateComponentForm ({
   open,
-  setComponentNameInput,
-  setSizeInput,
   toggleOpen
 }) {
 
@@ -27,11 +25,11 @@ export default function CreateComponentForm ({
 
   async function addComponent () {
     if (newComponentType === 'module') {
-      await createModule(newNameInput, setComponentNameInput, setSizeInput, toggleOpen);
+      await createModule(newNameInput, toggleOpen);
     }
 
     if (newComponentType === 'rotation') {
-      await createRotation(newNameInput, setComponentNameInput, setSizeInput, toggleOpen);
+      await createRotation(newNameInput, toggleOpen);
     }
   }
 
