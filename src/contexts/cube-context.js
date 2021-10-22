@@ -25,6 +25,7 @@ export const CubeContext = createContext({
     mainboard: [],
     modules: [],
     name: null,
+    published: false,
     rotations: [],
     sideboard: []
   },
@@ -113,6 +114,7 @@ export default function ContextualizedCubePage () {
       name
     }
     name
+    published
     rotations {
       _id
       cards {
@@ -387,7 +389,7 @@ export default function ContextualizedCubePage () {
     });
   }, [activeComponentState._id, cubeState._id, sendRequest]);
 
-  const editCube = React.useCallback(async function (description, name) {
+  const editCube = React.useCallback(async function (description, name, published) {
     await sendRequest({
       headers: { CubeID: cubeState._id },
       operation: 'editCube',
@@ -398,7 +400,8 @@ export default function ContextualizedCubePage () {
               ${this.operation}(
                 input: {
                   description: "${description}",
-                  name: "${name}"
+                  name: "${name}",
+                  published: ${published}
                 }
               ) {
                 _id

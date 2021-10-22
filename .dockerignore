@@ -1,0 +1,11 @@
+node_modules
+Dockerfile.development
+Dockerfile.production
+firebase.json
+.git
+.env
+.env.production
+.eslintcache
+.firebaserc
+.gitignore
+.yarnrc

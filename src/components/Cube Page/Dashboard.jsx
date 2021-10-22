@@ -4,6 +4,7 @@ import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
+import MUICheckbox from '@mui/material/Checkbox';
 import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
@@ -11,6 +12,7 @@ import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIEditIcon from '@mui/icons-material/Edit';
 import MUIFormControl from '@mui/material/FormControl';
+import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIIconButton from '@mui/material/IconButton';
 import MUIImageList from '@mui/material/ImageList';
 import MUIImageListItem from '@mui/material/ImageListItem';
@@ -40,6 +42,7 @@ export default function Dashboard () {
       mainboard,
       modules,
       name: cubeName,
+      published,
       rotations,
       sideboard
     },
@@ -56,6 +59,7 @@ export default function Dashboard () {
   const [cubeNameInput, setCubeNameInput] = React.useState(cubeName);
   const [descriptionInput, setDescriptionInput] = React.useState(description);
   const [editingComponentName, setEditingComponentName] = React.useState(false);
+  const [isPublished, setIsPublished] = React.useState(published);
   const [samplePack, setSamplePack] = React.useState([]);
   const [sizeInput, setSizeInput] = React.useState(activeComponentState.size);
   const componentNameInputRef = React.useRef();
@@ -67,6 +71,10 @@ export default function Dashboard () {
   React.useEffect(() => {
     setDescriptionInput(description);
   }, [description]);
+
+  React.useEffect(() => {
+    setIsPublished(published);
+  }, [published]);
 
   React.useEffect(() => {
     setSizeInput(activeComponentState.size);
@@ -108,7 +116,6 @@ export default function Dashboard () {
         <MUICardHeader
           action={
             <React.Fragment>
-              
               {!editingComponentName &&
                 <div style={{ display: 'flex' }}>
                   {!['mainboard', 'sideboard'].includes(activeComponentState._id) &&
@@ -225,14 +232,31 @@ export default function Dashboard () {
             />
           }
           title={
-            <MUITextField
-              disabled={userId !== creator._id}
-              inputProps={{ onBlur: () => editCube(descriptionInput, cubeNameInput) }}
-              label="Cube Name"
-              onChange={event => setCubeNameInput(event.target.value)}
-              type="text"
-              value={cubeNameInput}
-            />
+            <React.Fragment>
+              <MUITextField
+                disabled={userId !== creator._id}
+                inputProps={{ onBlur: () => editCube(descriptionInput, cubeNameInput, isPublished) }}
+                label="Cube Name"
+                onChange={event => setCubeNameInput(event.target.value)}
+                type="text"
+                value={cubeNameInput}
+              />
+              {userId === creator._id &&
+                <MUIFormControlLabel
+                  control={
+                    <MUICheckbox
+                      checked={isPublished}
+                      onChange={() => {
+                        editCube(descriptionInput, cubeNameInput, !isPublished);
+                        setIsPublished(prevState => !prevState);
+                      }}
+                    />
+                  }
+                  label="Published?"
+                  style={{ display: 'block' }}
+                />
+              }
+            </React.Fragment>
           }
           subheader={
             <React.Fragment>
