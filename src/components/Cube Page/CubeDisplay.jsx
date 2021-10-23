@@ -2,7 +2,9 @@ import React from 'react';
 import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
+import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
+import MUIWarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import { makeStyles } from '@mui/styles';
 
 import customSort from '../../functions/custom-sort';
@@ -168,6 +170,16 @@ export default function CubeDisplay ({
                                               variant="body1"
                                             >
                                               {index + 1}) {card.name}
+                                              {!card.mtgo_id &&
+                                                <MUITooltip title={`This version of ${card.name} is not available on MTGO.`}>
+                                                  <MUIWarningRoundedIcon
+                                                    style={{
+                                                      color: theme.palette.warning.main,
+                                                      fontSize: 20
+                                                    }}
+                                                  />
+                                                </MUITooltip>
+                                              }
                                             </MUITypography>
                                           </HoverPreview>
                                         </span>
@@ -220,10 +232,23 @@ export default function CubeDisplay ({
                                 <HoverPreview back_image={card.back_image} image={card.image}>
                                   <MUITypography
                                     onDoubleClick={() => setSelectedCard(card)}
-                                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                                    style={{
+                                      cursor: 'pointer',
+                                      userSelect: 'none'
+                                    }}
                                     variant="body1"
                                   >
                                     {index + 1}) {card.name}
+                                    {!card.mtgo_id &&
+                                      <MUITooltip title={`This version of ${card.name} is not available on MTGO.`}>
+                                        <MUIWarningRoundedIcon
+                                          style={{
+                                            color: theme.palette.warning.main,
+                                            fontSize: 20
+                                          }}
+                                        />
+                                      </MUITooltip>
+                                    }
                                   </MUITypography>
                                 </HoverPreview>
                               </span>

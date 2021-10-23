@@ -81,13 +81,13 @@ export default function ColorCheckboxes ({
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      {Array.from(Object.keys(colorObj)).map(color => (
+      {Array.from(Object.entries(colorObj)).map(color => (
         <MUICheckbox
-          key={color}
-          checked={colorObj[color].checked}
-          checkedIcon={colorObj[color].icon}
-          className={`${classes.colorCheckbox} ${classes[color]}`}
-          onChange={() => handleColorCheckboxClick(color)}
+          key={color[0]}
+          checked={color[1].checked}
+          checkedIcon={color[1].icon}
+          className={`${classes.colorCheckbox} ${classes[color[0]]}`}
+          onChange={() => handleColorCheckboxClick(color[0])}
         />
       ))}
     </div>

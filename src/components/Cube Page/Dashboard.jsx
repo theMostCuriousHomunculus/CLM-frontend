@@ -13,12 +13,14 @@ import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIEditIcon from '@mui/icons-material/Edit';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MUIIconButton from '@mui/material/IconButton';
 import MUIImageList from '@mui/material/ImageList';
 import MUIImageListItem from '@mui/material/ImageListItem';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
 import MUITextField from '@mui/material/TextField';
+import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
@@ -135,7 +137,7 @@ export default function Dashboard () {
                   <MUIFormControl variant="outlined">
                     <MUIInputLabel htmlFor="component-selector">Viewing</MUIInputLabel>
                     <MUISelect
-                      fullWidth
+                      inputProps={{ id: 'component-selector' }}
                       label="Viewing"
                       native
                       onChange={event => {
@@ -145,9 +147,6 @@ export default function Dashboard () {
                         }));
                       }}
                       value={activeComponentState._id}
-                      inputProps={{
-                        id: 'component-selector'
-                      }}
                     >
                       <optgroup label="Built-In">
                         <option value="mainboard">Mainboard</option>
@@ -242,19 +241,28 @@ export default function Dashboard () {
                 value={cubeNameInput}
               />
               {userId === creator._id &&
-                <MUIFormControlLabel
-                  control={
-                    <MUICheckbox
-                      checked={isPublished}
-                      onChange={() => {
-                        editCube(descriptionInput, cubeNameInput, !isPublished);
-                        setIsPublished(prevState => !prevState);
-                      }}
-                    />
-                  }
-                  label="Published?"
-                  style={{ display: 'block' }}
-                />
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <MUIFormControlLabel
+                    control={
+                      <MUICheckbox
+                        checked={isPublished}
+                        onChange={() => {
+                          editCube(descriptionInput, cubeNameInput, !isPublished);
+                          setIsPublished(prevState => !prevState);
+                        }}
+                      />
+                    }
+                    label="Published"
+                  />
+                  <MUITooltip title="A published cube is visible to other users.">
+                    <MUIHelpOutlineIcon color="primary" />
+                  </MUITooltip>
+                </div>
               }
             </React.Fragment>
           }

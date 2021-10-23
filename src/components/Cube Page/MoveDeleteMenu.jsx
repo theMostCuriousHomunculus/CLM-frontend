@@ -1,69 +1,65 @@
 import React from 'react';
-import MUIList from '@mui/material/List';
-import MUIListItem from '@mui/material/ListItem';
-import MUIListItemText from '@mui/material/ListItemText';
-import MUIMenu from '@mui/material/Menu';
-import MUIMenuItem from '@mui/material/MenuItem';
+import MUIFormControl from '@mui/material/FormControl';
+import MUIInputLabel from '@mui/material/InputLabel';
+import MUISelect from '@mui/material/Select';
+
+import { CubeContext } from '../../contexts/cube-context';
 
 export default function MoveDeleteMenu ({
   destination,
-  listItemPrimaryText,
-  modules,
-  rotations,
+  editable,
   setDestination
 }) {
 
-  const allComponents = [
-    { _id: 'mainboard', name: 'Mainboard' },
-    { _id: 'sideboard', name: 'Sideboard' },
-    ...modules,
-    ...rotations
-  ];
-  const [anchorEl, setAnchorEl] = React.useState();
+  const {
+    cubeState: {
+      modules,
+      rotations
+    }
+  } = React.useContext(CubeContext);
 
   return (
-    <React.Fragment>
-      <MUIList component="nav">
-        <MUIListItem
-          button
-          aria-haspopup="true"
-          aria-controls="lock-menu"
-          onClick={event => setAnchorEl(event.currentTarget)}
-        >
-          <MUIListItemText
-            primary={listItemPrimaryText}
-            secondary={destination.name}
-          />
-        </MUIListItem>
-      </MUIList>
-
-      <MUIMenu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
+    <MUIFormControl variant="outlined">
+      <MUIInputLabel htmlFor="move-delete-selector">Cube Component</MUIInputLabel>
+      <MUISelect
+        disabled={!editable}
+        inputProps={{ id: 'move-delete-selector' }}
+        label="Cube Component"
+        native
+        onChange={event => setDestination(event.target.value)}
+        style={{ marginBottom: 12 }}
+        value={destination}
       >
-        {allComponents.map((component) => (
-          <MUIMenuItem
-            key={component._id}
-            onClick={() => {
-              setAnchorEl(null);
-              setDestination({ _id: component._id, name: component.name });
-            }}
-            selected={destination._id === component._id}
-          >
-            {component.name}
-          </MUIMenuItem>
-        ))}
-        <MUIMenuItem
-          onClick={() => {
-            setAnchorEl(null);
-            setDestination({ _id: null, name: null });
-          }}
-        >
-          Delete from Cube
-        </MUIMenuItem>
-      </MUIMenu>
-    </React.Fragment>
+        <optgroup label="Built-In">
+          <option value="mainboard">Mainboard</option>
+          <option value="sideboard">Sideboard</option>
+        </optgroup>
+        {modules.length > 0 &&
+          <optgroup label="Modules">
+            {modules.map(module => (
+              <option
+                key={module._id}
+                value={module._id}
+              >
+                {module.name}
+              </option>
+            ))}
+          </optgroup>
+        }
+        {rotations.length > 0 &&
+          <optgroup label="Rotations">
+            {rotations.map(rotation => (
+              <option
+                key={rotation._id}
+                value={rotation._id}
+              >
+                {rotation.name}
+              </option>
+            ))}
+          </optgroup>
+        }
+        <option value="">Delete From Cube</option>
+      </MUISelect>
+    </MUIFormControl>
   );
 };

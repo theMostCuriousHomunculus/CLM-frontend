@@ -20,12 +20,14 @@ export default function Cube () {
     cubeState,
     setCubeState,
     addCardToCube,
-    deleteCard,
-    editCard,
     fetchCubeByID
   } = React.useContext(CubeContext);
-  const editable = cubeState.creator._id === userId;
+  const [editable, setEditable] = React.useState(cubeState.creator._id === userId);
   const [selectedCard, setSelectedCard] = React.useState();
+
+  React.useEffect(() => {
+    setEditable(cubeState.creator._id === userId);
+  }, [cubeState.creator._id, userId]);
 
   React.useEffect(() => {
 
@@ -75,15 +77,9 @@ export default function Cube () {
       <React.Fragment>
         {selectedCard &&
           <EditCardModal
-            activeComponentID={activeComponentState._id}
-            activeComponentName={activeComponentState.name}
             card={selectedCard}
             clear={() => setSelectedCard()}
-            deleteCard={deleteCard}
             editable={editable}
-            editCard={editCard}
-            modules={cubeState.modules.map(module => ({ _id: module._id, name: module.name }))}
-            rotations={cubeState.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))}
           />
         }
 
