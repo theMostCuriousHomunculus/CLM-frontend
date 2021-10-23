@@ -1,6 +1,5 @@
 import React from 'react';
 import MUICheckbox from '@mui/material/Checkbox';
-import MUIGrid from '@mui/material/Grid';
 import { makeStyles } from '@mui/styles';
 
 import { monoColors } from '../../constants/color-objects';
@@ -20,9 +19,6 @@ const useStyles = makeStyles({
       height: 40,
       width: 40
     }
-  },
-  colorCheckboxContainer: {
-    textAlign: 'center'
   },
   G: {
     color: monoColors[4].hex
@@ -84,17 +80,16 @@ export default function ColorCheckboxes ({
   }
 
   return (
-    <MUIGrid container justifyContent="space-around">
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       {Array.from(Object.keys(colorObj)).map(color => (
-        <MUIGrid className={classes.colorCheckboxContainer} item key={color} xs={4}>
-          <MUICheckbox
-            checked={colorObj[color].checked}
-            checkedIcon={colorObj[color].icon}
-            className={`${classes.colorCheckbox} ${classes[color]}`}
-            onChange={() => handleColorCheckboxClick(color)}
-          />
-        </MUIGrid>
+        <MUICheckbox
+          key={color}
+          checked={colorObj[color].checked}
+          checkedIcon={colorObj[color].icon}
+          className={`${classes.colorCheckbox} ${classes[color]}`}
+          onChange={() => handleColorCheckboxClick(color)}
+        />
       ))}
-    </MUIGrid>
+    </div>
   );
 };

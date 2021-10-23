@@ -88,6 +88,7 @@ export default function ContextualizedCubePage () {
     mana_cost
     mtgo_id
     name
+    notes
     oracle_id
     scryfall_id
     set
