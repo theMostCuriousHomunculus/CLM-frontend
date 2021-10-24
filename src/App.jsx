@@ -14,11 +14,21 @@ import { ErrorContext } from './contexts/error-context';
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Classy = React.lazy(() => import('./pages/Classy'));
-const ContextualizedCubePage = React.lazy(() => import('./contexts/cube-context'));
-const ContextualizedEventPage = React.lazy(() => import('./contexts/event-context'));
-const ContextualizedAccountPage = React.lazy(() => import ('./contexts/account-context'));
-const ContextualizedDeckPage = React.lazy(() => import('./contexts/deck-context'));
-const ContextualizedMatchPage = React.lazy(() => import('./contexts/match-context'));
+const ContextualizedCubePage = React.lazy(() =>
+  import('./contexts/cube-context')
+);
+const ContextualizedEventPage = React.lazy(() =>
+  import('./contexts/event-context')
+);
+const ContextualizedAccountPage = React.lazy(() =>
+  import('./contexts/account-context')
+);
+const ContextualizedDeckPage = React.lazy(() =>
+  import('./contexts/deck-context')
+);
+const ContextualizedMatchPage = React.lazy(() =>
+  import('./contexts/match-context')
+);
 const Home = React.lazy(() => import('./pages/Home'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
@@ -36,7 +46,6 @@ const useStyles = makeStyles({
 });
 
 export default function App() {
-
   const classes = useStyles();
   const { sendRequest } = useRequest();
   const [errorMessages, setErrorMessages] = React.useState([]);
@@ -76,9 +85,11 @@ export default function App() {
 
   React.useEffect(() => {
     if (Cookies.get('user_id') && Cookies.get('authentication_token')) {
-      login(Cookies.get('is_admin') === 'true',
+      login(
+        Cookies.get('is_admin') === 'true',
         Cookies.get('authentication_token'),
-        Cookies.get('user_id'));
+        Cookies.get('user_id')
+      );
     }
   }, [login]);
 
@@ -101,46 +112,48 @@ export default function App() {
         <BrowserRouter>
           <Navigation />
           <main className={classes.main}>
-            <React.Suspense 
-              fallback={<LoadingSpinner />}
-            >
-            <ErrorDialog
-              clearAll={() => setErrorMessages([])}
-              clearOne={() => setErrorMessages(prevState => prevState.slice(0, prevState.length - 1))}
-              messages={errorMessages}
-            />
+            <React.Suspense fallback={<LoadingSpinner />}>
+              <ErrorDialog
+                clearAll={() => setErrorMessages([])}
+                clearOne={() =>
+                  setErrorMessages((prevState) =>
+                    prevState.slice(0, prevState.length - 1)
+                  )
+                }
+                messages={errorMessages}
+              />
               <Switch>
-                <Route path='/' exact>
+                <Route path="/" exact>
                   <Home />
                 </Route>
-                <Route path='/account/:accountId'>
+                <Route path="/account/:accountId">
                   <ContextualizedAccountPage />
                 </Route>
-                <Route path='/blog/:blogPostId'>
+                <Route path="/blog/:blogPostId">
                   <BlogPost />
                 </Route>
-                <Route path='/blog'>
+                <Route path="/blog">
                   <Blog />
                 </Route>
-                <Route path='/classy'>
+                <Route path="/classy">
                   <Classy />
                 </Route>
-                <Route path='/cube/:cubeId'>
+                <Route path="/cube/:cubeId">
                   <ContextualizedCubePage />
                 </Route>
-                <Route path='/deck/:deckId'>
+                <Route path="/deck/:deckId">
                   <ContextualizedDeckPage />
                 </Route>
-                <Route path='/event/:eventId'>
+                <Route path="/event/:eventId">
                   <ContextualizedEventPage />
                 </Route>
-                <Route path='/match/:matchId'>
+                <Route path="/match/:matchId">
                   <ContextualizedMatchPage />
                 </Route>
-                <Route path='/reset/:resetToken'>
+                <Route path="/reset/:resetToken">
                   <PasswordReset />
                 </Route>
-                <Route path='/resources' exact>
+                <Route path="/resources" exact>
                   <Resources />
                 </Route>
               </Switch>
@@ -151,4 +164,4 @@ export default function App() {
       </ErrorContext.Provider>
     </AuthenticationContext.Provider>
   );
-};
+}

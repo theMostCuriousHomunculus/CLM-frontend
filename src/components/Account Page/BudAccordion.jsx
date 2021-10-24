@@ -44,13 +44,19 @@ const useStyles = makeStyles({
   }
 });
 
-export default function BudAccordion () {
-
+export default function BudAccordion() {
   const accountId = useParams().accountId;
   const classes = useStyles();
-  const { accountState: { buds, received_bud_requests, sent_bud_requests }, editAccount } = React.useContext(AccountContext);
+  const {
+    accountState: { buds, received_bud_requests, sent_bud_requests },
+    editAccount
+  } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
-  const [budToDelete, setBudToDelete] = React.useState({ _id: null, avatar: null, name: null });
+  const [budToDelete, setBudToDelete] = React.useState({
+    _id: null,
+    avatar: null,
+    name: null
+  });
   const [potentialBuds, setPotentialBuds] = React.useState([]);
 
   React.useEffect(() => {
@@ -68,18 +74,22 @@ export default function BudAccordion () {
           };
         }
       }
-    };
+    }
 
-    setPotentialBuds(Object.entries(pbObject)
-      .sort((a, b) => b[1].priority - a[1].priority)
-      .map(pb => ({ _id: pb[0], avatar: pb[1].avatar, name: pb[1].name }))
-      .filter(pb => !buds
-        .map(bud => bud._id)
-        .concat([accountId])
-        .concat(received_bud_requests.map(req => req._id))
-        .concat(sent_bud_requests.map(req => req._id))
-        .includes(pb._id)));
-
+    setPotentialBuds(
+      Object.entries(pbObject)
+        .sort((a, b) => b[1].priority - a[1].priority)
+        .map((pb) => ({ _id: pb[0], avatar: pb[1].avatar, name: pb[1].name }))
+        .filter(
+          (pb) =>
+            !buds
+              .map((bud) => bud._id)
+              .concat([accountId])
+              .concat(received_bud_requests.map((req) => req._id))
+              .concat(sent_bud_requests.map((req) => req._id))
+              .includes(pb._id)
+        )
+    );
   }, [accountId, buds, received_bud_requests, sent_bud_requests]);
 
   return (
@@ -91,12 +101,20 @@ export default function BudAccordion () {
         }}
         open={!!budToDelete._id}
         title={`Are you sure you want to un-bud ${budToDelete.name}?`}
-        toggleOpen={() => setBudToDelete({ _id: null, avatar: null, name: null })}
+        toggleOpen={() =>
+          setBudToDelete({ _id: null, avatar: null, name: null })
+        }
       >
         <div style={{ display: 'flex' }}>
-          <Avatar alt={budToDelete.name} size='large' src={budToDelete.avatar} style={{ marginRight: 16 }} />
+          <Avatar
+            alt={budToDelete.name}
+            size="large"
+            src={budToDelete.avatar}
+            style={{ marginRight: 16 }}
+          />
           <MUITypography variant="body1">
-            Think of all the good times you've had.  And how lonely they'll be without you.
+            Think of all the good times you've had. And how lonely they'll be
+            without you.
           </MUITypography>
         </div>
       </ConfirmationDialog>
@@ -110,39 +128,67 @@ export default function BudAccordion () {
           <MUITypography>Buds ({buds.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails style={{ display: 'block' }}>
-          {accountId === userId &&
+          {accountId === userId && (
             <React.Fragment>
-              <MUIListSubheader component="div" id="aspiring-buds">Aspiring</MUIListSubheader>
+              <MUIListSubheader component="div" id="aspiring-buds">
+                Aspiring
+              </MUIListSubheader>
               <MUIList className={classes.budList}>
                 {received_bud_requests.map(function (request) {
                   return (
                     <MUIListItem key={request._id}>
                       <MUIBadge
-                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                        badgeContent={<MUINotInterestedIcon className={classes.badgeIcon} />}
+                        anchorOrigin={{
+                          horizontal: 'right',
+                          vertical: 'bottom'
+                        }}
+                        badgeContent={
+                          <MUINotInterestedIcon className={classes.badgeIcon} />
+                        }
                         className={classes.badge}
                         color="secondary"
-                        onClick={event => {
-                          if (event.target.closest('span').classList.contains("MuiBadge-colorSecondary")) {
-                            editAccount(`action: "reject",\nother_user_id: "${request._id}"`);
+                        onClick={(event) => {
+                          if (
+                            event.target
+                              .closest('span')
+                              .classList.contains('MuiBadge-colorSecondary')
+                          ) {
+                            editAccount(
+                              `action: "reject",\nother_user_id: "${request._id}"`
+                            );
                           }
                         }}
                         overlap="circular"
                       >
                         <MUIBadge
-                          anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-                          badgeContent={<MUIPersonAddIcon className={classes.badgeIcon} />}
+                          anchorOrigin={{
+                            horizontal: 'right',
+                            vertical: 'top'
+                          }}
+                          badgeContent={
+                            <MUIPersonAddIcon className={classes.badgeIcon} />
+                          }
                           className={classes.badge}
                           color="primary"
-                          onClick={event => {
-                            if (event.target.closest('span').classList.contains("MuiBadge-colorPrimary")) {
-                              editAccount(`action: "accept",\nother_user_id: "${request._id}"`);
+                          onClick={(event) => {
+                            if (
+                              event.target
+                                .closest('span')
+                                .classList.contains('MuiBadge-colorPrimary')
+                            ) {
+                              editAccount(
+                                `action: "accept",\nother_user_id: "${request._id}"`
+                              );
                             }
                           }}
                           overlap="circular"
                         >
                           <Link to={`/account/${request._id}`}>
-                            <Avatar alt={request.name} size='large' src={request.avatar} />
+                            <Avatar
+                              alt={request.name}
+                              size="large"
+                              src={request.avatar}
+                            />
                           </Link>
                         </MUIBadge>
                       </MUIBadge>
@@ -151,38 +197,54 @@ export default function BudAccordion () {
                 })}
               </MUIList>
 
-              <MUIListSubheader component="div" id="pending-buds">Pending</MUIListSubheader>
+              <MUIListSubheader component="div" id="pending-buds">
+                Pending
+              </MUIListSubheader>
               <MUIList className={classes.budList}>
                 {sent_bud_requests.map(function (request) {
                   return (
                     <MUIListItem key={request._id}>
                       <Link to={`/account/${request._id}`}>
-                        <Avatar alt={request.name} size='large' src={request.avatar} />
+                        <Avatar
+                          alt={request.name}
+                          size="large"
+                          src={request.avatar}
+                        />
                       </Link>
                     </MUIListItem>
                   );
                 })}
               </MUIList>
 
-              <MUIListSubheader component="div" id="potential-buds">Potential</MUIListSubheader>
+              <MUIListSubheader component="div" id="potential-buds">
+                Potential
+              </MUIListSubheader>
               <MUIList className={classes.budList}>
                 {potentialBuds.map(function (pb) {
                   return (
                     <MUIListItem key={pb._id}>
                       <MUIBadge
                         anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-                        badgeContent={<MUIPersonAddIcon className={classes.badgeIcon} />}
+                        badgeContent={
+                          <MUIPersonAddIcon className={classes.badgeIcon} />
+                        }
                         className={classes.badge}
                         color="primary"
-                        onClick={event => {
-                          if (event.target.closest('span').classList.contains("MuiBadge-colorPrimary")) {
-                            editAccount(`action: "send",\nother_user_id: "${pb._id}"`);
+                        onClick={(event) => {
+                          if (
+                            event.target
+                              .closest('span')
+                              .classList.contains('MuiBadge-colorPrimary')
+                          ) {
+                            editAccount(
+                              `action: "send",\nother_user_id: "${pb._id}"`
+                            );
                           }
                         }}
                         overlap="circular"
                       >
                         <Link to={`/account/${pb._id}`}>
-                          <Avatar alt={pb.name} size='large' src={pb.avatar} />
+                          <Avatar alt={pb.name} size="large" src={pb.avatar} />
                         </Link>
                       </MUIBadge>
                     </MUIListItem>
@@ -190,33 +252,42 @@ export default function BudAccordion () {
                 })}
               </MUIList>
             </React.Fragment>
-          }
+          )}
 
-          <MUIListSubheader component="div" id="accepted-buds">Accepted</MUIListSubheader>
+          <MUIListSubheader component="div" id="accepted-buds">
+            Accepted
+          </MUIListSubheader>
           <MUIList className={classes.budList}>
-            {customSort(buds, ['name']).map(bud => (
+            {customSort(buds, ['name']).map((bud) => (
               <MUIListItem key={bud._id}>
-                {accountId === userId ?
+                {accountId === userId ? (
                   <MUIBadge
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                    badgeContent={<MUIDeleteForeverIcon className={classes.badgeIcon} />}
+                    badgeContent={
+                      <MUIDeleteForeverIcon className={classes.badgeIcon} />
+                    }
                     className={classes.badge}
                     color="secondary"
-                    onClick={event => {
-                      if (event.target.closest('span').classList.contains("MuiBadge-colorSecondary")) {
+                    onClick={(event) => {
+                      if (
+                        event.target
+                          .closest('span')
+                          .classList.contains('MuiBadge-colorSecondary')
+                      ) {
                         setBudToDelete(bud);
                       }
                     }}
                     overlap="circular"
                   >
                     <Link to={`/account/${bud._id}`}>
-                      <Avatar alt={bud.name} size='large' src={bud.avatar} />
+                      <Avatar alt={bud.name} size="large" src={bud.avatar} />
                     </Link>
-                  </MUIBadge> :
+                  </MUIBadge>
+                ) : (
                   <Link to={`/account/${bud._id}`}>
-                    <Avatar alt={bud.name} size='large' src={bud.avatar} />
+                    <Avatar alt={bud.name} size="large" src={bud.avatar} />
                   </Link>
-                }
+                )}
               </MUIListItem>
             ))}
           </MUIList>
@@ -224,4 +295,4 @@ export default function BudAccordion () {
       </MUIAccordion>
     </React.Fragment>
   );
-};
+}

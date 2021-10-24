@@ -22,7 +22,6 @@ export const AccountContext = createContext({
 });
 
 export default function ContextualizedAccountPage() {
-
   const accountID = useParams().accountId;
   const history = useHistory();
   const [accountState, setAccountState] = React.useState({
@@ -144,18 +143,19 @@ export default function ContextualizedAccountPage() {
   `;
   const { loading, sendRequest } = useRequest();
 
-  const createCube = React.useCallback(async function (event, cobraID, description, name) {
-    event.preventDefault();
+  const createCube = React.useCallback(
+    async function (event, cobraID, description, name) {
+      event.preventDefault();
 
-    await sendRequest({
-      callback: (data) => {
-        history.push(`/cube/${data._id}`);
-      },
-      load: true,
-      operation: 'createCube',
-      get body() {
-        return {
-          query: `
+      await sendRequest({
+        callback: (data) => {
+          history.push(`/cube/${data._id}`);
+        },
+        load: true,
+        operation: 'createCube',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -168,28 +168,35 @@ export default function ContextualizedAccountPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [history, sendRequest]);
+      });
+    },
+    [history, sendRequest]
+  );
 
-  const createDeck = React.useCallback(async function (event, description, existingListID, format, name) {
-    event.preventDefault();
+  const createDeck = React.useCallback(
+    async function (event, description, existingListID, format, name) {
+      event.preventDefault();
 
-    await sendRequest({
-      callback: (data) => {
-        history.push(`/deck/${data._id}`);
-      },
-      load: true,
-      operation: 'createDeck',
-      get body() {
-        return {
-          query: `
+      await sendRequest({
+        callback: (data) => {
+          history.push(`/deck/${data._id}`);
+        },
+        load: true,
+        operation: 'createDeck',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
                   description: "${description}",
-                  ${existingListID ? 'existingListID: "' + existingListID + '",\n' : ''}
+                  ${
+                    existingListID
+                      ? 'existingListID: "' + existingListID + '",\n'
+                      : ''
+                  }
                   ${format ? 'format: ' + format + ',\n' : ''}
                   name: "${name}"
                 }
@@ -198,41 +205,46 @@ export default function ContextualizedAccountPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [history, sendRequest]);
+      });
+    },
+    [history, sendRequest]
+  );
 
-  const createEvent = React.useCallback(async function (
-    event,
-    cubeID,
-    cardsPerPack,
-    eventType,
-    modules,
-    name,
-    otherPlayers,
-    packsPerPlayer
-  ) {
-    event.preventDefault();
+  const createEvent = React.useCallback(
+    async function (
+      event,
+      cubeID,
+      cardsPerPack,
+      eventType,
+      modules,
+      name,
+      otherPlayers,
+      packsPerPlayer
+    ) {
+      event.preventDefault();
 
-    await sendRequest({
-      callback: (data) => {
-        history.push(`/event/${data._id}`);
-      },
-      headers: { CubeID: cubeID },
-      load: true,
-      operation: 'createEvent',
-      get body() {
-        return {
-          query: `
+      await sendRequest({
+        callback: (data) => {
+          history.push(`/event/${data._id}`);
+        },
+        headers: { CubeID: cubeID },
+        load: true,
+        operation: 'createEvent',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
                   cards_per_pack: ${cardsPerPack},
                   event_type: ${eventType},
-                  modules: [${modules.map(mdl => '"' + mdl + '"')}],
+                  modules: [${modules.map((mdl) => '"' + mdl + '"')}],
                   name: "${name}",
-                  other_players: [${otherPlayers.map(plr => '"' + plr + '"')}],
+                  other_players: [${otherPlayers.map(
+                    (plr) => '"' + plr + '"'
+                  )}],
                   packs_per_player: ${packsPerPlayer}
                 }
               ) {
@@ -240,81 +252,93 @@ export default function ContextualizedAccountPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [history, sendRequest]);
+      });
+    },
+    [history, sendRequest]
+  );
 
-  const createMatch = React.useCallback(async function (event, deckIDs, eventID, playerIDs) {
-    event.preventDefault();
+  const createMatch = React.useCallback(
+    async function (event, deckIDs, eventID, playerIDs) {
+      event.preventDefault();
 
-    await sendRequest({
-      callback: (data) => {
-        history.push(`/match/${data._id}`);
-      },
-      load: true,
-      operation: 'createMatch',
-      get body() {
-        return {
-          query: `
+      await sendRequest({
+        callback: (data) => {
+          history.push(`/match/${data._id}`);
+        },
+        load: true,
+        operation: 'createMatch',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
-                  deckIDs: [${deckIDs.map(dckID => '"' + dckID + '"')}],
+                  deckIDs: [${deckIDs.map((dckID) => '"' + dckID + '"')}],
                   ${eventID ? 'eventID: "' + eventID + '",\n' : ''}
-                  playerIDs: [${playerIDs.map(plrID => '"' + plrID + '"')}]
+                  playerIDs: [${playerIDs.map((plrID) => '"' + plrID + '"')}]
                 }
               ) {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [history, sendRequest]);
+      });
+    },
+    [history, sendRequest]
+  );
 
-  const deleteCube = React.useCallback(async function (cubeID) {
-    await sendRequest({
-      headers: { CubeID: cubeID },
-      operation: 'deleteCube',
-      get body() {
-        return {
-          query: `
+  const deleteCube = React.useCallback(
+    async function (cubeID) {
+      await sendRequest({
+        headers: { CubeID: cubeID },
+        operation: 'deleteCube',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}
             }
           `
+          };
         }
-      }
-    });
-  }, [sendRequest]);
+      });
+    },
+    [sendRequest]
+  );
 
-  const deleteDeck = React.useCallback(async function (deckID) {
-    await sendRequest({
-      headers: { DeckID: deckID },
-      operation: 'deleteDeck',
-      get body() {
-        return {
-          query: `
+  const deleteDeck = React.useCallback(
+    async function (deckID) {
+      await sendRequest({
+        headers: { DeckID: deckID },
+        operation: 'deleteDeck',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}
             }
           `
+          };
         }
-      }
-    });
-  }, [sendRequest]);
+      });
+    },
+    [sendRequest]
+  );
 
-  const editAccount = React.useCallback(async function (changes) {
-    await sendRequest({
-      callback: (data) => {
-        setAccountState(data);
-      },
-      operation: 'editAccount',
-      get body() {
-        return {
-          query: `
+  const editAccount = React.useCallback(
+    async function (changes) {
+      await sendRequest({
+        callback: (data) => {
+          setAccountState(data);
+        },
+        operation: 'editAccount',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -325,29 +349,34 @@ export default function ContextualizedAccountPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [accountQuery, sendRequest]);
+      });
+    },
+    [accountQuery, sendRequest]
+  );
 
-  const fetchAccountByID = React.useCallback(async function () {
-    await sendRequest({
-      callback: data => setAccountState(data),
-      load: true,
-      operation: 'fetchAccountByID',
-      get body() {
-        return {
-          query: `
+  const fetchAccountByID = React.useCallback(
+    async function () {
+      await sendRequest({
+        callback: (data) => setAccountState(data),
+        load: true,
+        operation: 'fetchAccountByID',
+        get body() {
+          return {
+            query: `
             query {
               ${this.operation}(_id: "${accountID}") {
                 ${accountQuery}
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [accountQuery, accountID, sendRequest]);
+      });
+    },
+    [accountQuery, accountID, sendRequest]
+  );
 
   return (
     <AccountContext.Provider
@@ -369,4 +398,4 @@ export default function ContextualizedAccountPage() {
       <Account />
     </AccountContext.Provider>
   );
-};
+}

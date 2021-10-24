@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { deepPurple, orange, yellow } from '@mui/material/colors';
 
-const backgroundColor = `#efefef`;
+const backgroundColor = '#efefef';
 
 const theme = createTheme({
   components: {
@@ -10,7 +10,7 @@ const theme = createTheme({
         root: {
           borderRadius: 4,
           '&.Mui-expanded': {
-            margin: 4,
+            margin: 4
           }
         }
       }
@@ -152,7 +152,7 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         head: {
-          color: orange[500],
+          color: orange[500]
         },
         root: {
           padding: '4px 8px 4px 8px'
@@ -186,16 +186,8 @@ const theme = createTheme({
     }
   },
   typography: {
-    fontFamily: [
-      'Ubuntu',
-      'Roboto',
-      'Arial',
-      'sans-serif'
-    ].join(',')
+    fontFamily: ['Ubuntu', 'Roboto', 'Arial', 'sans-serif'].join(',')
   }
 });
 
-export {
-  backgroundColor,
-  theme as default
-};
+export { backgroundColor, theme as default };

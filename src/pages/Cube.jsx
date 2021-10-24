@@ -10,8 +10,7 @@ import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { CubeContext } from '../contexts/cube-context';
 
-export default function Cube () {
-
+export default function Cube() {
   const { token, userId } = React.useContext(AuthenticationContext);
   const {
     loading,
@@ -22,7 +21,9 @@ export default function Cube () {
     addCardToCube,
     fetchCubeByID
   } = React.useContext(CubeContext);
-  const [editable, setEditable] = React.useState(cubeState.creator._id === userId);
+  const [editable, setEditable] = React.useState(
+    cubeState.creator._id === userId
+  );
   const [selectedCard, setSelectedCard] = React.useState();
 
   React.useEffect(() => {
@@ -30,8 +31,7 @@ export default function Cube () {
   }, [cubeState.creator._id, userId]);
 
   React.useEffect(() => {
-
-    async function initialize () {
+    async function initialize() {
       await fetchCubeByID();
     }
 
@@ -45,63 +45,67 @@ export default function Cube () {
       url: process.env.REACT_APP_GRAPHQL_WS_URL
     });
 
-    async function subscribe () {
+    async function subscribe() {
       function onNext(update) {
         setCubeState(update.data.subscribeCube);
       }
 
       await new Promise((resolve, reject) => {
-        client.subscribe({
-          query: `subscription {
+        client.subscribe(
+          {
+            query: `subscription {
             subscribeCube {
               ${cubeQuery}
             }
           }`
-        },
-        {
-          complete: resolve,
-          error: reject,
-          next: onNext
-        });
+          },
+          {
+            complete: resolve,
+            error: reject,
+            next: onNext
+          }
+        );
       });
     }
 
-    subscribe(result => console.log(result), error => console.log(error));
+    subscribe(
+      (result) => console.log(result),
+      (error) => console.log(error)
+    );
 
     return client.dispose;
   }, [token, cubeQuery, cubeState._id, fetchCubeByID, setCubeState]);
 
-  return (
-    loading ?
-      <LoadingSpinner /> :
-      <React.Fragment>
-        {selectedCard &&
-          <EditCardModal
-            card={selectedCard}
-            clear={() => setSelectedCard()}
-            editable={editable}
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
+    <React.Fragment>
+      {selectedCard && (
+        <EditCardModal
+          card={selectedCard}
+          clear={() => setSelectedCard()}
+          editable={editable}
+        />
+      )}
+
+      <Dashboard />
+
+      {editable && (
+        <MUIPaper
+          style={{
+            position: 'sticky',
+            top: 4
+          }}
+        >
+          <ScryfallRequest
+            buttonText="Add to Cube"
+            labelText={`Add a card to ${activeComponentState.name}`}
+            onSubmit={addCardToCube}
           />
-        }
+        </MUIPaper>
+      )}
 
-        <Dashboard />
-
-        {editable &&
-          <MUIPaper
-            style={{
-              position: 'sticky',
-              top: 4
-            }}
-          >
-            <ScryfallRequest
-              buttonText="Add to Cube"
-              labelText={`Add a card to ${activeComponentState.name}`}
-              onSubmit={addCardToCube}
-            />
-          </MUIPaper>
-        }
-
-        <CubeDisplay setSelectedCard={setSelectedCard} />
-
-      </React.Fragment>
+      <CubeDisplay setSelectedCard={setSelectedCard} />
+    </React.Fragment>
   );
-};
+}

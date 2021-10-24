@@ -24,18 +24,10 @@ import { AuthenticationContext } from '../../contexts/authentication-context';
 import { DeckContext } from '../../contexts/deck-context';
 import { CSVLink } from 'react-csv';
 
-export default function DeckInfo () {
-
+export default function DeckInfo() {
   const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
   const {
-    deckState: {
-      creator,
-      description,
-      format,
-      mainboard,
-      name,
-      sideboard
-    },
+    deckState: { creator, description, format, mainboard, name, sideboard },
     cloneDeck,
     editDeck
   } = React.useContext(DeckContext);
@@ -45,14 +37,11 @@ export default function DeckInfo () {
 
   return (
     <React.Fragment>
-      <MUIDialog
-        onClose={() => setSampleHand([])}
-        open={sampleHand.length > 0}
-      >
+      <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
         <MUIDialogTitle>Sample Hand from {name}</MUIDialogTitle>
         <MUIDialogContent>
           <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
-            {sampleHand.map(card => (
+            {sampleHand.map((card) => (
               <MUIImageListItem key={card._id}>
                 <img
                   alt={card.name}
@@ -64,7 +53,11 @@ export default function DeckInfo () {
           </MUIImageList>
         </MUIDialogContent>
         <MUIDialogActions>
-          <MUIButton onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}>
+          <MUIButton
+            onClick={() =>
+              setSampleHand(randomSampleWOReplacement(mainboard, 7))
+            }
+          >
             New Sample Hand
           </MUIButton>
         </MUIDialogActions>
@@ -80,7 +73,9 @@ export default function DeckInfo () {
                 fullWidth
                 label="Format"
                 native
-                onChange={event => editDeck(descriptionInput, event.target.value, nameInput)}
+                onChange={(event) =>
+                  editDeck(descriptionInput, event.target.value, nameInput)
+                }
                 value={format}
                 inputProps={{
                   id: 'format-selector'
@@ -97,13 +92,17 @@ export default function DeckInfo () {
               </MUISelect>
             </MUIFormControl>
           }
-          avatar={<Avatar alt={creator.name} size='large' src={creator.avatar} />}
+          avatar={
+            <Avatar alt={creator.name} size="large" src={creator.avatar} />
+          }
           title={
             <MUITextField
               disabled={creator._id !== userId}
-              inputProps={{ onBlur: () => editDeck(descriptionInput, format, nameInput) }}
+              inputProps={{
+                onBlur: () => editDeck(descriptionInput, format, nameInput)
+              }}
               label="Deck Name"
-              onChange={event => setNameInput(event.target.value)}
+              onChange={(event) => setNameInput(event.target.value)}
               type="text"
               value={nameInput}
             />
@@ -111,7 +110,8 @@ export default function DeckInfo () {
           subheader={
             <React.Fragment>
               <MUITypography color="textSecondary" variant="subtitle1">
-                Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
+                Designed by:{' '}
+                <Link to={`/account/${creator._id}`}>{creator.name}</Link>
               </MUITypography>
               <MUITypography variant="subtitle1">
                 <CSVLink
@@ -130,13 +130,15 @@ export default function DeckInfo () {
           <MUITextField
             disabled={creator._id !== userId}
             fullWidth={true}
-            inputProps={{ onBlur: () => editDeck(descriptionInput, format, nameInput) }}
+            inputProps={{
+              onBlur: () => editDeck(descriptionInput, format, nameInput)
+            }}
             label="Deck Description"
             multiline
-            onChange={event => setDescriptionInput(event.target.value)}
+            onChange={(event) => setDescriptionInput(event.target.value)}
             rows={2}
             value={descriptionInput}
-          />      
+          />
         </MUICardContent>
 
         <MUICardActions
@@ -145,17 +147,17 @@ export default function DeckInfo () {
             justifyContent: 'flex-end'
           }}
         >
-          {isLoggedIn &&
-            <MUIButton onClick={cloneDeck}>
-              Clone Deck
-            </MUIButton>
-          }
+          {isLoggedIn && <MUIButton onClick={cloneDeck}>Clone Deck</MUIButton>}
 
-          <MUIButton onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}>
+          <MUIButton
+            onClick={() =>
+              setSampleHand(randomSampleWOReplacement(mainboard, 7))
+            }
+          >
             Sample Hand
           </MUIButton>
         </MUICardActions>
       </MUICard>
     </React.Fragment>
   );
-};
+}

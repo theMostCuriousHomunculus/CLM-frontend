@@ -38,8 +38,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function Account () {
-
+export default function Account() {
   const accountId = useParams().accountId;
   const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
   const {
@@ -59,76 +58,90 @@ export default function Account () {
   const classes = useStyles();
 
   React.useEffect(() => {
-    async function initialize () {
+    async function initialize() {
       await fetchAccountByID();
     }
 
     initialize();
   }, [fetchAccountByID]);
 
-  return (
-    loading ?
-      <LoadingSpinner /> :
-      <React.Fragment>
-        <MUICard>
-          <MUICardHeader
-            avatar={<Avatar alt={name} size='large' src={avatar} />}
-            className={classes.cardHeader}
-            title={
-              <MUITextField
-                autoComplete="off"
-                disabled={accountId !== userId}
-                inputProps={{ onBlur: event => editAccount(`name: "${event.target.value}"`) }}
-                label="Account Name"
-                onChange={(event) => {
-                  event.persist();
-                  setAccountState(prevState => ({
-                    ...prevState,
-                    name: event.target.value
-                  }));
-                }}
-                type="text"
-                value={name}
-              />
-            }
-            subheader={accountId === userId &&
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
+    <React.Fragment>
+      <MUICard>
+        <MUICardHeader
+          avatar={<Avatar alt={name} size="large" src={avatar} />}
+          className={classes.cardHeader}
+          title={
+            <MUITextField
+              autoComplete="off"
+              disabled={accountId !== userId}
+              inputProps={{
+                onBlur: (event) => editAccount(`name: "${event.target.value}"`)
+              }}
+              label="Account Name"
+              onChange={(event) => {
+                event.persist();
+                setAccountState((prevState) => ({
+                  ...prevState,
+                  name: event.target.value
+                }));
+              }}
+              type="text"
+              value={name}
+            />
+          }
+          subheader={
+            accountId === userId && (
               <MUITypography color="textSecondary" variant="subtitle1">
                 {email}
               </MUITypography>
-            }
-          />
-          {accountId === userId &&
-            <MUICardActions>
-              <ScryfallRequest
-                buttonText="Change Avatar"
-                labelText="Change your avatar"
-                onSubmit={chosenCard => editAccount(`avatar: "${chosenCard.art_crop}"`)}
-              />
-            </MUICardActions>
+            )
           }
-          {isLoggedIn &&
-            accountId !== userId &&
-            buds.filter(bud => bud._id === userId).length === 0 &&
-            received_bud_requests.filter(request => request._id === userId).length === 0 &&
-            sent_bud_requests.filter(request => request._id === userId).length === 0 &&
+        />
+        {accountId === userId && (
+          <MUICardActions>
+            <ScryfallRequest
+              buttonText="Change Avatar"
+              labelText="Change your avatar"
+              onSubmit={(chosenCard) =>
+                editAccount(`avatar: "${chosenCard.art_crop}"`)
+              }
+            />
+          </MUICardActions>
+        )}
+        {isLoggedIn &&
+          accountId !== userId &&
+          buds.filter((bud) => bud._id === userId).length === 0 &&
+          received_bud_requests.filter((request) => request._id === userId)
+            .length === 0 &&
+          sent_bud_requests.filter((request) => request._id === userId)
+            .length === 0 && (
             // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
             <MUICardActions>
-              <MUIButton onClick={() => editAccount(`action: "send",\nother_user_id: "${accountId}",\nreturn_other: true`)}>
+              <MUIButton
+                onClick={() =>
+                  editAccount(
+                    `action: "send",\nother_user_id: "${accountId}",\nreturn_other: true`
+                  )
+                }
+              >
                 <MUIPersonAddIcon />
               </MUIButton>
             </MUICardActions>
-          }
-        </MUICard>
+          )}
+      </MUICard>
 
-        <BudAccordion />
+      <BudAccordion />
 
-        <CubeAccordion pageClasses={classes} />
+      <CubeAccordion pageClasses={classes} />
 
-        <DeckAccordion pageClasses={classes} />
+      <DeckAccordion pageClasses={classes} />
 
-        <EventAccordion pageClasses={classes} />
+      <EventAccordion pageClasses={classes} />
 
-        <MatchAccordion pageClasses={classes} />
-      </React.Fragment>
+      <MatchAccordion pageClasses={classes} />
+    </React.Fragment>
   );
-};
+}

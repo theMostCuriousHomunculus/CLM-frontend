@@ -43,19 +43,22 @@ const useStyles = makeStyles({
   }
 });
 
-function Navigation (props) {
-
-  const [authenticateFormDisplayed, setAuthenticateFormDisplayed] = React.useState(false);
+function Navigation(props) {
+  const [authenticateFormDisplayed, setAuthenticateFormDisplayed] =
+    React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const classes = useStyles();
   const { history } = props;
 
-  function toggleDrawer (event) {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+  function toggleDrawer(event) {
+    if (
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
       return;
     }
-    setDrawerOpen(prevState => !prevState);
-  };
+    setDrawerOpen((prevState) => !prevState);
+  }
 
   return (
     <React.Fragment>
@@ -63,11 +66,7 @@ function Navigation (props) {
         open={authenticateFormDisplayed}
         toggleOpen={() => setAuthenticateFormDisplayed(false)}
       />
-      <MUIAppBar
-        className={classes.appBar}
-        id="app-bar"
-        position="static"
-      >
+      <MUIAppBar className={classes.appBar} id="app-bar" position="static">
         <MUIToolbar className={classes.toolbar}>
           <MUIMenuIcon
             className={classes.menuIcon}
@@ -75,10 +74,7 @@ function Navigation (props) {
             onClick={() => setDrawerOpen(true)}
           />
           <div className={classes.headlineContainer}>
-            <MUITypography
-              color="secondary"
-              variant="h3"
-            >
+            <MUITypography color="secondary" variant="h3">
               Cube Level Midnight
             </MUITypography>
           </div>

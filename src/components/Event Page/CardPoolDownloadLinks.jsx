@@ -4,16 +4,12 @@ import { CSVLink } from 'react-csv';
 
 import generateCSVList from '../../functions/generate-csv-list';
 
-export default function CardPoolDownloadLinks ({ me, others }) {
-
+export default function CardPoolDownloadLinks({ me, others }) {
   return (
     <div style={{ margin: 4 }}>
       <MUITypography variant="body1">
         <CSVLink
-          data={generateCSVList(
-            me.mainboard,
-            me.sideboard
-          )}
+          data={generateCSVList(me.mainboard, me.sideboard)}
           filename={`${me.account.name}.csv`}
           target="_blank"
         >
@@ -40,19 +36,20 @@ export default function CardPoolDownloadLinks ({ me, others }) {
             <MUITypography key={plr.account._id} variant="body1">
               <CSVLink
                 data={cardpool.reduce(function (a, c) {
-                  return a + " ,1," + c.mtgo_id + ", , , , ,No,0\n";
-                }, "Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n")}
+                  return a + ' ,1,' + c.mtgo_id + ', , , , ,No,0\n';
+                }, 'Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n')}
                 filename={`${plr.account.name}.csv`}
                 target="_blank"
               >
-                Download {plr.account.name}'s card pool in CSV format for MTGO play!
+                Download {plr.account.name}'s card pool in CSV format for MTGO
+                play!
               </CSVLink>
             </MUITypography>
           );
         } else {
-          return null
+          return null;
         }
       })}
     </div>
   );
-};
+}

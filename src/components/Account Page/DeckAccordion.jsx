@@ -21,18 +21,20 @@ import CreateDeckForm from './CreateDeckForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function DeckAccordion ({
-  pageClasses
-}) {
-
-  const { accountState: { _id, decks }, deleteDeck } = React.useContext(AccountContext);
+export default function DeckAccordion({ pageClasses }) {
+  const {
+    accountState: { _id, decks },
+    deleteDeck
+  } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
-  const [deckToDelete, setDeckToDelete] = React.useState({ _id: null, name: null })
+  const [deckToDelete, setDeckToDelete] = React.useState({
+    _id: null,
+    name: null
+  });
   const [showDeckForm, setShowDeckForm] = React.useState(false);
 
   return (
     <React.Fragment>
-
       <ConfirmationDialog
         confirmHandler={() => {
           deleteDeck(deckToDelete._id);
@@ -43,13 +45,13 @@ export default function DeckAccordion ({
         toggleOpen={() => setDeckToDelete({ _id: null, name: null })}
       >
         <MUITypography variant="body1">
-          This action cannot be undone.  You may want to export your list first.
+          This action cannot be undone. You may want to export your list first.
         </MUITypography>
       </ConfirmationDialog>
 
       <CreateDeckForm
         open={showDeckForm}
-        toggleOpen={() => setShowDeckForm(prevState => !prevState)}
+        toggleOpen={() => setShowDeckForm((prevState) => !prevState)}
       />
 
       <MUIAccordion>
@@ -67,31 +69,29 @@ export default function DeckAccordion ({
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Format</MUITableCell>
-                  {_id === userId &&
-                    <MUITableCell>Delete</MUITableCell>
-                  }
+                  {_id === userId && <MUITableCell>Delete</MUITableCell>}
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
-                {decks.map(deck => (
+                {decks.map((deck) => (
                   <MUITableRow key={deck._id}>
                     <MUITableCell>
                       <Link to={`/deck/${deck._id}`}>{deck.name}</Link>
                     </MUITableCell>
-                    <MUITableCell>
-                      {deck.format}
-                    </MUITableCell>
-                    {_id === userId &&
+                    <MUITableCell>{deck.format}</MUITableCell>
+                    {_id === userId && (
                       <MUITableCell>
                         <MUIIconButton
                           className={pageClasses.iconButton}
-                          onClick={() => setDeckToDelete({ _id: deck._id, name: deck.name })}
+                          onClick={() =>
+                            setDeckToDelete({ _id: deck._id, name: deck.name })
+                          }
                           size="small"
                         >
                           <MUIDeleteForeverIcon />
                         </MUIIconButton>
                       </MUITableCell>
-                    }
+                    )}
                   </MUITableRow>
                 ))}
               </MUITableBody>
@@ -99,16 +99,14 @@ export default function DeckAccordion ({
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {_id === userId &&
+        {_id === userId && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowDeckForm(true)}>
               Create a Deck
             </MUIButton>
           </MUIAccordionActions>
-        }
-        
+        )}
       </MUIAccordion>
-
     </React.Fragment>
   );
-};
+}

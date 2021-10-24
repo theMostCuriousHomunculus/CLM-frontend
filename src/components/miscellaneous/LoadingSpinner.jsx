@@ -9,10 +9,9 @@ const useStyles = makeStyles({
     flexGrow: 1,
     justifyContent: 'center'
   }
-})
+});
 
-export default function LoadingSpinner () {
-
+export default function LoadingSpinner() {
   const classes = useStyles();
 
   return (
@@ -20,4 +19,4 @@ export default function LoadingSpinner () {
       <MUICircularProgress size={100} />
     </div>
   );
-};
+}

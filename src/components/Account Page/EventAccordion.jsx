@@ -19,32 +19,25 @@ import Avatar from '../miscellaneous/Avatar';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function EventAccordion ({
-  pageClasses
-}) {
-
+export default function EventAccordion({ pageClasses }) {
   const accountId = useParams().accountId;
   const {
-    accountState: {
-      buds,
-      cubes,
-      events
-    }
+    accountState: { buds, cubes, events }
   } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
   const [showEventForm, setShowEventForm] = React.useState(false);
 
   return (
     <React.Fragment>
-      {accountId === userId && cubes.length > 0 &&
+      {accountId === userId && cubes.length > 0 && (
         <CreateEventForm
           buds={buds}
           cubes={cubes}
           open={showEventForm}
-          toggleOpen={() => setShowEventForm(prevState => !prevState)}
+          toggleOpen={() => setShowEventForm((prevState) => !prevState)}
         />
-      }
-      
+      )}
+
       <MUIAccordion>
         <MUIAccordionSummary
           expandIcon={<MUIExpandMoreIcon />}
@@ -73,15 +66,30 @@ export default function EventAccordion ({
                       </MUITableCell>
                       <MUITableCell>
                         <Link to={`/account/${event.host._id}`}>
-                          <Avatar alt={event.host.name} size='small' src={event.host.avatar} />
+                          <Avatar
+                            alt={event.host.name}
+                            size="small"
+                            src={event.host.avatar}
+                          />
                         </Link>
                       </MUITableCell>
                       <MUITableCell style={{ display: 'flex' }}>
-                        {event.players.filter(player => player.account._id !== event.host._id).map(player => (
-                          <Link key={player.account._id} to={`/account/${player.account._id}`}>
-                            <Avatar alt={player.account.name} size='small' src={player.account.avatar} />
-                          </Link>
-                        ))}
+                        {event.players
+                          .filter(
+                            (player) => player.account._id !== event.host._id
+                          )
+                          .map((player) => (
+                            <Link
+                              key={player.account._id}
+                              to={`/account/${player.account._id}`}
+                            >
+                              <Avatar
+                                alt={player.account.name}
+                                size="small"
+                                src={player.account.avatar}
+                              />
+                            </Link>
+                          ))}
                       </MUITableCell>
                       <MUITableCell>
                         {new Date(parseInt(event.createdAt)).toLocaleString()}
@@ -94,19 +102,19 @@ export default function EventAccordion ({
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {accountId === userId &&
+        {accountId === userId && (
           <MUIAccordionActions>
             <MUIButton
               disabled={cubes.length === 0}
               onClick={() => setShowEventForm(true)}
             >
-              {cubes.length === 0 ? 'You must create a cube before hosting an event!' : 'Host an Event'}
+              {cubes.length === 0
+                ? 'You must create a cube before hosting an event!'
+                : 'Host an Event'}
             </MUIButton>
           </MUIAccordionActions>
-        }
-
+        )}
       </MUIAccordion>
-    
     </React.Fragment>
   );
-};
+}

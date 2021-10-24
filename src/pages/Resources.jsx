@@ -16,18 +16,19 @@ const useStyles = makeStyles({
   }
 });
 
-export default function Resources () {
-
+export default function Resources() {
   const classes = useStyles();
   const resourcesArray = [
     {
-      description: 'MTG Cube draft strategy and theory for players and curators.',
+      description:
+        'MTG Cube draft strategy and theory for players and curators.',
       link: 'https://www.youtube.com/channel/UC-6jOdvL1awVWd-ME7QAV8Q',
       name: 'Cultic Cube',
       platform: 'YouTube'
     },
     {
-      description: 'Limited Resources is a place to learn about and improve at Magic: the Gathering with an emphasis on Limited play.',
+      description:
+        'Limited Resources is a place to learn about and improve at Magic: the Gathering with an emphasis on Limited play.',
       link: 'https://www.youtube.com/c/LimitedResourcesPodcast/featured',
       name: 'Limited Resources',
       platform: 'YouTube'
@@ -45,7 +46,8 @@ export default function Resources () {
       platform: 'Web Site'
     },
     {
-      description: 'Path to Cube is dedicated to providing current and relevant content relating to cube and it’s ever growing popularity among Magic players.',
+      description:
+        'Path to Cube is dedicated to providing current and relevant content relating to cube and it’s ever growing popularity among Magic players.',
       link: 'https://soundcloud.com/user-184099770',
       name: 'Path to Cube',
       platform: 'Podcast'
@@ -57,16 +59,17 @@ export default function Resources () {
       platform: 'Web Site'
     },
     {
-      description: "'The 540', a Magic: The Gathering podcast from Star City Games, features Justin Parnell and Ryan Overturf discussing their favorite Magic format of all time — Cube!",
+      description:
+        "'The 540', a Magic: The Gathering podcast from Star City Games, features Justin Parnell and Ryan Overturf discussing their favorite Magic format of all time — Cube!",
       link: 'https://www.youtube.com/playlist?list=PL5d1KNNFArSNcPm8nmlDOuFpe6u3QYYAL',
       name: 'The 540',
       platform: 'YouTube'
     }
   ];
-  
+
   return (
     <MUIGrid container spacing={0}>
-      {resourcesArray.map(resource => (
+      {resourcesArray.map((resource) => (
         <MUIGrid
           container
           item
@@ -81,14 +84,17 @@ export default function Resources () {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              flexGrow: 1 }}
-            >
+              flexGrow: 1
+            }}
+          >
             <MUICardHeader
               title={resource.name}
               subheader={resource.platform}
             />
             <MUICardContent style={{ flexGrow: 1 }}>
-              <MUITypography variant="body1">{resource.description}</MUITypography>
+              <MUITypography variant="body1">
+                {resource.description}
+              </MUITypography>
             </MUICardContent>
             <MUICardActions>
               <MUIButton
@@ -103,4 +109,4 @@ export default function Resources () {
       ))}
     </MUIGrid>
   );
-};
+}

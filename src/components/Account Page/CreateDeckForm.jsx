@@ -24,11 +24,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function CreateCubeForm ({
-  open,
-  toggleOpen
-}) {
-
+export default function CreateCubeForm({ open, toggleOpen }) {
   const classes = useStyles();
   const { loading, createDeck } = React.useContext(AccountContext);
   const [deckID, setDeckID] = React.useState('');
@@ -39,18 +35,23 @@ export default function CreateCubeForm ({
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
       <MUIDialogTitle>Create A New Deck</MUIDialogTitle>
-      {loading ?
+      {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
-        </MUIDialogContent> :
-        <form onSubmit={event => createDeck(event, description, deckID, format, name)}>
+        </MUIDialogContent>
+      ) : (
+        <form
+          onSubmit={(event) =>
+            createDeck(event, description, deckID, format, name)
+          }
+        >
           <MUIDialogContent style={{ height: 'max-content' }}>
             <MUITextField
               autoComplete="off"
               autoFocus
               fullWidth
               label="Deck Name"
-              onChange={event => setName(event.target.value)}
+              onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
               value={name}
@@ -61,7 +62,7 @@ export default function CreateCubeForm ({
               fullWidth
               label="Deck Description"
               multiline
-              onChange={event => setDescription(event.target.value)}
+              onChange={(event) => setDescription(event.target.value)}
               required={false}
               rows={2}
               style={{ marginBottom: '12px', marginTop: '16px' }}
@@ -75,7 +76,7 @@ export default function CreateCubeForm ({
                 fullWidth
                 label="Format"
                 native
-                onChange={event => setFormat(event.target.value)}
+                onChange={(event) => setFormat(event.target.value)}
                 value={format}
                 inputProps={{
                   id: 'format-selector'
@@ -92,12 +93,17 @@ export default function CreateCubeForm ({
               </MUISelect>
             </MUIFormControl>
 
-            <MUITypography variant="subtitle1" style={{ margin: '16px 0 8px 0'}}>Already have a deck list on Scryfall.com?</MUITypography>
+            <MUITypography
+              variant="subtitle1"
+              style={{ margin: '16px 0 8px 0' }}
+            >
+              Already have a deck list on Scryfall.com?
+            </MUITypography>
             <MUITextField
               autoComplete="off"
               fullWidth
               label="Scyfall Deck ID"
-              onChange={event => setDeckID(event.target.value)}
+              onChange={(event) => setDeckID(event.target.value)}
               required={false}
               style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
@@ -105,15 +111,11 @@ export default function CreateCubeForm ({
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton type="submit">
-              Create!
-            </MUIButton>
-            <WarningButton onClick={toggleOpen}>
-              Cancel
-            </WarningButton>
+            <MUIButton type="submit">Create!</MUIButton>
+            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
           </MUIDialogActions>
         </form>
-      }
+      )}
     </MUIDialog>
   );
-};
+}

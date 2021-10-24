@@ -14,16 +14,12 @@ import MUITextField from '@mui/material/TextField';
 import WarningButton from '../miscellaneous/WarningButton';
 import { CubeContext } from '../../contexts/cube-context';
 
-export default function CreateComponentForm ({
-  open,
-  toggleOpen
-}) {
-
+export default function CreateComponentForm({ open, toggleOpen }) {
   const { createModule, createRotation } = React.useContext(CubeContext);
   const [newNameInput, setNewNameInput] = React.useState();
   const [newComponentType, setNewComponentType] = React.useState('module');
 
-  async function addComponent () {
+  async function addComponent() {
     if (newComponentType === 'module') {
       await createModule(newNameInput, toggleOpen);
     }
@@ -34,13 +30,8 @@ export default function CreateComponentForm ({
   }
 
   return (
-    <MUIDialog
-      open={open}
-      onClose={toggleOpen}
-    >
-      <MUIDialogTitle>
-        Create A New Component
-      </MUIDialogTitle>
+    <MUIDialog open={open} onClose={toggleOpen}>
+      <MUIDialogTitle>Create A New Component</MUIDialogTitle>
 
       <MUIDialogContent style={{ paddingTop: 8 }}>
         <MUITextField
@@ -48,7 +39,7 @@ export default function CreateComponentForm ({
           autoFocus
           fullWidth
           label="New Component Name"
-          onChange={event => setNewNameInput(event.target.value)}
+          onChange={(event) => setNewNameInput(event.target.value)}
           required={true}
           type="text"
           value={newNameInput}
@@ -59,9 +50,7 @@ export default function CreateComponentForm ({
           required={true}
           style={{ marginTop: 8 }}
         >
-          <MUIFormLabel component="legend">
-            New Component Type
-          </MUIFormLabel>
+          <MUIFormLabel component="legend">New Component Type</MUIFormLabel>
 
           <MUIRadioGroup
             name="Component Type"
@@ -84,13 +73,9 @@ export default function CreateComponentForm ({
       </MUIDialogContent>
 
       <MUIDialogActions>
-        <MUIButton onClick={addComponent}>
-          Create!
-        </MUIButton>
-        <WarningButton onClick={toggleOpen}>
-          Cancel
-        </WarningButton>
+        <MUIButton onClick={addComponent}>Create!</MUIButton>
+        <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
       </MUIDialogActions>
     </MUIDialog>
   );
-};
+}

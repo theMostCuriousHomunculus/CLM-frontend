@@ -22,11 +22,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function AuthenticateForm ({
-  open,
-  toggleOpen
-}) {
-
+export default function AuthenticateForm({ open, toggleOpen }) {
   const { login } = React.useContext(AuthenticationContext);
   const { loading, sendRequest } = useRequest();
   const { setErrorMessages } = React.useContext(ErrorContext);
@@ -36,7 +32,7 @@ export default function AuthenticateForm ({
   const [nameInput, setNameInput] = React.useState();
   const [passwordInput, setPasswordInput] = React.useState();
 
-  async function handleLogin () {
+  async function handleLogin() {
     await sendRequest({
       callback: (data) => {
         login(data.isAdmin, data.token, data.userId);
@@ -44,7 +40,7 @@ export default function AuthenticateForm ({
       },
       load: true,
       operation: 'login',
-      get body () {
+      get body() {
         return {
           query: `
             mutation {
@@ -60,12 +56,12 @@ export default function AuthenticateForm ({
               }
             }
           `
-        }
+        };
       }
     });
   }
 
-  async function handleRegister () {
+  async function handleRegister() {
     const avatar = {};
 
     await sendRequest({
@@ -95,7 +91,7 @@ export default function AuthenticateForm ({
       },
       load: true,
       operation: 'register',
-      get body () {
+      get body() {
         return {
           query: `
             mutation {
@@ -112,34 +108,37 @@ export default function AuthenticateForm ({
               }
             }
           `
-        }
+        };
       }
     });
   }
 
-  async function handleRequestPasswordReset () {
+  async function handleRequestPasswordReset() {
     await sendRequest({
       callback: () => {
-        setErrorMessages(prevState => {
-          return [...prevState, `A link to reset your password has been sent.  Please check your email inbox and your spam folder.`];
+        setErrorMessages((prevState) => {
+          return [
+            ...prevState,
+            `A link to reset your password has been sent.  Please check your email inbox and your spam folder.`
+          ];
         });
         toggleOpen();
       },
       load: true,
       operation: 'requestPasswordReset',
-      get body () {
+      get body() {
         return {
           query: `
             mutation {
               ${this.operation}(email: "${emailInput}")
             }
           `
-        }
+        };
       }
     });
   }
 
-  function submitForm (event) {
+  function submitForm(event) {
     event.preventDefault();
 
     if (mode === 'Login') {
@@ -152,17 +151,13 @@ export default function AuthenticateForm ({
   }
 
   return (
-    <MUIDialog
-      open={open}
-      onClose={toggleOpen}
-    >
-      <MUIDialogTitle>
-        {mode}
-      </MUIDialogTitle>
-      {loading ?
+    <MUIDialog open={open} onClose={toggleOpen}>
+      <MUIDialogTitle>{mode}</MUIDialogTitle>
+      {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
-        </MUIDialogContent> :
+        </MUIDialogContent>
+      ) : (
         <form onSubmit={submitForm}>
           <MUIDialogContent>
             <MUITextField
@@ -176,7 +171,7 @@ export default function AuthenticateForm ({
               value={emailInput}
             />
 
-            {mode === 'Register' &&
+            {mode === 'Register' && (
               <MUITextField
                 autoComplete="off"
                 fullWidth
@@ -187,9 +182,9 @@ export default function AuthenticateForm ({
                 type="text"
                 value={nameInput}
               />
-            }
+            )}
 
-            {mode !== 'Reset Password' &&
+            {mode !== 'Reset Password' && (
               <MUITextField
                 autoComplete="off"
                 fullWidth
@@ -200,28 +195,32 @@ export default function AuthenticateForm ({
                 type="password"
                 value={passwordInput}
               />
-            }
+            )}
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton type="submit">
-              {mode}!
-            </MUIButton>
-            {mode === 'Login' &&
+            <MUIButton type="submit">{mode}!</MUIButton>
+            {mode === 'Login' && (
               <MUIButton
                 color="secondary"
                 onClick={() => setMode('Reset Password')}
               >
                 Forgot Your Password?
               </MUIButton>
-            }
+            )}
             <WarningButton
-              onClick={() => setMode((prevState) => prevState === 'Register' ? 'Login' : 'Register')}
+              onClick={() =>
+                setMode((prevState) =>
+                  prevState === 'Register' ? 'Login' : 'Register'
+                )
+              }
             >
-              {mode === 'Register' ? 'Already have an account?' : "Don't have an account yet?"}
+              {mode === 'Register'
+                ? 'Already have an account?'
+                : "Don't have an account yet?"}
             </WarningButton>
           </MUIDialogActions>
         </form>
-      }
+      )}
     </MUIDialog>
   );
-};
+}

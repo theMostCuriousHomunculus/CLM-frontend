@@ -1,6 +1,6 @@
 import React from 'react';
 import MUIIconButton from '@mui/material/IconButton';
-import MUISwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import MUISwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import MUISwapVertIcon from '@mui/icons-material/SwapVert';
 import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
@@ -26,7 +26,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function PlaysetDisplay ({
+export default function PlaysetDisplay({
   add,
   authorizedID,
   component,
@@ -34,7 +34,6 @@ export default function PlaysetDisplay ({
   remove,
   toggle
 }) {
-
   const { userId } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [updatedCount, setUpdatedCount] = React.useState(copies.length);
@@ -46,8 +45,7 @@ export default function PlaysetDisplay ({
   const isMatch = !!useParams().matchId;
   const isEvent = !!useParams().eventId;
 
-  function handleChangeNumberOfCopies () {
-
+  function handleChangeNumberOfCopies() {
     if (copies.length < updatedCount) {
       add(card, component, updatedCount - copies.length);
     } else if (copies.length > updatedCount) {
@@ -55,14 +53,17 @@ export default function PlaysetDisplay ({
     } else {
       // don't do anything; no changes
     }
-
   }
 
   return (
     <div style={{ alignItems: 'center', display: 'flex' }}>
       <MUITextField
         autoComplete="off"
-        disabled={isMatch || (isEvent && !card.type_line.includes('Basic')) || authorizedID !== userId}
+        disabled={
+          isMatch ||
+          (isEvent && !card.type_line.includes('Basic')) ||
+          authorizedID !== userId
+        }
         inputProps={{
           min: 0,
           onBlur: handleChangeNumberOfCopies,
@@ -72,7 +73,7 @@ export default function PlaysetDisplay ({
             paddingTop: 4
           }
         }}
-        onChange={event => setUpdatedCount(event.target.value)}
+        onChange={(event) => setUpdatedCount(event.target.value)}
         style={{
           marginLeft: 16,
           marginTop: 4,
@@ -82,17 +83,22 @@ export default function PlaysetDisplay ({
         value={updatedCount}
       />
       <div style={{ display: 'flex', flexGrow: 1 }}>
-        <MUITooltip title={`Move One to ${component === 'mainboard' ? 'Sideboard' : 'Mainboard'}`}>
+        <MUITooltip
+          title={`Move One to ${
+            component === 'mainboard' ? 'Sideboard' : 'Mainboard'
+          }`}
+        >
           <MUIIconButton
             className={classes.iconButton}
             onClick={() => toggle(copies[0])}
             size="small"
             style={{ alignSelf: 'center' }}
           >
-            {useMediaQuery(theme.breakpoints.up('md')) ?
-              <MUISwapHorizIcon /> :
+            {useMediaQuery(theme.breakpoints.up('md')) ? (
+              <MUISwapHorizIcon />
+            ) : (
               <MUISwapVertIcon />
-            }
+            )}
           </MUIIconButton>
         </MUITooltip>
         <MUITypography
@@ -103,18 +109,12 @@ export default function PlaysetDisplay ({
             justifyContent: 'space-between'
           }}
         >
-          <HoverPreview
-            back_image={card.back_image}
-            image={card.image}
-          >
+          <HoverPreview back_image={card.back_image} image={card.image}>
             <span>{card.name}</span>
           </HoverPreview>
           <span>
             {card.set.toUpperCase()}
-            <ManaCostSVGs
-              manaCostString={card.mana_cost}
-              size={20}
-            />
+            <ManaCostSVGs manaCostString={card.mana_cost} size={20} />
           </span>
         </MUITypography>
       </div>

@@ -15,7 +15,7 @@ const useStyles = makeStyles({
   input: {
     margin: '8px 8px 8px 56px',
     '& input[type=text]': {
-      color: '#ffffff',
+      color: '#ffffff'
     },
     '& .MuiInputBase-root': {
       padding: '8px 40px 8px 8px !important'
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     backgroundColor: alpha(theme.palette.common.white, 0.15),
     position: 'relative',
     '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
+      backgroundColor: alpha(theme.palette.common.white, 0.25)
     },
     '& .MuiAutocomplete-root': {
       [theme.breakpoints.down('sm')]: {
@@ -70,28 +70,23 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UserSearchBar ({
-  history,
-  orientation,
-  setDrawerOpen
-}) {
-
+export default function UserSearchBar({ history, orientation, setDrawerOpen }) {
   const { loading, sendRequest } = useRequest();
   // const [open, setOpen] = React.useState(false);
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
 
-  async function searchAccounts (event) {
+  async function searchAccounts(event) {
     if (event.target.value.length > 2) {
-        await sendRequest({
-          callback: (data) => {
-            setUserSearchResults(data);
-          },
-          load: true,
-          operation: 'searchAccounts',
-          get body() {
-            return {
-              query: `
+      await sendRequest({
+        callback: (data) => {
+          setUserSearchResults(data);
+        },
+        load: true,
+        operation: 'searchAccounts',
+        get body() {
+          return {
+            query: `
                 query {
                   ${this.operation}(name: "${event.target.value}") {
                     _id
@@ -100,17 +95,22 @@ export default function UserSearchBar ({
                   }
                 }
               `
-            }
-            
-          }
-        });
+          };
+        }
+      });
     } else {
       setUserSearchResults([]);
     }
   }
 
   return (
-    <div className={(orientation === 'side' ? classes.sideBar : classes.topBar) + ' ' + classes.search}>
+    <div
+      className={
+        (orientation === 'side' ? classes.sideBar : classes.topBar) +
+        ' ' +
+        classes.search
+      }
+    >
       <div className={classes.searchIcon}>
         <MUISearchIcon />
       </div>
@@ -147,22 +147,13 @@ export default function UserSearchBar ({
         )}
         renderOption={(props, option) => {
           return (
-            <li
-              className={classes.option}
-              {...props}
-            >
-              <Avatar
-                alt={option.name}
-                size='small'
-                src={option.avatar}
-              />
-              <MUITypography variant="body1">
-                {option.name}
-              </MUITypography>
+            <li className={classes.option} {...props}>
+              <Avatar alt={option.name} size="small" src={option.avatar} />
+              <MUITypography variant="body1">{option.name}</MUITypography>
             </li>
           );
         }}
       />
     </div>
   );
-};
+}

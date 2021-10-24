@@ -45,13 +45,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function CreateEventForm ({
-  buds,
-  cubes,
-  open,
-  toggleOpen
-}) {
-
+export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
   const { loading, createEvent } = React.useContext(AccountContext);
   const classes = useStyles();
   const [cardsPerPack, setCardsPerPack] = React.useState(1);
@@ -64,16 +58,16 @@ export default function CreateEventForm ({
   const [packsPerPlayer, setPacksPerPlayer] = React.useState(1);
   const [selectedCube, setSelectedCube] = React.useState(cubes[0]);
 
-
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
       <MUIDialogTitle>Host an Event</MUIDialogTitle>
-      {loading ?
+      {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
-        </MUIDialogContent> :
+        </MUIDialogContent>
+      ) : (
         <form
-          onSubmit={event => {
+          onSubmit={(event) => {
             createEvent(
               event,
               selectedCube._id,
@@ -83,17 +77,16 @@ export default function CreateEventForm ({
               eventName,
               otherPlayers,
               packsPerPlayer
-            )
+            );
           }}
         >
           <MUIDialogContent>
-
             <MUITextField
               autoComplete="off"
               autoFocus
               fullWidth
               label="Event Name"
-              onChange={event => setEventName(event.target.value)}
+              onChange={(event) => setEventName(event.target.value)}
               required={true}
               type="text"
               value={eventName}
@@ -118,7 +111,7 @@ export default function CreateEventForm ({
               open={Boolean(cubeAnchorEl)}
               onClose={() => setCubeAnchorEl(null)}
             >
-              {cubes.map(cube => (
+              {cubes.map((cube) => (
                 <MUIMenuItem
                   key={cube._id}
                   onClick={() => {
@@ -139,10 +132,7 @@ export default function CreateEventForm ({
                 aria-controls="lock-menu"
                 onClick={(event) => setEventAnchorEl(event.currentTarget)}
               >
-                <MUIListItemText
-                  primary="Event Type"
-                  secondary={eventType}
-                />
+                <MUIListItemText primary="Event Type" secondary={eventType} />
               </MUIListItem>
             </MUIList>
             <MUIMenu
@@ -172,19 +162,27 @@ export default function CreateEventForm ({
               </MUIMenuItem>
             </MUIMenu>
 
-            <MUIFormControl component="fieldset" className={classes.formControl}>
+            <MUIFormControl
+              component="fieldset"
+              className={classes.formControl}
+            >
               <MUIFormLabel component="legend">Buds to Invite</MUIFormLabel>
               <MUIFormGroup>
-                {buds.map(bud => (
+                {buds.map((bud) => (
                   <MUIFormControlLabel
                     className={classes.budSwitch}
                     control={
                       <MUISwitch
                         onChange={() => {
                           if (otherPlayers.includes(bud._id)) {
-                            setOtherPlayers(prevState => prevState.filter(plr => plr!== bud._id));
+                            setOtherPlayers((prevState) =>
+                              prevState.filter((plr) => plr !== bud._id)
+                            );
                           } else {
-                            setOtherPlayers(prevState => [...prevState, bud._id]);
+                            setOtherPlayers((prevState) => [
+                              ...prevState,
+                              bud._id
+                            ]);
                           }
                         }}
                         value={bud._id}
@@ -193,8 +191,10 @@ export default function CreateEventForm ({
                     key={bud._id}
                     label={
                       <span className={classes.flex}>
-                        <Avatar alt={bud.name} size='small' src={bud.avatar} />
-                        <MUITypography variant="subtitle1">{bud.name}</MUITypography>
+                        <Avatar alt={bud.name} size="small" src={bud.avatar} />
+                        <MUITypography variant="subtitle1">
+                          {bud.name}
+                        </MUITypography>
                       </span>
                     }
                   />
@@ -202,39 +202,41 @@ export default function CreateEventForm ({
               </MUIFormGroup>
             </MUIFormControl>
 
-            <MUIFormControl component="fieldset" className={classes.formControl}>
+            <MUIFormControl
+              component="fieldset"
+              className={classes.formControl}
+            >
               <MUIFormLabel component="legend">Modules to Include</MUIFormLabel>
               <MUIFormGroup>
-                {selectedCube && selectedCube.modules.map(module => (
-                  <MUIFormControlLabel
-                    control={
-                      <MUICheckbox
-                        onChange={() => {
-                          if (includedModules.includes(module._id)) {
-                            setIncludedModules(prevState => prevState.filter(mdl => mdl!== module._id));
-                          } else {
-                            setIncludedModules(prevState => [...prevState, module._id]);
-                          }
-                        }}
-                        value={module._id}
-                      />
-                    }
-                    key={module._id}
-                    label={module.name}
-                  />
-                ))}
+                {selectedCube &&
+                  selectedCube.modules.map((module) => (
+                    <MUIFormControlLabel
+                      control={
+                        <MUICheckbox
+                          onChange={() => {
+                            if (includedModules.includes(module._id)) {
+                              setIncludedModules((prevState) =>
+                                prevState.filter((mdl) => mdl !== module._id)
+                              );
+                            } else {
+                              setIncludedModules((prevState) => [
+                                ...prevState,
+                                module._id
+                              ]);
+                            }
+                          }}
+                          value={module._id}
+                        />
+                      }
+                      key={module._id}
+                      label={module.name}
+                    />
+                  ))}
               </MUIFormGroup>
             </MUIFormControl>
 
-            <MUIGrid
-              container
-              spacing={2}
-            >
-              <MUIGrid
-                item
-                xs={12}
-                md={6}
-              >
+            <MUIGrid container spacing={2}>
+              <MUIGrid item xs={12} md={6}>
                 <MUITextField
                   autoComplete="off"
                   fullWidth
@@ -252,11 +254,7 @@ export default function CreateEventForm ({
                 />
               </MUIGrid>
 
-              <MUIGrid
-                item
-                xs={12}
-                md={6}
-              >
+              <MUIGrid item xs={12} md={6}>
                 <MUITextField
                   autoComplete="off"
                   fullWidth
@@ -277,16 +275,12 @@ export default function CreateEventForm ({
           </MUIDialogContent>
 
           <MUIDialogActions>
-            <WarningButton onClick={toggleOpen}>
-              Cancel
-            </WarningButton>
+            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
 
-            <MUIButton type="submit">
-              Create!
-            </MUIButton>
+            <MUIButton type="submit">Create!</MUIButton>
           </MUIDialogActions>
         </form>
-      }
+      )}
     </MUIDialog>
   );
 }

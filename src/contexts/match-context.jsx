@@ -127,7 +127,6 @@ export const MatchContext = createContext({
 });
 
 export default function ContextualizedMatchPage() {
-
   const { userId } = React.useContext(AuthenticationContext);
   const [matchState, setMatchState] = React.useState({
     _id: useParams().matchId,
@@ -136,9 +135,9 @@ export default function ContextualizedMatchPage() {
     players: [
       {
         account: {
-          _id: "A",
-          avatar: "",
-          name: "..."
+          _id: 'A',
+          avatar: '',
+          name: '...'
         },
         battlefield: [],
         energy: 0,
@@ -154,9 +153,9 @@ export default function ContextualizedMatchPage() {
       },
       {
         account: {
-          _id: "B",
-          avatar: "",
-          name: "..."
+          _id: 'B',
+          avatar: '',
+          name: '...'
         },
         battlefield: [],
         energy: 0,
@@ -180,8 +179,12 @@ export default function ContextualizedMatchPage() {
     title: null,
     updateFunction: null
   });
-  const [bottomPlayerState, setBottomPlayerState] = React.useState(matchState.players[0]);
-  const [topPlayerState, setTopPlayerState] = React.useState(matchState.players[1]);
+  const [bottomPlayerState, setBottomPlayerState] = React.useState(
+    matchState.players[0]
+  );
+  const [topPlayerState, setTopPlayerState] = React.useState(
+    matchState.players[1]
+  );
   const matchQuery = `
     _id
     game_winners {
@@ -394,14 +397,20 @@ export default function ContextualizedMatchPage() {
 
   React.useEffect(() => {
     // this allows a more smooth drag and drop experience
-    const me = matchState.players.find(player => player.account._id === userId);
+    const me = matchState.players.find(
+      (player) => player.account._id === userId
+    );
 
     if (me) {
-      if (JSON.stringify(bottomPlayerState) !== JSON.stringify(me)) setBottomPlayerState(me);
+      if (JSON.stringify(bottomPlayerState) !== JSON.stringify(me))
+        setBottomPlayerState(me);
 
-      const opponent = matchState.players.find(player => player.account._id !== userId);
+      const opponent = matchState.players.find(
+        (player) => player.account._id !== userId
+      );
 
-      if (JSON.stringify(topPlayerState) !== JSON.stringify(opponent)) setTopPlayerState(opponent);
+      if (JSON.stringify(topPlayerState) !== JSON.stringify(opponent))
+        setTopPlayerState(opponent);
     }
 
     if (!me) {
@@ -409,16 +418,17 @@ export default function ContextualizedMatchPage() {
       setTopPlayerState(matchState.players[1]);
     }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchState, userId]);
 
-  const adjustCounters = React.useCallback(async function (cardID, counterAmount, counterType, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'adjustCounters',
-      get body() {
-        return {
-          query: `
+  const adjustCounters = React.useCallback(
+    async function (cardID, counterAmount, counterType, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'adjustCounters',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -432,72 +442,84 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const adjustEnergyCounters = React.useCallback(async function (energy) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'adjustEnergyCounters',
-      get body() {
-        return {
-          query: `
+  const adjustEnergyCounters = React.useCallback(
+    async function (energy) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'adjustEnergyCounters',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(energy: ${energy}) {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const adjustLifeTotal = React.useCallback(async function (life) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'adjustLifeTotal',
-      get body() {
-        return {
-          query: `
+  const adjustLifeTotal = React.useCallback(
+    async function (life) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'adjustLifeTotal',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(life: ${life}) {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const adjustPoisonCounters = React.useCallback(async function (poison) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'adjustPoisonCounters',
-      get body() {
-        return {
-          query: `
+  const adjustPoisonCounters = React.useCallback(
+    async function (poison) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'adjustPoisonCounters',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(poison: ${poison}) {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const changeFaceDownImage = React.useCallback(async function (cardID, faceDownImage, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'changeFaceDownImage',
-      get body() {
-        return {
-          query: `
+  const changeFaceDownImage = React.useCallback(
+    async function (cardID, faceDownImage, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'changeFaceDownImage',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -510,36 +532,42 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const concedeGame = React.useCallback(async function () {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'concedeGame',
-      get body() {
-        return {
-          query: `
+  const concedeGame = React.useCallback(
+    async function () {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'concedeGame',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation} {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const createCopies = React.useCallback(async function (cardID, controllerID, numberOfCopies, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'createCopies',
-      get body() {
-        return {
-          query: `
+  const createCopies = React.useCallback(
+    async function (cardID, controllerID, numberOfCopies, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'createCopies',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -553,18 +581,21 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const createTokens = React.useCallback(async function ({ back_image, image, name }, numberOfTokens) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'createTokens',
-      get body() {
-        return {
-          query: `
+  const createTokens = React.useCallback(
+    async function ({ back_image, image, name }, numberOfTokens) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'createTokens',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -580,18 +611,21 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const destroyCopyToken = React.useCallback(async function (cardID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'destroyCopyToken',
-      get body() {
-        return {
-          query: `
+  const destroyCopyToken = React.useCallback(
+    async function (cardID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'destroyCopyToken',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -603,18 +637,21 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    })
-  }, [matchState._id, sendRequest])
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const dragCard = React.useCallback(async function (cardID, xCoordinate, yCoordinate, zIndex) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'dragCard',
-      get body() {
-        return {
-          query: `
+  const dragCard = React.useCallback(
+    async function (cardID, xCoordinate, yCoordinate, zIndex) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'dragCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -628,56 +665,65 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const drawCard = React.useCallback(async function () {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'drawCard',
-      get body() {
-        return {
-          query: `
+  const drawCard = React.useCallback(
+    async function () {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'drawCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation} {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const fetchMatchByID = React.useCallback(async function () {
-    await sendRequest({
-      callback: data => setMatchState(data),
-      headers: { MatchID: matchState._id },
-      load: true,
-      operation: 'fetchMatchByID',
-      get body() {
-        return {
-          query: `
+  const fetchMatchByID = React.useCallback(
+    async function () {
+      await sendRequest({
+        callback: (data) => setMatchState(data),
+        headers: { MatchID: matchState._id },
+        load: true,
+        operation: 'fetchMatchByID',
+        get body() {
+          return {
+            query: `
             query {
               ${this.operation} {
                 ${matchQuery}
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchQuery, matchState._id, sendRequest]);
+      });
+    },
+    [matchQuery, matchState._id, sendRequest]
+  );
 
-  const flipCard = React.useCallback(async function (cardID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'flipCard',
-      get body() {
-        return {
-          query: `
+  const flipCard = React.useCallback(
+    async function (cardID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'flipCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -689,36 +735,42 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const flipCoin = React.useCallback(async function () {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'flipCoin',
-      get body() {
-        return {
-          query: `
+  const flipCoin = React.useCallback(
+    async function () {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'flipCoin',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation} {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const gainControlOfCard = React.useCallback(async function (cardID, controllerID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'gainControlOfCard',
-      get body() {
-        return {
-          query: `
+  const gainControlOfCard = React.useCallback(
+    async function (cardID, controllerID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'gainControlOfCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -731,54 +783,63 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const mulligan = React.useCallback(async function () {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'mulligan',
-      get body() {
-        return {
-          query: `
+  const mulligan = React.useCallback(
+    async function () {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'mulligan',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation} {
                 _id
               }
             }
           `
+          };
         }
-      }
-    })
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const ready = React.useCallback(async function () {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'ready',
-      get body() {
-        return {
-          query: `
+  const ready = React.useCallback(
+    async function () {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'ready',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation} {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const revealCard = React.useCallback(async function (cardID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'revealCard',
-      get body() {
-        return {
-          query: `
+  const revealCard = React.useCallback(
+    async function (cardID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'revealCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -790,95 +851,117 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const rollDice = React.useCallback(async function  (sides) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'rollDice',
-      get body() {
-        return {
-          query: `
+  const rollDice = React.useCallback(
+    async function (sides) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'rollDice',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(sides: ${sides}) {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const shuffleLibrary = React.useCallback(async function () {
-    await sendRequest({
-      headers: { MatchID: matchState._id},
-      operation: 'shuffleLibrary',
-      get body() {
-        return {
-          query: `
+  const shuffleLibrary = React.useCallback(
+    async function () {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'shuffleLibrary',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation} {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const tapUntapCards = React.useCallback(async function  (cardIDs) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'tapUntapCards',
-      get body() {
-        return {
-          query: `
+  const tapUntapCards = React.useCallback(
+    async function (cardIDs) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'tapUntapCards',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
-                  cardIDs: [${cardIDs.map(id => '"' + id + '"')}]
+                  cardIDs: [${cardIDs.map((id) => '"' + id + '"')}]
                 }
               ) {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const toggleMainboardSideboardMatch = React.useCallback(async function (cardID) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'toggleMainboardSideboardMatch',
-      get body() {
-        return {
-          query: `
+  const toggleMainboardSideboardMatch = React.useCallback(
+    async function (cardID) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'toggleMainboardSideboardMatch',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(cardID: "${cardID}") {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
   // TODO: Improve
-  const transferCard = React.useCallback(async function (cardID, destinationZone, originZone, reveal, shuffle, index) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'transferCard',
-      get body() {
-        return {
-          query: `
+  const transferCard = React.useCallback(
+    async function (
+      cardID,
+      destinationZone,
+      originZone,
+      reveal,
+      shuffle,
+      index
+    ) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'transferCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -894,18 +977,21 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const turnCard = React.useCallback(async function (cardID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'turnCard',
-      get body() {
-        return {
-          query: `
+  const turnCard = React.useCallback(
+    async function (cardID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'turnCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -917,18 +1003,21 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
-  const viewCard = React.useCallback(async function (cardID, controllerID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'viewCard',
-      get body() {
-        return {
-          query: `
+  const viewCard = React.useCallback(
+    async function (cardID, controllerID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'viewCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -941,19 +1030,22 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
   // TODO: Expand
-  const viewZone = React.useCallback(async function (controllerID, zone) {
-    await sendRequest({
-      headers: { MatchID: matchState._id },
-      operation: 'viewZone',
-      get body() {
-        return {
-          query: `
+  const viewZone = React.useCallback(
+    async function (controllerID, zone) {
+      await sendRequest({
+        headers: { MatchID: matchState._id },
+        operation: 'viewZone',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
@@ -965,10 +1057,12 @@ export default function ContextualizedMatchPage() {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [matchState._id, sendRequest]);
+      });
+    },
+    [matchState._id, sendRequest]
+  );
 
   return (
     <MatchContext.Provider
@@ -1013,4 +1107,4 @@ export default function ContextualizedMatchPage() {
       <Match />
     </MatchContext.Provider>
   );
-};
+}

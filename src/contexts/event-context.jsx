@@ -17,16 +17,18 @@ export const EventContext = createContext({
       name: '...'
     },
     name: null,
-    players: [{
-      account: {
-        _id: null,
-        avatar: null,
-        name: '...'
-      },
-      current_pack: [],
-      mainboard: [],
-      sideboard: []
-    }]
+    players: [
+      {
+        account: {
+          _id: null,
+          avatar: null,
+          name: '...'
+        },
+        current_pack: [],
+        mainboard: [],
+        sideboard: []
+      }
+    ]
   },
   myState: {
     account: {
@@ -47,8 +49,7 @@ export const EventContext = createContext({
   toggleMainboardSideboardEvent: () => null
 });
 
-export default function ContextualizedEventPage () {
-
+export default function ContextualizedEventPage() {
   const { userId } = React.useContext(AuthenticationContext);
   const [eventState, setEventState] = React.useState({
     _id: useParams().eventId,
@@ -59,16 +60,18 @@ export default function ContextualizedEventPage () {
       name: '...'
     },
     name: null,
-    players: [{
-      account: {
-        _id: userId,
-        avatar: null,
-        name: '...'
-      },
-      current_pack: [],
-      mainboard: [],
-      sideboard: []
-    }]
+    players: [
+      {
+        account: {
+          _id: userId,
+          avatar: null,
+          name: '...'
+        },
+        current_pack: [],
+        mainboard: [],
+        sideboard: []
+      }
+    ]
   });
   const [myState, setMyState] = React.useState({
     account: {
@@ -125,51 +128,67 @@ export default function ContextualizedEventPage () {
   const { loading, sendRequest } = useRequest();
 
   React.useEffect(() => {
-    const me = eventState.players.find(plr => plr.account._id === userId);
+    const me = eventState.players.find((plr) => plr.account._id === userId);
     const updateNeeded =
-      (me.current_pack ? me.current_pack.length : -1) !== (myState.current_pack ? myState.current_pack.length : -1) ||
+      (me.current_pack ? me.current_pack.length : -1) !==
+        (myState.current_pack ? myState.current_pack.length : -1) ||
       me.mainboard.length !== myState.mainboard.length ||
       me.sideboard.length !== myState.sideboard.length;
 
     if (updateNeeded) setMyState(me);
   }, [eventState, myState, userId]);
 
-  const addBasics = React.useCallback(async function ({
-    cmc,
-    collector_number,
-    color_identity,
-    image,
-    keywords,
-    mana_cost,
-    mtgo_id,
-    name,
-    oracle_id,
-    tcgplayer_id,
-    scryfall_id,
-    set,
-    set_name,
-    type_line
-  }, component, numberOfCopies) {
-    await sendRequest({
-      headers: { EventID: eventState._id },
-      operation: 'addBasics',
-      get body() {
-        return {
-          query: `
+  const addBasics = React.useCallback(
+    async function (
+      {
+        cmc,
+        collector_number,
+        color_identity,
+        image,
+        keywords,
+        mana_cost,
+        mtgo_id,
+        name,
+        oracle_id,
+        tcgplayer_id,
+        scryfall_id,
+        set,
+        set_name,
+        type_line
+      },
+      component,
+      numberOfCopies
+    ) {
+      await sendRequest({
+        headers: { EventID: eventState._id },
+        operation: 'addBasics',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
                   card: {
                     cmc: ${cmc},
                     collector_number: ${collector_number},
-                    color_identity: [${color_identity.map(ci => '"' + ci + '"')}],
+                    color_identity: [${color_identity.map(
+                      (ci) => '"' + ci + '"'
+                    )}],
                     image: "${image}",
-                    keywords: [${keywords.map(kw => '"' + kw + '"')}],
+                    keywords: [${keywords.map((kw) => '"' + kw + '"')}],
                     mana_cost: "${mana_cost}",
-                    ${Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',\n' : ''}
+                    ${
+                      Number.isInteger(mtgo_id)
+                        ? 'mtgo_id: ' + mtgo_id + ',\n'
+                        : ''
+                    }
                     name: "${name}",
                     oracle_id: "${oracle_id}",
-                    ${Number.isInteger(tcgplayer_id) ? 'tcgplayer_id: ' + tcgplayer_id + ',\n' : ''} 
+                    ${
+                      Number.isInteger(tcgplayer_id)
+                        ? 'tcgplayer_id: ' + tcgplayer_id + ',\n'
+                        : ''
+                    } 
                     scryfall_id: "${scryfall_id}",
                     set: "${set}",
                     set_name: "${set_name}",
@@ -183,42 +202,48 @@ export default function ContextualizedEventPage () {
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [eventState._id, sendRequest]);
+      });
+    },
+    [eventState._id, sendRequest]
+  );
 
-  const fetchEventByID = React.useCallback(async function () {
-    await sendRequest({
-      callback: data => setEventState(data),
-      headers: { EventID: eventState._id },
-      load: true,
-      operation: 'fetchEventByID',
-      get body() {
-        return {
-          query: `
+  const fetchEventByID = React.useCallback(
+    async function () {
+      await sendRequest({
+        callback: (data) => setEventState(data),
+        headers: { EventID: eventState._id },
+        load: true,
+        operation: 'fetchEventByID',
+        get body() {
+          return {
+            query: `
             query {
               ${this.operation} {
                 ${eventQuery}
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [eventQuery, eventState._id, sendRequest]);
+      });
+    },
+    [eventQuery, eventState._id, sendRequest]
+  );
 
-  const removeBasics = React.useCallback(async function (cardIDs, component) {
-    await sendRequest({
-      headers: { EventID: eventState._id },
-      operation: 'removeBasics',
-      get body() {
-        return {
-          query: `
+  const removeBasics = React.useCallback(
+    async function (cardIDs, component) {
+      await sendRequest({
+        headers: { EventID: eventState._id },
+        operation: 'removeBasics',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(
                 input: {
-                  cardIDs: [${cardIDs.map(cardID => '"' + cardID + '"')}],
+                  cardIDs: [${cardIDs.map((cardID) => '"' + cardID + '"')}],
                   component: ${component}
                 }
               ) {
@@ -226,46 +251,54 @@ export default function ContextualizedEventPage () {
               }
             }
           `
+          };
         }
-      }
-    })
-  }, [eventState._id, sendRequest]);
+      });
+    },
+    [eventState._id, sendRequest]
+  );
 
-  const selectCard = React.useCallback(async function (cardID) {
-    await sendRequest({
-      headers: { EventID: eventState._id },
-      operation: 'selectCard',
-      get body() {
-        return {
-          query: `
+  const selectCard = React.useCallback(
+    async function (cardID) {
+      await sendRequest({
+        headers: { EventID: eventState._id },
+        operation: 'selectCard',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(_id: "${cardID}") {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [eventState._id, sendRequest])
+      });
+    },
+    [eventState._id, sendRequest]
+  );
 
-  const toggleMainboardSideboardEvent = React.useCallback(async function (cardID) {
-    await sendRequest({
-      headers: { EventID: eventState._id },
-      operation: 'toggleMainboardSideboardEvent',
-      get body() {
-        return {
-          query: `
+  const toggleMainboardSideboardEvent = React.useCallback(
+    async function (cardID) {
+      await sendRequest({
+        headers: { EventID: eventState._id },
+        operation: 'toggleMainboardSideboardEvent',
+        get body() {
+          return {
+            query: `
             mutation {
               ${this.operation}(cardID: "${cardID}") {
                 _id
               }
             }
           `
+          };
         }
-      }
-    });
-  }, [eventState._id, sendRequest]);
+      });
+    },
+    [eventState._id, sendRequest]
+  );
 
   return (
     <EventContext.Provider
@@ -286,4 +319,4 @@ export default function ContextualizedEventPage () {
       <Event />
     </EventContext.Provider>
   );
-};
+}

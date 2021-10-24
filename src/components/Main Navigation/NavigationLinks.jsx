@@ -26,29 +26,28 @@ const useStyles = makeStyles({
   }
 });
 
-export default function NavigationLinks ({
+export default function NavigationLinks({
   history,
   setAuthenticateFormDisplayed,
   toggleDrawer
 }) {
-
   const authentication = React.useContext(AuthenticationContext);
   const classes = useStyles();
 
   const loggedInPages = [
     {
       icon: <MUIHomeIcon />,
-      name: "Home",
+      name: 'Home',
       onClick: () => history.push('/')
     },
     {
       icon: <MUIAccountCircleIcon />,
-      name: "My Profile",
+      name: 'My Profile',
       onClick: () => history.push(`/account/${authentication.userId}`)
     },
     {
       icon: <MUIChatOutlinedIcon />,
-      name: "Blog",
+      name: 'Blog',
       onClick: () => history.push('/blog')
     },
     {
@@ -58,12 +57,12 @@ export default function NavigationLinks ({
     },
     {
       icon: <MUIAllInclusiveIcon />,
-      name: "Resources",
+      name: 'Resources',
       onClick: () => history.push('/resources')
     },
     {
       icon: <MUIExitToAppIcon />,
-      name: "Logout",
+      name: 'Logout',
       onClick: authentication.logout
     }
   ];
@@ -71,12 +70,12 @@ export default function NavigationLinks ({
   const loggedOutPages = [
     {
       icon: <MUIHomeIcon />,
-      name: "Home",
+      name: 'Home',
       onClick: () => history.push('/')
     },
     {
       icon: <MUIChatOutlinedIcon />,
-      name: "Blog",
+      name: 'Blog',
       onClick: () => history.push('/blog')
     },
     {
@@ -86,28 +85,34 @@ export default function NavigationLinks ({
     },
     {
       icon: <MUIAllInclusiveIcon />,
-      name: "Resources",
+      name: 'Resources',
       onClick: () => history.push('/resources')
     },
     {
       icon: <MUIExitToAppIcon />,
-      name: "Login / Register",
+      name: 'Login / Register',
       onClick: () => setAuthenticateFormDisplayed(true)
     }
   ];
 
   return (
-    <MUIList className={classes.list} onClick={toggleDrawer} onKeyDown={toggleDrawer}>
-      {
-        (authentication.isLoggedIn ? loggedInPages : loggedOutPages).map(function (page) {
+    <MUIList
+      className={classes.list}
+      onClick={toggleDrawer}
+      onKeyDown={toggleDrawer}
+    >
+      {(authentication.isLoggedIn ? loggedInPages : loggedOutPages).map(
+        function (page) {
           return (
             <MUIListItem button key={page.name} onClick={page.onClick}>
-              <MUIListItemIcon className={classes.item}>{page.icon}</MUIListItemIcon>
+              <MUIListItemIcon className={classes.item}>
+                {page.icon}
+              </MUIListItemIcon>
               <MUIListItemText className={classes.item} primary={page.name} />
             </MUIListItem>
           );
-        })
-      }
+        }
+      )}
     </MUIList>
   );
-};
+}

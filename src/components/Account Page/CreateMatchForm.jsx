@@ -40,12 +40,12 @@ const useStyles = makeStyles({
   }
 });
 
-export default function CreateMatchForm ({
-  open,
-  toggleOpen
-}) {
-
-  const { loading, accountState: { buds, decks, events }, createMatch } = React.useContext(AccountContext);
+export default function CreateMatchForm({ open, toggleOpen }) {
+  const {
+    loading,
+    accountState: { buds, decks, events },
+    createMatch
+  } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState();
@@ -62,17 +62,30 @@ export default function CreateMatchForm ({
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
       <MUIDialogTitle>Set Up A Match</MUIDialogTitle>
-      {loading ?
+      {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
-        </MUIDialogContent> :
-        <form onSubmit={event => createMatch(event, [myDeckID, opponentDeckID], selectedEvent._id, [userId, selectedOpponent])}>
-          <MUIDialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-
-            <MUIFormControl className={classes.formControlWithMargin} component="fieldset" required={true}>
+        </MUIDialogContent>
+      ) : (
+        <form
+          onSubmit={(event) =>
+            createMatch(event, [myDeckID, opponentDeckID], selectedEvent._id, [
+              userId,
+              selectedOpponent
+            ])
+          }
+        >
+          <MUIDialogContent
+            style={{ display: 'flex', flexDirection: 'column' }}
+          >
+            <MUIFormControl
+              className={classes.formControlWithMargin}
+              component="fieldset"
+              required={true}
+            >
               <MUIFormLabel component="legend">Create Match from</MUIFormLabel>
               <MUIRadioGroup
-                onChange={event => {
+                onChange={(event) => {
                   if (event.target.value === 'true') {
                     setMyDeckID(null);
                     setOpponentDeckID(null);
@@ -97,7 +110,7 @@ export default function CreateMatchForm ({
               </MUIRadioGroup>
             </MUIFormControl>
 
-            {fromEvent ?
+            {fromEvent ? (
               <React.Fragment>
                 <MUIList component="nav">
                   <MUIListItem
@@ -118,7 +131,7 @@ export default function CreateMatchForm ({
                   open={Boolean(anchorEl)}
                   onClose={() => setAnchorEl(null)}
                 >
-                  {events.map(evnt => (
+                  {events.map((evnt) => (
                     <MUIMenuItem
                       key={evnt._id}
                       onClick={function () {
@@ -131,21 +144,30 @@ export default function CreateMatchForm ({
                     </MUIMenuItem>
                   ))}
                 </MUIMenu>
-              </React.Fragment> :
-              <MUIFormControl className={classes.formControlWithMargin} component="fieldset" required={true}>
+              </React.Fragment>
+            ) : (
+              <MUIFormControl
+                className={classes.formControlWithMargin}
+                component="fieldset"
+                required={true}
+              >
                 <MUIFormLabel component="legend">Your Deck</MUIFormLabel>
                 <MUIRadioGroup
-                  onChange={event => setMyDeckID(event.target.value)}
+                  onChange={(event) => setMyDeckID(event.target.value)}
                   value={myDeckID}
                 >
-                  {decks.map(dck => (
+                  {decks.map((dck) => (
                     <MUIFormControlLabel
                       control={<MUIRadio />}
                       key={dck._id}
                       label={
                         <React.Fragment>
-                          <MUITypography variant="subtitle1">{dck.name}</MUITypography>
-                          <MUITypography variant="subtitle2">{dck.format}</MUITypography>
+                          <MUITypography variant="subtitle1">
+                            {dck.name}
+                          </MUITypography>
+                          <MUITypography variant="subtitle2">
+                            {dck.format}
+                          </MUITypography>
                         </React.Fragment>
                       }
                       value={dck._id}
@@ -153,83 +175,109 @@ export default function CreateMatchForm ({
                   ))}
                 </MUIRadioGroup>
               </MUIFormControl>
-            }
+            )}
 
-            <MUIFormControl className={classes.formControlWithMargin} component="fieldset" required={true}>
+            <MUIFormControl
+              className={classes.formControlWithMargin}
+              component="fieldset"
+              required={true}
+            >
               <MUIFormLabel component="legend">Your Next Victim</MUIFormLabel>
               <MUIRadioGroup
-                onChange={event => setSelectedOpponent(event.target.value)}
+                onChange={(event) => setSelectedOpponent(event.target.value)}
                 value={selectedOpponent}
               >
-                {fromEvent ?
-                  selectedEvent.players.filter(plr => plr.account._id !== userId).map(plr => (
-                    <MUIFormControlLabel
-                      control={<MUIRadio />}
-                      key={plr.account._id}
-                      label={
-                        <span className={classes.flex}>
-                          <Avatar alt={plr.account.name} size='small' src={plr.account.avatar} />
-                          <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
-                        </span>
-                      }
-                      value={plr.account._id}
-                    />
-                  )) :
+                {fromEvent ? (
+                  selectedEvent.players
+                    .filter((plr) => plr.account._id !== userId)
+                    .map((plr) => (
+                      <MUIFormControlLabel
+                        control={<MUIRadio />}
+                        key={plr.account._id}
+                        label={
+                          <span className={classes.flex}>
+                            <Avatar
+                              alt={plr.account.name}
+                              size="small"
+                              src={plr.account.avatar}
+                            />
+                            <MUITypography variant="subtitle1">
+                              {plr.account.name}
+                            </MUITypography>
+                          </span>
+                        }
+                        value={plr.account._id}
+                      />
+                    ))
+                ) : (
                   <React.Fragment>
-                    {buds.map(bud => (
+                    {buds.map((bud) => (
                       <MUIFormControlLabel
                         control={<MUIRadio />}
                         key={bud._id}
                         label={
                           <span className={classes.flex}>
-                            <Avatar alt={bud.name} size='small' src={bud.avatar} />
-                            <MUITypography variant="subtitle1">{bud.name}</MUITypography>
+                            <Avatar
+                              alt={bud.name}
+                              size="small"
+                              src={bud.avatar}
+                            />
+                            <MUITypography variant="subtitle1">
+                              {bud.name}
+                            </MUITypography>
                           </span>
                         }
                         value={bud._id}
                       />
                     ))}
-                    
                   </React.Fragment>
-                }
+                )}
               </MUIRadioGroup>
             </MUIFormControl>
 
-            {!fromEvent &&
-              <MUIFormControl className={classes.formControlWithMargin} component="fieldset" required={true}>
-                <MUIFormLabel component="legend">Your Opponent's Deck</MUIFormLabel>
+            {!fromEvent && (
+              <MUIFormControl
+                className={classes.formControlWithMargin}
+                component="fieldset"
+                required={true}
+              >
+                <MUIFormLabel component="legend">
+                  Your Opponent's Deck
+                </MUIFormLabel>
                 <MUIRadioGroup
-                  onChange={event => setOpponentDeckID(event.target.value)}
+                  onChange={(event) => setOpponentDeckID(event.target.value)}
                   value={opponentDeckID}
                 >
-                  {selectedOpponent && buds.find(bud => bud._id === selectedOpponent).decks.map(dck => (
-                    <MUIFormControlLabel
-                      control={<MUIRadio />}
-                      key={dck._id}
-                      label={
-                        <React.Fragment>
-                          <MUITypography variant="subtitle1">{dck.name}</MUITypography>
-                          <MUITypography variant="subtitle2">{dck.format}</MUITypography>
-                        </React.Fragment>
-                      }
-                      value={dck._id}
-                    />
-                  ))}
+                  {selectedOpponent &&
+                    buds
+                      .find((bud) => bud._id === selectedOpponent)
+                      .decks.map((dck) => (
+                        <MUIFormControlLabel
+                          control={<MUIRadio />}
+                          key={dck._id}
+                          label={
+                            <React.Fragment>
+                              <MUITypography variant="subtitle1">
+                                {dck.name}
+                              </MUITypography>
+                              <MUITypography variant="subtitle2">
+                                {dck.format}
+                              </MUITypography>
+                            </React.Fragment>
+                          }
+                          value={dck._id}
+                        />
+                      ))}
                 </MUIRadioGroup>
               </MUIFormControl>
-            }
-
+            )}
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton type="submit">
-              Whoop that Ass!
-            </MUIButton>
-            <WarningButton onClick={toggleOpen}>
-              Cancel
-            </WarningButton>
+            <MUIButton type="submit">Whoop that Ass!</MUIButton>
+            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
           </MUIDialogActions>
         </form>
-      }
+      )}
     </MUIDialog>
   );
-};
+}
