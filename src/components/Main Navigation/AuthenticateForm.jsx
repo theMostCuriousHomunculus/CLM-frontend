@@ -45,10 +45,8 @@ export default function AuthenticateForm({ open, toggleOpen }) {
           query: `
             mutation {
               ${this.operation}(
-                input: {
-                  email: "${emailInput}",
-                  password: "${passwordInput}"
-                }
+                email: "${emailInput}",
+                password: "${passwordInput}"
               ) {
                 isAdmin
                 token
@@ -96,12 +94,10 @@ export default function AuthenticateForm({ open, toggleOpen }) {
           query: `
             mutation {
               ${this.operation}(
-                input: {
-                  avatar: "${avatar.printings[randomIndex].image_uris.art_crop}",
-                  email: "${emailInput}",
-                  name: "${nameInput}",
-                  password: "${passwordInput}"
-                }
+                avatar: "${avatar.printings[randomIndex].image_uris.art_crop}",
+                email: "${emailInput}",
+                name: "${nameInput}",
+                password: "${passwordInput}"
               ) {
                 token
                 userId

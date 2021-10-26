@@ -158,11 +158,9 @@ export default function ContextualizedAccountPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  ${cobraID ? 'cobraID: "' + cobraID + '",\n' : ''}
-                  description: "${description}",
-                  name: "${name}"
-                }
+                ${cobraID ? 'cobraID: "' + cobraID + '",\n' : ''}
+                description: "${description}",
+                name: "${name}"
               ) {
                 _id
               }
@@ -190,16 +188,14 @@ export default function ContextualizedAccountPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  description: "${description}",
-                  ${
-                    existingListID
-                      ? 'existingListID: "' + existingListID + '",\n'
-                      : ''
-                  }
-                  ${format ? 'format: ' + format + ',\n' : ''}
-                  name: "${name}"
+                description: "${description}",
+                ${
+                  existingListID
+                    ? 'existingListID: "' + existingListID + '",\n'
+                    : ''
                 }
+                ${format ? 'format: ' + format + ',\n' : ''}
+                name: "${name}"
               ) {
                 _id
               }
@@ -237,16 +233,12 @@ export default function ContextualizedAccountPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cards_per_pack: ${cardsPerPack},
-                  event_type: ${eventType},
-                  modules: [${modules.map((mdl) => '"' + mdl + '"')}],
-                  name: "${name}",
-                  other_players: [${otherPlayers.map(
-                    (plr) => '"' + plr + '"'
-                  )}],
-                  packs_per_player: ${packsPerPlayer}
-                }
+                cards_per_pack: ${cardsPerPack},
+                event_type: ${eventType},
+                modules: [${modules.map((mdl) => '"' + mdl + '"')}],
+                name: "${name}",
+                other_players: [${otherPlayers.map((plr) => '"' + plr + '"')}],
+                packs_per_player: ${packsPerPlayer}
               ) {
                 _id
               }
@@ -274,11 +266,9 @@ export default function ContextualizedAccountPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  deckIDs: [${deckIDs.map((dckID) => '"' + dckID + '"')}],
-                  ${eventID ? 'eventID: "' + eventID + '",\n' : ''}
-                  playerIDs: [${playerIDs.map((plrID) => '"' + plrID + '"')}]
-                }
+                deckIDs: [${deckIDs.map((dckID) => '"' + dckID + '"')}],
+                ${eventID ? 'eventID: "' + eventID + '",\n' : ''}
+                playerIDs: [${playerIDs.map((plrID) => '"' + plrID + '"')}]
               ) {
                 _id
               }

@@ -167,36 +167,34 @@ export default function ContextualizedEventPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  card: {
-                    cmc: ${cmc},
-                    collector_number: ${collector_number},
-                    color_identity: [${color_identity.map(
-                      (ci) => '"' + ci + '"'
-                    )}],
-                    image: "${image}",
-                    keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                    mana_cost: "${mana_cost}",
-                    ${
-                      Number.isInteger(mtgo_id)
-                        ? 'mtgo_id: ' + mtgo_id + ',\n'
-                        : ''
-                    }
-                    name: "${name}",
-                    oracle_id: "${oracle_id}",
-                    ${
-                      Number.isInteger(tcgplayer_id)
-                        ? 'tcgplayer_id: ' + tcgplayer_id + ',\n'
-                        : ''
-                    } 
-                    scryfall_id: "${scryfall_id}",
-                    set: "${set}",
-                    set_name: "${set_name}",
-                    type_line: "${type_line}"
-                  },
-                  component: ${component},
-                  numberOfCopies: ${numberOfCopies}
-                }
+                card: {
+                  cmc: ${cmc},
+                  collector_number: ${collector_number},
+                  color_identity: [${color_identity.map(
+                    (ci) => '"' + ci + '"'
+                  )}],
+                  image: "${image}",
+                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
+                  mana_cost: "${mana_cost}",
+                  ${
+                    Number.isInteger(mtgo_id)
+                      ? 'mtgo_id: ' + mtgo_id + ',\n'
+                      : ''
+                  }
+                  name: "${name}",
+                  oracle_id: "${oracle_id}",
+                  ${
+                    Number.isInteger(tcgplayer_id)
+                      ? 'tcgplayer_id: ' + tcgplayer_id + ',\n'
+                      : ''
+                  } 
+                  scryfall_id: "${scryfall_id}",
+                  set: "${set}",
+                  set_name: "${set_name}",
+                  type_line: "${type_line}"
+                },
+                component: ${component},
+                numberOfCopies: ${numberOfCopies}
               ) {
                 _id
               }
@@ -242,10 +240,8 @@ export default function ContextualizedEventPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardIDs: [${cardIDs.map((cardID) => '"' + cardID + '"')}],
-                  component: ${component}
-                }
+                cardIDs: [${cardIDs.map((cardID) => '"' + cardID + '"')}],
+                component: ${component}
               ) {
                 _id
               }

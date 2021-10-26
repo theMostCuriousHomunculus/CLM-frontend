@@ -254,12 +254,10 @@ export default function BlogPost() {
         query: `
           mutation {
             ${operation}(
-              input: {
-                body: """${blogPost.body}""",
-                image: "${blogPost.image}",
-                subtitle: "${blogPost.subtitle}",
-                title: "${blogPost.title}"
-              }
+              body: """${blogPost.body}""",
+              image: "${blogPost.image}",
+              subtitle: "${blogPost.subtitle}",
+              title: "${blogPost.title}"
             ) {
               _id
             }

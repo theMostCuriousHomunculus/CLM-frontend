@@ -431,12 +431,10 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  counterAmount: ${counterAmount},
-                  counterType: "${counterType}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                counterAmount: ${counterAmount},
+                counterType: "${counterType}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -522,11 +520,9 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  faceDownImage: ${faceDownImage},
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                faceDownImage: ${faceDownImage},
+                zone: ${zone}
               ) {
                 _id
               }
@@ -570,12 +566,10 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  controllerID: "${controllerID}",
-                  numberOfCopies: ${numberOfCopies},
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                controllerID: "${controllerID}",
+                numberOfCopies: ${numberOfCopies},
+                zone: ${zone}
               ) {
                 _id
               }
@@ -598,14 +592,10 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  token: {
-                    ${back_image ? 'back_image: "' + back_image + '",\n' : ''}
-                    image: "${image}",
-                    name: "${name}"
-                  },
-                  numberOfTokens: ${numberOfTokens}
-                }
+                ${back_image ? 'back_image: "' + back_image + '",\n' : ''}
+                image: "${image}",
+                name: "${name}",
+                numberOfTokens: ${numberOfTokens}
               ) {
                 _id
               }
@@ -628,10 +618,8 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -654,12 +642,10 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  xCoordinate: ${xCoordinate},
-                  yCoordinate: ${yCoordinate},
-                  zIndex: ${zIndex}
-                }
+                cardID: "${cardID}",
+                xCoordinate: ${xCoordinate},
+                yCoordinate: ${yCoordinate},
+                zIndex: ${zIndex}
               ) {
                 _id
               }
@@ -726,10 +712,8 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -773,11 +757,9 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  controllerID: "${controllerID}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                controllerID: "${controllerID}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -842,10 +824,8 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -910,9 +890,7 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardIDs: [${cardIDs.map((id) => '"' + id + '"')}]
-                }
+                cardIDs: [${cardIDs.map((id) => '"' + id + '"')}]
               ) {
                 _id
               }
@@ -964,14 +942,12 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  destinationZone: ${destinationZone},
-                  ${Number.isInteger(index) ? 'index: ' + index + ',\n' : ''}
-                  originZone: ${originZone},
-                  reveal: ${reveal},
-                  shuffle: ${shuffle}
-                }
+                cardID: "${cardID}",
+                destinationZone: ${destinationZone},
+                ${Number.isInteger(index) ? 'index: ' + index + ',\n' : ''}
+                originZone: ${originZone},
+                reveal: ${reveal},
+                shuffle: ${shuffle}
               ) {
                 _id
               }
@@ -994,10 +970,8 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -1020,11 +994,9 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  controllerID: "${controllerID}",
-                  zone: ${zone}
-                }
+                cardID: "${cardID}",
+                controllerID: "${controllerID}",
+                zone: ${zone}
               ) {
                 _id
               }
@@ -1048,10 +1020,8 @@ export default function ContextualizedMatchPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  controllerID: "${controllerID}",
-                  zone: ${zone}
-                }
+                controllerID: "${controllerID}",
+                zone: ${zone}
               ) {
                 _id
               }

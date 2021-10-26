@@ -38,11 +38,9 @@ export default function PasswordReset() {
             query: `
               mutation {
                 ${operation}(
-                  input: {
-                    email: "${emailInput.current.value}"
-                    password: "${passwordInput.current.value}"
-                    reset_token: "${resetToken}"
-                  }
+                  email: "${emailInput.current.value}"
+                  password: "${passwordInput.current.value}"
+                  reset_token: "${resetToken}"
                 ) {
                   isAdmin
                   token

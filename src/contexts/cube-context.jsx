@@ -205,35 +205,31 @@ export default function ContextualizedCubePage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  componentID: "${activeComponentState._id}",
-                  card: {
-                    ${back_image ? 'back_image: "' + back_image + '",' : ''}
-                    cmc: ${cmc},
-                    collector_number: ${collector_number},
-                    color_identity: [${color_identity.map(
-                      (ci) => '"' + ci + '"'
-                    )}],
-                    image: "${image}",
-                    keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                    mana_cost: "${mana_cost}",
-                    ${
-                      Number.isInteger(mtgo_id)
-                        ? 'mtgo_id: ' + mtgo_id + ','
-                        : ''
-                    }
-                    name: "${name}",
-                    oracle_id: "${oracle_id}",
-                    scryfall_id: "${scryfall_id}",
-                    set: "${set}",
-                    set_name: "${set_name}",
-                    ${
-                      Number.isInteger(tcgplayer_id)
-                        ? 'tcgplayer_id: ' + tcgplayer_id + ','
-                        : ''
-                    }
-                    type_line: "${type_line}"
+                componentID: "${activeComponentState._id}",
+                card: {
+                  ${back_image ? 'back_image: "' + back_image + '",' : ''}
+                  cmc: ${cmc},
+                  collector_number: ${collector_number},
+                  color_identity: [${color_identity.map(
+                    (ci) => '"' + ci + '"'
+                  )}],
+                  image: "${image}",
+                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
+                  mana_cost: "${mana_cost}",
+                  ${
+                    Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''
                   }
+                  name: "${name}",
+                  oracle_id: "${oracle_id}",
+                  scryfall_id: "${scryfall_id}",
+                  set: "${set}",
+                  set_name: "${set_name}",
+                  ${
+                    Number.isInteger(tcgplayer_id)
+                      ? 'tcgplayer_id: ' + tcgplayer_id + ','
+                      : ''
+                  }
+                  type_line: "${type_line}"
                 }
               ) {
                 _id
@@ -346,15 +342,11 @@ export default function ContextualizedCubePage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  cardID: "${cardID}",
-                  ${
-                    destinationID
-                      ? 'destinationID: "' + destinationID + '",'
-                      : ''
-                  }
-                  originID: "${activeComponentState._id}"
+                cardID: "${cardID}",
+                ${
+                  destinationID ? 'destinationID: "' + destinationID + '",' : ''
                 }
+                originID: "${activeComponentState._id}"
               )
             }
           `
@@ -425,10 +417,8 @@ export default function ContextualizedCubePage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  componentID: "${activeComponentState._id}",
-                  ${changes}
-                }
+                componentID: "${activeComponentState._id}",
+                ${changes}
               ) {
                 _id
               }
@@ -451,11 +441,9 @@ export default function ContextualizedCubePage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  description: "${description}",
-                  name: "${name}",
-                  published: ${published}
-                }
+                description: "${description}",
+                name: "${name}",
+                published: ${published}
               ) {
                 _id
               }
@@ -478,10 +466,8 @@ export default function ContextualizedCubePage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  moduleID: "${activeComponentState._id}",
-                  name: "${name}"
-                }
+                moduleID: "${activeComponentState._id}",
+                name: "${name}"
               ) {
                 _id
               }
@@ -504,11 +490,9 @@ export default function ContextualizedCubePage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  rotationID: "${activeComponentState._id}",
-                  name: "${name}",
-                  size: ${size}
-                }
+                rotationID: "${activeComponentState._id}",
+                name: "${name}",
+                size: ${size}
               ) {
                 _id
               }
