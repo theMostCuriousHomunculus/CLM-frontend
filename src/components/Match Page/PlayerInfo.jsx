@@ -42,12 +42,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function PlayerInfo ({
-  player,
-  position,
-  setClickedPlayer
-}) {
-
+export default function PlayerInfo({ player, position, setClickedPlayer }) {
   const avatarRef = React.useRef();
   const classes = useStyles();
   const [dragging, setDragging] = React.useState(false);
@@ -60,65 +55,70 @@ export default function PlayerInfo ({
   } = React.useContext(MatchContext);
 
   React.useEffect(() => {
-
-    function energyBadgeClickListner () {
+    function energyBadgeClickListner() {
       setClickedPlayer({
         _id: null,
         anchorElement: null,
         position: null
       });
       setNumberInputDialogInfo({
-        buttonText: "Update",
+        buttonText: 'Update',
         defaultValue: player.energy,
-        inputLabel: "Energy",
-        title: "Update Your Energy Counters",
-        updateFunction: updatedValue => adjustEnergyCounters(updatedValue)
+        inputLabel: 'Energy',
+        title: 'Update Your Energy Counters',
+        updateFunction: (updatedValue) => adjustEnergyCounters(updatedValue)
       });
     }
 
-    function lifeBadgeClickListner () {
+    function lifeBadgeClickListner() {
       setClickedPlayer({
         _id: null,
         anchorElement: null,
         position: null
       });
       setNumberInputDialogInfo({
-        buttonText: "Update",
+        buttonText: 'Update',
         defaultValue: player.life,
-        inputLabel: "Life",
-        title: "Update Your Life Total",
-        updateFunction: updatedValue => adjustLifeTotal(updatedValue)
+        inputLabel: 'Life',
+        title: 'Update Your Life Total',
+        updateFunction: (updatedValue) => adjustLifeTotal(updatedValue)
       });
     }
 
-    function poisonBadgeClickListner () {
+    function poisonBadgeClickListner() {
       setClickedPlayer({
         _id: null,
         anchorElement: null,
         position: null
       });
       setNumberInputDialogInfo({
-        buttonText: "Update",
+        buttonText: 'Update',
         defaultValue: player.poison,
-        inputLabel: "Poison",
-        title: "Update Your Poison Counters",
-        updateFunction: updatedValue => adjustPoisonCounters(updatedValue)
+        inputLabel: 'Poison',
+        title: 'Update Your Poison Counters',
+        updateFunction: (updatedValue) => adjustPoisonCounters(updatedValue)
       });
     }
 
     if (avatarRef.current && userId === player.account._id) {
-      const energyBadge = avatarRef.current.getElementsByClassName("MuiBadge-anchorOriginBottomRightCircle")[0];
-      const lifeBadge = avatarRef.current.getElementsByClassName("MuiBadge-anchorOriginTopRightCircle")[0];
-      const poisonBadge = avatarRef.current.getElementsByClassName("MuiBadge-anchorOriginTopLeftCircle")[0];
-      
-      energyBadge.addEventListener("click", energyBadgeClickListner);
-      lifeBadge.addEventListener("click", lifeBadgeClickListner);
-      poisonBadge.addEventListener("click", poisonBadgeClickListner);
+      const energyBadge = avatarRef.current.getElementsByClassName(
+        'MuiBadge-anchorOriginBottomRightCircle'
+      )[0];
+      const lifeBadge = avatarRef.current.getElementsByClassName(
+        'MuiBadge-anchorOriginTopRightCircle'
+      )[0];
+      const poisonBadge = avatarRef.current.getElementsByClassName(
+        'MuiBadge-anchorOriginTopLeftCircle'
+      )[0];
+
+      energyBadge.addEventListener('click', energyBadgeClickListner);
+      lifeBadge.addEventListener('click', lifeBadgeClickListner);
+      poisonBadge.addEventListener('click', poisonBadgeClickListner);
 
       return () => {
-        energyBadge.removeEventListener("click", energyBadgeClickListner);
-        lifeBadge.removeEventListener("click", lifeBadgeClickListner);
-        poisonBadge.removeEventListener("click", poisonBadgeClickListner);
+        energyBadge.removeEventListener('click', energyBadgeClickListner);
+        lifeBadge.removeEventListener('click', lifeBadgeClickListner);
+        poisonBadge.removeEventListener('click', poisonBadgeClickListner);
       };
     }
   }, [
@@ -147,7 +147,6 @@ export default function PlayerInfo ({
         setDragging(true);
       }}
       onStop={(event, data) => {
-
         if (!dragging) {
           setClickedPlayer({
             _id: player.account._id,
@@ -164,39 +163,43 @@ export default function PlayerInfo ({
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           badgeContent={
             <React.Fragment>
-              <EnergySymbol className={classes.badgeIcon} /> : {player.energy > 99 ? '99+' : player.energy}
+              <EnergySymbol className={classes.badgeIcon} /> :{' '}
+              {player.energy > 99 ? '99+' : player.energy}
             </React.Fragment>
           }
           className={classes.energyBadge}
-          overlap='circular'
+          overlap="circular"
           showZero
         >
           <MUIBadge
             anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             badgeContent={
               <React.Fragment>
-                <MUIFavoriteIcon className={classes.badgeIcon} /> : {player.life > 99 ? '99+' : player.life}
+                <MUIFavoriteIcon className={classes.badgeIcon} /> :{' '}
+                {player.life > 99 ? '99+' : player.life}
               </React.Fragment>
             }
             className={classes.lifeBadge}
-            overlap='circular'
+            overlap="circular"
             showZero
           >
             <MUIBadge
               anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
               badgeContent={
                 <React.Fragment>
-                  <PoisonSymbol className={classes.badgeIcon} /> : {player.poison > 10 ? '10+' : player.poison}
+                  <PoisonSymbol className={classes.badgeIcon} /> :{' '}
+                  {player.poison > 10 ? '10+' : player.poison}
                 </React.Fragment>
               }
               className={classes.poisonBadge}
-              overlap='circular'
+              overlap="circular"
               showZero
             >
               <Avatar
                 alt={player.account.name}
                 id={`${position}-avatar`}
-                size='large' src={player.account.avatar}
+                size="large"
+                src={player.account.avatar}
                 style={{ cursor: 'move' }}
               />
             </MUIBadge>
@@ -205,4 +208,4 @@ export default function PlayerInfo ({
       </span>
     </Draggable>
   );
-};
+}

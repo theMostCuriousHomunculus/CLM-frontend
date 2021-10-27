@@ -19,7 +19,8 @@ import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
-const desiredBlogPostInfo = `_id\nauthor {\n_id\navatar\nname\n}\nbody\ncomments {\n_id\nauthor {\n_id\navatar\nname\n}\nbody\nupdatedAt\n}\nimage\nsubtitle\ntitle\ncreatedAt\nupdatedAt`;
+const desiredBlogPostInfo =
+  '_id\nauthor {\n_id\navatar\nname\n}\nbody\ncomments {\n_id\nauthor {\n_id\navatar\nname\n}\nbody\nupdatedAt\n}\nimage\nsubtitle\ntitle\ncreatedAt\nupdatedAt';
 
 const useStyles = makeStyles({
   article: {
@@ -183,38 +184,38 @@ export default function BlogPost() {
 
     initialize();
 
-    if (blogPostID !== 'new-post') {
-      const client = createClient({
-        connectionParams: {
-          authToken: authentication.token,
-          blogPostID
-        },
-        url: process.env.REACT_APP_GRAPHQL_WS_URL
-      });
+    const client = createClient({
+      connectionParams: {
+        authToken: authentication.token,
+        blogPostID
+      },
+      url: process.env.REACT_APP_GRAPHQL_WS_URL
+    });
 
-      async function subscribe() {
-        function onNext(update) {
-          setBlogPost(update.data.subscribeBlogPost);
-        }
-
-        await new Promise((resolve, reject) => {
-          client.subscribe(
-            {
-              query: `subscription {
-              subscribeBlogPost {
-                ${desiredBlogPostInfo}
-              }
-            }`
-            },
-            {
-              complete: resolve,
-              error: reject,
-              next: onNext
-            }
-          );
-        });
+    async function subscribe() {
+      function onNext(update) {
+        setBlogPost(update.data.subscribeBlogPost);
       }
 
+      await new Promise((resolve, reject) => {
+        client.subscribe(
+          {
+            query: `subscription {
+            subscribeBlogPost {
+              ${desiredBlogPostInfo}
+            }
+          }`
+          },
+          {
+            complete: resolve,
+            error: reject,
+            next: onNext
+          }
+        );
+      });
+    }
+
+    if (blogPostID !== 'new-post') {
       subscribe(
         (result) => console.log(result),
         (error) => console.log(error)
@@ -398,10 +399,9 @@ export default function BlogPost() {
                 />
               ) : (
                 <article className={classes.article}>
-                  <ReactMarkdown
-                    rehypePlugins={[rehypeRaw]}
-                    children={blogPost.body}
-                  />
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                    {blogPost.body}
+                  </ReactMarkdown>
                 </article>
               )}
             </MUICardContent>
@@ -427,10 +427,9 @@ export default function BlogPost() {
             />
             <MUICardContent>
               <article className={classes.article}>
-                <ReactMarkdown
-                  rehypePlugins={[rehypeRaw]}
-                  children={blogPost.body}
-                />
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {blogPost.body}
+                </ReactMarkdown>
               </article>
             </MUICardContent>
           </React.Fragment>

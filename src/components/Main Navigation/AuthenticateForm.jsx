@@ -115,7 +115,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
         setErrorMessages((prevState) => {
           return [
             ...prevState,
-            `A link to reset your password has been sent.  Please check your email inbox and your spam folder.`
+            'A link to reset your password has been sent.  Please check your email inbox and your spam folder.'
           ];
         });
         toggleOpen();

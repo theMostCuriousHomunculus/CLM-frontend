@@ -17,8 +17,7 @@ import useRequest from '../../hooks/request-hook';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import { MatchContext } from '../../contexts/match-context';
 
-export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
-
+export default function ScryfallTokenSearch({ closeDialog, openDialog }) {
   const cardSearchInput = React.useRef();
   const { loading, sendRequest } = useRequest();
   const { createTokens } = React.useContext(MatchContext);
@@ -29,113 +28,137 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
   const [numberOfTokens, setNumberOfTokens] = React.useState(1);
   const [timer, setTimer] = React.useState();
 
-  const scryfallCardSearch = React.useCallback(event => {
-    event.persist();
-    setTimer(setTimeout(async function () {
-      if (event.target.value.length < 2) {
-        setCardSearchResults([]);
-        setChosenCard(null);
-      } else {
-        await sendRequest({
-          callback: (data) => {
-            if (data.data) {
-              setCardSearchResults(data.data.map(match => {
-                let powerToughness = '';
-
-                if (match.type_line.includes('Creature') && match.layout === 'double_faced_token') {
-                  if (match.card_faces[0].type_line.includes('Creature')) {
-                    powerToughness = powerToughness.concat(`${match.card_faces[0].power} / ${match.card_faces[0].toughness}`);
-                  }
-
-                  if (match.card_faces[0].type_line.includes('Creature') && match.card_faces[1].type_line.includes('Creature')) {
-                    powerToughness = powerToughness.concat(' // ');
-                  }
-
-                  if (match.card_faces[1].type_line.includes('Creature')) {
-                    powerToughness = powerToughness.concat(`${match.card_faces[1].power} / ${match.card_faces[1].toughness}`);
-                  }
-                } else if (match.type_line.includes('Creature')) {
-                  powerToughness = `${match.power} / ${match.toughness}`;
-                } else {
-                  powerToughness = null;
-                }
-
-                return ({
-                keywords: match.keywords,
-                name: match.name,
-                oracle_id: match.oracle_id,
-                powerToughness,
-                type_line: match.type_line
-                });
-              }));
-            } else {
-              setCardSearchResults([]);
-            }
-          },
-          method: 'GET',
-          url: `https://api.scryfall.com/cards/search?q=${event.target.value}+type%3Atoken`
-        });
-      }
-    }, 250));
-  }, [sendRequest]);
-
-  const scryfallPrintSearch = React.useCallback(async function (oracleID) {
-    await sendRequest({
-      callback: async (data) => {
-        const printings = data.data.map(print => {
-          let back_image, image;
-
-          if (print.layout === 'double_faced_token') {
-            back_image = print.card_faces[1].image_uris.large;
-            image = print.card_faces[0].image_uris.large;
+  const scryfallCardSearch = React.useCallback(
+    (event) => {
+      event.persist();
+      setTimer(
+        setTimeout(async function () {
+          if (event.target.value.length < 2) {
+            setCardSearchResults([]);
+            setChosenCard(null);
           } else {
-            image = print.image_uris.large;
+            await sendRequest({
+              callback: (data) => {
+                if (data.data) {
+                  setCardSearchResults(
+                    data.data.map((match) => {
+                      let powerToughness = '';
+
+                      if (
+                        match.type_line.includes('Creature') &&
+                        match.layout === 'double_faced_token'
+                      ) {
+                        if (
+                          match.card_faces[0].type_line.includes('Creature')
+                        ) {
+                          powerToughness = powerToughness.concat(
+                            `${match.card_faces[0].power} / ${match.card_faces[0].toughness}`
+                          );
+                        }
+
+                        if (
+                          match.card_faces[0].type_line.includes('Creature') &&
+                          match.card_faces[1].type_line.includes('Creature')
+                        ) {
+                          powerToughness = powerToughness.concat(' // ');
+                        }
+
+                        if (
+                          match.card_faces[1].type_line.includes('Creature')
+                        ) {
+                          powerToughness = powerToughness.concat(
+                            `${match.card_faces[1].power} / ${match.card_faces[1].toughness}`
+                          );
+                        }
+                      } else if (match.type_line.includes('Creature')) {
+                        powerToughness = `${match.power} / ${match.toughness}`;
+                      } else {
+                        powerToughness = null;
+                      }
+
+                      return {
+                        keywords: match.keywords,
+                        name: match.name,
+                        oracle_id: match.oracle_id,
+                        powerToughness,
+                        type_line: match.type_line
+                      };
+                    })
+                  );
+                } else {
+                  setCardSearchResults([]);
+                }
+              },
+              method: 'GET',
+              url: `https://api.scryfall.com/cards/search?q=${event.target.value}+type%3Atoken`
+            });
           }
+        }, 250)
+      );
+    },
+    [sendRequest]
+  );
 
-          return ({
-            back_image,
-            collector_number: print.collector_number,
-            image,
-            name: print.name,
-            scryfall_id: print.id,
-            set_name: print.set_name
+  const scryfallPrintSearch = React.useCallback(
+    async function (oracleID) {
+      await sendRequest({
+        callback: async (data) => {
+          const printings = data.data.map((print) => {
+            let back_image, image;
+
+            if (print.layout === 'double_faced_token') {
+              back_image = print.card_faces[1].image_uris.large;
+              image = print.card_faces[0].image_uris.large;
+            } else {
+              image = print.image_uris.large;
+            }
+
+            return {
+              back_image,
+              collector_number: print.collector_number,
+              image,
+              name: print.name,
+              scryfall_id: print.id,
+              set_name: print.set_name
+            };
           });
-        });
 
-        setChosenCard(printings[0]);
-        setAvailablePrintings(printings);
-      },
-      method: 'GET',
-      url: `https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleID}&unique=prints`
-    });
-  }, [sendRequest]);
+          setChosenCard(printings[0]);
+          setAvailablePrintings(printings);
+        },
+        method: 'GET',
+        url: `https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleID}&unique=prints`
+      });
+    },
+    [sendRequest]
+  );
 
-  function submitForm () {
+  function submitForm() {
     setAnchorEl(null);
     setAvailablePrintings([]);
     setCardSearchResults([]);
-    createTokens({
-      back_image: chosenCard.back_image,
-      image: chosenCard.image,
-      name: chosenCard.name
-    }, numberOfTokens);
+    createTokens(
+      {
+        back_image: chosenCard.back_image,
+        image: chosenCard.image,
+        name: chosenCard.name
+      },
+      numberOfTokens
+    );
     setChosenCard(null);
     setNumberOfTokens(1);
     closeDialog();
   }
 
   return (
-    <MUIDialog
-      onClose={closeDialog}
-      open={openDialog}
-    >
+    <MUIDialog onClose={closeDialog} open={openDialog}>
       <MUIDialogTitle>Create Tokens</MUIDialogTitle>
       <MUIDialogContent>
         <MUIAutocomplete
           clearOnBlur={false}
           clearOnEscape={true}
           fullWidth={true}
-          getOptionLabel={option => option.name}
+          getOptionLabel={(option) => option.name}
           id="card-search-input"
           loading={loading}
           onChange={function (event, value, reason) {
@@ -144,7 +167,7 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
             }
           }}
           options={cardSearchResults}
-          renderInput={params => (
+          renderInput={(params) => (
             <MUITextField
               {...params}
               inputRef={cardSearchInput}
@@ -157,7 +180,9 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
                 ...params.InputProps,
                 endAdornment: (
                   <React.Fragment>
-                    {loading && <MUICircularProgress color="inherit" size={20} />}
+                    {loading && (
+                      <MUICircularProgress color="inherit" size={20} />
+                    )}
                     {params.InputProps.endAdornment}
                   </React.Fragment>
                 )
@@ -165,14 +190,14 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
             />
           )}
           renderOption={(props, option) => (
-            <li
-              value={option.oracle_id}
-              {...props}
-            >
-              <span style={{ marginRight: 8 }}>
-                {option.name}
-              </span>
-              {option.keywords.length > 0 && <span style={{ marginRight: 8 }}> - {option.keywords.join(', ')} - </span>}
+            <li value={option.oracle_id} {...props}>
+              <span style={{ marginRight: 8 }}>{option.name}</span>
+              {option.keywords.length > 0 && (
+                <span style={{ marginRight: 8 }}>
+                  {' '}
+                  - {option.keywords.join(', ')} -{' '}
+                </span>
+              )}
               {option.powerToughness && <span>{option.powerToughness}</span>}
             </li>
           )}
@@ -183,11 +208,14 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
             button
             aria-haspopup="true"
             aria-controls="lock-menu"
-            onClick={event => setAnchorEl(event.currentTarget)}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
           >
             <MUIListItemText
               primary="Selected Printing"
-              secondary={chosenCard && `${chosenCard.set_name} - ${chosenCard.collector_number}`}
+              secondary={
+                chosenCard &&
+                `${chosenCard.set_name} - ${chosenCard.collector_number}`
+              }
             />
           </MUIListItem>
         </MUIList>
@@ -223,19 +251,16 @@ export default function ScryfallTokenSearch ({ closeDialog, openDialog }) {
             step: 1
           }}
           label="Number of Tokens"
-          onChange={event => setNumberOfTokens(parseInt(event.target.value))}
+          onChange={(event) => setNumberOfTokens(parseInt(event.target.value))}
           type="number"
           value={numberOfTokens}
         />
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton
-          fullWidth={true}
-          onClick={submitForm}
-        >
+        <MUIButton fullWidth={true} onClick={submitForm}>
           {`Create Token${numberOfTokens === 1 ? '' : 's'}!`}
         </MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );
-};
+}

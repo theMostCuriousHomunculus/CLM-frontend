@@ -24,25 +24,28 @@ const useStyles = makeStyles({
   }
 });
 
-export default function MatchLog () {
-
+export default function MatchLog() {
   const classes = useStyles();
-  const { matchState: { log } } = React.useContext(MatchContext);
+  const {
+    matchState: { log }
+  } = React.useContext(MatchContext);
 
   return (
     <MUICard className={classes.card}>
       <MUICardHeader title="Match Log" />
       <MUICardContent className={classes.cardContent}>
-        {log.map((val, index, array) => array[array.length - 1 - index]).map((update, index, array) => {
-          return (
-            <MUITypography
-              key={`log-update-${array.length - index}`}
-              variant="body2"
-            >
-              {array.length - index}) {update}
-            </MUITypography>
-          );
-        })}
+        {log
+          .map((val, index, array) => array[array.length - 1 - index])
+          .map((update, index, array) => {
+            return (
+              <MUITypography
+                key={`log-update-${array.length - index}`}
+                variant="body2"
+              >
+                {array.length - index}) {update}
+              </MUITypography>
+            );
+          })}
       </MUICardContent>
     </MUICard>
   );

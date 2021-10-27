@@ -28,7 +28,7 @@ export default function PasswordReset() {
       if (passwordInput.current.value !== confirmPasswordInput.current.value) {
         setErrorMessages((prevState) => [
           ...prevState,
-          `The entered passwords do not match.  Please try again.`
+          'The entered passwords do not match.  Please try again.'
         ]);
       } else {
         const operation = 'submitPasswordReset';

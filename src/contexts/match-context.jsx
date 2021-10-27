@@ -417,8 +417,6 @@ export default function ContextualizedMatchPage() {
       setBottomPlayerState(matchState.players[0]);
       setTopPlayerState(matchState.players[1]);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchState, userId]);
 
   const adjustCounters = React.useCallback(

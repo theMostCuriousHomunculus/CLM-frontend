@@ -34,7 +34,8 @@ export default function Resources() {
       platform: 'YouTube'
     },
     {
-      description: `A channel dedicated to talkin' about the best game ever created - Magic: The Gathering.`,
+      description:
+        "A channel dedicated to talkin' about the best game ever created - Magic: The Gathering.",
       link: 'https://www.youtube.com/c/MiloDaGreat1/featured',
       name: 'Milo the Gathering',
       platform: 'YouTube'

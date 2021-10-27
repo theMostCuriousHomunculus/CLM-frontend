@@ -35,7 +35,7 @@ const useStyles = makeStyles({
 
 export default function Classy() {
   const bannedCards = [
-    `Accorder's Shield`,
+    "Accorder's Shield",
     'Allosaurus Rider',
     'Alpine Meadow',
     'Ancestral Vision',
@@ -49,7 +49,7 @@ export default function Classy() {
     'Bone Saw',
     'Boreal Shelf',
     'Bridge From Below',
-    `Cathar's Shield`,
+    "Cathar's Shield",
     'Choke',
     'Chrome Mox',
     'Claws of Gix',
@@ -62,7 +62,7 @@ export default function Classy() {
     'Darksteel Relic',
     'Dig Through Time',
     'Disrupting Shoal',
-    `Dragon's Rage Channeler`,
+    "Dragon's Rage Channeler",
     'Endurance',
     'Ensnaring Bridge',
     'Evermind',
@@ -81,7 +81,7 @@ export default function Classy() {
     'Frostwalk Bastion',
     'Fury',
     'Fury of the Horde',
-    `Gaea's Will`,
+    "Gaea's Will",
     'Gitaxian Probe',
     'Glacial Floodplain',
     'Glimpse of Nature',
@@ -127,7 +127,7 @@ export default function Classy() {
     'Memnite',
     'Mental Misstep',
     'Mine Collapse',
-    `Mishra's Bauble`,
+    "Mishra's Bauble",
     'Moldervine Cloak',
     'Mouth of Ronom',
     'Mox Amber',
@@ -153,7 +153,7 @@ export default function Classy() {
     'Rimewood Falls',
     'Rite of Flame',
     'Scrying Sheets',
-    `Sensei's Divining Top`,
+    "Sensei's Divining Top",
     'Shambling Shell',
     'Shenanigans',
     'Shimmerdrift Vale',
@@ -178,16 +178,16 @@ export default function Classy() {
     'Subtlety',
     'Sulfurous Mire',
     'Summer Bloom',
-    `Summoner's Pact`,
+    "Summoner's Pact",
     'Sunscour',
     'Surgical Extraction',
-    `Tibalt's Trickery`,
-    `Tormod's Crypt`,
+    "Tibalt's Trickery",
+    "Tormod's Crypt",
     'Tresserhorn Sinks',
-    `Umezawa's Jitte`,
+    "Umezawa's Jitte",
     'Umori, the Collector',
-    `Uro, Titan of Nature's Wrath`,
-    `Urza's Saga`,
+    "Uro, Titan of Nature's Wrath",
+    "Urza's Saga",
     'Veil of Summer',
     'Volatile Fjord',
     'Walking Ballista',
@@ -721,7 +721,7 @@ export default function Classy() {
           </MUITypography>
           <MUIList className={classes.multiColumnList}>
             {bannedCards.map((card, index) => (
-              <MUIListItem>
+              <MUIListItem key={card}>
                 <MUIListItemText disableTypography={true}>
                   <MUITypography variant="body2">
                     {index + 1}) {card}

@@ -8,13 +8,14 @@ import theme from '../../theme';
 import MagicCard from '../miscellaneous/MagicCard';
 import { MatchContext } from '../../contexts/match-context';
 
-export default function TheStack ({ setRightClickedCard }) {
-
-  const { matchState: { stack } } = React.useContext(MatchContext);
+export default function TheStack({ setRightClickedCard }) {
+  const {
+    matchState: { stack }
+  } = React.useContext(MatchContext);
 
   return (
     <Draggable bounds="body" handle="#stack">
-      <MUICard 
+      <MUICard
         style={{
           backgroundColor: theme.palette.secondary.main,
           display: 'flex',
@@ -27,7 +28,11 @@ export default function TheStack ({ setRightClickedCard }) {
         <MUICardHeader
           id="stack"
           title="The Stack"
-          style={{ color: theme.palette.primary.main, cursor: 'move', textAlign: 'center' }}
+          style={{
+            color: theme.palette.primary.main,
+            cursor: 'move',
+            textAlign: 'center'
+          }}
         />
         <MUICardContent
           style={{
@@ -36,14 +41,14 @@ export default function TheStack ({ setRightClickedCard }) {
             overflowY: 'auto'
           }}
         >
-          {stack.map(card => (
+          {stack.map((card) => (
             <MagicCard
               cardData={card}
               customStyle={{
                 flexShrink: 0
               }}
               key={card._id}
-              rightClickFunction={event => {
+              rightClickFunction={(event) => {
                 event.preventDefault();
                 setRightClickedCard({
                   _id: card._id,
@@ -63,4 +68,4 @@ export default function TheStack ({ setRightClickedCard }) {
       </MUICard>
     </Draggable>
   );
-};
+}

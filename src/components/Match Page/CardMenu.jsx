@@ -6,11 +6,7 @@ import CountersDialog from './CountersDialog';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { MatchContext } from '../../contexts/match-context';
 
-export default function CardMenu ({
-  rightClickedCard,
-  setRightClickedCard
-}) {
-
+export default function CardMenu({ rightClickedCard, setRightClickedCard }) {
   const { userId } = React.useContext(AuthenticationContext);
   const {
     matchState: { players },
@@ -36,33 +32,42 @@ export default function CardMenu ({
       origin: null,
       owner: null,
       visibility: []
-    })
+    });
   }, [setRightClickedCard]);
 
-  function handleChangeFaceDownImage (faceDownImage) {
-    changeFaceDownImage(rightClickedCard._id, faceDownImage, rightClickedCard.origin);
+  function handleChangeFaceDownImage(faceDownImage) {
+    changeFaceDownImage(
+      rightClickedCard._id,
+      faceDownImage,
+      rightClickedCard.origin
+    );
     setFaceDownImageAnchorEl(null);
     clearRightClickedCard();
   }
 
-  function handleCreateCopies () {
-    setRightClickedCard(prevState => ({
+  function handleCreateCopies() {
+    setRightClickedCard((prevState) => ({
       ...prevState,
       anchorElement: null
     }));
     setNumberInputDialogInfo({
-      buttonText: "Create Copies!",
+      buttonText: 'Create Copies!',
       defaultValue: 1,
-      inputLabel: "Number of Copies",
+      inputLabel: 'Number of Copies',
       title: `Create Copies of ${rightClickedCard.name}`,
       updateFunction: (value) => {
-        createCopies(rightClickedCard._id, rightClickedCard.controller, value, rightClickedCard.origin);
+        createCopies(
+          rightClickedCard._id,
+          rightClickedCard.controller,
+          value,
+          rightClickedCard.origin
+        );
         clearRightClickedCard();
       }
     });
   }
 
-  function handleTransferCard (destinationZone, reveal, shuffle, index) {
+  function handleTransferCard(destinationZone, reveal, shuffle, index) {
     transferCard(
       rightClickedCard._id,
       destinationZone,
@@ -96,18 +101,20 @@ export default function CardMenu ({
         anchorEl={rightClickedCard.anchorElement}
         keepMounted
         open={Boolean(rightClickedCard.anchorElement)}
-        onClose={() => setRightClickedCard(prevState => ({
-          ...prevState,
-          anchorElement: null
-        }))}
+        onClose={() =>
+          setRightClickedCard((prevState) => ({
+            ...prevState,
+            anchorElement: null
+          }))
+        }
         style={{ zIndex: 2147483647 }}
       >
-        {rightClickedCard.controller === userId &&
+        {rightClickedCard.controller === userId && (
           <React.Fragment>
             <MUIMenuItem
               onClick={() => {
                 setMoveToAnchorEl(rightClickedCard.anchorElement);
-                setRightClickedCard(prevState => ({
+                setRightClickedCard((prevState) => ({
                   ...prevState,
                   anchorElement: null
                 }));
@@ -118,7 +125,7 @@ export default function CardMenu ({
             <MUIMenuItem
               onClick={() => {
                 setCounterDialogOpen(true);
-                setRightClickedCard(prevState => ({
+                setRightClickedCard((prevState) => ({
                   ...prevState,
                   anchorElement: null
                 }));
@@ -126,16 +133,16 @@ export default function CardMenu ({
             >
               Adjust Counters
             </MUIMenuItem>
-            {['battlefield', 'stack'].includes(rightClickedCard.origin) &&
+            {['battlefield', 'stack'].includes(rightClickedCard.origin) && (
               <MUIMenuItem onClick={handleCreateCopies}>
                 Create Copies
               </MUIMenuItem>
-            }
+            )}
             {/**/}
             <MUIMenuItem
               onClick={() => {
                 setFaceDownImageAnchorEl(rightClickedCard.anchorElement);
-                setRightClickedCard(prevState => ({
+                setRightClickedCard((prevState) => ({
                   ...prevState,
                   anchorElement: null
                 }));
@@ -149,9 +156,9 @@ export default function CardMenu ({
                 clearRightClickedCard();
               }}
             >
-              {rightClickedCard.face_down ? "Turn Face-Up" : "Turn Face-Down"}
+              {rightClickedCard.face_down ? 'Turn Face-Up' : 'Turn Face-Down'}
             </MUIMenuItem>
-            {rightClickedCard.visibility.length < players.length &&
+            {rightClickedCard.visibility.length < players.length && (
               <MUIMenuItem
                 onClick={() => {
                   revealCard(rightClickedCard._id, rightClickedCard.origin);
@@ -160,39 +167,52 @@ export default function CardMenu ({
               >
                 Reveal Card
               </MUIMenuItem>
-            }
-            {rightClickedCard.isCopyToken &&
+            )}
+            {rightClickedCard.isCopyToken && (
               <MUIMenuItem
                 onClick={() => {
-                  destroyCopyToken(rightClickedCard._id, rightClickedCard.origin);
+                  destroyCopyToken(
+                    rightClickedCard._id,
+                    rightClickedCard.origin
+                  );
                   clearRightClickedCard();
                 }}
               >
                 Destroy Copy/Token
               </MUIMenuItem>
-            }
+            )}
           </React.Fragment>
-        }
-        {!rightClickedCard.visibility.map(plr => plr._id).includes(userId) &&
+        )}
+        {!rightClickedCard.visibility
+          .map((plr) => plr._id)
+          .includes(userId) && (
           <MUIMenuItem
             onClick={() => {
-              viewCard(rightClickedCard._id, rightClickedCard.controller, rightClickedCard.origin);
+              viewCard(
+                rightClickedCard._id,
+                rightClickedCard.controller,
+                rightClickedCard.origin
+              );
               clearRightClickedCard();
             }}
           >
             View Card
           </MUIMenuItem>
-        }
-        {rightClickedCard.controller !== userId &&
+        )}
+        {rightClickedCard.controller !== userId && (
           <MUIMenuItem
             onClick={() => {
-              gainControlOfCard(rightClickedCard._id, rightClickedCard.controller, rightClickedCard.origin);
+              gainControlOfCard(
+                rightClickedCard._id,
+                rightClickedCard.controller,
+                rightClickedCard.origin
+              );
               clearRightClickedCard();
             }}
           >
             Gain Control of Card
           </MUIMenuItem>
-        }
+        )}
       </MUIMenu>
 
       <MUIMenu
@@ -202,31 +222,39 @@ export default function CardMenu ({
         onClose={() => setMoveToAnchorEl(null)}
         style={{ zIndex: 2147483647 }}
       >
-        {rightClickedCard.origin !== 'battlefield' &&
-          <MUIMenuItem onClick={() => handleTransferCard('battlefield', false, false)}>
+        {rightClickedCard.origin !== 'battlefield' && (
+          <MUIMenuItem
+            onClick={() => handleTransferCard('battlefield', false, false)}
+          >
             Move to Battlefield
           </MUIMenuItem>
-        }
-        {rightClickedCard.origin !== 'exile' &&
-          <MUIMenuItem onClick={() => handleTransferCard('exile', false, false)}>
+        )}
+        {rightClickedCard.origin !== 'exile' && (
+          <MUIMenuItem
+            onClick={() => handleTransferCard('exile', false, false)}
+          >
             Move to Exile
           </MUIMenuItem>
-        }
-        {rightClickedCard.origin !== 'graveyard' &&
-          <MUIMenuItem onClick={() => handleTransferCard('graveyard', true, false)}>
+        )}
+        {rightClickedCard.origin !== 'graveyard' && (
+          <MUIMenuItem
+            onClick={() => handleTransferCard('graveyard', true, false)}
+          >
             Move to Graveyard
           </MUIMenuItem>
-        }
-        {rightClickedCard.origin !== 'hand' &&
+        )}
+        {rightClickedCard.origin !== 'hand' && (
           <MUIMenuItem onClick={() => handleTransferCard('hand', false, false)}>
             Move to Hand
           </MUIMenuItem>
-        }
-        {rightClickedCard.origin !== 'stack' &&
-          <MUIMenuItem onClick={() => handleTransferCard('stack', false, false)}>
+        )}
+        {rightClickedCard.origin !== 'stack' && (
+          <MUIMenuItem
+            onClick={() => handleTransferCard('stack', false, false)}
+          >
             Put on the Stack
           </MUIMenuItem>
-        }
+        )}
         <MUIMenuItem onClick={() => handleTransferCard('library', false, true)}>
           Shuffle Into Library
         </MUIMenuItem>
@@ -254,4 +282,4 @@ export default function CardMenu ({
       </MUIMenu>
     </React.Fragment>
   );
-};
+}

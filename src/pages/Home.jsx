@@ -20,7 +20,7 @@ export default function Home() {
     'Allows you and your buds to draft your cubes in real time or generate sealed pools',
     'Provides a simple deck building tool for both limited decks you assemble on CLM and for various constructed formats',
     'Allows you to play matches with your buds in real time using either decks from a limited event or constructed decks stored on CLM',
-    `Introduces "Classy", an independently managed, constructed format and brewer's paradise`
+    'Introduces "Classy", an independently managed, constructed format and brewer\'s paradise'
   ];
 
   return (
