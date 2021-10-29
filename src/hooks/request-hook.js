@@ -17,9 +17,9 @@ export default function useRequest() {
       load = false,
       method = 'POST',
       operation = null,
-      url = process.env.REACT_APP_GRAPHQL_HTTP_URL
+      url = process.env.REACT_APP_HTTP_URL
     }) {
-      if (token && url === process.env.REACT_APP_GRAPHQL_HTTP_URL) {
+      if (token && url === process.env.REACT_APP_HTTP_URL) {
         headers.Authorization = `Bearer ${token}`;
       }
 

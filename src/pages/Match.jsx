@@ -91,7 +91,7 @@ export default function Match() {
           authToken: token,
           matchID: matchState._id
         },
-        url: process.env.REACT_APP_GRAPHQL_WS_URL
+        url: process.env.REACT_APP_WS_URL
       });
 
       async function subscribe() {

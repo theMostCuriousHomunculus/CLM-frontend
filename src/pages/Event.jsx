@@ -54,7 +54,7 @@ export default function Event() {
           authToken: token,
           eventID: eventState._id
         },
-        url: process.env.REACT_APP_GRAPHQL_WS_URL
+        url: process.env.REACT_APP_WS_URL
       });
 
       async function subscribe() {

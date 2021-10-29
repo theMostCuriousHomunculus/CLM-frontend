@@ -36,7 +36,7 @@ export default function Deck() {
           authToken: token,
           deckID: deckState._id
         },
-        url: process.env.REACT_APP_GRAPHQL_WS_URL
+        url: process.env.REACT_APP_WS_URL
       });
 
       async function subscribe() {

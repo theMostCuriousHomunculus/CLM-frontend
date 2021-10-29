@@ -189,7 +189,7 @@ export default function BlogPost() {
         authToken: authentication.token,
         blogPostID
       },
-      url: process.env.REACT_APP_GRAPHQL_WS_URL
+      url: process.env.REACT_APP_WS_URL
     });
 
     async function subscribe() {
