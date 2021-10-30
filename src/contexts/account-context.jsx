@@ -22,7 +22,7 @@ export const AccountContext = createContext({
 });
 
 export default function ContextualizedAccountPage() {
-  const accountID = useParams().accountId;
+  const { accountID } = useParams();
   const history = useHistory();
   const [accountState, setAccountState] = React.useState({
     _id: accountID,

@@ -126,10 +126,10 @@ export default function App() {
                 <Route path="/" exact>
                   <Home />
                 </Route>
-                <Route path="/account/:accountId">
+                <Route path="/account/:accountID">
                   <ContextualizedAccountPage />
                 </Route>
-                <Route path="/blog/:blogPostId">
+                <Route path="/blog/:blogPostID">
                   <BlogPost />
                 </Route>
                 <Route path="/blog">
@@ -138,16 +138,16 @@ export default function App() {
                 <Route path="/classy">
                   <Classy />
                 </Route>
-                <Route path="/cube/:cubeId">
+                <Route path="/cube/:cubeID">
                   <ContextualizedCubePage />
                 </Route>
-                <Route path="/deck/:deckId">
+                <Route path="/deck/:deckID">
                   <ContextualizedDeckPage />
                 </Route>
-                <Route path="/event/:eventId">
+                <Route path="/event/:eventID">
                   <ContextualizedEventPage />
                 </Route>
-                <Route path="/match/:matchId">
+                <Route path="/match/:matchID">
                   <ContextualizedMatchPage />
                 </Route>
                 <Route path="/reset/:resetToken">

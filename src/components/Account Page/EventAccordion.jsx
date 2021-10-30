@@ -20,7 +20,7 @@ import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 export default function EventAccordion({ pageClasses }) {
-  const accountId = useParams().accountId;
+  const { accountID } = useParams();
   const {
     accountState: { buds, cubes, events }
   } = React.useContext(AccountContext);
@@ -29,7 +29,7 @@ export default function EventAccordion({ pageClasses }) {
 
   return (
     <React.Fragment>
-      {accountId === userId && cubes.length > 0 && (
+      {accountID === userId && cubes.length > 0 && (
         <CreateEventForm
           buds={buds}
           cubes={cubes}
@@ -102,7 +102,7 @@ export default function EventAccordion({ pageClasses }) {
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {accountId === userId && (
+        {accountID === userId && (
           <MUIAccordionActions>
             <MUIButton
               disabled={cubes.length === 0}

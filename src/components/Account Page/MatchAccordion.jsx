@@ -20,7 +20,7 @@ import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
 export default function MatchAccordion({ pageClasses }) {
-  const accountId = useParams().accountId;
+  const { accountID } = useParams();
   const {
     accountState: { matches }
   } = React.useContext(AccountContext);
@@ -29,7 +29,7 @@ export default function MatchAccordion({ pageClasses }) {
 
   return (
     <React.Fragment>
-      {accountId === userId && (
+      {accountID === userId && (
         <CreateMatchForm
           open={showMatchForm}
           toggleOpen={() => setShowMatchForm((prevState) => !prevState)}
@@ -58,7 +58,7 @@ export default function MatchAccordion({ pageClasses }) {
               <MUITableBody>
                 {matches.map(function (match) {
                   const opponent = match.players.find(
-                    (player) => player.account._id !== accountId
+                    (player) => player.account._id !== accountID
                   );
 
                   return (
@@ -103,7 +103,7 @@ export default function MatchAccordion({ pageClasses }) {
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {accountId === userId && (
+        {accountID === userId && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowMatchForm(true)}>
               Create a Match

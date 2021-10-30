@@ -104,7 +104,7 @@ const useStyles = makeStyles({
 
 export default function BlogPost() {
   const authentication = React.useContext(AuthenticationContext);
-  const blogPostID = useParams().blogPostId;
+  const { blogPostID } = useParams();
   const classes = useStyles();
   const history = useHistory();
   const newComment = React.useRef();

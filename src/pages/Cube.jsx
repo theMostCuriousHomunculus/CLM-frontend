@@ -1,6 +1,5 @@
 import React from 'react';
 import MUIPaper from '@mui/material/Paper';
-import { createClient } from 'graphql-ws';
 
 import CubeDisplay from '../components/Cube Page/CubeDisplay';
 import Dashboard from '../components/Cube Page/Dashboard';
@@ -11,16 +10,9 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { CubeContext } from '../contexts/cube-context';
 
 export default function Cube() {
-  const { token, userId } = React.useContext(AuthenticationContext);
-  const {
-    loading,
-    activeComponentState,
-    cubeQuery,
-    cubeState,
-    setCubeState,
-    addCardToCube,
-    fetchCubeByID
-  } = React.useContext(CubeContext);
+  const { userId } = React.useContext(AuthenticationContext);
+  const { loading, activeComponentState, cubeState, addCardToCube } =
+    React.useContext(CubeContext);
   const [editable, setEditable] = React.useState(
     cubeState.creator._id === userId
   );
@@ -29,52 +21,6 @@ export default function Cube() {
   React.useEffect(() => {
     setEditable(cubeState.creator._id === userId);
   }, [cubeState.creator._id, userId]);
-
-  React.useEffect(() => {
-    async function initialize() {
-      await fetchCubeByID();
-    }
-
-    initialize();
-
-    const client = createClient({
-      connectionParams: {
-        authToken: token,
-        cubeID: cubeState._id
-      },
-      url: process.env.REACT_APP_WS_URL
-    });
-
-    async function subscribe() {
-      function onNext(update) {
-        setCubeState(update.data.subscribeCube);
-      }
-
-      await new Promise((resolve, reject) => {
-        client.subscribe(
-          {
-            query: `subscription {
-            subscribeCube {
-              ${cubeQuery}
-            }
-          }`
-          },
-          {
-            complete: resolve,
-            error: reject,
-            next: onNext
-          }
-        );
-      });
-    }
-
-    subscribe(
-      (result) => console.log(result),
-      (error) => console.log(error)
-    );
-
-    return client.dispose;
-  }, [token, cubeQuery, cubeState._id, fetchCubeByID, setCubeState]);
 
   return loading ? (
     <LoadingSpinner />

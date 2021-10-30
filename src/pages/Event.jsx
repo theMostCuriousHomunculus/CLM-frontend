@@ -4,7 +4,6 @@ import MUITab from '@mui/material/Tab';
 import MUITabs from '@mui/material/Tabs';
 import MUITypography from '@mui/material/Typography';
 import arrayMove from 'array-move';
-import { createClient } from 'graphql-ws';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
@@ -17,16 +16,13 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { EventContext } from '../contexts/event-context';
 
 export default function Event() {
-  const { token, userId } = React.useContext(AuthenticationContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const {
     loading,
-    eventQuery,
     eventState,
     myState,
-    setEventState,
     setMyState,
     addBasics,
-    fetchEventByID,
     removeBasics,
     selectCard,
     toggleMainboardSideboardEvent
@@ -40,55 +36,6 @@ export default function Event() {
   });
   const [tabNumber, setTabNumber] = React.useState(0);
   const others = eventState.players.filter((plr) => plr.account._id !== userId);
-
-  React.useEffect(
-    function () {
-      async function initialize() {
-        await fetchEventByID();
-      }
-
-      initialize();
-
-      const client = createClient({
-        connectionParams: {
-          authToken: token,
-          eventID: eventState._id
-        },
-        url: process.env.REACT_APP_WS_URL
-      });
-
-      async function subscribe() {
-        function onNext(update) {
-          setEventState(update.data.subscribeEvent);
-        }
-
-        await new Promise((resolve, reject) => {
-          client.subscribe(
-            {
-              query: `subscription {
-            subscribeEvent {
-              ${eventQuery}
-            }
-          }`
-            },
-            {
-              complete: resolve,
-              error: reject,
-              next: onNext
-            }
-          );
-        });
-      }
-
-      subscribe(
-        (result) => console.log(result),
-        (error) => console.log(error)
-      );
-
-      return client.dispose;
-    },
-    [token, eventState._id, eventQuery, fetchEventByID, setEventState]
-  );
 
   function onSortEnd({ collection, newIndex, oldIndex }) {
     if (newIndex !== oldIndex) {

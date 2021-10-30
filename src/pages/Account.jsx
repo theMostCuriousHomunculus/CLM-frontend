@@ -39,7 +39,7 @@ const useStyles = makeStyles({
 });
 
 export default function Account() {
-  const accountId = useParams().accountId;
+  const { accountID } = useParams();
   const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
   const {
     loading,
@@ -76,7 +76,7 @@ export default function Account() {
           title={
             <MUITextField
               autoComplete="off"
-              disabled={accountId !== userId}
+              disabled={accountID !== userId}
               inputProps={{
                 onBlur: (event) => editAccount(`name: "${event.target.value}"`)
               }}
@@ -93,14 +93,14 @@ export default function Account() {
             />
           }
           subheader={
-            accountId === userId && (
+            accountID === userId && (
               <MUITypography color="textSecondary" variant="subtitle1">
                 {email}
               </MUITypography>
             )
           }
         />
-        {accountId === userId && (
+        {accountID === userId && (
           <MUICardActions>
             <ScryfallRequest
               buttonText="Change Avatar"
@@ -112,7 +112,7 @@ export default function Account() {
           </MUICardActions>
         )}
         {isLoggedIn &&
-          accountId !== userId &&
+          accountID !== userId &&
           buds.filter((bud) => bud._id === userId).length === 0 &&
           received_bud_requests.filter((request) => request._id === userId)
             .length === 0 &&
@@ -123,7 +123,7 @@ export default function Account() {
               <MUIButton
                 onClick={() =>
                   editAccount(
-                    `action: "send",\nother_user_id: "${accountId}",\nreturn_other: true`
+                    `action: "send",\nother_user_id: "${accountID}",\nreturn_other: true`
                   )
                 }
               >

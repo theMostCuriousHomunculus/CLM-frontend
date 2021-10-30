@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import Match from '../pages/Match';
 import { AuthenticationContext } from './authentication-context';
 
@@ -128,8 +129,9 @@ export const MatchContext = createContext({
 
 export default function ContextualizedMatchPage() {
   const { userId } = React.useContext(AuthenticationContext);
+  const { matchID } = useParams();
   const [matchState, setMatchState] = React.useState({
-    _id: useParams().matchId,
+    _id: matchID,
     game_winners: [],
     log: [],
     players: [
@@ -394,6 +396,7 @@ export default function ContextualizedMatchPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+  const { requestSubscription } = useSubscribe();
 
   React.useEffect(() => {
     // this allows a more smooth drag and drop experience
@@ -1031,6 +1034,16 @@ export default function ContextualizedMatchPage() {
     },
     [matchState._id, sendRequest]
   );
+
+  React.useEffect(() => {
+    requestSubscription({
+      headers: { matchID },
+      queryString: matchQuery,
+      setup: fetchMatchByID,
+      subscriptionType: 'subscribeMatch',
+      update: setMatchState
+    });
+  }, [matchID, matchQuery, fetchMatchByID, requestSubscription]);
 
   return (
     <MatchContext.Provider

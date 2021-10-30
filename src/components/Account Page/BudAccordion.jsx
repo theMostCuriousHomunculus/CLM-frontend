@@ -45,7 +45,7 @@ const useStyles = makeStyles({
 });
 
 export default function BudAccordion() {
-  const accountId = useParams().accountId;
+  const { accountID } = useParams();
   const classes = useStyles();
   const {
     accountState: { buds, received_bud_requests, sent_bud_requests },
@@ -84,13 +84,13 @@ export default function BudAccordion() {
           (pb) =>
             !buds
               .map((bud) => bud._id)
-              .concat([accountId])
+              .concat([accountID])
               .concat(received_bud_requests.map((req) => req._id))
               .concat(sent_bud_requests.map((req) => req._id))
               .includes(pb._id)
         )
     );
-  }, [accountId, buds, received_bud_requests, sent_bud_requests]);
+  }, [accountID, buds, received_bud_requests, sent_bud_requests]);
 
   return (
     <React.Fragment>
@@ -128,7 +128,7 @@ export default function BudAccordion() {
           <MUITypography>Buds ({buds.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails style={{ display: 'block' }}>
-          {accountId === userId && (
+          {accountID === userId && (
             <React.Fragment>
               <MUIListSubheader component="div" id="aspiring-buds">
                 Aspiring
@@ -260,7 +260,7 @@ export default function BudAccordion() {
           <MUIList className={classes.budList}>
             {customSort(buds, ['name']).map((bud) => (
               <MUIListItem key={bud._id}>
-                {accountId === userId ? (
+                {accountID === userId ? (
                   <MUIBadge
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     badgeContent={

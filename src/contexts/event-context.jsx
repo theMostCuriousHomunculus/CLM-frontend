@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
 import { AuthenticationContext } from './authentication-context';
 
@@ -51,8 +52,9 @@ export const EventContext = createContext({
 
 export default function ContextualizedEventPage() {
   const { userId } = React.useContext(AuthenticationContext);
+  const { eventID } = useParams();
   const [eventState, setEventState] = React.useState({
-    _id: useParams().eventId,
+    _id: eventID,
     finished: false,
     host: {
       _id: null,
@@ -126,6 +128,7 @@ export default function ContextualizedEventPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+  const { requestSubscription } = useSubscribe();
 
   React.useEffect(() => {
     const me = eventState.players.find((plr) => plr.account._id === userId);
@@ -295,6 +298,16 @@ export default function ContextualizedEventPage() {
     },
     [eventState._id, sendRequest]
   );
+
+  React.useEffect(() => {
+    requestSubscription({
+      headers: { eventID },
+      queryString: eventQuery,
+      setup: fetchEventByID,
+      subscriptionType: 'subscribeEvent',
+      update: setEventState
+    });
+  }, [eventID, eventQuery, fetchEventByID, requestSubscription]);
 
   return (
     <EventContext.Provider

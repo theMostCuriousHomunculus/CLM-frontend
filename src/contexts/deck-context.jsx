@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import Deck from '../pages/Deck';
 
 export const DeckContext = createContext({
@@ -31,8 +32,9 @@ export const DeckContext = createContext({
 
 export default function ContextualizedDeckPage() {
   const history = useHistory();
+  const { deckID } = useParams();
   const [deckState, setDeckState] = React.useState({
-    _id: useParams().deckId,
+    _id: deckID,
     creator: {
       _id: '',
       avatar: '',
@@ -80,6 +82,7 @@ export default function ContextualizedDeckPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+  const { requestSubscription } = useSubscribe();
 
   const addCardsToDeck = React.useCallback(
     async function (
@@ -270,6 +273,16 @@ export default function ContextualizedDeckPage() {
     },
     [deckState._id, sendRequest]
   );
+
+  React.useEffect(() => {
+    requestSubscription({
+      headers: { deckID },
+      queryString: deckQuery,
+      setup: fetchDeckByID,
+      subscriptionType: 'subscribeDeck',
+      update: setDeckState
+    });
+  }, [deckID, deckQuery, fetchDeckByID, requestSubscription]);
 
   return (
     <DeckContext.Provider

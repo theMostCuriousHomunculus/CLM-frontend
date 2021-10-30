@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import Cube from '../pages/Cube';
 
 export const CubeContext = createContext({
@@ -58,8 +59,9 @@ export default function ContextualizedCubePage() {
     name: 'Mainboard',
     size: null
   });
+  const { cubeID } = useParams();
   const [cubeState, setCubeState] = React.useState({
-    _id: useParams().cubeId,
+    _id: cubeID,
     creator: {
       _id: null,
       avatar: null,
@@ -128,6 +130,7 @@ export default function ContextualizedCubePage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+  const { requestSubscription } = useSubscribe();
 
   const filterCards = React.useCallback(
     (cards, text) =>
@@ -527,6 +530,16 @@ export default function ContextualizedCubePage() {
     },
     [cubeQuery, cubeState._id, sendRequest]
   );
+
+  React.useEffect(() => {
+    requestSubscription({
+      headers: { cubeID },
+      queryString: cubeQuery,
+      setup: fetchCubeByID,
+      subscriptionType: 'subscribeCube',
+      update: setCubeState
+    });
+  }, [cubeID, cubeQuery, fetchCubeByID, requestSubscription]);
 
   return (
     <CubeContext.Provider

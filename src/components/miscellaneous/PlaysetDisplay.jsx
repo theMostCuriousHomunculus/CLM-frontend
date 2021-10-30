@@ -42,8 +42,8 @@ export default function PlaysetDisplay({
     setUpdatedCount(copies.length);
   }, [copies.length]);
 
-  const isMatch = !!useParams().matchId;
-  const isEvent = !!useParams().eventId;
+  const isMatch = !!useParams().matchID;
+  const isEvent = !!useParams().eventID;
 
   function handleChangeNumberOfCopies() {
     if (copies.length < updatedCount) {

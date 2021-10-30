@@ -19,7 +19,7 @@ export default function PasswordReset() {
   const emailInput = React.useRef();
   const history = useHistory();
   const passwordInput = React.useRef();
-  const resetToken = useParams().resetToken;
+  const { resetToken } = useParams();
   const { loading, sendRequest } = useRequest();
 
   async function submitPasswordReset(event) {
