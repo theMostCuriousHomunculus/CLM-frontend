@@ -8,16 +8,17 @@ import { Link } from 'react-router-dom';
 import Avatar from '../miscellaneous/Avatar';
 import { EventContext } from '../../contexts/event-context';
 
-export default function InfoSection () {
-
-  const { eventState: { name, players } } = React.useContext(EventContext);
+export default function InfoSection() {
+  const {
+    eventState: { name, players }
+  } = React.useContext(EventContext);
 
   return (
     <MUICard>
       <MUICardHeader title={name} />
       <MUICardContent>
         <MUIGrid container justifyContent="space-around" spacing={0}>
-          {players.map(player => (
+          {players.map((player) => (
             <MUIGrid
               container
               item
@@ -28,7 +29,11 @@ export default function InfoSection () {
               md={1}
             >
               <Link to={`/account/${player.account._id}`}>
-                <Avatar alt={player.account.name} size='small' src={player.account.avatar} />
+                <Avatar
+                  alt={player.account.name}
+                  size="small"
+                  src={player.account.avatar}
+                />
               </Link>
             </MUIGrid>
           ))}
@@ -36,4 +41,4 @@ export default function InfoSection () {
       </MUICardContent>
     </MUICard>
   );
-};
+}

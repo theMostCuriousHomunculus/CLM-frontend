@@ -5,43 +5,41 @@ import MUIMenuItem from '@mui/material/MenuItem';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 import { MatchContext } from '../../contexts/match-context';
 
-export default function PlayerMenu ({
+export default function PlayerMenu({
   clickedPlayer,
   displayedZones,
   setClickedPlayer,
   setDisplayedZones,
   setZoneName
 }) {
-
   const authentication = React.useContext(AuthenticationContext);
-  const {
-    viewZone
-  } = React.useContext(MatchContext);
+  const { viewZone } = React.useContext(MatchContext);
 
   return (
     <MUIMenu
       anchorEl={clickedPlayer.anchorElement}
       keepMounted
       open={Boolean(clickedPlayer.anchorElement)}
-      onClose={() => setClickedPlayer({
-        _id: null,
-        anchorElement: null,
-        position: null
-      })}
+      onClose={() =>
+        setClickedPlayer({
+          _id: null,
+          anchorElement: null,
+          position: null
+        })
+      }
       style={{ zIndex: 2147483647 }}
     >
       <MUIMenuItem
         onClick={() => {
-
           if (clickedPlayer.position === 'bottom') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               bottomExile: !prevState.bottomExile
             }));
           }
-          
+
           if (clickedPlayer.position === 'top') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               topExile: !prevState.topExile
             }));
@@ -54,21 +52,24 @@ export default function PlayerMenu ({
           });
         }}
       >
-        {clickedPlayer.position === 'bottom' && (displayedZones.bottomExile ? "Hide Exile Zone" : "Inspect Exile Zone")}
-        {clickedPlayer.position === 'top' && (displayedZones.topExile ? "Hide Exile Zone" : "Inspect Exile Zone")}
+        {clickedPlayer.position === 'bottom' &&
+          (displayedZones.bottomExile
+            ? 'Hide Exile Zone'
+            : 'Inspect Exile Zone')}
+        {clickedPlayer.position === 'top' &&
+          (displayedZones.topExile ? 'Hide Exile Zone' : 'Inspect Exile Zone')}
       </MUIMenuItem>
       <MUIMenuItem
         onClick={() => {
-          
           if (clickedPlayer.position === 'bottom') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               bottomGraveyard: !prevState.bottomGraveyard
             }));
           }
-          
+
           if (clickedPlayer.position === 'top') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               topGraveyard: !prevState.topGraveyard
             }));
@@ -81,21 +82,26 @@ export default function PlayerMenu ({
           });
         }}
       >
-        {clickedPlayer.position === 'bottom' && (displayedZones.bottomGraveyard ? "Hide Graveyard" : "Inspect Graveyard")}
-        {clickedPlayer.position === 'top' && (displayedZones.topGraveyard ? "Hide Graveyard" : "Inspect Graveyard")}
+        {clickedPlayer.position === 'bottom' &&
+          (displayedZones.bottomGraveyard
+            ? 'Hide Graveyard'
+            : 'Inspect Graveyard')}
+        {clickedPlayer.position === 'top' &&
+          (displayedZones.topGraveyard
+            ? 'Hide Graveyard'
+            : 'Inspect Graveyard')}
       </MUIMenuItem>
       <MUIMenuItem
         onClick={() => {
-          
           if (clickedPlayer.position === 'bottom') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               bottomHand: !prevState.bottomHand
             }));
           }
-          
+
           if (clickedPlayer.position === 'top') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               topHand: !prevState.topHand
             }));
@@ -108,21 +114,22 @@ export default function PlayerMenu ({
           });
         }}
       >
-        {clickedPlayer.position === 'bottom' && (displayedZones.bottomHand ? "Hide Hand" : "Inspect Hand")}
-        {clickedPlayer.position === 'top' && (displayedZones.topHand ? "Hide Hand" : "Inspect Hand")}
+        {clickedPlayer.position === 'bottom' &&
+          (displayedZones.bottomHand ? 'Hide Hand' : 'Inspect Hand')}
+        {clickedPlayer.position === 'top' &&
+          (displayedZones.topHand ? 'Hide Hand' : 'Inspect Hand')}
       </MUIMenuItem>
       <MUIMenuItem
         onClick={() => {
-
           if (clickedPlayer.position === 'bottom') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               bottomLibrary: !prevState.bottomLibrary
             }));
           }
-          
+
           if (clickedPlayer.position === 'top') {
-            setDisplayedZones(prevState => ({
+            setDisplayedZones((prevState) => ({
               ...prevState,
               topLibrary: !prevState.topLibrary
             }));
@@ -135,13 +142,15 @@ export default function PlayerMenu ({
           });
         }}
       >
-        {clickedPlayer.position === 'bottom' && (displayedZones.bottomLibrary ? "Hide Library" : "Inspect Library")}
-        {clickedPlayer.position === 'top' && (displayedZones.topLibrary ? "Hide Library" : "Inspect Library")}
+        {clickedPlayer.position === 'bottom' &&
+          (displayedZones.bottomLibrary ? 'Hide Library' : 'Inspect Library')}
+        {clickedPlayer.position === 'top' &&
+          (displayedZones.topLibrary ? 'Hide Library' : 'Inspect Library')}
       </MUIMenuItem>
       <MUIMenuItem
         onClick={async () => {
           await viewZone(clickedPlayer._id, 'library');
-          setClickedPlayer(prevState => ({
+          setClickedPlayer((prevState) => ({
             ...prevState,
             anchorElement: null
           }));
@@ -151,10 +160,10 @@ export default function PlayerMenu ({
         Search Library
       </MUIMenuItem>
 
-      {clickedPlayer._id === authentication.userId &&
+      {clickedPlayer._id === authentication.userId && (
         <MUIMenuItem
           onClick={() => {
-            setClickedPlayer(prevState => ({
+            setClickedPlayer((prevState) => ({
               ...prevState,
               anchorElement: null
             }));
@@ -163,11 +172,11 @@ export default function PlayerMenu ({
         >
           Inspect Sideboard
         </MUIMenuItem>
-      }
+      )}
 
       <MUIMenuItem
         onClick={() => {
-          setClickedPlayer(prevState => ({
+          setClickedPlayer((prevState) => ({
             ...prevState,
             anchorElement: null
           }));
@@ -176,7 +185,6 @@ export default function PlayerMenu ({
       >
         Inspect Temporary Zone
       </MUIMenuItem>
-
     </MUIMenu>
   );
-};
+}

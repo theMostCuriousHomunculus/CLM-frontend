@@ -1,5 +1,4 @@
-export default function randomSampleWOReplacement (array, sampleSize) {
-
+export default function randomSampleWOReplacement(array, sampleSize) {
   const copyArray = [...array];
   const sampleArray = [];
   let randomNumber;
@@ -10,5 +9,5 @@ export default function randomSampleWOReplacement (array, sampleSize) {
     copyArray.splice(randomNumber, 1);
   }
 
-  return sampleArray
-};
+  return sampleArray;
+}

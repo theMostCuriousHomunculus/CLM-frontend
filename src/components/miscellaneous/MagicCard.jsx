@@ -12,7 +12,7 @@ import { makeStyles } from '@mui/styles';
 import theme from '../../theme';
 import HoverPreview from './HoverPreview';
 
-export default function MagicCard ({
+export default function MagicCard({
   cardData,
   clickFunction = () => null,
   customStyle,
@@ -27,7 +27,6 @@ export default function MagicCard ({
   onTouchStart,
   onTouchEnd
 }) {
-
   const {
     _id,
     back_image,
@@ -39,10 +38,10 @@ export default function MagicCard ({
     isCopyToken,
     tapped
   } = cardData;
-  
+
   let displayedImage;
 
-  switch(face_down_image) {
+  switch (face_down_image) {
     case 'foretell':
       displayedImage = '"/images/Foretell.jpg"';
       break;
@@ -78,9 +77,7 @@ export default function MagicCard ({
         }
       };
     }
-    
   } else {
-
     if (image && !flipped) {
       displayedImage = image;
     } else if (back_image && flipped) {
@@ -90,14 +87,14 @@ export default function MagicCard ({
     css = {
       ...css,
       backgroundImage: `url(${displayedImage})`
-    }
+    };
   }
 
   if (isCopyToken) {
     css = {
       ...css,
       boxShadow: 'inset 1000px 0 0 0 rgba(255, 255, 0, 0.5)'
-    }
+    };
   }
 
   const useStyles = makeStyles({
@@ -157,70 +154,69 @@ export default function MagicCard ({
       className={`${classes.magicCard}${className ? ' ' + className : ''}`}
       id={`drag-${_id}`}
       onClick={() => clickFunction(cardData)}
-      onContextMenu={event => rightClickFunction(event)}
+      onContextMenu={(event) => rightClickFunction(event)}
       style={{
         ...customStyle,
         ...style,
-        transform: `${ style && style.transform ? style.transform : ''}${tapped ? ' rotate(90deg)' : ''}`
+        transform: `${style && style.transform ? style.transform : ''}${
+          tapped ? ' rotate(90deg)' : ''
+        }`
       }}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {hoverPreview &&
-        <HoverPreview
-          back_image={back_image}
-          image={image}
-        >
+      {hoverPreview && (
+        <HoverPreview back_image={back_image} image={image}>
           <div
             className={classes.countersContainer}
             id={`hover-${_id}`}
-            onClick={event => {
+            onClick={(event) => {
               clickFunction(cardData);
               event.stopPropagation();
             }}
           >
-            {counters && counters.map(counter => {
-              const style = {};
-              if (counter.counterType === '+1/+1') style.backgroundColor = lightGreen[500];
-              if (counter.counterType === '-1/-1') style.backgroundColor = deepOrange[500];
-              return (
-                <div
-                  className={classes.counterContainer}
-                  key={counter.counterType}
-                >
-                  <MUIBadge
-                    badgeContent={counter.counterAmount}
-                    className={classes.counterBadge}
-                    color="primary"
-                    overlap="circular"
+            {counters &&
+              counters.map((counter) => {
+                const style = {};
+                if (counter.counterType === '+1/+1')
+                  style.backgroundColor = lightGreen[500];
+                if (counter.counterType === '-1/-1')
+                  style.backgroundColor = deepOrange[500];
+                return (
+                  <div
+                    className={classes.counterContainer}
+                    key={counter.counterType}
                   >
-                    <MUITooltip title={counter.counterType}>
-                      <div
-                        className={classes.counterIcon}
-                        style={style}
-                      >
-                        <MUITypography
-                          className={classes.counterLabel}
-                          variant="caption"
-                        >
-                          {counter.counterType[0].toUpperCase()}
-                        </MUITypography>
-                      </div>
-                    </MUITooltip>
-                  </MUIBadge>
-                </div>
-              )
-            })}
+                    <MUIBadge
+                      badgeContent={counter.counterAmount}
+                      className={classes.counterBadge}
+                      color="primary"
+                      overlap="circular"
+                    >
+                      <MUITooltip title={counter.counterType}>
+                        <div className={classes.counterIcon} style={style}>
+                          <MUITypography
+                            className={classes.counterLabel}
+                            variant="caption"
+                          >
+                            {counter.counterType[0].toUpperCase()}
+                          </MUITypography>
+                        </div>
+                      </MUITooltip>
+                    </MUIBadge>
+                  </div>
+                );
+              })}
           </div>
         </HoverPreview>
-      }
-      {back_image &&
+      )}
+      {back_image && (
         <MUITooltip title="Flip Card">
           <MUIIconButton
             className={classes.flipButton}
-            onClick={event => {
+            onClick={(event) => {
               flipHandler();
               event.stopPropagation();
             }}
@@ -229,7 +225,7 @@ export default function MagicCard ({
             <MUIAutorenewIcon />
           </MUIIconButton>
         </MUITooltip>
-      }
+      )}
     </MUIPaper>
   );
-};
+}

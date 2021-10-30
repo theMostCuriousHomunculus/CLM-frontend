@@ -21,11 +21,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function CreateCubeForm ({
-  open,
-  toggleOpen
-}) {
-
+export default function CreateCubeForm({ open, toggleOpen }) {
   const classes = useStyles();
   const { loading, createCube } = React.useContext(AccountContext);
   const [cobraID, setCobraID] = React.useState('');
@@ -35,18 +31,21 @@ export default function CreateCubeForm ({
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
       <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
-      {loading ?
+      {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
-        </MUIDialogContent> :
-        <form onSubmit={event => createCube(event, cobraID, description, name)}>
+        </MUIDialogContent>
+      ) : (
+        <form
+          onSubmit={(event) => createCube(event, cobraID, description, name)}
+        >
           <MUIDialogContent style={{ height: 'max-content' }}>
             <MUITextField
               autoComplete="off"
               autoFocus
               fullWidth
               label="Cube Name"
-              onChange={event => setName(event.target.value)}
+              onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
               value={name}
@@ -57,7 +56,7 @@ export default function CreateCubeForm ({
               fullWidth
               label="Cube Description"
               multiline
-              onChange={event => setDescription(event.target.value)}
+              onChange={(event) => setDescription(event.target.value)}
               required={false}
               rows={2}
               style={{ marginBottom: '12px', marginTop: '16px' }}
@@ -73,7 +72,7 @@ export default function CreateCubeForm ({
               autoComplete="off"
               fullWidth
               label="24 character ID from cubecobra URL"
-              onChange={event => setCobraID(event.target.value)}
+              onChange={(event) => setCobraID(event.target.value)}
               required={false}
               style={{ marginTop: '8px' }}
               type="text"
@@ -81,15 +80,11 @@ export default function CreateCubeForm ({
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <WarningButton onClick={toggleOpen}>
-              Cancel
-            </WarningButton>
-            <MUIButton type="submit">
-              Create!
-            </MUIButton>
+            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
+            <MUIButton type="submit">Create!</MUIButton>
           </MUIDialogActions>
         </form>
-      }
+      )}
     </MUIDialog>
   );
-};
+}

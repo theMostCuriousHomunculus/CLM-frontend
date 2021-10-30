@@ -8,7 +8,7 @@ import MUITextField from '@mui/material/TextField';
 
 import WarningButton from './WarningButton';
 
-export default function NumberInputDialogue ({
+export default function NumberInputDialogue({
   buttonText,
   close,
   defaultValue,
@@ -16,14 +16,10 @@ export default function NumberInputDialogue ({
   title,
   updateFunction
 }) {
-
   const valueRef = React.useRef();
 
   return (
-    <MUIDialog
-      open={Number.isInteger(defaultValue)}
-      onClose={close}
-    >
+    <MUIDialog open={Number.isInteger(defaultValue)} onClose={close}>
       <MUIDialogTitle>{title}</MUIDialogTitle>
       <MUIDialogContent>
         <MUITextField
@@ -36,9 +32,7 @@ export default function NumberInputDialogue ({
         />
       </MUIDialogContent>
       <MUIDialogActions style={{ justifyContent: 'space-between' }}>
-        <WarningButton onClick={close}>
-          Cancel
-        </WarningButton>
+        <WarningButton onClick={close}>Cancel</WarningButton>
         <MUIButton
           autoFocus
           onClick={() => {
@@ -51,4 +45,4 @@ export default function NumberInputDialogue ({
       </MUIDialogActions>
     </MUIDialog>
   );
-};
+}

@@ -54,26 +54,29 @@ const useStyles = makeStyles({
   }
 });
 
-export default function PlayZone ({
+export default function PlayZone({
   displayedZones,
   participant,
   setClickedPlayer,
   setRightClickedCard
 }) {
-
-  const { bottomPlayerState, topPlayerState, dragCard, flipCard, tapUntapCards } = React.useContext(MatchContext);
+  const {
+    bottomPlayerState,
+    topPlayerState,
+    dragCard,
+    flipCard,
+    tapUntapCards
+  } = React.useContext(MatchContext);
   const battlefieldRef = React.useRef();
   const classes = useStyles();
-  const topZIndex = Math.max(...bottomPlayerState.battlefield.map(crd => crd.z_index)) + 1;
+  const topZIndex =
+    Math.max(...bottomPlayerState.battlefield.map((crd) => crd.z_index)) + 1;
 
   return (
     <div className={classes.playZoneContainer}>
-      {topPlayerState &&
-        <div
-          id="top-player"
-          className={classes.columnFlex}
-        >
-          {displayedZones.topLibrary &&
+      {topPlayerState && (
+        <div id="top-player" className={classes.columnFlex}>
+          {displayedZones.topLibrary && (
             <VerticalCollapsableZone
               customStyle={matchCard}
               iconColor={blue[500]}
@@ -82,12 +85,12 @@ export default function PlayZone ({
               setRightClickedCard={setRightClickedCard}
               zone="Library"
             />
-          }
+          )}
 
           <div className={classes.rowFlex}>
-            {displayedZones.topHand &&
+            {displayedZones.topHand && (
               <div className={classes.handContainer}>
-                {topPlayerState.hand.map(card => {
+                {topPlayerState.hand.map((card) => {
                   return (
                     <MagicCard
                       cardData={card}
@@ -113,12 +116,12 @@ export default function PlayZone ({
                   );
                 })}
               </div>
-            }
+            )}
             <div
               className={classes.battlefieldContainer}
               style={{ transform: 'rotate(180deg)' }}
             >
-              {topPlayerState.battlefield.map(card => (
+              {topPlayerState.battlefield.map((card) => (
                 <MagicCard
                   cardData={card}
                   customStyle={{
@@ -150,7 +153,7 @@ export default function PlayZone ({
             </div>
           </div>
 
-          {displayedZones.topGraveyard &&
+          {displayedZones.topGraveyard && (
             <VerticalCollapsableZone
               customStyle={matchCard}
               iconColor="#888888"
@@ -159,9 +162,9 @@ export default function PlayZone ({
               setRightClickedCard={setRightClickedCard}
               zone="Graveyard"
             />
-          }
+          )}
 
-          {displayedZones.topExile &&
+          {displayedZones.topExile && (
             <VerticalCollapsableZone
               customStyle={matchCard}
               iconColor={orange[500]}
@@ -170,7 +173,7 @@ export default function PlayZone ({
               setRightClickedCard={setRightClickedCard}
               zone="Exile"
             />
-          }
+          )}
 
           <PlayerInfo
             player={topPlayerState}
@@ -178,10 +181,10 @@ export default function PlayZone ({
             setClickedPlayer={setClickedPlayer}
           />
         </div>
-      }
+      )}
 
       <div id="bottom-player" className={classes.columnFlex}>
-        {displayedZones.bottomLibrary &&
+        {displayedZones.bottomLibrary && (
           <VerticalCollapsableZone
             customStyle={matchCard}
             iconColor={blue[500]}
@@ -190,77 +193,91 @@ export default function PlayZone ({
             setRightClickedCard={setRightClickedCard}
             zone="Library"
           />
-        }
+        )}
         <div className={classes.rowFlex}>
-          {participant ?
+          {participant ? (
             <div
               className={classes.battlefieldContainer}
               id="bottom-player-battlefield"
               ref={battlefieldRef}
             >
-              {battlefieldRef.current && bottomPlayerState.battlefield.map(card => (
-                <Draggable
-                  bounds="#bottom-player-battlefield"
-                  handle={`#drag-${card._id}`}
-                  key={`drag-${card._id}`}
-                  onStart={(event, data) => {
-                    event.target.style.zIndex = topZIndex;
-                  }}
-                  onStop={(event, data) => {
-                    
-                    const oldXPosition = parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100;
-                    const oldYPosition = parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100;
-                    
-                    if (Math.abs(oldXPosition - data.x) < 2 &&
-                      Math.abs(oldYPosition - data.y < 2) &&
-                      // so that a click on the flip button doesn't also tap or untap the card
-                      event.target.id.includes(card._id)
-                    ) {
-                      tapUntapCards([card._id]);
-                    } else {
-                      dragCard(
-                        data.node.id.replace("drag-", ""),
-                        data.x * 100 / battlefieldRef.current.offsetWidth,
-                        data.y * 100 / battlefieldRef.current.offsetHeight,
-                        topZIndex);
-                    }
+              {battlefieldRef.current &&
+                bottomPlayerState.battlefield.map((card) => (
+                  <Draggable
+                    bounds="#bottom-player-battlefield"
+                    handle={`#drag-${card._id}`}
+                    key={`drag-${card._id}`}
+                    onStart={(event, data) => {
+                      event.target.style.zIndex = topZIndex;
+                    }}
+                    onStop={(event, data) => {
+                      const oldXPosition =
+                        (parseFloat(card.x_coordinate) *
+                          battlefieldRef.current.offsetWidth) /
+                        100;
+                      const oldYPosition =
+                        (parseFloat(card.y_coordinate) *
+                          battlefieldRef.current.offsetHeight) /
+                        100;
 
-                  }}
-                  defaultPosition={{
-                    x: parseFloat(card.x_coordinate) * battlefieldRef.current.offsetWidth / 100,
-                    y: parseFloat(card.y_coordinate) * battlefieldRef.current.offsetHeight / 100
-                  }}
-                >
-                  <MagicCard
-                    cardData={card}
-                    customStyle={{
-                      ...matchCard,
-                      cursor: 'move',
-                      position: 'absolute',
-                      zIndex: card.z_index
+                      if (
+                        Math.abs(oldXPosition - data.x) < 2 &&
+                        Math.abs(oldYPosition - data.y < 2) &&
+                        // so that a click on the flip button doesn't also tap or untap the card
+                        event.target.id.includes(card._id)
+                      ) {
+                        tapUntapCards([card._id]);
+                      } else {
+                        dragCard(
+                          data.node.id.replace('drag-', ''),
+                          (data.x * 100) / battlefieldRef.current.offsetWidth,
+                          (data.y * 100) / battlefieldRef.current.offsetHeight,
+                          topZIndex
+                        );
+                      }
                     }}
-                    flipHandler={() => flipCard(card._id, 'battlefield')}
-                    hoverPreview={!!card.image}
-                    rightClickFunction={event => {
-                      event.preventDefault();
-                      setRightClickedCard({
-                        _id: card._id,
-                        anchorElement: event.currentTarget,
-                        controller: card.controller._id,
-                        face_down: card.face_down,
-                        isCopyToken: card.isCopyToken,
-                        name: card.name,
-                        origin: 'battlefield',
-                        owner: card.owner._id,
-                        visibility: card.visibility
-                      });
+                    defaultPosition={{
+                      x:
+                        (parseFloat(card.x_coordinate) *
+                          battlefieldRef.current.offsetWidth) /
+                        100,
+                      y:
+                        (parseFloat(card.y_coordinate) *
+                          battlefieldRef.current.offsetHeight) /
+                        100
                     }}
-                  />
-                </Draggable>
-              ))}
-            </div> :
+                  >
+                    <MagicCard
+                      cardData={card}
+                      customStyle={{
+                        ...matchCard,
+                        cursor: 'move',
+                        position: 'absolute',
+                        zIndex: card.z_index
+                      }}
+                      flipHandler={() => flipCard(card._id, 'battlefield')}
+                      hoverPreview={!!card.image}
+                      rightClickFunction={(event) => {
+                        event.preventDefault();
+                        setRightClickedCard({
+                          _id: card._id,
+                          anchorElement: event.currentTarget,
+                          controller: card.controller._id,
+                          face_down: card.face_down,
+                          isCopyToken: card.isCopyToken,
+                          name: card.name,
+                          origin: 'battlefield',
+                          owner: card.owner._id,
+                          visibility: card.visibility
+                        });
+                      }}
+                    />
+                  </Draggable>
+                ))}
+            </div>
+          ) : (
             <div className={classes.battlefieldContainer}>
-              {bottomPlayerState.battlefield.map(card => (
+              {bottomPlayerState.battlefield.map((card) => (
                 <MagicCard
                   cardData={card}
                   customStyle={{
@@ -290,16 +307,20 @@ export default function PlayZone ({
                 />
               ))}
             </div>
-          }
+          )}
 
-          {displayedZones.bottomHand &&
+          {displayedZones.bottomHand && (
             <div className={classes.handContainer}>
-              {bottomPlayerState.hand.map(card => {
+              {bottomPlayerState.hand.map((card) => {
                 return (
                   <MagicCard
                     cardData={card}
                     customStyle={matchCard}
-                    flipHandler={participant ? () => flipCard(card._id, 'hand') : () => null}
+                    flipHandler={
+                      participant
+                        ? () => flipCard(card._id, 'hand')
+                        : () => null
+                    }
                     hoverPreview={!!card.image}
                     key={card._id}
                     rightClickFunction={(event) => {
@@ -320,10 +341,10 @@ export default function PlayZone ({
                 );
               })}
             </div>
-          }
+          )}
         </div>
 
-        {displayedZones.bottomGraveyard &&
+        {displayedZones.bottomGraveyard && (
           <VerticalCollapsableZone
             customStyle={matchCard}
             iconColor="#888888"
@@ -332,9 +353,9 @@ export default function PlayZone ({
             setRightClickedCard={setRightClickedCard}
             zone="Graveyard"
           />
-        }
+        )}
 
-        {displayedZones.bottomExile &&
+        {displayedZones.bottomExile && (
           <VerticalCollapsableZone
             customStyle={matchCard}
             iconColor={orange[500]}
@@ -343,7 +364,7 @@ export default function PlayZone ({
             setRightClickedCard={setRightClickedCard}
             zone="Exile"
           />
-        }
+        )}
 
         <PlayerInfo
           player={bottomPlayerState}
@@ -353,4 +374,4 @@ export default function PlayZone ({
       </div>
     </div>
   );
-};
+}

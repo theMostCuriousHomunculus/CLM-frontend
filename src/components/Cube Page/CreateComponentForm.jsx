@@ -14,64 +14,68 @@ import MUITextField from '@mui/material/TextField';
 import WarningButton from '../miscellaneous/WarningButton';
 import { CubeContext } from '../../contexts/cube-context';
 
-export default function CreateComponentForm ({
-  open,
-  setNameInput,
-  setSizeInput,
-  toggleOpen
-}) {
-
+export default function CreateComponentForm({ open, toggleOpen }) {
   const { createModule, createRotation } = React.useContext(CubeContext);
   const [newNameInput, setNewNameInput] = React.useState();
   const [newComponentType, setNewComponentType] = React.useState('module');
 
-  async function addComponent () {
+  async function addComponent() {
     if (newComponentType === 'module') {
-      await createModule(newNameInput, setNameInput, setSizeInput, toggleOpen);
+      await createModule(newNameInput, toggleOpen);
     }
 
     if (newComponentType === 'rotation') {
-      await createRotation(newNameInput, setNameInput, setSizeInput, toggleOpen);
+      await createRotation(newNameInput, toggleOpen);
     }
   }
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
       <MUIDialogTitle>Create A New Component</MUIDialogTitle>
-      <MUIDialogContent>
 
+      <MUIDialogContent style={{ paddingTop: 8 }}>
         <MUITextField
           autoComplete="off"
           autoFocus
           fullWidth
           label="New Component Name"
-          onChange={event => setNewNameInput(event.target.value)}
+          onChange={(event) => setNewNameInput(event.target.value)}
           required={true}
           type="text"
           value={newNameInput}
         />
 
-        <MUIFormControl component="fieldset" required={true} style={{ marginTop: 8 }}>
+        <MUIFormControl
+          component="fieldset"
+          required={true}
+          style={{ marginTop: 8 }}
+        >
           <MUIFormLabel component="legend">New Component Type</MUIFormLabel>
+
           <MUIRadioGroup
             name="Component Type"
             onChange={(event) => setNewComponentType(event.target.value)}
             value={newComponentType}
           >
-            <MUIFormControlLabel value="module" control={<MUIRadio />} label="Module" />
-            <MUIFormControlLabel value="rotation" control={<MUIRadio />} label="Rotation" />
+            <MUIFormControlLabel
+              value="module"
+              control={<MUIRadio />}
+              label="Module"
+            />
+
+            <MUIFormControlLabel
+              value="rotation"
+              control={<MUIRadio />}
+              label="Rotation"
+            />
           </MUIRadioGroup>
         </MUIFormControl>
-
       </MUIDialogContent>
+
       <MUIDialogActions>
-        <MUIButton onClick={addComponent}>
-          Create!
-        </MUIButton>
-        <WarningButton onClick={toggleOpen}>
-          Cancel
-        </WarningButton>
+        <MUIButton onClick={addComponent}>Create!</MUIButton>
+        <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
       </MUIDialogActions>
     </MUIDialog>
   );
-};
+}

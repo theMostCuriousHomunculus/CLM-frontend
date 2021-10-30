@@ -1,114 +1,57 @@
 import React from 'react';
 import MUIPaper from '@mui/material/Paper';
-import { createClient } from 'graphql-ws';
 
-import ComponentInfo from '../components/Cube Page/ComponentInfo';
 import CubeDisplay from '../components/Cube Page/CubeDisplay';
-import CubeInfo from '../components/Cube Page/CubeInfo';
+import Dashboard from '../components/Cube Page/Dashboard';
 import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { CubeContext } from '../contexts/cube-context';
 
-export default function Cube () {
-
-  const { token, userId } = React.useContext(AuthenticationContext);
-  const {
-    loading,
-    activeComponentState,
-    cubeQuery,
-    cubeState,
-    setCubeState,
-    addCardToCube,
-    deleteCard,
-    editCard,
-    fetchCubeByID
-  } = React.useContext(CubeContext);
-  const editable = cubeState.creator._id === userId;
+export default function Cube() {
+  const { userId } = React.useContext(AuthenticationContext);
+  const { loading, activeComponentState, cubeState, addCardToCube } =
+    React.useContext(CubeContext);
+  const [editable, setEditable] = React.useState(
+    cubeState.creator._id === userId
+  );
   const [selectedCard, setSelectedCard] = React.useState();
 
   React.useEffect(() => {
+    setEditable(cubeState.creator._id === userId);
+  }, [cubeState.creator._id, userId]);
 
-    async function initialize () {
-      await fetchCubeByID();
-    }
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
+    <React.Fragment>
+      {selectedCard && (
+        <EditCardModal
+          card={selectedCard}
+          clear={() => setSelectedCard()}
+          editable={editable}
+        />
+      )}
 
-    initialize();
+      <Dashboard />
 
-    const client = createClient({
-      connectionParams: {
-        authToken: token,
-        cubeID: cubeState._id
-      },
-      url: process.env.REACT_APP_GRAPHQL_WS_URL
-    });
-
-    async function subscribe () {
-      function onNext(update) {
-        setCubeState(update.data.subscribeCube);
-      }
-
-      await new Promise((resolve, reject) => {
-        client.subscribe({
-          query: `subscription {
-            subscribeCube {
-              ${cubeQuery}
-            }
-          }`
-        },
-        {
-          complete: resolve,
-          error: reject,
-          next: onNext
-        });
-      });
-    }
-
-    subscribe(result => console.log(result), error => console.log(error));
-
-    return client.dispose;
-  }, [token, cubeQuery, cubeState._id, fetchCubeByID, setCubeState]);
-
-  return (
-    loading ?
-      <LoadingSpinner /> :
-      <React.Fragment>
-        {selectedCard &&
-          <EditCardModal
-            activeComponentID={activeComponentState._id}
-            activeComponentName={activeComponentState.name}
-            card={selectedCard}
-            clear={() => setSelectedCard()}
-            deleteCard={deleteCard}
-            editable={editable}
-            editCard={editCard}
-            modules={cubeState.modules.map(module => ({ _id: module._id, name: module.name }))}
-            rotations={cubeState.rotations.map(rotation => ({ _id: rotation._id, name: rotation.name }))}
+      {editable && (
+        <MUIPaper
+          style={{
+            position: 'sticky',
+            top: 4
+          }}
+        >
+          <ScryfallRequest
+            buttonText="Add to Cube"
+            labelText={`Add a card to ${activeComponentState.name}`}
+            onSubmit={addCardToCube}
           />
-        }
+        </MUIPaper>
+      )}
 
-        <CubeInfo />
-
-        <ComponentInfo />
-
-        {editable &&
-          <MUIPaper
-            style={{
-              position: 'sticky',
-              top: 4
-            }}
-          >
-            <ScryfallRequest
-              buttonText="Add to Cube"
-              labelText={`Add a card to ${activeComponentState.name}`}
-              onSubmit={addCardToCube}
-            />
-          </MUIPaper>
-        }
-
-        <CubeDisplay setSelectedCard={setSelectedCard} />
-
-      </React.Fragment>
+      <CubeDisplay setSelectedCard={setSelectedCard} />
+    </React.Fragment>
   );
-};
+}

@@ -12,25 +12,25 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
 import { ErrorContext } from '../contexts/error-context';
 
-export default function PasswordReset () {
-
+export default function PasswordReset() {
   const authentication = React.useContext(AuthenticationContext);
   const { setErrorMessages } = React.useContext(ErrorContext);
   const confirmPasswordInput = React.useRef();
   const emailInput = React.useRef();
   const history = useHistory();
   const passwordInput = React.useRef();
-  const resetToken = useParams().resetToken;
+  const { resetToken } = useParams();
   const { loading, sendRequest } = useRequest();
 
-  async function submitPasswordReset (event) {
+  async function submitPasswordReset(event) {
     event.preventDefault();
     try {
-
       if (passwordInput.current.value !== confirmPasswordInput.current.value) {
-        setErrorMessages(prevState => [...prevState, `The entered passwords do not match.  Please try again.`]);
+        setErrorMessages((prevState) => [
+          ...prevState,
+          'The entered passwords do not match.  Please try again.'
+        ]);
       } else {
-        
         const operation = 'submitPasswordReset';
         const response = await sendRequest({
           operation,
@@ -38,11 +38,9 @@ export default function PasswordReset () {
             query: `
               mutation {
                 ${operation}(
-                  input: {
-                    email: "${emailInput.current.value}"
-                    password: "${passwordInput.current.value}"
-                    reset_token: "${resetToken}"
-                  }
+                  email: "${emailInput.current.value}"
+                  password: "${passwordInput.current.value}"
+                  reset_token: "${resetToken}"
                 ) {
                   isAdmin
                   token
@@ -52,23 +50,21 @@ export default function PasswordReset () {
             `
           }
         });
-        
+
         authentication.login(response.isAdmin, response.token, response.userId);
         history.push(`/account/${response.userId}`);
       }
-
-    } catch (error) {
-
-    }
+    } catch (error) {}
   }
-  
+
   return (
     <MUICard>
       <MUICardHeader title="Password Reset" />
       <form onSubmit={submitPasswordReset}>
         <MUICardContent>
-          {loading ?
-            <LoadingSpinner /> :
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
             <React.Fragment>
               <MUITextField
                 fullWidth
@@ -92,14 +88,12 @@ export default function PasswordReset () {
                 type="password"
               />
             </React.Fragment>
-          }
+          )}
         </MUICardContent>
         <MUICardActions>
-          <MUIButton type="submit">
-            Submit!
-          </MUIButton>
+          <MUIButton type="submit">Submit!</MUIButton>
         </MUICardActions>
       </form>
     </MUICard>
   );
-};
+}

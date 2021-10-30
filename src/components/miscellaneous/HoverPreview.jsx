@@ -14,21 +14,20 @@ const useStyles = makeStyles({
   }
 });
 
-export default function HoverPreview ({ back_image, children, image }) {
-
+export default function HoverPreview({ back_image, children, image }) {
   const classes = useStyles();
   const imageContainer = React.useRef();
   const [preview, setPreview] = React.useState({
     bottom: undefined,
-    image_display: "none",
+    image_display: 'none',
     left: 0,
     right: undefined,
     top: 0,
     visible: false
   });
-  
+
   const hidePreview = React.useCallback(function () {
-    setPreview(prevState => ({
+    setPreview((prevState) => ({
       ...prevState,
       visible: false
     }));
@@ -44,11 +43,16 @@ export default function HoverPreview ({ back_image, children, image }) {
     let bottom, left, right, top;
 
     if (event.pageX < windowWidth / 2) {
-      left = `${event.pageX - (hpcWidth * event.pageX / windowWidth)}px`;
+      left = `${event.pageX - (hpcWidth * event.pageX) / windowWidth}px`;
       right = undefined;
     } else {
       left = undefined;
-      right = `${windowWidth - event.pageX - hpcWidth + (hpcWidth * event.pageX / windowWidth)}px`;
+      right = `${
+        windowWidth -
+        event.pageX -
+        hpcWidth +
+        (hpcWidth * event.pageX) / windowWidth
+      }px`;
     }
 
     if (event.screenY < windowHeight / 2) {
@@ -59,7 +63,7 @@ export default function HoverPreview ({ back_image, children, image }) {
       top = undefined;
     }
 
-    setPreview(prevState => ({
+    setPreview((prevState) => ({
       ...prevState,
       bottom,
       left,
@@ -69,25 +73,24 @@ export default function HoverPreview ({ back_image, children, image }) {
   }, []);
 
   const showPreview = React.useCallback(function () {
-    setPreview(prevState => ({
+    setPreview((prevState) => ({
       ...prevState,
       visible: true
     }));
   }, []);
 
-  const childrenWithShowHidePreview = React.Children.map(children, child => (
-    child ? React.cloneElement(child,
-      {
-        onMouseMove: movePreview,
-        onMouseOut: hidePreview,
-        onMouseOver: showPreview
-      }
-    ) : null
-  ));
+  const childrenWithShowHidePreview = React.Children.map(children, (child) =>
+    child
+      ? React.cloneElement(child, {
+          onMouseMove: movePreview,
+          onMouseOut: hidePreview,
+          onMouseOver: showPreview
+        })
+      : null
+  );
 
   return (
     <React.Fragment>
-
       {preview.visible &&
         createPortal(
           <div
@@ -105,19 +108,18 @@ export default function HoverPreview ({ back_image, children, image }) {
               className={classes.hoverPreviewImage}
               src={image}
             />
-            {back_image &&
+            {back_image && (
               <img
                 alt="back of card"
                 className={classes.hoverPreviewImage}
                 src={back_image}
               />
-            }
-          </div>
-          , document.getElementById('hover-preview'))
-      }
+            )}
+          </div>,
+          document.getElementById('hover-preview')
+        )}
 
       {childrenWithShowHidePreview}
-
     </React.Fragment>
   );
-};
+}

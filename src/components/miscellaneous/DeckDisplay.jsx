@@ -9,28 +9,43 @@ import customSort from '../../functions/custom-sort';
 import specificCardType from '../../functions/specific-card-type';
 import PlaysetDisplay from './PlaysetDisplay';
 
-export default function DeckDisplay ({
+export default function DeckDisplay({
   add,
   authorizedID,
   deck,
   remove,
   toggle
 }) {
-
   return (
     <MUIGrid container spacing={0}>
-      {['Mainboard', 'Sideboard'].map(component => (
+      {['Mainboard', 'Sideboard'].map((component) => (
         <MUIGrid item key={component} xs={12} md={6}>
           <MUICard>
-            <MUICardHeader title={`${component} (${deck[component.toLowerCase()].length})`} />
+            <MUICardHeader
+              title={`${component} (${deck[component.toLowerCase()].length})`}
+            />
             <MUICardContent>
-              {["Land", "Creature", "Planeswalker", "Artifact", "Enchantment", "Instant", "Sorcery"].map(function (type) {
-                const group = customSort(deck[component.toLocaleLowerCase()], ['cmc', 'name', 'set'])
-                  .filter(card => specificCardType(card.type_line) === type);
+              {[
+                'Land',
+                'Creature',
+                'Planeswalker',
+                'Artifact',
+                'Enchantment',
+                'Instant',
+                'Sorcery'
+              ].map(function (type) {
+                const group = customSort(deck[component.toLocaleLowerCase()], [
+                  'cmc',
+                  'name',
+                  'set'
+                ]).filter((card) => specificCardType(card.type_line) === type);
                 const condensedGroup = [];
 
                 for (const card of group) {
-                  const existingCopies = condensedGroup.find(abstraction => abstraction.card.scryfall_id === card.scryfall_id);
+                  const existingCopies = condensedGroup.find(
+                    (abstraction) =>
+                      abstraction.card.scryfall_id === card.scryfall_id
+                  );
                   if (existingCopies) {
                     existingCopies.copies.push(card._id);
                   } else {
@@ -58,21 +73,22 @@ export default function DeckDisplay ({
                 }
 
                 return (
-                  group.length > 0 &&
-                  <React.Fragment key={`${component}-${type}`}>
-                    <MUITypography variant="subtitle1">{`${type} (${group.length})`}</MUITypography>
-                    {condensedGroup.map(playset => (
-                      <PlaysetDisplay
-                        add={add}
-                        authorizedID={authorizedID}
-                        component={component.toLowerCase()}
-                        key={playset.card.scryfall_id}
-                        playset={playset}
-                        remove={remove}
-                        toggle={toggle}
-                      />
-                    ))}
-                  </React.Fragment>
+                  group.length > 0 && (
+                    <React.Fragment key={`${component}-${type}`}>
+                      <MUITypography variant="subtitle1">{`${type} (${group.length})`}</MUITypography>
+                      {condensedGroup.map((playset) => (
+                        <PlaysetDisplay
+                          add={add}
+                          authorizedID={authorizedID}
+                          component={component.toLowerCase()}
+                          key={playset.card.scryfall_id}
+                          playset={playset}
+                          remove={remove}
+                          toggle={toggle}
+                        />
+                      ))}
+                    </React.Fragment>
+                  )
                 );
               })}
             </MUICardContent>
@@ -81,4 +97,4 @@ export default function DeckDisplay ({
       ))}
     </MUIGrid>
   );
-};
+}

@@ -21,18 +21,20 @@ import CreateCubeForm from './CreateCubeForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function CubeAccordion ({
-  pageClasses
-}) {
-
-  const { accountState: { _id, cubes }, deleteCube } = React.useContext(AccountContext);
+export default function CubeAccordion({ pageClasses }) {
+  const {
+    accountState: { _id, cubes },
+    deleteCube
+  } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
-  const [cubeToDelete, setCubeToDelete] = React.useState({ _id: null, name: null })
+  const [cubeToDelete, setCubeToDelete] = React.useState({
+    _id: null,
+    name: null
+  });
   const [showCubeForm, setShowCubeForm] = React.useState(false);
 
   return (
     <React.Fragment>
-
       <ConfirmationDialog
         confirmHandler={() => {
           deleteCube(cubeToDelete._id);
@@ -43,13 +45,13 @@ export default function CubeAccordion ({
         toggleOpen={() => setCubeToDelete({ _id: null, name: null })}
       >
         <MUITypography variant="body1">
-          This action cannot be undone.  You may want to export your list first.
+          This action cannot be undone. You may want to export your list first.
         </MUITypography>
       </ConfirmationDialog>
 
       <CreateCubeForm
         open={showCubeForm}
-        toggleOpen={() => setShowCubeForm(prevState => !prevState)}
+        toggleOpen={() => setShowCubeForm((prevState) => !prevState)}
       />
 
       <MUIAccordion>
@@ -67,31 +69,29 @@ export default function CubeAccordion ({
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Description</MUITableCell>
-                  {_id === userId &&
-                    <MUITableCell>Delete</MUITableCell>
-                  }
+                  {_id === userId && <MUITableCell>Delete</MUITableCell>}
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
-                {cubes.map(cube => (
+                {cubes.map((cube) => (
                   <MUITableRow key={cube._id}>
                     <MUITableCell>
                       <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
                     </MUITableCell>
-                    <MUITableCell>
-                      {cube.description}
-                    </MUITableCell>
-                    {_id === userId &&
+                    <MUITableCell>{cube.description}</MUITableCell>
+                    {_id === userId && (
                       <MUITableCell>
                         <MUIIconButton
                           className={pageClasses.iconButton}
-                          onClick={() => setCubeToDelete({ _id: cube._id, name: cube.name })}
+                          onClick={() =>
+                            setCubeToDelete({ _id: cube._id, name: cube.name })
+                          }
                           size="small"
                         >
                           <MUIDeleteForeverIcon />
                         </MUIIconButton>
                       </MUITableCell>
-                    }
+                    )}
                   </MUITableRow>
                 ))}
               </MUITableBody>
@@ -99,16 +99,14 @@ export default function CubeAccordion ({
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {_id === userId &&
+        {_id === userId && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowCubeForm(true)}>
               Create a Cube
             </MUIButton>
           </MUIAccordionActions>
-        }
-
+        )}
       </MUIAccordion>
-
     </React.Fragment>
   );
-};
+}

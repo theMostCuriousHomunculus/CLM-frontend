@@ -17,16 +17,18 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/authentication-context';
 
-export default function Blog () {
-
+export default function Blog() {
   const authentication = React.useContext(AuthenticationContext);
   const { loading, sendRequest } = useRequest();
   const [blogPosts, setBlogPosts] = React.useState([]);
-  const [blogPostToDelete, setBlogPostToDelete] = React.useState({ _id: null, title: null });
+  const [blogPostToDelete, setBlogPostToDelete] = React.useState({
+    _id: null,
+    title: null
+  });
   const history = useHistory();
 
   React.useEffect(() => {
-    async function fetchBlogPosts () {
+    async function fetchBlogPosts() {
       await sendRequest({
         callback: (data) => {
           setBlogPosts(data);
@@ -53,7 +55,7 @@ export default function Blog () {
                 }
               }
             `
-          }
+          };
         }
       });
     }
@@ -61,10 +63,12 @@ export default function Blog () {
     fetchBlogPosts();
   }, [sendRequest]);
 
-  async function deleteBlogPost () {
+  async function deleteBlogPost() {
     await sendRequest({
       callback: () => {
-        setBlogPosts((prevState) => prevState.filter((blogPost) => blogPost._id !== blogPostToDelete._id));
+        setBlogPosts((prevState) =>
+          prevState.filter((blogPost) => blogPost._id !== blogPostToDelete._id)
+        );
       },
       operation: 'deleteBlogPost',
       get body() {
@@ -74,83 +78,104 @@ export default function Blog () {
               ${this.operation}(_id: "${blogPostToDelete._id}")
             }
           `
-        }
+        };
       }
     });
   }
 
-  return (
-    loading ?
-      <LoadingSpinner /> :
-      <React.Fragment>
-        <ConfirmationDialog
-          confirmHandler={() => {
-            deleteBlogPost();
-            setBlogPostToDelete({ _id: null, title: null });
-          }}
-          open={!!blogPostToDelete._id}
-          title={`Are you sure you want to delete ${blogPostToDelete.title}?`}
-          toggleOpen={() => setBlogPostToDelete({ _id: null, title: null })}
-        >
-          <MUITypography variant="body1">
-            This action cannot be undone.  Your wise counsel and witty humor will be lost to the ages...
-          </MUITypography>
-        </ConfirmationDialog>
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
+    <React.Fragment>
+      <ConfirmationDialog
+        confirmHandler={() => {
+          deleteBlogPost();
+          setBlogPostToDelete({ _id: null, title: null });
+        }}
+        open={!!blogPostToDelete._id}
+        title={`Are you sure you want to delete ${blogPostToDelete.title}?`}
+        toggleOpen={() => setBlogPostToDelete({ _id: null, title: null })}
+      >
+        <MUITypography variant="body1">
+          This action cannot be undone. Your wise counsel and witty humor will
+          be lost to the ages...
+        </MUITypography>
+      </ConfirmationDialog>
 
-        <MUIGrid container spacing={0}>
-          {authentication.isAdmin &&
-            <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
-              <MUICard>
-                <MUICardHeader
-                  title={<MUITypography variant="subtitle1">New Article</MUITypography>}
-                  subheader={
-                    <MUITypography color="textSecondary" variant="subtitle2">
-                      The world eagerly awaits your opinions on shit
-                    </MUITypography>
-                  }
-                />
-                <MUICardMedia
-                  image="https://c1.scryfall.com/file/scryfall-cards/art_crop/front/c/b/cb3b35b8-f321-46d8-a441-6b9a6efa9021.jpg?1562304347"
-                />
-                <MUICardActions>
-                  <MUIButton
-                    onClick={() => history.push('/blog/new-post')}
-                    startIcon={<MUICreateIcon />}
+      <MUIGrid container spacing={0}>
+        {authentication.isAdmin && (
+          <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
+            <MUICard>
+              <MUICardHeader
+                title={
+                  <MUITypography variant="subtitle1">New Article</MUITypography>
+                }
+                subheader={
+                  <MUITypography color="textSecondary" variant="subtitle2">
+                    The world eagerly awaits your opinions on shit
+                  </MUITypography>
+                }
+              />
+              <MUICardMedia image="https://c1.scryfall.com/file/scryfall-cards/art_crop/front/c/b/cb3b35b8-f321-46d8-a441-6b9a6efa9021.jpg?1562304347" />
+              <MUICardActions>
+                <MUIButton
+                  onClick={() => history.push('/blog/new-post')}
+                  startIcon={<MUICreateIcon />}
+                >
+                  Write
+                </MUIButton>
+              </MUICardActions>
+            </MUICard>
+          </MUIGrid>
+        )}
+        {blogPosts.map((blogPost) => (
+          <MUIGrid item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
+            <MUICard>
+              <MUICardHeader
+                avatar={
+                  <Avatar
+                    alt={blogPost.author.name}
+                    size="small"
+                    src={blogPost.author.avatar}
+                  />
+                }
+                subheader={
+                  <MUITypography color="textSecondary" variant="subtitle2">
+                    {blogPost.subtitle}
+                  </MUITypography>
+                }
+                title={
+                  <MUITypography variant="subtitle1">
+                    {blogPost.title}
+                  </MUITypography>
+                }
+              />
+              <MUICardMedia image={blogPost.image} />
+              <MUICardActions>
+                <MUIButton
+                  onClick={() => history.push(`/blog/${blogPost._id}`)}
+                >
+                  Read
+                </MUIButton>
+                {blogPost.author._id === authentication.userId && (
+                  <WarningButton
+                    onClick={() =>
+                      setBlogPostToDelete({
+                        _id: blogPost._id,
+                        title: blogPost.title
+                      })
+                    }
+                    startIcon={<MUIDeleteForeverIcon />}
+                    style={{ marginLeft: 0 }}
                   >
-                    Write
-                  </MUIButton>
-                </MUICardActions>
-              </MUICard>
-            </MUIGrid>
-          }
-          {blogPosts.map(blogPost => (
-            <MUIGrid item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
-              <MUICard>
-                <MUICardHeader
-                  avatar={<Avatar alt={blogPost.author.name} size='small' src={blogPost.author.avatar} />}
-                  subheader={<MUITypography color="textSecondary" variant="subtitle2">{blogPost.subtitle}</MUITypography>}
-                  title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
-                />
-                <MUICardMedia
-                  image={blogPost.image}
-                />
-                <MUICardActions>
-                  <MUIButton onClick={() => history.push(`/blog/${blogPost._id}`)}>
-                    Read
-                  </MUIButton>
-                  {blogPost.author._id === authentication.userId &&
-                    <WarningButton
-                      onClick={() => setBlogPostToDelete({ _id: blogPost._id, title: blogPost.title })}
-                      startIcon={<MUIDeleteForeverIcon />}
-                    >
-                      Delete
-                    </WarningButton>
-                  }
-                </MUICardActions>
-              </MUICard>
-            </MUIGrid>
-          ))}
-        </MUIGrid>
-      </React.Fragment>
+                    Delete
+                  </WarningButton>
+                )}
+              </MUICardActions>
+            </MUICard>
+          </MUIGrid>
+        ))}
+      </MUIGrid>
+    </React.Fragment>
   );
-};
+}

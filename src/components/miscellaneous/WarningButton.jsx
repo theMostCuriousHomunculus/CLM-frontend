@@ -14,14 +14,13 @@ const useStyles = makeStyles({
   }
 });
 
-export default function WarningButton ({
+export default function WarningButton({
   children,
   fullWidth,
   onClick,
   startIcon,
   ...rest
 }) {
-
   return (
     <MUIButton
       className={useStyles().warningButton}
@@ -33,4 +32,4 @@ export default function WarningButton ({
       {children}
     </MUIButton>
   );
-};
+}

@@ -48,61 +48,62 @@ import { ReactComponent as ManaSymbolY } from '../../svgs/Y-mana-symbol.svg';
 import { ReactComponent as ManaSymbolZ } from '../../svgs/Z-mana-symbol.svg';
 
 const manaSymbolComponents = {
-  '0': <ManaSymbol0 />,
-  '1': <ManaSymbol1 />,
-  '2': <ManaSymbol2 />,
-  '3': <ManaSymbol3 />,
-  '4': <ManaSymbol4 />,
-  '5': <ManaSymbol5 />,
-  '6': <ManaSymbol6 />,
-  '7': <ManaSymbol7 />,
-  '8': <ManaSymbol8 />,
-  '9': <ManaSymbol9 />,
-  '10': <ManaSymbol10 />,
-  '11': <ManaSymbol11 />,
-  '12': <ManaSymbol12 />,
-  '13': <ManaSymbol13 />,
-  '14': <ManaSymbol14 />,
-  '15': <ManaSymbol15 />,
-  '16': <ManaSymbol16 />,
-  'W': <ManaSymbolW />,
-  'U': <ManaSymbolU />,
-  'B': <ManaSymbolB />,
-  'R': <ManaSymbolR />,
-  'G': <ManaSymbolG />,
-  'C': <ManaSymbolC />,
+  0: <ManaSymbol0 />,
+  1: <ManaSymbol1 />,
+  2: <ManaSymbol2 />,
+  3: <ManaSymbol3 />,
+  4: <ManaSymbol4 />,
+  5: <ManaSymbol5 />,
+  6: <ManaSymbol6 />,
+  7: <ManaSymbol7 />,
+  8: <ManaSymbol8 />,
+  9: <ManaSymbol9 />,
+  10: <ManaSymbol10 />,
+  11: <ManaSymbol11 />,
+  12: <ManaSymbol12 />,
+  13: <ManaSymbol13 />,
+  14: <ManaSymbol14 />,
+  15: <ManaSymbol15 />,
+  16: <ManaSymbol16 />,
+  W: <ManaSymbolW />,
+  U: <ManaSymbolU />,
+  B: <ManaSymbolB />,
+  R: <ManaSymbolR />,
+  G: <ManaSymbolG />,
+  C: <ManaSymbolC />,
   '2W': <ManaSymbol2W />,
   '2U': <ManaSymbol2U />,
   '2B': <ManaSymbol2B />,
   '2R': <ManaSymbol2R />,
   '2G': <ManaSymbol2G />,
-  'BG': <ManaSymbolBG />,
-  'BR': <ManaSymbolBR />,
-  'BP': <ManaSymbolBP />,
-  'GU': <ManaSymbolGU />,
-  'GW': <ManaSymbolGW />,
-  'GP': <ManaSymbolGP />,
-  'RG': <ManaSymbolRG />,
-  'RW': <ManaSymbolRW />,
-  'RP': <ManaSymbolRP />,
-  'UB': <ManaSymbolUB />,
-  'UR': <ManaSymbolUR />,
-  'UP': <ManaSymbolUP />,
-  'WB': <ManaSymbolWB />,
-  'WU': <ManaSymbolWU />,
-  'WP': <ManaSymbolWP />,
-  'X': <ManaSymbolX />,
-  'Y': <ManaSymbolY />,
-  'Z': <ManaSymbolZ />
-}
+  BG: <ManaSymbolBG />,
+  BR: <ManaSymbolBR />,
+  BP: <ManaSymbolBP />,
+  GU: <ManaSymbolGU />,
+  GW: <ManaSymbolGW />,
+  GP: <ManaSymbolGP />,
+  RG: <ManaSymbolRG />,
+  RW: <ManaSymbolRW />,
+  RP: <ManaSymbolRP />,
+  UB: <ManaSymbolUB />,
+  UR: <ManaSymbolUR />,
+  UP: <ManaSymbolUP />,
+  WB: <ManaSymbolWB />,
+  WU: <ManaSymbolWU />,
+  WP: <ManaSymbolWP />,
+  X: <ManaSymbolX />,
+  Y: <ManaSymbolY />,
+  Z: <ManaSymbolZ />
+};
 
-export default function ManaCostSVGs ({ manaCostString, size }) {
-
+export default function ManaCostSVGs({ manaCostString, size }) {
   const stringArray = manaCostString.split('}{');
-  
+
   if (stringArray[0]) {
     stringArray[0] = stringArray[0].replace('{', '');
-    stringArray[stringArray.length - 1] = stringArray[stringArray.length - 1].replace('}', '');
+    stringArray[stringArray.length - 1] = stringArray[
+      stringArray.length - 1
+    ].replace('}', '');
 
     for (let index = 0; index < stringArray.length; index++) {
       stringArray[index] = stringArray[index].replace('/', '');
@@ -113,9 +114,12 @@ export default function ManaCostSVGs ({ manaCostString, size }) {
 
   return (
     <span style={{ display: 'inline-flex' }}>
-      {stringArray.map((str, index) => React.cloneElement(manaSymbolComponents[str],
-        { key: index, style: { height: size, width: size } }))
-      }
+      {stringArray.map((str, index) =>
+        React.cloneElement(manaSymbolComponents[str], {
+          key: index,
+          style: { height: size, width: size }
+        })
+      )}
     </span>
   );
-};
+}

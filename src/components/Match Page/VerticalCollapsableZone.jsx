@@ -43,88 +43,96 @@ const useStyles = makeStyles({
   }
 });
 
-const SortableZone = SortableContainer(({
-  customStyle,
-  iconColor,
-  iconElement,
-  player,
-  setRightClickedCard,
-  zone
-}) => {
+const SortableZone = SortableContainer(
+  ({
+    customStyle,
+    iconColor,
+    iconElement,
+    player,
+    setRightClickedCard,
+    zone
+  }) => {
+    const classes = useStyles();
+    const { userId } = React.useContext(AuthenticationContext);
 
-  const classes = useStyles();
-  const { userId } = React.useContext(AuthenticationContext);
-
-  return (
-    <div
-      className={classes.collapsableZoneContainer}
-      style={{ minWidth: customStyle.width + 2 }}
-    >
-      {player[zone.toLowerCase()].map((val, index, array) => array[array.length - 1 - index]).map((card, index) => (
-        <SortableCard
-          card={card}
-          customStyle={customStyle}
-          disabled={player.account._id !== userId}
-          index={index}
-          key={card._id}
-          setRightClickedCard={setRightClickedCard}
-          zone={zone}
-        />
-      ))}
-      <div className={classes.badgeContainer}>
-        <MUITooltip title={zone}>
-          <MUIBadge
-            badgeContent={player[zone.toLowerCase()].length}
-            className={classes.zoneBadge}
-            color='primary'
-            showZero
-          >
-            <MUISvgIcon
-              className={classes.svg}
-              style={{ backgroundColor: iconColor }}
+    return (
+      <div
+        className={classes.collapsableZoneContainer}
+        style={{ minWidth: customStyle.width + 2 }}
+      >
+        {player[zone.toLowerCase()]
+          .map((val, index, array) => array[array.length - 1 - index])
+          .map((card, index) => (
+            <SortableCard
+              card={card}
+              customStyle={customStyle}
+              disabled={player.account._id !== userId}
+              index={index}
+              key={card._id}
+              setRightClickedCard={setRightClickedCard}
+              zone={zone}
+            />
+          ))}
+        <div className={classes.badgeContainer}>
+          <MUITooltip title={zone}>
+            <MUIBadge
+              badgeContent={player[zone.toLowerCase()].length}
+              className={classes.zoneBadge}
+              color="primary"
+              showZero
             >
-              {iconElement}
-            </MUISvgIcon>
-          </MUIBadge>
-        </MUITooltip>
+              <MUISvgIcon
+                className={classes.svg}
+                style={{ backgroundColor: iconColor }}
+              >
+                {iconElement}
+              </MUISvgIcon>
+            </MUIBadge>
+          </MUITooltip>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
-const SortableCard = SortableElement(({ card, customStyle, setRightClickedCard, zone }) => {
+const SortableCard = SortableElement(
+  ({ card, customStyle, setRightClickedCard, zone }) => {
+    const { userId } = React.useContext(AuthenticationContext);
+    const { flipCard } = React.useContext(MatchContext);
+    const style = { ...customStyle };
 
-  const { userId } = React.useContext(AuthenticationContext);
-  const { flipCard } = React.useContext(MatchContext);
-  const style = { ...customStyle };
+    if (card.controller._id === userId) style.cursor = 'grab';
 
-  if (card.controller._id === userId) style.cursor = 'grab';
+    return (
+      <MagicCard
+        cardData={card}
+        customStyle={style}
+        flipHandler={
+          card.controller._id === userId
+            ? () => flipCard(card._id, zone.toLowerCase())
+            : () => null
+        }
+        hoverPreview={!!card.image}
+        rightClickFunction={(event) => {
+          event.preventDefault();
+          setRightClickedCard({
+            _id: card._id,
+            anchorElement: event.currentTarget,
+            controller: card.controller._id,
+            face_down: card.face_down,
+            isCopyToken: card.isCopyToken,
+            name: card.name,
+            origin: zone.toLowerCase(),
+            owner: card.owner._id,
+            visibility: card.visibility
+          });
+        }}
+      />
+    );
+  }
+);
 
-  return (
-    <MagicCard
-      cardData={card}
-      customStyle={style}
-      flipHandler={card.controller._id === userId ? () => flipCard(card._id, zone.toLowerCase()) : () => null}
-      hoverPreview={!!card.image}
-      rightClickFunction={event => {
-        event.preventDefault();
-        setRightClickedCard({
-          _id: card._id,
-          anchorElement: event.currentTarget,
-          controller: card.controller._id,
-          face_down: card.face_down,
-          isCopyToken: card.isCopyToken,
-          name: card.name,
-          origin: zone.toLowerCase(),
-          owner: card.owner._id,
-          visibility: card.visibility
-        });
-      }}
-    />
-  );
-});
-
-export default function VerticalCollapsableZone ({
+export default function VerticalCollapsableZone({
   customStyle,
   iconColor,
   iconElement,
@@ -132,17 +140,20 @@ export default function VerticalCollapsableZone ({
   setRightClickedCard,
   zone
 }) {
-
   const { setBottomPlayerState } = React.useContext(MatchContext);
 
-  function onSortEnd ({ collection, newIndex, oldIndex }) {
+  function onSortEnd({ collection, newIndex, oldIndex }) {
     // since I am populating zones in reverse order
     const oppositeIndex = player[zone.toLowerCase()].length - 1;
 
     if (newIndex !== oldIndex) {
-      setBottomPlayerState(prevState => ({
+      setBottomPlayerState((prevState) => ({
         ...prevState,
-        [zone.toLowerCase()]: arrayMove(prevState[zone.toLowerCase()], oppositeIndex - oldIndex, oppositeIndex - newIndex)
+        [zone.toLowerCase()]: arrayMove(
+          prevState[zone.toLowerCase()],
+          oppositeIndex - oldIndex,
+          oppositeIndex - newIndex
+        )
       }));
     }
   }
@@ -160,4 +171,4 @@ export default function VerticalCollapsableZone ({
       zone={zone}
     />
   );
-};
+}

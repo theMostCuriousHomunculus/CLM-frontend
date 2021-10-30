@@ -11,43 +11,48 @@ import { ReactComponent as NonCreatureSVG } from '../svgs/jmp.svg';
 
 const generalCardTypes = [
   {
-    name: "Creature",
+    name: 'Creature',
     svg: <CreatureSVG />
-  }, {
-    name: "Non-Creature",
+  },
+  {
+    name: 'Non-Creature',
     svg: <NonCreatureSVG />
-  }, {
-    name: "Land",
+  },
+  {
+    name: 'Land',
     svg: <LandSVG />
   }
 ];
 
 const specificCardTypes = [
   {
-    name: "Creature",
+    name: 'Creature',
     svg: <CreatureSVG />
-  }, {
-    name: "Planeswalker",
+  },
+  {
+    name: 'Planeswalker',
     svg: <PlaneswalkerSVG />
-  }, {
-    name: "Instant",
+  },
+  {
+    name: 'Instant',
     svg: <InstantSVG />
-  }, {
-    name: "Sorcery",
+  },
+  {
+    name: 'Sorcery',
     svg: <SorcerySVG />
-  }, {
-    name: "Enchantment",
+  },
+  {
+    name: 'Enchantment',
     svg: <EnchantmentSVG />
-  }, {
-    name: "Artifact",
+  },
+  {
+    name: 'Artifact',
     svg: <ArtifactSVG />
-  }, {
-    name: "Land",
+  },
+  {
+    name: 'Land',
     svg: <LandSVG />
   }
 ];
 
-export {
-  generalCardTypes,
-  specificCardTypes
-};
+export { generalCardTypes, specificCardTypes };

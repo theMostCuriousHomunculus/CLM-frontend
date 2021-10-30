@@ -14,8 +14,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function LargeAvatar ({ alt, size, ...rest }) {
-
+export default function LargeAvatar({ alt, size, ...rest }) {
   const classes = useStyles();
 
   return (
@@ -28,4 +27,4 @@ export default function LargeAvatar ({ alt, size, ...rest }) {
       />
     </MUITooltip>
   );
-};
+}

@@ -1,7 +1,6 @@
 import React from 'react';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MUIIconButton from '@mui/material/IconButton';
-import { createClient } from 'graphql-ws';
 import { makeStyles } from '@mui/styles';
 
 import CardMenu from '../components/Match Page/CardMenu';
@@ -27,9 +26,8 @@ const useStyles = makeStyles({
   }
 });
 
-export default function Match () {
-
-  const { token, userId } = React.useContext(AuthenticationContext);
+export default function Match() {
+  const { userId } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [clickedPlayer, setClickedPlayer] = React.useState({
     _id: null,
@@ -49,16 +47,13 @@ export default function Match () {
   const [helpDisplayed, setHelpDisplayed] = React.useState(false);
   const {
     loading,
-    matchQuery,
     bottomPlayerState,
     matchState,
     numberInputDialogInfo,
     topPlayerState,
-    setMatchState,
     setNumberInputDialogInfo,
     concedeGame,
     drawCard,
-    fetchMatchByID,
     mulligan,
     rollDice,
     shuffleLibrary,
@@ -79,51 +74,8 @@ export default function Match () {
   const [tokenDialogOpen, setTokenDialogOpen] = React.useState(false);
   const [zoneName, setZoneName] = React.useState(null);
 
-  React.useEffect(function () {
-
-    async function initialize () {
-      await fetchMatchByID();
-    }
-
-    initialize();
-
-    const client = createClient({
-      connectionParams: {
-        authToken: token,
-        matchID: matchState._id
-      },
-      url: process.env.REACT_APP_GRAPHQL_WS_URL
-    });
-
-    async function subscribe () {
-      function onNext(update) {
-        setMatchState(update.data.subscribeMatch);
-      }
-
-      await new Promise((resolve, reject) => {
-        client.subscribe({
-          query: `subscription {
-            subscribeMatch {
-              ${matchQuery}
-            }
-          }`
-        },
-        {
-          complete: resolve,
-          error: reject,
-          next: onNext
-        });
-      });
-    }
-
-    subscribe(result => console.log(result), error => console.log(error));
-
-    return client.dispose;
-  }, [fetchMatchByID, matchQuery, matchState._id, setMatchState, token]);
-
   React.useEffect(() => {
-    function handleHotKeys (event) {
-
+    function handleHotKeys(event) {
       if (event.altKey && event.shiftKey && event.key === 'C') {
         concedeGame();
       }
@@ -138,11 +90,11 @@ export default function Match () {
 
       if (event.altKey && event.shiftKey && event.key === 'R') {
         setNumberInputDialogInfo({
-          buttonText: "Roll",
+          buttonText: 'Roll',
           defaultValue: 6,
-          inputLabel: "Number of Sides",
-          title: "Roll Dice",
-          updateFunction: updatedValue => rollDice(updatedValue)
+          inputLabel: 'Number of Sides',
+          title: 'Roll Dice',
+          updateFunction: (updatedValue) => rollDice(updatedValue)
         });
       }
 
@@ -155,17 +107,19 @@ export default function Match () {
       }
 
       if (event.altKey && event.shiftKey && event.key === 'U') {
-        tapUntapCards(bottomPlayerState.battlefield.filter(crd => crd.tapped).map(crd => crd._id));
+        tapUntapCards(
+          bottomPlayerState.battlefield
+            .filter((crd) => crd.tapped)
+            .map((crd) => crd._id)
+        );
       }
-
     }
 
     if (participant) {
-      document.addEventListener("keydown", handleHotKeys);
+      document.addEventListener('keydown', handleHotKeys);
 
-      return () => document.removeEventListener("keydown", handleHotKeys);
+      return () => document.removeEventListener('keydown', handleHotKeys);
     }
-
   }, [
     bottomPlayerState.battlefield,
     concedeGame,
@@ -178,24 +132,23 @@ export default function Match () {
     tapUntapCards
   ]);
 
-  return (
-    loading ?
-    <LoadingSpinner /> :
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
     <React.Fragment>
-      <HelpDialog
-        open={helpDisplayed}
-        close={() => setHelpDisplayed(false)}
-      />
+      <HelpDialog open={helpDisplayed} close={() => setHelpDisplayed(false)} />
 
       <NumberInputDialog
         buttonText={numberInputDialogInfo.buttonText}
-        close={() => setNumberInputDialogInfo({
-          buttonText: null,
-          defaultValue: null,
-          inputLabel: null,
-          title: null,
-          updateFunction: null
-        })}
+        close={() =>
+          setNumberInputDialogInfo({
+            buttonText: null,
+            defaultValue: null,
+            inputLabel: null,
+            title: null,
+            updateFunction: null
+          })
+        }
         defaultValue={numberInputDialogInfo.defaultValue}
         inputLabel={numberInputDialogInfo.inputLabel}
         title={numberInputDialogInfo.title}
@@ -211,7 +164,9 @@ export default function Match () {
             position: null
           });
         }}
-        player={clickedPlayer.position === 'top' ? topPlayerState : bottomPlayerState}
+        player={
+          clickedPlayer.position === 'top' ? topPlayerState : bottomPlayerState
+        }
         setRightClickedCard={setRightClickedCard}
         zoneName={zoneName}
       />
@@ -229,13 +184,16 @@ export default function Match () {
         setZoneName={setZoneName}
       />
 
-      {matchState.stack.length > 0 &&
+      {matchState.stack.length > 0 && (
         <TheStack setRightClickedCard={setRightClickedCard} />
-      }
+      )}
 
-      <ScryfallTokenSearchDialog closeDialog={() => setTokenDialogOpen(false)} openDialog={tokenDialogOpen} />
+      <ScryfallTokenSearchDialog
+        closeDialog={() => setTokenDialogOpen(false)}
+        openDialog={tokenDialogOpen}
+      />
 
-      {matchState.players.every(plr => plr.mainboard.length === 0) ?
+      {matchState.players.every((plr) => plr.mainboard.length === 0) ? (
         <div className={classes.matchScreenFlexContainer}>
           <div
             style={{
@@ -245,8 +203,8 @@ export default function Match () {
             }}
           >
             <MUIIconButton
-              aria-label='help'
-              color='primary'
+              aria-label="help"
+              color="primary"
               onClick={() => setHelpDisplayed(true)}
             >
               <MUIHelpOutlineIcon />
@@ -261,9 +219,10 @@ export default function Match () {
           />
 
           <MatchLog />
-        </div> :
+        </div>
+      ) : (
         <Intermission />
-      }
+      )}
     </React.Fragment>
   );
-};
+}

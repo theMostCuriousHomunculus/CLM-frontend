@@ -19,24 +19,23 @@ import CreateMatchForm from './CreateMatchForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/authentication-context';
 
-export default function MatchAccordion ({
-  pageClasses
-}) {
-
-  const accountId = useParams().accountId;
-  const { accountState: { matches } } = React.useContext(AccountContext);
+export default function MatchAccordion({ pageClasses }) {
+  const { accountID } = useParams();
+  const {
+    accountState: { matches }
+  } = React.useContext(AccountContext);
   const { userId } = React.useContext(AuthenticationContext);
   const [showMatchForm, setShowMatchForm] = React.useState(false);
 
   return (
     <React.Fragment>
-      {accountId === userId &&
+      {accountID === userId && (
         <CreateMatchForm
           open={showMatchForm}
-          toggleOpen={() => setShowMatchForm(prevState => !prevState)}
+          toggleOpen={() => setShowMatchForm((prevState) => !prevState)}
         />
-      }
-      
+      )}
+
       <MUIAccordion>
         <MUIAccordionSummary
           expandIcon={<MUIExpandMoreIcon />}
@@ -58,7 +57,9 @@ export default function MatchAccordion ({
               </MUITableHead>
               <MUITableBody>
                 {matches.map(function (match) {
-                  const opponent = match.players.find(player => player.account._id !== accountId);
+                  const opponent = match.players.find(
+                    (player) => player.account._id !== accountID
+                  );
 
                   return (
                     <MUITableRow key={match._id}>
@@ -66,29 +67,30 @@ export default function MatchAccordion ({
                         <Link to={`/match/${match._id}`}>
                           <Avatar
                             alt={opponent.account.name}
-                            size='small'
+                            size="small"
                             src={opponent.account.avatar}
                             style={{ marginRight: 16 }}
                           />
                         </Link>
                       </MUITableCell>
                       <MUITableCell>
-                        <span style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span
+                          style={{ display: 'flex', flexDirection: 'column' }}
+                        >
                           {match.decks &&
-                            match.decks.map(deck => (
+                            match.decks.map((deck) => (
                               <Link key={deck._id} to={`/deck/${deck._id}`}>
                                 {deck.name} / {deck.format}
                               </Link>
-                            ))
-                          }
+                            ))}
                         </span>
                       </MUITableCell>
                       <MUITableCell>
-                        {match.event &&
+                        {match.event && (
                           <Link to={`/event/${match.event._id}`}>
                             {match.event.name}
                           </Link>
-                        }
+                        )}
                       </MUITableCell>
                       <MUITableCell>
                         {new Date(parseInt(match.createdAt)).toLocaleString()}
@@ -101,16 +103,14 @@ export default function MatchAccordion ({
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {accountId === userId &&
+        {accountID === userId && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowMatchForm(true)}>
               Create a Match
             </MUIButton>
           </MUIAccordionActions>
-        }
-
+        )}
       </MUIAccordion>
-
     </React.Fragment>
   );
-};
+}

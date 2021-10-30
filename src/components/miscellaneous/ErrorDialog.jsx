@@ -19,19 +19,11 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ErrorDialog ({
-  clearAll,
-  clearOne,
-  messages
-}) {
-
+export default function ErrorDialog({ clearAll, clearOne, messages }) {
   const classes = useStyles();
 
   return (
-    <MUIDialog
-      open={messages.length > 0}
-      onClose={clearAll}
-    >
+    <MUIDialog open={messages.length > 0} onClose={clearAll}>
       <MUIDialogTitle className={classes.title}>
         <span>Error</span>
         <MUIWarningRoundedIcon
@@ -46,10 +38,8 @@ export default function ErrorDialog ({
         <MUIDialogContentText>{messages[0]}</MUIDialogContentText>
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton onClick={clearOne}>
-          Dismiss
-        </MUIButton>
+        <MUIButton onClick={clearOne}>Dismiss</MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );
-};
+}

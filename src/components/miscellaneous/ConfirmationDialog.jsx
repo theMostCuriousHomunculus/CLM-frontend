@@ -6,36 +6,23 @@ import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import WarningButton from './WarningButton';
 
-export default function ConfirmationDialog ({
+export default function ConfirmationDialog({
   children,
   confirmHandler,
   open,
   title,
   toggleOpen
 }) {
-
   return (
-    <MUIDialog
-      open={open}
-      onClose={toggleOpen}
-    >
+    <MUIDialog open={open} onClose={toggleOpen}>
       <MUIDialogTitle>{title}</MUIDialogTitle>
-      <MUIDialogContent>
-        {children}
-      </MUIDialogContent>
+      <MUIDialogContent>{children}</MUIDialogContent>
       <MUIDialogActions>
-        <WarningButton
-          onClick={confirmHandler}
-        >
-          Confirm
-        </WarningButton>
-        <MUIButton
-          autoFocus
-          onClick={toggleOpen}
-        >
+        <WarningButton onClick={confirmHandler}>Confirm</WarningButton>
+        <MUIButton autoFocus onClick={toggleOpen}>
           Cancel
         </MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );
-};
+}
