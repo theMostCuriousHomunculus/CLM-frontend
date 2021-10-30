@@ -59,34 +59,26 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
         callback: async (data) => {
           const printings = await Promise.all(
             data.data.map(async function (print) {
-              let art_crop, back_image, image, /*mana_cost, */ type_line;
+              let art_crop, back_image, image, type_line;
               switch (print.layout) {
                 case 'adventure':
                   // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
                   art_crop = print.image_uris.art_crop;
                   image = print.image_uris.large;
-                  // mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
-                  // type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
                   break;
                 case 'flip':
                   // flip was only in Kamigawa block (plus an "Un" card and a couple of reprints), which was before planeswalkers existed.  unlikely they ever bring this layout back, and if they do, no idea how they would fit a planeswalker onto one side.  all flip cards are creatures on one end and either a creature or an enchantment on the other
                   art_crop = print.image_uris.art_crop;
                   image = print.image_uris.large;
-                  // mana_cost = print.card_faces[0].mana_cost;
-                  // type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
                   break;
                 case 'leveler':
                   // all level up cards have been creatures.  this is a mechanic that has so far only appeared in Rise of the Eldrazi and a single card in Modern Horizons.  i don't expect the mechanic to return, but the printing of Hexdrinker in MH1 suggests it may
                   art_crop = print.image_uris.art_crop;
                   image = print.image_uris.large;
-                  // mana_cost = print.mana_cost;
-                  // type_line = print.type_line;
                   break;
                 case 'meld':
                   // meld only appeared in Eldritch Moon and probably won't ever come back.  no planeswalkers; only creatures and a single land
                   art_crop = print.image_uris.art_crop;
-                  // mana_cost = print.mana_cost;
-                  // type_line = print.type_line;
                   const meldResultPart = print.all_parts.find(
                     (part) => part.component === 'meld_result'
                   );
@@ -103,53 +95,35 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
                   art_crop = print.card_faces[0].image_uris.art_crop;
                   back_image = print.card_faces[1].image_uris.large;
                   image = print.card_faces[0].image_uris.large;
-                  // mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
-                  // type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
                   break;
                 case 'saga':
                   // saga's have no other faces; they simply have their own layout type becuase of the fact that the art is on the right side of the card rather than the top of the card.  all sagas printed so far (through Kaldheim) have only 3 or 4 chapters
                   art_crop = print.image_uris.art_crop;
                   image = print.image_uris.large;
-                  // mana_cost = print.mana_cost;
-                  // type_line = print.type_line;
                   break;
                 case 'split':
                   // split cards are always instants and/or sorceries
                   art_crop = print.image_uris.art_crop;
                   image = print.image_uris.large;
-                  // mana_cost = `${print.card_faces[0].mana_cost}${print.card_faces[1].mana_cost}`;
-                  // type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
                   break;
                 case 'transform':
                   art_crop = print.card_faces[0].image_uris.art_crop;
                   back_image = print.card_faces[1].image_uris.large;
                   image = print.card_faces[0].image_uris.large;
-                  // mana_cost = print.card_faces[0].mana_cost;
-                  // type_line = `${print.card_faces[0].type_line} / ${print.card_faces[1].type_line}`;
                   break;
                 default:
                   art_crop = print.image_uris.art_crop;
                   image = print.image_uris.large;
-                // mana_cost = print.mana_cost;
-                // type_line = print.type_line;
               }
               return {
                 art_crop,
                 back_image,
-                cmc: print.cmc,
                 collector_number: print.collector_number,
-                color_identity: print.color_identity,
                 image,
-                // keywords: print.keywords,
-                // mana_cost,
-                // mtgo_id: print.mtgo_id,
                 name: print.name,
                 oracle_id: print.oracle_id,
                 scryfall_id: print.id,
-                set: print.set,
-                set_name: print.set_name,
-                // tcgplayer_id: print.tcgplayer_id,
-                type_line
+                set_name: print.set_name
               };
             })
           );
