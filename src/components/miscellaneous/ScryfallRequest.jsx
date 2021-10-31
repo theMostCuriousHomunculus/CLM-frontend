@@ -59,7 +59,7 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
         callback: async (data) => {
           const printings = await Promise.all(
             data.data.map(async function (print) {
-              let art_crop, back_image, image, type_line;
+              let art_crop, back_image, image;
               switch (print.layout) {
                 case 'adventure':
                   // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again

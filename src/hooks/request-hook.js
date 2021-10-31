@@ -61,9 +61,9 @@ export default function useRequest() {
             setErrorMessages((prevState) => [...prevState, error.message]);
           }
         } else if (operation) {
-          callback(responseData.data[operation]);
+          await callback(responseData.data[operation]);
         } else {
-          callback(responseData);
+          await callback(responseData);
         }
       } catch (error) {
         setErrorMessages((prevState) => [...prevState, error.message]);

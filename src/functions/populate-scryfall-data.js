@@ -1,5 +1,4 @@
-export default async function populateScryfallData (cubeOrDeck, scryfallCardData) {
-
+export default async function populateScryfallData(scryfallCardData) {
   let art_crop, back_image, image, mana_cost, type_line;
   switch (scryfallCardData.layout) {
     case 'adventure':
@@ -29,7 +28,11 @@ export default async function populateScryfallData (cubeOrDeck, scryfallCardData
       mana_cost = scryfallCardData.mana_cost;
       type_line = scryfallCardData.type_line;
 
-      const meldResult = await fetch(scryfallCardData.all_parts.find(part => part.component === 'meld_result').uri).json();
+      const meldResult = await fetch(
+        scryfallCardData.all_parts.find(
+          (part) => part.component === 'meld_result'
+        ).uri
+      ).json();
       back_image = meldResult.image_uris.large;
       image = scryfallCardData.image_uris.large;
       break;
@@ -67,8 +70,8 @@ export default async function populateScryfallData (cubeOrDeck, scryfallCardData
       mana_cost = scryfallCardData.mana_cost;
       type_line = scryfallCardData.type_line;
   }
-  
-  const formattedScryfallData = {
+
+  return {
     art_crop,
     back_image,
     cmc: scryfallCardData.cmc,
@@ -86,44 +89,4 @@ export default async function populateScryfallData (cubeOrDeck, scryfallCardData
     tcgplayer_id: scryfallCardData.tcgplayer_id,
     type_line
   };
-  
-  for (const card of cubeOrDeck.mainboard) {
-    if (card.scryfall_id === scryfallCardData.id) {
-      for (const [key, value] of Object.entries(formattedScryfallData)) {
-        if (typeof card[key] === 'undefined') card[key] = value;
-      }
-    }
-  }
-
-  for (const card of cubeOrDeck.sideboard) {
-    if (card.scryfall_id === scryfallCardData.id) {
-      for (const [key, value] of Object.entries(formattedScryfallData)) {
-        if (typeof card[key] === 'undefined') card[key] = value;
-      }
-    }
-  }
-
-  if (cubeOrDeck.modules) {
-    for (const module of cubeOrDeck.modules) {
-      for (const card of module.cards) {
-        if (card.scryfall_id === scryfallCardData.id) {
-          for (const [key, value] of Object.entries(formattedScryfallData)) {
-            if (typeof card[key] === 'undefined') card[key] = value;
-          }
-        }
-      }
-    }
-  }
-
-  if (cubeOrDeck.rotations) {
-    for (const rotation of cubeOrDeck.rotations) {
-      for (const card of rotation.cards) {
-        if (card.scryfall_id === scryfallCardData.id) {
-          for (const [key, value] of Object.entries(formattedScryfallData)) {
-            if (typeof card[key] === 'undefined') card[key] = value;
-          }
-        }
-      }
-    }
-  }
 }

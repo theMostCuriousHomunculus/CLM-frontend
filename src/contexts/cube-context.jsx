@@ -4,6 +4,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Cube from '../pages/Cube';
+import { CardCacheContext } from './card-cache-context';
 
 export const CubeContext = createContext({
   loading: false,
@@ -14,7 +15,6 @@ export const CubeContext = createContext({
     name: 'Mainboard',
     size: null
   },
-  cubeQuery: '',
   cubeState: {
     _id: null,
     creator: {
@@ -46,8 +46,7 @@ export const CubeContext = createContext({
   editCard: () => null,
   editCube: () => null,
   editModule: () => null,
-  editRotation: () => null,
-  fetchCubeByID: () => null
+  editRotation: () => null
 });
 
 export default function ContextualizedCubePage() {
@@ -60,6 +59,8 @@ export default function ContextualizedCubePage() {
     size: null
   });
   const { cubeID } = useParams();
+  const { addCardsToCache, scryfallCardDataCache } =
+    React.useContext(CardCacheContext);
   const [cubeState, setCubeState] = React.useState({
     _id: cubeID,
     creator: {
@@ -80,21 +81,12 @@ export default function ContextualizedCubePage() {
   });
   const cardQuery = `
     _id
-    back_image
     cmc
-    collector_number
     color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
     name
     notes
     oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
     type_line
   `;
   const cubeQuery = `
@@ -473,7 +465,65 @@ export default function ContextualizedCubePage() {
   const fetchCubeByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: (data) => setCubeState(data),
+        callback: async function (data) {
+          const cardSet = new Set();
+
+          for (const card of data.mainboard) {
+            cardSet.add(card.scryfall_id);
+          }
+
+          for (const card of data.sideboard) {
+            cardSet.add(card.scryfall_id);
+          }
+
+          for (const module of data.modules) {
+            for (const card of module.cards) {
+              cardSet.add(card.scryfall_id);
+            }
+          }
+
+          for (const rotation of data.rotations) {
+            for (const card of rotation.cards) {
+              cardSet.add(card.scryfall_id);
+            }
+          }
+
+          await addCardsToCache([...cardSet]);
+
+          data.mainboard.forEach((card, index, array) => {
+            array[index] = {
+              ...scryfallCardDataCache.current[card.scryfall_id],
+              ...card
+            };
+          });
+
+          data.sideboard.forEach((card, index, array) => {
+            array[index] = {
+              ...scryfallCardDataCache.current[card.scryfall_id],
+              ...card
+            };
+          });
+
+          for (const module of data.modules) {
+            module.cards.forEach((card, index, array) => {
+              array[index] = {
+                ...scryfallCardDataCache.current[card.scryfall_id],
+                ...card
+              };
+            });
+          }
+
+          for (const rotation of data.rotations) {
+            rotation.cards.forEach((card, index, array) => {
+              array[index] = {
+                ...scryfallCardDataCache.current[card.scryfall_id],
+                ...card
+              };
+            });
+          }
+
+          setCubeState(data);
+        },
         headers: { CubeID: cubeState._id },
         load: true,
         operation: 'fetchCubeByID',
@@ -490,7 +540,13 @@ export default function ContextualizedCubePage() {
         }
       });
     },
-    [cubeQuery, cubeState._id, sendRequest]
+    [
+      addCardsToCache,
+      cubeQuery,
+      cubeState._id,
+      scryfallCardDataCache,
+      sendRequest
+    ]
   );
 
   React.useEffect(() => {
@@ -507,7 +563,6 @@ export default function ContextualizedCubePage() {
     <CubeContext.Provider
       value={{
         loading,
-        cubeQuery,
         activeComponentState,
         cubeState,
         displayState,
@@ -523,8 +578,7 @@ export default function ContextualizedCubePage() {
         editCard,
         editCube,
         editModule,
-        editRotation,
-        fetchCubeByID
+        editRotation
       }}
     >
       <Cube />

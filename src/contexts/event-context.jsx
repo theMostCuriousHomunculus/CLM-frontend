@@ -8,7 +8,6 @@ import { AuthenticationContext } from './authentication-context';
 
 export const EventContext = createContext({
   loading: false,
-  eventQuery: '',
   eventState: {
     _id: null,
     finished: false,
@@ -44,7 +43,6 @@ export const EventContext = createContext({
   setEventState: () => null,
   setMyState: () => null,
   addBasics: () => null,
-  fetchEventByID: () => null,
   removeBasics: () => null,
   selectCard: () => null,
   toggleMainboardSideboardEvent: () => null
@@ -87,21 +85,9 @@ export default function ContextualizedEventPage() {
   });
   const cardQuery = `
     _id
-    back_image
-    cmc
-    collector_number
-    color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
     name
     oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
-    type_line
   `;
   const eventQuery = `
     _id
@@ -275,13 +261,11 @@ export default function ContextualizedEventPage() {
     <EventContext.Provider
       value={{
         loading,
-        eventQuery,
         eventState,
         myState,
         setEventState,
         setMyState,
         addBasics,
-        fetchEventByID,
         removeBasics,
         selectCard,
         toggleMainboardSideboardEvent

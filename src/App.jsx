@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 
+import populateScryfallData from './functions/populate-scryfall-data';
 import useRequest from './hooks/request-hook';
 import ErrorDialog from './components/miscellaneous/ErrorDialog';
 import Footer from './components/miscellaneous/Footer';
@@ -10,6 +11,7 @@ import LoadingSpinner from './components/miscellaneous/LoadingSpinner';
 import Navigation from './components/Main Navigation/Navigation';
 import { AuthenticationContext } from './contexts/authentication-context';
 import { ErrorContext } from './contexts/error-context';
+import { CardCacheContext } from './contexts/card-cache-context';
 
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
@@ -46,12 +48,53 @@ const useStyles = makeStyles({
 });
 
 export default function App() {
+  const scryfallCardDataCache = React.useRef(Object.create(null));
   const classes = useStyles();
   const { sendRequest } = useRequest();
   const [errorMessages, setErrorMessages] = React.useState([]);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [token, setToken] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
+
+  const addCardsToCache = React.useCallback(
+    async (scryfall_ids) => {
+      const newCards = [];
+
+      for (const scryfall_id of scryfall_ids) {
+        if (!scryfallCardDataCache.current[scryfall_id]) {
+          newCards.push({ id: scryfall_id });
+        }
+      }
+
+      // according to scryfall api documentation, "A maximum of 75 card references may be submitted per request."
+      const numberOfScryfallRequests = Math.ceil(newCards.length / 75);
+      const scryfallRequestArrays = [];
+
+      for (
+        let requestNumber = 0;
+        requestNumber < numberOfScryfallRequests;
+        requestNumber++
+      ) {
+        scryfallRequestArrays.push(newCards.splice(0, 75));
+      }
+
+      for (let request of scryfallRequestArrays) {
+        await sendRequest({
+          body: {
+            identifiers: request
+          },
+          callback: async (data) => {
+            for (const card of data.data) {
+              scryfallCardDataCache.current[card.id] =
+                await populateScryfallData(card);
+            }
+          },
+          url: 'https://api.scryfall.com/cards/collection'
+        });
+      }
+    },
+    [sendRequest]
+  );
 
   const login = React.useCallback((admin, tkn, uid) => {
     setIsAdmin(admin);
@@ -109,58 +152,65 @@ export default function App() {
           setErrorMessages
         }}
       >
-        <BrowserRouter>
-          <Navigation />
-          <main className={classes.main}>
-            <React.Suspense fallback={<LoadingSpinner />}>
-              <ErrorDialog
-                clearAll={() => setErrorMessages([])}
-                clearOne={() =>
-                  setErrorMessages((prevState) =>
-                    prevState.slice(0, prevState.length - 1)
-                  )
-                }
-                messages={errorMessages}
-              />
-              <Switch>
-                <Route path="/" exact>
-                  <Home />
-                </Route>
-                <Route path="/account/:accountID">
-                  <ContextualizedAccountPage />
-                </Route>
-                <Route path="/blog/:blogPostID">
-                  <BlogPost />
-                </Route>
-                <Route path="/blog">
-                  <Blog />
-                </Route>
-                <Route path="/classy">
-                  <Classy />
-                </Route>
-                <Route path="/cube/:cubeID">
-                  <ContextualizedCubePage />
-                </Route>
-                <Route path="/deck/:deckID">
-                  <ContextualizedDeckPage />
-                </Route>
-                <Route path="/event/:eventID">
-                  <ContextualizedEventPage />
-                </Route>
-                <Route path="/match/:matchID">
-                  <ContextualizedMatchPage />
-                </Route>
-                <Route path="/reset/:resetToken">
-                  <PasswordReset />
-                </Route>
-                <Route path="/resources" exact>
-                  <Resources />
-                </Route>
-              </Switch>
-            </React.Suspense>
-          </main>
-          <Footer />
-        </BrowserRouter>
+        <CardCacheContext.Provider
+          value={{
+            addCardsToCache,
+            scryfallCardDataCache
+          }}
+        >
+          <BrowserRouter>
+            <Navigation />
+            <main className={classes.main}>
+              <React.Suspense fallback={<LoadingSpinner />}>
+                <ErrorDialog
+                  clearAll={() => setErrorMessages([])}
+                  clearOne={() =>
+                    setErrorMessages((prevState) =>
+                      prevState.slice(0, prevState.length - 1)
+                    )
+                  }
+                  messages={errorMessages}
+                />
+                <Switch>
+                  <Route path="/" exact>
+                    <Home />
+                  </Route>
+                  <Route path="/account/:accountID">
+                    <ContextualizedAccountPage />
+                  </Route>
+                  <Route path="/blog/:blogPostID">
+                    <BlogPost />
+                  </Route>
+                  <Route path="/blog">
+                    <Blog />
+                  </Route>
+                  <Route path="/classy">
+                    <Classy />
+                  </Route>
+                  <Route path="/cube/:cubeID">
+                    <ContextualizedCubePage />
+                  </Route>
+                  <Route path="/deck/:deckID">
+                    <ContextualizedDeckPage />
+                  </Route>
+                  <Route path="/event/:eventID">
+                    <ContextualizedEventPage />
+                  </Route>
+                  <Route path="/match/:matchID">
+                    <ContextualizedMatchPage />
+                  </Route>
+                  <Route path="/reset/:resetToken">
+                    <PasswordReset />
+                  </Route>
+                  <Route path="/resources" exact>
+                    <Resources />
+                  </Route>
+                </Switch>
+              </React.Suspense>
+            </main>
+            <Footer />
+          </BrowserRouter>
+        </CardCacheContext.Provider>
       </ErrorContext.Provider>
     </AuthenticationContext.Provider>
   );

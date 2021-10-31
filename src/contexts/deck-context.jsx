@@ -7,7 +7,6 @@ import Deck from '../pages/Deck';
 
 export const DeckContext = createContext({
   loading: false,
-  deckQuery: '',
   deckState: {
     _id: null,
     creator: {
@@ -25,7 +24,6 @@ export const DeckContext = createContext({
   addCardsToDeck: () => null,
   cloneDeck: () => null,
   editDeck: () => null,
-  fetchDeckByID: () => null,
   removeCardsFromDeck: () => null,
   toggleMainboardSideboardDeck: () => null
 });
@@ -48,21 +46,9 @@ export default function ContextualizedDeckPage() {
   });
   const cardQuery = `
     _id
-    back_image
-    cmc
-    collector_number
-    color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
     name
     oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
-    type_line
   `;
   const deckQuery = `
     _id
@@ -248,13 +234,11 @@ export default function ContextualizedDeckPage() {
     <DeckContext.Provider
       value={{
         loading,
-        deckQuery,
         deckState,
         setDeckState,
         addCardsToDeck,
         cloneDeck,
         editDeck,
-        fetchDeckByID,
         removeCardsFromDeck,
         toggleMainboardSideboardDeck
       }}

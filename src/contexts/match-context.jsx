@@ -8,7 +8,6 @@ import { AuthenticationContext } from './authentication-context';
 
 export const MatchContext = createContext({
   loading: false,
-  matchQuery: '',
   bottomPlayerState: {
     account: {
       _id: null,
@@ -110,7 +109,6 @@ export const MatchContext = createContext({
   destroyCopyToken: () => null,
   dragCard: () => null,
   drawCard: () => null,
-  fetchMatchByID: () => null,
   flipCard: () => null,
   flipCoin: () => null,
   gainControlOfCard: () => null,
@@ -1049,7 +1047,6 @@ export default function ContextualizedMatchPage() {
     <MatchContext.Provider
       value={{
         loading,
-        matchQuery,
         bottomPlayerState,
         matchState,
         numberInputDialogInfo,
@@ -1068,7 +1065,6 @@ export default function ContextualizedMatchPage() {
         destroyCopyToken,
         dragCard,
         drawCard,
-        fetchMatchByID,
         flipCard,
         flipCoin,
         gainControlOfCard,
