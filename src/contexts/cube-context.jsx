@@ -175,7 +175,7 @@ export default function ContextualizedCubePage() {
   }, [cubeState, displayState, filterCards]);
 
   const addCardToCube = React.useCallback(
-    async function ({ name, oracle_id, scryfall_id }) {
+    async function ({ name, scryfall_id }) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
         operation: 'addCardToCube',
@@ -186,7 +186,6 @@ export default function ContextualizedCubePage() {
               ${this.operation}(
                 componentID: "${activeComponentState._id}",
                 name: "${name}",
-                oracle_id: "${oracle_id}",
                 scryfall_id: "${scryfall_id}"
               ) {
                 _id

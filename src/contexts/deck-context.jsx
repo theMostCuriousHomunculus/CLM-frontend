@@ -71,11 +71,7 @@ export default function ContextualizedDeckPage() {
   const { requestSubscription } = useSubscribe();
 
   const addCardsToDeck = React.useCallback(
-    async function (
-      { name, oracle_id, scryfall_id },
-      component,
-      numberOfCopies
-    ) {
+    async function ({ name, scryfall_id }, component, numberOfCopies) {
       await sendRequest({
         headers: { DeckID: deckState._id },
         operation: 'addCardsToDeck',
@@ -87,7 +83,6 @@ export default function ContextualizedDeckPage() {
                 component: ${component},
                 name: "${name}",
                 numberOfCopies: ${numberOfCopies},
-                oracle_id: "${oracle_id}",
                 scryfall_id: "${scryfall_id}"
               ) {
                 _id
