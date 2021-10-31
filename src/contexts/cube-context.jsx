@@ -85,7 +85,6 @@ export default function ContextualizedCubePage() {
     color_identity
     name
     notes
-    oracle_id
     scryfall_id
     type_line
   `;
