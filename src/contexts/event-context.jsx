@@ -5,6 +5,7 @@ import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
 import { AuthenticationContext } from './authentication-context';
+import { CardCacheContext } from './card-cache-context';
 
 export const EventContext = createContext({
   loading: false,
@@ -49,8 +50,10 @@ export const EventContext = createContext({
 });
 
 export default function ContextualizedEventPage() {
-  const { userId } = React.useContext(AuthenticationContext);
   const { eventID } = useParams();
+  const { addCardsToCache, scryfallCardDataCache } =
+    React.useContext(CardCacheContext);
+  const { userId } = React.useContext(AuthenticationContext);
   const [eventState, setEventState] = React.useState({
     _id: eventID,
     finished: false,
@@ -86,7 +89,6 @@ export default function ContextualizedEventPage() {
   const cardQuery = `
     _id
     name
-    oracle_id
     scryfall_id
   `;
   const eventQuery = `
@@ -161,7 +163,62 @@ export default function ContextualizedEventPage() {
   const fetchEventByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: (data) => setEventState(data),
+        callback: async function (data) {
+          const cardSet = new Set();
+
+          for (const player of data.players) {
+            if (player.current_pack) {
+              for (const card of player.current_pack) {
+                cardSet.add(card.scryfall_id);
+              }
+            }
+
+            if (player.mainboard) {
+              for (const card of player.mainboard) {
+                cardSet.add(card.scryfall_id);
+              }
+            }
+
+            if (player.sideboard) {
+              for (const card of player.sideboard) {
+                cardSet.add(card.scryfall_id);
+              }
+            }
+          }
+
+          await addCardsToCache([...cardSet]);
+
+          for (const player of data.players) {
+            if (player.current_pack) {
+              player.current_pack.forEach((card, index, array) => {
+                array[index] = {
+                  ...scryfallCardDataCache.current[card.scryfall_id],
+                  ...card
+                };
+              });
+            }
+
+            if (player.mainboard) {
+              player.mainboard.forEach((card, index, array) => {
+                array[index] = {
+                  ...scryfallCardDataCache.current[card.scryfall_id],
+                  ...card
+                };
+              });
+            }
+
+            if (player.sideboard) {
+              player.sideboard.forEach((card, index, array) => {
+                array[index] = {
+                  ...scryfallCardDataCache.current[card.scryfall_id],
+                  ...card
+                };
+              });
+            }
+          }
+
+          setEventState(data);
+        },
         headers: { EventID: eventState._id },
         load: true,
         operation: 'fetchEventByID',
@@ -178,7 +235,13 @@ export default function ContextualizedEventPage() {
         }
       });
     },
-    [eventQuery, eventState._id, sendRequest]
+    [
+      addCardsToCache,
+      eventQuery,
+      eventState._id,
+      scryfallCardDataCache,
+      sendRequest
+    ]
   );
 
   const removeBasics = React.useCallback(

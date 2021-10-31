@@ -197,7 +197,13 @@ export default function ContextualizedDeckPage() {
         }
       });
     },
-    [deckQuery, deckState._id, sendRequest]
+    [
+      addCardsToCache,
+      deckQuery,
+      deckState._id,
+      scryfallCardDataCache,
+      sendRequest
+    ]
   );
 
   const removeCardsFromDeck = React.useCallback(

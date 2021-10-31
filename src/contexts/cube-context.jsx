@@ -491,23 +491,56 @@ export default function ContextualizedCubePage() {
           data.mainboard.forEach((card, index, array) => {
             array[index] = {
               ...scryfallCardDataCache.current[card.scryfall_id],
-              ...card
+              _id: card._id,
+              notes: card.notes
             };
+
+            if (Number.isInteger(card.cmc)) {
+              array[index].cmc = card.cmc;
+            }
+            if (card.color_identity) {
+              array[index].color_identity = card.color_identity;
+            }
+            if (card.type_line) {
+              array[index].type_line = card.type_line;
+            }
           });
 
           data.sideboard.forEach((card, index, array) => {
             array[index] = {
               ...scryfallCardDataCache.current[card.scryfall_id],
-              ...card
+              _id: card._id,
+              notes: card.notes
             };
+
+            if (Number.isInteger(card.cmc)) {
+              array[index].cmc = card.cmc;
+            }
+            if (card.color_identity) {
+              array[index].color_identity = card.color_identity;
+            }
+            if (card.type_line) {
+              array[index].type_line = card.type_line;
+            }
           });
 
           for (const module of data.modules) {
             module.cards.forEach((card, index, array) => {
               array[index] = {
                 ...scryfallCardDataCache.current[card.scryfall_id],
-                ...card
+                _id: card._id,
+                notes: card.notes
               };
+
+              if (Number.isInteger(card.cmc)) {
+                array[index].cmc = card.cmc;
+              }
+              if (card.color_identity) {
+                array[index].color_identity = card.color_identity;
+              }
+              if (card.type_line) {
+                array[index].type_line = card.type_line;
+              }
             });
           }
 
@@ -515,8 +548,19 @@ export default function ContextualizedCubePage() {
             rotation.cards.forEach((card, index, array) => {
               array[index] = {
                 ...scryfallCardDataCache.current[card.scryfall_id],
-                ...card
+                _id: card._id,
+                notes: card.notes
               };
+
+              if (Number.isInteger(card.cmc)) {
+                array[index].cmc = card.cmc;
+              }
+              if (card.color_identity) {
+                array[index].color_identity = card.color_identity;
+              }
+              if (card.type_line) {
+                array[index].type_line = card.type_line;
+              }
             });
           }
 
@@ -547,15 +591,54 @@ export default function ContextualizedCubePage() {
     ]
   );
 
+  const updateCubeState = React.useCallback(
+    async function (data) {
+      if (data.change === 'addCardToCube') {
+        console.log('cock and balls');
+        await addCardsToCache([data.card.scryfall_id]);
+        setCubeState((prevState) => {
+          if (data.componentID === 'mainboard') {
+            return {
+              ...prevState,
+              mainboard: [
+                ...prevState.mainboard,
+                {
+                  ...scryfallCardDataCache.current[data.card.scryfall_id],
+                  ...data.card
+                }
+              ]
+            };
+          }
+
+          if (data.componentID === 'sideboard') {
+            return {
+              ...prevState,
+              sideboard: [
+                ...prevState.sideboard,
+                {
+                  ...scryfallCardDataCache.current[data.card.scryfall_id],
+                  ...data.card
+                }
+              ]
+            };
+          }
+        });
+      } else {
+        setCubeState(data);
+      }
+    },
+    [addCardsToCache, scryfallCardDataCache]
+  );
+
   React.useEffect(() => {
     requestSubscription({
       headers: { cubeID },
       queryString: cubeQuery,
       setup: fetchCubeByID,
       subscriptionType: 'subscribeCube',
-      update: setCubeState
+      update: updateCubeState
     });
-  }, [cubeID, cubeQuery, fetchCubeByID, requestSubscription]);
+  }, [cubeID, cubeQuery, fetchCubeByID, requestSubscription, updateCubeState]);
 
   return (
     <CubeContext.Provider
