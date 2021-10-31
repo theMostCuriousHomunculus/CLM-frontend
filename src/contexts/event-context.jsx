@@ -143,22 +143,7 @@ export default function ContextualizedEventPage() {
 
   const addBasics = React.useCallback(
     async function (
-      {
-        cmc,
-        collector_number,
-        color_identity,
-        image,
-        keywords,
-        mana_cost,
-        mtgo_id,
-        name,
-        oracle_id,
-        tcgplayer_id,
-        scryfall_id,
-        set,
-        set_name,
-        type_line
-      },
+      { name, oracle_id, scryfall_id },
       component,
       numberOfCopies
     ) {
@@ -170,34 +155,11 @@ export default function ContextualizedEventPage() {
             query: `
             mutation {
               ${this.operation}(
-                card: {
-                  cmc: ${cmc},
-                  collector_number: ${collector_number},
-                  color_identity: [${color_identity.map(
-                    (ci) => '"' + ci + '"'
-                  )}],
-                  image: "${image}",
-                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                  mana_cost: "${mana_cost}",
-                  ${
-                    Number.isInteger(mtgo_id)
-                      ? 'mtgo_id: ' + mtgo_id + ',\n'
-                      : ''
-                  }
-                  name: "${name}",
-                  oracle_id: "${oracle_id}",
-                  ${
-                    Number.isInteger(tcgplayer_id)
-                      ? 'tcgplayer_id: ' + tcgplayer_id + ',\n'
-                      : ''
-                  } 
-                  scryfall_id: "${scryfall_id}",
-                  set: "${set}",
-                  set_name: "${set_name}",
-                  type_line: "${type_line}"
-                },
                 component: ${component},
-                numberOfCopies: ${numberOfCopies}
+                name: "${name}",
+                numberOfCopies: ${numberOfCopies},
+                oracle_id: "${oracle_id}",
+                scryfall_id: "${scryfall_id}"
               ) {
                 _id
               }

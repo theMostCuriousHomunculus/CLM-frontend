@@ -183,23 +183,7 @@ export default function ContextualizedCubePage() {
   }, [cubeState, displayState, filterCards]);
 
   const addCardToCube = React.useCallback(
-    async function ({
-      back_image,
-      cmc,
-      collector_number,
-      color_identity,
-      image,
-      keywords,
-      mana_cost,
-      mtgo_id,
-      name,
-      oracle_id,
-      scryfall_id,
-      set,
-      set_name,
-      tcgplayer_id,
-      type_line
-    }) {
+    async function ({ name, oracle_id, scryfall_id }) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
         operation: 'addCardToCube',
@@ -209,31 +193,9 @@ export default function ContextualizedCubePage() {
             mutation {
               ${this.operation}(
                 componentID: "${activeComponentState._id}",
-                card: {
-                  ${back_image ? 'back_image: "' + back_image + '",' : ''}
-                  cmc: ${cmc},
-                  collector_number: ${collector_number},
-                  color_identity: [${color_identity.map(
-                    (ci) => '"' + ci + '"'
-                  )}],
-                  image: "${image}",
-                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                  mana_cost: "${mana_cost}",
-                  ${
-                    Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''
-                  }
-                  name: "${name}",
-                  oracle_id: "${oracle_id}",
-                  scryfall_id: "${scryfall_id}",
-                  set: "${set}",
-                  set_name: "${set_name}",
-                  ${
-                    Number.isInteger(tcgplayer_id)
-                      ? 'tcgplayer_id: ' + tcgplayer_id + ','
-                      : ''
-                  }
-                  type_line: "${type_line}"
-                }
+                name: "${name}",
+                oracle_id: "${oracle_id}",
+                scryfall_id: "${scryfall_id}"
               ) {
                 _id
               }
