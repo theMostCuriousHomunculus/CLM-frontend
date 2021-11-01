@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 
-import populateScryfallData from './functions/populate-scryfall-data';
+import cacheScryfallData from './functions/cache-scryfall-data';
 import useRequest from './hooks/request-hook';
 import ErrorDialog from './components/miscellaneous/ErrorDialog';
 import Footer from './components/miscellaneous/Footer';
@@ -85,8 +85,9 @@ export default function App() {
           },
           callback: async (data) => {
             for (const card of data.data) {
-              scryfallCardDataCache.current[card.id] =
-                await populateScryfallData(card);
+              scryfallCardDataCache.current[card.id] = await cacheScryfallData(
+                card
+              );
             }
           },
           url: 'https://api.scryfall.com/cards/collection'

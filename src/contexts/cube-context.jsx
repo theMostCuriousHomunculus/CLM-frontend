@@ -1,6 +1,7 @@
 import React, { createContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Cube from '../pages/Cube';
@@ -59,8 +60,7 @@ export default function ContextualizedCubePage() {
     size: null
   });
   const { cubeID } = useParams();
-  const { addCardsToCache, scryfallCardDataCache } =
-    React.useContext(CardCacheContext);
+  const { addCardsToCache } = React.useContext(CardCacheContext);
   const [cubeState, setCubeState] = React.useState({
     _id: cubeID,
     creator: {
@@ -120,6 +120,7 @@ export default function ContextualizedCubePage() {
       ${cardQuery}
     }
   `;
+  const { populateCachedScryfallData } = usePopulate();
   const { loading, sendRequest } = useRequest();
   const { requestSubscription } = useSubscribe();
 
@@ -172,6 +173,49 @@ export default function ContextualizedCubePage() {
 
     setActiveComponentState(state);
   }, [cubeState, displayState, filterCards]);
+
+  const updateCubeState = React.useCallback(
+    async function (data) {
+      const cardSet = new Set();
+
+      for (const card of data.mainboard) {
+        cardSet.add(card.scryfall_id);
+      }
+
+      for (const card of data.sideboard) {
+        cardSet.add(card.scryfall_id);
+      }
+
+      for (const module of data.modules) {
+        for (const card of module.cards) {
+          cardSet.add(card.scryfall_id);
+        }
+      }
+
+      for (const rotation of data.rotations) {
+        for (const card of rotation.cards) {
+          cardSet.add(card.scryfall_id);
+        }
+      }
+
+      await addCardsToCache([...cardSet]);
+
+      data.mainboard.forEach(populateCachedScryfallData);
+
+      data.sideboard.forEach(populateCachedScryfallData);
+
+      for (const module of data.modules) {
+        module.cards.forEach(populateCachedScryfallData);
+      }
+
+      for (const rotation of data.rotations) {
+        rotation.cards.forEach(populateCachedScryfallData);
+      }
+
+      setCubeState(data);
+    },
+    [addCardsToCache, populateCachedScryfallData]
+  );
 
   const addCardToCube = React.useCallback(
     async function ({ name, scryfall_id }) {
@@ -463,109 +507,7 @@ export default function ContextualizedCubePage() {
   const fetchCubeByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: async function (data) {
-          const cardSet = new Set();
-
-          for (const card of data.mainboard) {
-            cardSet.add(card.scryfall_id);
-          }
-
-          for (const card of data.sideboard) {
-            cardSet.add(card.scryfall_id);
-          }
-
-          for (const module of data.modules) {
-            for (const card of module.cards) {
-              cardSet.add(card.scryfall_id);
-            }
-          }
-
-          for (const rotation of data.rotations) {
-            for (const card of rotation.cards) {
-              cardSet.add(card.scryfall_id);
-            }
-          }
-
-          await addCardsToCache([...cardSet]);
-
-          data.mainboard.forEach((card, index, array) => {
-            array[index] = {
-              ...scryfallCardDataCache.current[card.scryfall_id],
-              _id: card._id,
-              notes: card.notes
-            };
-
-            if (Number.isInteger(card.cmc)) {
-              array[index].cmc = card.cmc;
-            }
-            if (card.color_identity) {
-              array[index].color_identity = card.color_identity;
-            }
-            if (card.type_line) {
-              array[index].type_line = card.type_line;
-            }
-          });
-
-          data.sideboard.forEach((card, index, array) => {
-            array[index] = {
-              ...scryfallCardDataCache.current[card.scryfall_id],
-              _id: card._id,
-              notes: card.notes
-            };
-
-            if (Number.isInteger(card.cmc)) {
-              array[index].cmc = card.cmc;
-            }
-            if (card.color_identity) {
-              array[index].color_identity = card.color_identity;
-            }
-            if (card.type_line) {
-              array[index].type_line = card.type_line;
-            }
-          });
-
-          for (const module of data.modules) {
-            module.cards.forEach((card, index, array) => {
-              array[index] = {
-                ...scryfallCardDataCache.current[card.scryfall_id],
-                _id: card._id,
-                notes: card.notes
-              };
-
-              if (Number.isInteger(card.cmc)) {
-                array[index].cmc = card.cmc;
-              }
-              if (card.color_identity) {
-                array[index].color_identity = card.color_identity;
-              }
-              if (card.type_line) {
-                array[index].type_line = card.type_line;
-              }
-            });
-          }
-
-          for (const rotation of data.rotations) {
-            rotation.cards.forEach((card, index, array) => {
-              array[index] = {
-                ...scryfallCardDataCache.current[card.scryfall_id],
-                _id: card._id,
-                notes: card.notes
-              };
-
-              if (Number.isInteger(card.cmc)) {
-                array[index].cmc = card.cmc;
-              }
-              if (card.color_identity) {
-                array[index].color_identity = card.color_identity;
-              }
-              if (card.type_line) {
-                array[index].type_line = card.type_line;
-              }
-            });
-          }
-
-          setCubeState(data);
-        },
+        callback: updateCubeState,
         headers: { CubeID: cubeState._id },
         load: true,
         operation: 'fetchCubeByID',
@@ -582,52 +524,7 @@ export default function ContextualizedCubePage() {
         }
       });
     },
-    [
-      addCardsToCache,
-      cubeQuery,
-      cubeState._id,
-      scryfallCardDataCache,
-      sendRequest
-    ]
-  );
-
-  const updateCubeState = React.useCallback(
-    async function (data) {
-      if (data.change === 'addCardToCube') {
-        console.log('cock and balls');
-        await addCardsToCache([data.card.scryfall_id]);
-        setCubeState((prevState) => {
-          if (data.componentID === 'mainboard') {
-            return {
-              ...prevState,
-              mainboard: [
-                ...prevState.mainboard,
-                {
-                  ...scryfallCardDataCache.current[data.card.scryfall_id],
-                  ...data.card
-                }
-              ]
-            };
-          }
-
-          if (data.componentID === 'sideboard') {
-            return {
-              ...prevState,
-              sideboard: [
-                ...prevState.sideboard,
-                {
-                  ...scryfallCardDataCache.current[data.card.scryfall_id],
-                  ...data.card
-                }
-              ]
-            };
-          }
-        });
-      } else {
-        setCubeState(data);
-      }
-    },
-    [addCardsToCache, scryfallCardDataCache]
+    [cubeQuery, cubeState._id, sendRequest, updateCubeState]
   );
 
   React.useEffect(() => {
