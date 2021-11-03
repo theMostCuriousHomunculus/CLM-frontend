@@ -51,7 +51,7 @@ export default function BudAccordion() {
     accountState: { buds, received_bud_requests, sent_bud_requests },
     editAccount
   } = React.useContext(AccountContext);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const [budToDelete, setBudToDelete] = React.useState({
     _id: null,
     avatar: null,
@@ -128,7 +128,7 @@ export default function BudAccordion() {
           <MUITypography>Buds ({buds.length})</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails style={{ display: 'block' }}>
-          {accountID === userId && (
+          {accountID === userID && (
             <React.Fragment>
               <MUIListSubheader component="div" id="aspiring-buds">
                 Aspiring
@@ -260,7 +260,7 @@ export default function BudAccordion() {
           <MUIList className={classes.budList}>
             {customSort(buds, ['name']).map((bud) => (
               <MUIListItem key={bud._id}>
-                {accountID === userId ? (
+                {accountID === userID ? (
                   <MUIBadge
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     badgeContent={

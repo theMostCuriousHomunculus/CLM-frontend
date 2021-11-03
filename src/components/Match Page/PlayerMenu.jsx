@@ -160,7 +160,7 @@ export default function PlayerMenu({
         Search Library
       </MUIMenuItem>
 
-      {clickedPlayer._id === authentication.userId && (
+      {clickedPlayer._id === authentication.userID && (
         <MUIMenuItem
           onClick={() => {
             setClickedPlayer((prevState) => ({

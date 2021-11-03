@@ -25,7 +25,7 @@ import { DeckContext } from '../../contexts/deck-context';
 import { CSVLink } from 'react-csv';
 
 export default function DeckInfo() {
-  const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
   const {
     deckState: { creator, description, format, mainboard, name, sideboard },
     cloneDeck,
@@ -69,7 +69,7 @@ export default function DeckInfo() {
             <MUIFormControl variant="outlined">
               <MUIInputLabel htmlFor="format-selector">Format</MUIInputLabel>
               <MUISelect
-                disabled={creator._id !== userId}
+                disabled={creator._id !== userID}
                 fullWidth
                 label="Format"
                 native
@@ -97,7 +97,7 @@ export default function DeckInfo() {
           }
           title={
             <MUITextField
-              disabled={creator._id !== userId}
+              disabled={creator._id !== userID}
               inputProps={{
                 onBlur: () => editDeck(descriptionInput, format, nameInput)
               }}
@@ -128,7 +128,7 @@ export default function DeckInfo() {
 
         <MUICardContent>
           <MUITextField
-            disabled={creator._id !== userId}
+            disabled={creator._id !== userID}
             fullWidth={true}
             inputProps={{
               onBlur: () => editDeck(descriptionInput, format, nameInput)

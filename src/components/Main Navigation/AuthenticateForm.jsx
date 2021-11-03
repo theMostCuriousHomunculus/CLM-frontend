@@ -8,10 +8,8 @@ import MUITextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import useRequest from '../../hooks/request-hook';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/authentication-context';
-import { ErrorContext } from '../../contexts/error-context';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {
@@ -23,127 +21,27 @@ const useStyles = makeStyles({
 });
 
 export default function AuthenticateForm({ open, toggleOpen }) {
-  const { login } = React.useContext(AuthenticationContext);
-  const { loading, sendRequest } = useRequest();
-  const { setErrorMessages } = React.useContext(ErrorContext);
+  const { loading, login, register, requestPasswordReset } = React.useContext(
+    AuthenticationContext
+  );
   const classes = useStyles();
   const [mode, setMode] = React.useState('Login');
   const [emailInput, setEmailInput] = React.useState();
   const [nameInput, setNameInput] = React.useState();
   const [passwordInput, setPasswordInput] = React.useState();
 
-  async function handleLogin() {
-    await sendRequest({
-      callback: (data) => {
-        login(data.isAdmin, data.token, data.userId);
-        toggleOpen();
-      },
-      load: true,
-      operation: 'login',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                email: "${emailInput}",
-                password: "${passwordInput}"
-              ) {
-                isAdmin
-                token
-                userId
-              }
-            }
-          `
-        };
-      }
-    });
-  }
-
-  async function handleRegister() {
-    const avatar = {};
-
-    await sendRequest({
-      callback: (data) => {
-        avatar.prints_search_uri = data.prints_search_uri;
-      },
-      load: true,
-      method: 'GET',
-      url: 'https://api.scryfall.com/cards/random'
-    });
-
-    await sendRequest({
-      callback: (data) => {
-        avatar.printings = data.data;
-      },
-      load: true,
-      method: 'GET',
-      url: avatar.prints_search_uri
-    });
-
-    const randomIndex = Math.floor(Math.random() * avatar.printings.length);
-
-    await sendRequest({
-      callback: (data) => {
-        login(false, data.token, data.userId);
-        toggleOpen();
-      },
-      load: true,
-      operation: 'register',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                avatar: "${avatar.printings[randomIndex].image_uris.art_crop}",
-                email: "${emailInput}",
-                name: "${nameInput}",
-                password: "${passwordInput}"
-              ) {
-                token
-                userId
-              }
-            }
-          `
-        };
-      }
-    });
-  }
-
-  async function handleRequestPasswordReset() {
-    await sendRequest({
-      callback: () => {
-        setErrorMessages((prevState) => {
-          return [
-            ...prevState,
-            'A link to reset your password has been sent.  Please check your email inbox and your spam folder.'
-          ];
-        });
-        toggleOpen();
-      },
-      load: true,
-      operation: 'requestPasswordReset',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(email: "${emailInput}")
-            }
-          `
-        };
-      }
-    });
-  }
-
   function submitForm(event) {
     event.preventDefault();
 
     if (mode === 'Login') {
-      handleLogin();
+      login(emailInput, passwordInput);
     } else if (mode === 'Register') {
-      handleRegister();
+      register(emailInput, nameInput, passwordInput);
     } else {
-      handleRequestPasswordReset();
+      requestPasswordReset(emailInput);
     }
+
+    toggleOpen();
   }
 
   return (

@@ -27,7 +27,7 @@ const useStyles = makeStyles({
 });
 
 export default function Match() {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [clickedPlayer, setClickedPlayer] = React.useState({
     _id: null,
@@ -59,7 +59,7 @@ export default function Match() {
     shuffleLibrary,
     tapUntapCards
   } = React.useContext(MatchContext);
-  const participant = bottomPlayerState.account._id === userId;
+  const participant = bottomPlayerState.account._id === userID;
   const [rightClickedCard, setRightClickedCard] = React.useState({
     _id: null,
     anchorElement: null,

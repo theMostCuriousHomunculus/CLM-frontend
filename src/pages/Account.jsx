@@ -40,7 +40,7 @@ const useStyles = makeStyles({
 
 export default function Account() {
   const { accountID } = useParams();
-  const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
   const {
     loading,
     accountState: {
@@ -76,7 +76,7 @@ export default function Account() {
           title={
             <MUITextField
               autoComplete="off"
-              disabled={accountID !== userId}
+              disabled={accountID !== userID}
               inputProps={{
                 onBlur: (event) => editAccount(`name: "${event.target.value}"`)
               }}
@@ -93,14 +93,14 @@ export default function Account() {
             />
           }
           subheader={
-            accountID === userId && (
+            accountID === userID && (
               <MUITypography color="textSecondary" variant="subtitle1">
                 {email}
               </MUITypography>
             )
           }
         />
-        {accountID === userId && (
+        {accountID === userID && (
           <MUICardActions>
             <ScryfallRequest
               buttonText="Change Avatar"
@@ -112,11 +112,11 @@ export default function Account() {
           </MUICardActions>
         )}
         {isLoggedIn &&
-          accountID !== userId &&
-          buds.filter((bud) => bud._id === userId).length === 0 &&
-          received_bud_requests.filter((request) => request._id === userId)
+          accountID !== userID &&
+          buds.filter((bud) => bud._id === userID).length === 0 &&
+          received_bud_requests.filter((request) => request._id === userID)
             .length === 0 &&
-          sent_bud_requests.filter((request) => request._id === userId)
+          sent_bud_requests.filter((request) => request._id === userID)
             .length === 0 && (
             // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
             <MUICardActions>

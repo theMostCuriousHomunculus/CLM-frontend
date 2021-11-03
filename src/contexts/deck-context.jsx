@@ -1,13 +1,14 @@
 import React, { createContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Deck from '../pages/Deck';
+import { CardCacheContext } from './card-cache-context';
 
 export const DeckContext = createContext({
   loading: false,
-  deckQuery: '',
   deckState: {
     _id: null,
     creator: {
@@ -21,11 +22,9 @@ export const DeckContext = createContext({
     name: null,
     sideboard: []
   },
-  setDeckState: () => null,
   addCardsToDeck: () => null,
   cloneDeck: () => null,
   editDeck: () => null,
-  fetchDeckByID: () => null,
   removeCardsFromDeck: () => null,
   toggleMainboardSideboardDeck: () => null
 });
@@ -33,6 +32,7 @@ export const DeckContext = createContext({
 export default function ContextualizedDeckPage() {
   const history = useHistory();
   const { deckID } = useParams();
+  const { addCardsToCache } = React.useContext(CardCacheContext);
   const [deckState, setDeckState] = React.useState({
     _id: deckID,
     creator: {
@@ -48,21 +48,7 @@ export default function ContextualizedDeckPage() {
   });
   const cardQuery = `
     _id
-    back_image
-    cmc
-    collector_number
-    color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
-    name
-    oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
-    type_line
   `;
   const deckQuery = `
     _id
@@ -82,30 +68,34 @@ export default function ContextualizedDeckPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+  const { populateCachedScryfallData } = usePopulate();
   const { requestSubscription } = useSubscribe();
 
+  const updateDeckState = React.useCallback(
+    async function (data) {
+      const cardSet = new Set();
+
+      for (const card of data.mainboard) {
+        cardSet.add(card.scryfall_id);
+      }
+
+      for (const card of data.sideboard) {
+        cardSet.add(card.scryfall_id);
+      }
+
+      await addCardsToCache([...cardSet]);
+
+      data.mainboard.forEach(populateCachedScryfallData);
+
+      data.sideboard.forEach(populateCachedScryfallData);
+
+      setDeckState(data);
+    },
+    [addCardsToCache, populateCachedScryfallData]
+  );
+
   const addCardsToDeck = React.useCallback(
-    async function (
-      {
-        back_image,
-        cmc,
-        collector_number,
-        color_identity,
-        image,
-        keywords,
-        mana_cost,
-        mtgo_id,
-        name,
-        oracle_id,
-        tcgplayer_id,
-        scryfall_id,
-        set,
-        set_name,
-        type_line
-      },
-      component,
-      numberOfCopies
-    ) {
+    async function ({ name, scryfall_id }, component, numberOfCopies) {
       await sendRequest({
         headers: { DeckID: deckState._id },
         operation: 'addCardsToDeck',
@@ -114,35 +104,10 @@ export default function ContextualizedDeckPage() {
             query: `
             mutation {
               ${this.operation}(
-                card: {
-                  ${back_image ? 'back_image: "' + back_image + '",\n' : ''}
-                  cmc: ${cmc},
-                  collector_number: ${collector_number},
-                  color_identity: [${color_identity.map(
-                    (ci) => '"' + ci + '"'
-                  )}],
-                  image: "${image}",
-                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                  mana_cost: "${mana_cost}",
-                  ${
-                    Number.isInteger(mtgo_id)
-                      ? 'mtgo_id: ' + mtgo_id + ',\n'
-                      : ''
-                  }
-                  name: "${name}",
-                  oracle_id: "${oracle_id}",
-                  ${
-                    Number.isInteger(tcgplayer_id)
-                      ? 'tcgplayer_id: ' + tcgplayer_id + ',\n'
-                      : ''
-                  } 
-                  scryfall_id: "${scryfall_id}",
-                  set: "${set}",
-                  set_name: "${set_name}",
-                  type_line: "${type_line}"
-                },
                 component: ${component},
-                numberOfCopies: ${numberOfCopies}
+                name: "${name}",
+                numberOfCopies: ${numberOfCopies},
+                scryfall_id: "${scryfall_id}"
               ) {
                 _id
               }
@@ -209,7 +174,7 @@ export default function ContextualizedDeckPage() {
   const fetchDeckByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: (data) => setDeckState(data),
+        callback: updateDeckState,
         headers: { DeckID: deckState._id },
         load: true,
         operation: 'fetchDeckByID',
@@ -226,7 +191,7 @@ export default function ContextualizedDeckPage() {
         }
       });
     },
-    [deckQuery, deckState._id, sendRequest]
+    [deckQuery, deckState._id, sendRequest, updateDeckState]
   );
 
   const removeCardsFromDeck = React.useCallback(
@@ -280,21 +245,18 @@ export default function ContextualizedDeckPage() {
       queryString: deckQuery,
       setup: fetchDeckByID,
       subscriptionType: 'subscribeDeck',
-      update: setDeckState
+      update: updateDeckState
     });
-  }, [deckID, deckQuery, fetchDeckByID, requestSubscription]);
+  }, [deckID, deckQuery, fetchDeckByID, requestSubscription, updateDeckState]);
 
   return (
     <DeckContext.Provider
       value={{
         loading,
-        deckQuery,
         deckState,
-        setDeckState,
         addCardsToDeck,
         cloneDeck,
         editDeck,
-        fetchDeckByID,
         removeCardsFromDeck,
         toggleMainboardSideboardDeck
       }}

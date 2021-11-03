@@ -1,9 +1,11 @@
 import React, { createContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Cube from '../pages/Cube';
+import { CardCacheContext } from './card-cache-context';
 
 export const CubeContext = createContext({
   loading: false,
@@ -14,7 +16,6 @@ export const CubeContext = createContext({
     name: 'Mainboard',
     size: null
   },
-  cubeQuery: '',
   cubeState: {
     _id: null,
     creator: {
@@ -34,7 +35,6 @@ export const CubeContext = createContext({
     activeComponentID: null,
     filter: ''
   },
-  setCubeState: () => null,
   setDisplayState: () => null,
   addCardToCube: () => null,
   cloneCube: () => null,
@@ -46,8 +46,7 @@ export const CubeContext = createContext({
   editCard: () => null,
   editCube: () => null,
   editModule: () => null,
-  editRotation: () => null,
-  fetchCubeByID: () => null
+  editRotation: () => null
 });
 
 export default function ContextualizedCubePage() {
@@ -60,6 +59,7 @@ export default function ContextualizedCubePage() {
     size: null
   });
   const { cubeID } = useParams();
+  const { addCardsToCache } = React.useContext(CardCacheContext);
   const [cubeState, setCubeState] = React.useState({
     _id: cubeID,
     creator: {
@@ -80,21 +80,10 @@ export default function ContextualizedCubePage() {
   });
   const cardQuery = `
     _id
-    back_image
     cmc
-    collector_number
     color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
-    name
     notes
-    oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
     type_line
   `;
   const cubeQuery = `
@@ -129,6 +118,7 @@ export default function ContextualizedCubePage() {
       ${cardQuery}
     }
   `;
+  const { populateCachedScryfallData } = usePopulate();
   const { loading, sendRequest } = useRequest();
   const { requestSubscription } = useSubscribe();
 
@@ -182,24 +172,51 @@ export default function ContextualizedCubePage() {
     setActiveComponentState(state);
   }, [cubeState, displayState, filterCards]);
 
+  const updateCubeState = React.useCallback(
+    async function (data) {
+      const cardSet = new Set();
+
+      for (const card of data.mainboard) {
+        cardSet.add(card.scryfall_id);
+      }
+
+      for (const card of data.sideboard) {
+        cardSet.add(card.scryfall_id);
+      }
+
+      for (const module of data.modules) {
+        for (const card of module.cards) {
+          cardSet.add(card.scryfall_id);
+        }
+      }
+
+      for (const rotation of data.rotations) {
+        for (const card of rotation.cards) {
+          cardSet.add(card.scryfall_id);
+        }
+      }
+
+      await addCardsToCache([...cardSet]);
+
+      data.mainboard.forEach(populateCachedScryfallData);
+
+      data.sideboard.forEach(populateCachedScryfallData);
+
+      for (const module of data.modules) {
+        module.cards.forEach(populateCachedScryfallData);
+      }
+
+      for (const rotation of data.rotations) {
+        rotation.cards.forEach(populateCachedScryfallData);
+      }
+
+      setCubeState(data);
+    },
+    [addCardsToCache, populateCachedScryfallData]
+  );
+
   const addCardToCube = React.useCallback(
-    async function ({
-      back_image,
-      cmc,
-      collector_number,
-      color_identity,
-      image,
-      keywords,
-      mana_cost,
-      mtgo_id,
-      name,
-      oracle_id,
-      scryfall_id,
-      set,
-      set_name,
-      tcgplayer_id,
-      type_line
-    }) {
+    async function ({ name, scryfall_id }) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
         operation: 'addCardToCube',
@@ -209,31 +226,8 @@ export default function ContextualizedCubePage() {
             mutation {
               ${this.operation}(
                 componentID: "${activeComponentState._id}",
-                card: {
-                  ${back_image ? 'back_image: "' + back_image + '",' : ''}
-                  cmc: ${cmc},
-                  collector_number: ${collector_number},
-                  color_identity: [${color_identity.map(
-                    (ci) => '"' + ci + '"'
-                  )}],
-                  image: "${image}",
-                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                  mana_cost: "${mana_cost}",
-                  ${
-                    Number.isInteger(mtgo_id) ? 'mtgo_id: ' + mtgo_id + ',' : ''
-                  }
-                  name: "${name}",
-                  oracle_id: "${oracle_id}",
-                  scryfall_id: "${scryfall_id}",
-                  set: "${set}",
-                  set_name: "${set_name}",
-                  ${
-                    Number.isInteger(tcgplayer_id)
-                      ? 'tcgplayer_id: ' + tcgplayer_id + ','
-                      : ''
-                  }
-                  type_line: "${type_line}"
-                }
+                name: "${name}",
+                scryfall_id: "${scryfall_id}"
               ) {
                 _id
               }
@@ -511,7 +505,7 @@ export default function ContextualizedCubePage() {
   const fetchCubeByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: (data) => setCubeState(data),
+        callback: updateCubeState,
         headers: { CubeID: cubeState._id },
         load: true,
         operation: 'fetchCubeByID',
@@ -528,7 +522,7 @@ export default function ContextualizedCubePage() {
         }
       });
     },
-    [cubeQuery, cubeState._id, sendRequest]
+    [cubeQuery, cubeState._id, sendRequest, updateCubeState]
   );
 
   React.useEffect(() => {
@@ -537,19 +531,17 @@ export default function ContextualizedCubePage() {
       queryString: cubeQuery,
       setup: fetchCubeByID,
       subscriptionType: 'subscribeCube',
-      update: setCubeState
+      update: updateCubeState
     });
-  }, [cubeID, cubeQuery, fetchCubeByID, requestSubscription]);
+  }, [cubeID, cubeQuery, fetchCubeByID, requestSubscription, updateCubeState]);
 
   return (
     <CubeContext.Provider
       value={{
         loading,
-        cubeQuery,
         activeComponentState,
         cubeState,
         displayState,
-        setCubeState,
         setDisplayState,
         addCardToCube,
         cloneCube,
@@ -561,8 +553,7 @@ export default function ContextualizedCubePage() {
         editCard,
         editCube,
         editModule,
-        editRotation,
-        fetchCubeByID
+        editRotation
       }}
     >
       <Cube />

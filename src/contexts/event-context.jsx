@@ -1,14 +1,15 @@
 import React, { createContext } from 'react';
 import { useParams } from 'react-router-dom';
 
+import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
 import { AuthenticationContext } from './authentication-context';
+import { CardCacheContext } from './card-cache-context';
 
 export const EventContext = createContext({
   loading: false,
-  eventQuery: '',
   eventState: {
     _id: null,
     finished: false,
@@ -41,18 +42,17 @@ export const EventContext = createContext({
     mainboard: [],
     sideboard: []
   },
-  setEventState: () => null,
   setMyState: () => null,
   addBasics: () => null,
-  fetchEventByID: () => null,
   removeBasics: () => null,
   selectCard: () => null,
   toggleMainboardSideboardEvent: () => null
 });
 
 export default function ContextualizedEventPage() {
-  const { userId } = React.useContext(AuthenticationContext);
   const { eventID } = useParams();
+  const { addCardsToCache } = React.useContext(CardCacheContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const [eventState, setEventState] = React.useState({
     _id: eventID,
     finished: false,
@@ -65,7 +65,7 @@ export default function ContextualizedEventPage() {
     players: [
       {
         account: {
-          _id: userId,
+          _id: userID,
           avatar: null,
           name: '...'
         },
@@ -77,7 +77,7 @@ export default function ContextualizedEventPage() {
   });
   const [myState, setMyState] = React.useState({
     account: {
-      _id: userId,
+      _id: userID,
       avatar: null,
       name: null
     },
@@ -87,21 +87,7 @@ export default function ContextualizedEventPage() {
   });
   const cardQuery = `
     _id
-    back_image
-    cmc
-    collector_number
-    color_identity
-    image
-    keywords
-    mana_cost
-    mtgo_id
-    name
-    oracle_id
     scryfall_id
-    set
-    set_name
-    tcgplayer_id
-    type_line
   `;
   const eventQuery = `
     _id
@@ -128,10 +114,11 @@ export default function ContextualizedEventPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+  const { populateCachedScryfallData } = usePopulate();
   const { requestSubscription } = useSubscribe();
 
   React.useEffect(() => {
-    const me = eventState.players.find((plr) => plr.account._id === userId);
+    const me = eventState.players.find((plr) => plr.account._id === userID);
     const updateNeeded =
       (me.current_pack ? me.current_pack.length : -1) !==
         (myState.current_pack ? myState.current_pack.length : -1) ||
@@ -139,26 +126,56 @@ export default function ContextualizedEventPage() {
       me.sideboard.length !== myState.sideboard.length;
 
     if (updateNeeded) setMyState(me);
-  }, [eventState, myState, userId]);
+  }, [eventState, myState, userID]);
+
+  const updateEventState = React.useCallback(
+    async function (data) {
+      const cardSet = new Set();
+
+      for (const player of data.players) {
+        if (player.current_pack) {
+          for (const card of player.current_pack) {
+            cardSet.add(card.scryfall_id);
+          }
+        }
+
+        if (player.mainboard) {
+          for (const card of player.mainboard) {
+            cardSet.add(card.scryfall_id);
+          }
+        }
+
+        if (player.sideboard) {
+          for (const card of player.sideboard) {
+            cardSet.add(card.scryfall_id);
+          }
+        }
+      }
+
+      await addCardsToCache([...cardSet]);
+
+      for (const player of data.players) {
+        if (player.current_pack) {
+          player.current_pack.forEach(populateCachedScryfallData);
+        }
+
+        if (player.mainboard) {
+          player.mainboard.forEach(populateCachedScryfallData);
+        }
+
+        if (player.sideboard) {
+          player.sideboard.forEach(populateCachedScryfallData);
+        }
+      }
+
+      setEventState(data);
+    },
+    [addCardsToCache, populateCachedScryfallData]
+  );
 
   const addBasics = React.useCallback(
     async function (
-      {
-        cmc,
-        collector_number,
-        color_identity,
-        image,
-        keywords,
-        mana_cost,
-        mtgo_id,
-        name,
-        oracle_id,
-        tcgplayer_id,
-        scryfall_id,
-        set,
-        set_name,
-        type_line
-      },
+      { name, oracle_id, scryfall_id },
       component,
       numberOfCopies
     ) {
@@ -170,34 +187,11 @@ export default function ContextualizedEventPage() {
             query: `
             mutation {
               ${this.operation}(
-                card: {
-                  cmc: ${cmc},
-                  collector_number: ${collector_number},
-                  color_identity: [${color_identity.map(
-                    (ci) => '"' + ci + '"'
-                  )}],
-                  image: "${image}",
-                  keywords: [${keywords.map((kw) => '"' + kw + '"')}],
-                  mana_cost: "${mana_cost}",
-                  ${
-                    Number.isInteger(mtgo_id)
-                      ? 'mtgo_id: ' + mtgo_id + ',\n'
-                      : ''
-                  }
-                  name: "${name}",
-                  oracle_id: "${oracle_id}",
-                  ${
-                    Number.isInteger(tcgplayer_id)
-                      ? 'tcgplayer_id: ' + tcgplayer_id + ',\n'
-                      : ''
-                  } 
-                  scryfall_id: "${scryfall_id}",
-                  set: "${set}",
-                  set_name: "${set_name}",
-                  type_line: "${type_line}"
-                },
                 component: ${component},
-                numberOfCopies: ${numberOfCopies}
+                name: "${name}",
+                numberOfCopies: ${numberOfCopies},
+                oracle_id: "${oracle_id}",
+                scryfall_id: "${scryfall_id}"
               ) {
                 _id
               }
@@ -213,7 +207,7 @@ export default function ContextualizedEventPage() {
   const fetchEventByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: (data) => setEventState(data),
+        callback: updateEventState,
         headers: { EventID: eventState._id },
         load: true,
         operation: 'fetchEventByID',
@@ -230,7 +224,7 @@ export default function ContextualizedEventPage() {
         }
       });
     },
-    [eventQuery, eventState._id, sendRequest]
+    [eventQuery, eventState._id, sendRequest, updateEventState]
   );
 
   const removeBasics = React.useCallback(
@@ -305,21 +299,24 @@ export default function ContextualizedEventPage() {
       queryString: eventQuery,
       setup: fetchEventByID,
       subscriptionType: 'subscribeEvent',
-      update: setEventState
+      update: updateEventState
     });
-  }, [eventID, eventQuery, fetchEventByID, requestSubscription]);
+  }, [
+    eventID,
+    eventQuery,
+    fetchEventByID,
+    requestSubscription,
+    updateEventState
+  ]);
 
   return (
     <EventContext.Provider
       value={{
         loading,
-        eventQuery,
         eventState,
         myState,
-        setEventState,
         setMyState,
         addBasics,
-        fetchEventByID,
         removeBasics,
         selectCard,
         toggleMainboardSideboardEvent

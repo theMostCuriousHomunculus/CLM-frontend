@@ -10,17 +10,17 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { CubeContext } from '../contexts/cube-context';
 
 export default function Cube() {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const { loading, activeComponentState, cubeState, addCardToCube } =
     React.useContext(CubeContext);
   const [editable, setEditable] = React.useState(
-    cubeState.creator._id === userId
+    cubeState.creator._id === userID
   );
   const [selectedCard, setSelectedCard] = React.useState();
 
   React.useEffect(() => {
-    setEditable(cubeState.creator._id === userId);
-  }, [cubeState.creator._id, userId]);
+    setEditable(cubeState.creator._id === userID);
+  }, [cubeState.creator._id, userID]);
 
   return loading ? (
     <LoadingSpinner />

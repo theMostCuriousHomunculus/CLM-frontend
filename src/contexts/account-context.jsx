@@ -322,9 +322,7 @@ export default function ContextualizedAccountPage() {
   const editAccount = React.useCallback(
     async function (changes) {
       await sendRequest({
-        callback: (data) => {
-          setAccountState(data);
-        },
+        callback: setAccountState,
         operation: 'editAccount',
         get body() {
           return {
@@ -349,7 +347,7 @@ export default function ContextualizedAccountPage() {
   const fetchAccountByID = React.useCallback(
     async function () {
       await sendRequest({
-        callback: (data) => setAccountState(data),
+        callback: setAccountState,
         load: true,
         operation: 'fetchAccountByID',
         get body() {

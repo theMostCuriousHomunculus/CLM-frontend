@@ -34,7 +34,7 @@ import { AuthenticationContext } from '../../contexts/authentication-context';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function Dashboard() {
-  const { isLoggedIn, userId } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
   const {
     activeComponentState,
     cubeState: {
@@ -126,7 +126,7 @@ export default function Dashboard() {
                   {!['mainboard', 'sideboard'].includes(
                     activeComponentState._id
                   ) &&
-                    userId === creator._id && (
+                    userID === creator._id && (
                       <MUIIconButton
                         aria-label="edit component name"
                         color="primary"
@@ -212,7 +212,7 @@ export default function Dashboard() {
 
               {Number.isInteger(activeComponentState.size) && (
                 <MUITextField
-                  disabled={userId !== creator._id}
+                  disabled={userID !== creator._id}
                   label="Rotation Size"
                   inputProps={{
                     max: activeComponentState.maxSize,
@@ -225,7 +225,7 @@ export default function Dashboard() {
                   style={{
                     marginLeft:
                       !editingComponentName &&
-                      userId === creator._id &&
+                      userID === creator._id &&
                       !['mainboard', 'sideboard'].includes(
                         activeComponentState._id
                       )
@@ -245,7 +245,7 @@ export default function Dashboard() {
           title={
             <React.Fragment>
               <MUITextField
-                disabled={userId !== creator._id}
+                disabled={userID !== creator._id}
                 inputProps={{
                   onBlur: () =>
                     editCube(descriptionInput, cubeNameInput, isPublished)
@@ -255,7 +255,7 @@ export default function Dashboard() {
                 type="text"
                 value={cubeNameInput}
               />
-              {userId === creator._id && (
+              {userID === creator._id && (
                 <div
                   style={{
                     display: 'flex',
@@ -315,7 +315,7 @@ export default function Dashboard() {
 
         <MUICardContent>
           <MUITextField
-            disabled={userId !== creator._id}
+            disabled={userID !== creator._id}
             fullWidth={true}
             inputProps={{
               onBlur: () => editCube(descriptionInput, cubeNameInput)
@@ -359,7 +359,7 @@ export default function Dashboard() {
             justifyContent: 'flex-end'
           }}
         >
-          {userId === creator._id &&
+          {userID === creator._id &&
             !['mainboard', 'sideboard'].includes(activeComponentState._id) && (
               <WarningButton
                 onClick={
@@ -378,7 +378,7 @@ export default function Dashboard() {
 
           {isLoggedIn && <MUIButton onClick={cloneCube}>Clone Cube</MUIButton>}
 
-          {userId === creator._id && (
+          {userID === creator._id && (
             <MUIButton onClick={() => setCreateComponentDialogIsOpen(true)}>
               New Component
             </MUIButton>

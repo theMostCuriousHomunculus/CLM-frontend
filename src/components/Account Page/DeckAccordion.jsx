@@ -26,7 +26,7 @@ export default function DeckAccordion({ pageClasses }) {
     accountState: { _id, decks },
     deleteDeck
   } = React.useContext(AccountContext);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const [deckToDelete, setDeckToDelete] = React.useState({
     _id: null,
     name: null
@@ -69,7 +69,7 @@ export default function DeckAccordion({ pageClasses }) {
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Format</MUITableCell>
-                  {_id === userId && <MUITableCell>Delete</MUITableCell>}
+                  {_id === userID && <MUITableCell>Delete</MUITableCell>}
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
@@ -79,7 +79,7 @@ export default function DeckAccordion({ pageClasses }) {
                       <Link to={`/deck/${deck._id}`}>{deck.name}</Link>
                     </MUITableCell>
                     <MUITableCell>{deck.format}</MUITableCell>
-                    {_id === userId && (
+                    {_id === userID && (
                       <MUITableCell>
                         <MUIIconButton
                           className={pageClasses.iconButton}
@@ -99,7 +99,7 @@ export default function DeckAccordion({ pageClasses }) {
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {_id === userId && (
+        {_id === userID && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowDeckForm(true)}>
               Create a Deck

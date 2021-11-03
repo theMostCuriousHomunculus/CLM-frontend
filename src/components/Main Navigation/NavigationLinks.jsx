@@ -31,10 +31,12 @@ export default function NavigationLinks({
   setAuthenticateFormDisplayed,
   toggleDrawer
 }) {
-  const authentication = React.useContext(AuthenticationContext);
+  const { isLoggedIn, logout, userID } = React.useContext(
+    AuthenticationContext
+  );
   const classes = useStyles();
 
-  const loggedInPages = [
+  const loggedInOptions = [
     {
       icon: <MUIHomeIcon />,
       name: 'Home',
@@ -43,7 +45,7 @@ export default function NavigationLinks({
     {
       icon: <MUIAccountCircleIcon />,
       name: 'My Profile',
-      onClick: () => history.push(`/account/${authentication.userId}`)
+      onClick: () => history.push(`/account/${userID}`)
     },
     {
       icon: <MUIChatOutlinedIcon />,
@@ -63,11 +65,11 @@ export default function NavigationLinks({
     {
       icon: <MUIExitToAppIcon />,
       name: 'Logout',
-      onClick: authentication.logout
+      onClick: logout
     }
   ];
 
-  const loggedOutPages = [
+  const loggedOutOptions = [
     {
       icon: <MUIHomeIcon />,
       name: 'Home',
@@ -101,18 +103,16 @@ export default function NavigationLinks({
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
-      {(authentication.isLoggedIn ? loggedInPages : loggedOutPages).map(
-        function (page) {
-          return (
-            <MUIListItem button key={page.name} onClick={page.onClick}>
-              <MUIListItemIcon className={classes.item}>
-                {page.icon}
-              </MUIListItemIcon>
-              <MUIListItemText className={classes.item} primary={page.name} />
-            </MUIListItem>
-          );
-        }
-      )}
+      {(isLoggedIn ? loggedInOptions : loggedOutOptions).map(function (option) {
+        return (
+          <MUIListItem button key={option.name} onClick={option.onClick}>
+            <MUIListItemIcon className={classes.item}>
+              {option.icon}
+            </MUIListItemIcon>
+            <MUIListItemText className={classes.item} primary={option.name} />
+          </MUIListItem>
+        );
+      })}
     </MUIList>
   );
 }
