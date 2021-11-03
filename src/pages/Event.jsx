@@ -16,7 +16,7 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { EventContext } from '../contexts/event-context';
 
 export default function Event() {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const {
     loading,
     eventState,
@@ -35,7 +35,7 @@ export default function Event() {
     name: null
   });
   const [tabNumber, setTabNumber] = React.useState(0);
-  const others = eventState.players.filter((plr) => plr.account._id !== userId);
+  const others = eventState.players.filter((plr) => plr.account._id !== userID);
 
   function onSortEnd({ collection, newIndex, oldIndex }) {
     if (newIndex !== oldIndex) {

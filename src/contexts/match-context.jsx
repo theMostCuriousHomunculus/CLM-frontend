@@ -126,7 +126,7 @@ export const MatchContext = createContext({
 });
 
 export default function ContextualizedMatchPage() {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const { matchID } = useParams();
   const [matchState, setMatchState] = React.useState({
     _id: matchID,
@@ -399,7 +399,7 @@ export default function ContextualizedMatchPage() {
   React.useEffect(() => {
     // this allows a more smooth drag and drop experience
     const me = matchState.players.find(
-      (player) => player.account._id === userId
+      (player) => player.account._id === userID
     );
 
     if (me) {
@@ -407,7 +407,7 @@ export default function ContextualizedMatchPage() {
         setBottomPlayerState(me);
 
       const opponent = matchState.players.find(
-        (player) => player.account._id !== userId
+        (player) => player.account._id !== userID
       );
 
       if (JSON.stringify(topPlayerState) !== JSON.stringify(opponent))
@@ -418,7 +418,7 @@ export default function ContextualizedMatchPage() {
       setBottomPlayerState(matchState.players[0]);
       setTopPlayerState(matchState.players[1]);
     }
-  }, [matchState, userId]);
+  }, [matchState, userID]);
 
   const adjustCounters = React.useCallback(
     async function (cardID, counterAmount, counterType, zone) {

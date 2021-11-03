@@ -34,7 +34,7 @@ export default function PlaysetDisplay({
   remove,
   toggle
 }) {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [updatedCount, setUpdatedCount] = React.useState(copies.length);
 
@@ -62,7 +62,7 @@ export default function PlaysetDisplay({
         disabled={
           isMatch ||
           (isEvent && !card.type_line.includes('Basic')) ||
-          authorizedID !== userId
+          authorizedID !== userID
         }
         inputProps={{
           min: 0,

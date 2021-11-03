@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 });
 
 export default function AuthenticateForm({ open, toggleOpen }) {
-  const { login } = React.useContext(AuthenticationContext);
+  const { storeUserInfo } = React.useContext(AuthenticationContext);
   const { loading, sendRequest } = useRequest();
   const { setErrorMessages } = React.useContext(ErrorContext);
   const classes = useStyles();
@@ -33,30 +33,8 @@ export default function AuthenticateForm({ open, toggleOpen }) {
   const [passwordInput, setPasswordInput] = React.useState();
 
   async function handleLogin() {
-    await sendRequest({
-      callback: (data) => {
-        login(data.isAdmin, data.token, data.userId);
-        toggleOpen();
-      },
-      load: true,
-      operation: 'login',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(
-                email: "${emailInput}",
-                password: "${passwordInput}"
-              ) {
-                isAdmin
-                token
-                userId
-              }
-            }
-          `
-        };
-      }
-    });
+    storeUserInfo(emailInput, passwordInput);
+    toggleOpen();
   }
 
   async function handleRegister() {
@@ -84,7 +62,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
 
     await sendRequest({
       callback: (data) => {
-        login(false, data.token, data.userId);
+        login(false, data.token, data.userID);
         toggleOpen();
       },
       load: true,
@@ -100,7 +78,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 password: "${passwordInput}"
               ) {
                 token
-                userId
+                userID
               }
             }
           `

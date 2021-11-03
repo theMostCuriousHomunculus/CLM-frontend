@@ -46,7 +46,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
     accountState: { buds, decks, events },
     createMatch
   } = React.useContext(AccountContext);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState();
   const [fromEvent, setFromEvent] = React.useState(true);
@@ -70,7 +70,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
         <form
           onSubmit={(event) =>
             createMatch(event, [myDeckID, opponentDeckID], selectedEvent._id, [
-              userId,
+              userID,
               selectedOpponent
             ])
           }
@@ -189,7 +189,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
               >
                 {fromEvent ? (
                   selectedEvent.players
-                    .filter((plr) => plr.account._id !== userId)
+                    .filter((plr) => plr.account._id !== userID)
                     .map((plr) => (
                       <MUIFormControlLabel
                         control={<MUIRadio />}

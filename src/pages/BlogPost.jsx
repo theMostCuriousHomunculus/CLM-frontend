@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
@@ -10,7 +10,6 @@ import MUISyncIcon from '@mui/icons-material/Sync';
 import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
 import rehypeRaw from 'rehype-raw';
-import { createClient } from 'graphql-ws';
 import { makeStyles } from '@mui/styles';
 
 import theme, { backgroundColor } from '../theme';
@@ -18,9 +17,6 @@ import useRequest from '../hooks/request-hook';
 import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
-
-const desiredBlogPostInfo =
-  '_id\nauthor {\n_id\navatar\nname\n}\nbody\ncomments {\n_id\nauthor {\n_id\navatar\nname\n}\nbody\nupdatedAt\n}\nimage\nsubtitle\ntitle\ncreatedAt\nupdatedAt';
 
 const useStyles = makeStyles({
   article: {
@@ -106,7 +102,6 @@ export default function BlogPost() {
   const authentication = React.useContext(AuthenticationContext);
   const { blogPostID } = useParams();
   const classes = useStyles();
-  const history = useHistory();
   const newComment = React.useRef();
   const { loading, sendRequest } = useRequest();
   const [viewMode, setViewMode] = React.useState('Live');
@@ -125,148 +120,6 @@ export default function BlogPost() {
     createdAt: null,
     updatedAt: null
   });
-
-  React.useEffect(() => {
-    async function initialize() {
-      if (blogPostID !== 'new-post') {
-        await sendRequest({
-          callback: (data) => {
-            setBlogPost(data);
-          },
-          headers: { BlogPostID: blogPostID },
-          load: true,
-          operation: 'fetchBlogPostByID',
-          get body() {
-            return {
-              query: `
-                query {
-                  ${this.operation} {
-                    ${desiredBlogPostInfo}
-                  }
-                }
-              `
-            };
-          }
-        });
-      } else if (!authentication.isAdmin) {
-        // user is not an admin but trying to create a new blog post
-        history.push('/blog');
-      } else {
-        setViewMode('Edit');
-
-        await sendRequest({
-          callback: (data) => {
-            setBlogPost((prevState) => ({
-              ...prevState,
-              author: {
-                ...data
-              }
-            }));
-          },
-          load: true,
-          operation: 'fetchAccountByID',
-          get body() {
-            return {
-              query: `
-                query {
-                  ${this.operation}(_id: "${authentication.userId}") {
-                    _id
-                    avatar
-                    name
-                  }
-                }
-              `
-            };
-          }
-        });
-      }
-    }
-
-    initialize();
-
-    const client = createClient({
-      connectionParams: {
-        authToken: authentication.token,
-        blogPostID
-      },
-      url: process.env.REACT_APP_WS_URL
-    });
-
-    async function subscribe() {
-      function onNext(update) {
-        setBlogPost(update.data.subscribeBlogPost);
-      }
-
-      await new Promise((resolve, reject) => {
-        client.subscribe(
-          {
-            query: `subscription {
-            subscribeBlogPost {
-              ${desiredBlogPostInfo}
-            }
-          }`
-          },
-          {
-            complete: resolve,
-            error: reject,
-            next: onNext
-          }
-        );
-      });
-    }
-
-    if (blogPostID !== 'new-post') {
-      subscribe(
-        (result) => console.log(result),
-        (error) => console.log(error)
-      );
-
-      return client.dispose;
-    }
-  }, [
-    authentication.isAdmin,
-    authentication.token,
-    authentication.userId,
-    blogPostID,
-    history,
-    sendRequest
-  ]);
-
-  async function submitBlogPost(event) {
-    event.preventDefault();
-
-    const headers = {};
-    let operation;
-
-    if (blogPostID === 'new-post') {
-      operation = 'createBlogPost';
-    } else {
-      headers.BlogPostID = blogPostID;
-      operation = 'editBlogPost';
-    }
-
-    await sendRequest({
-      callback: () => {
-        setTimeout(() => history.push('/blog'), 0);
-      },
-      headers,
-      operation,
-      body: {
-        query: `
-          mutation {
-            ${operation}(
-              body: """${blogPost.body}""",
-              image: "${blogPost.image}",
-              subtitle: "${blogPost.subtitle}",
-              title: "${blogPost.title}"
-            ) {
-              _id
-            }
-          }
-        `
-      }
-    });
-  }
 
   async function submitComment(event) {
     event.preventDefault();
@@ -298,7 +151,7 @@ export default function BlogPost() {
   ) : (
     <React.Fragment>
       <MUICard>
-        {blogPost.author._id === authentication.userId ? (
+        {blogPost.author._id === authentication.userID ? (
           <form onSubmit={submitBlogPost}>
             <MUICardHeader
               avatar={

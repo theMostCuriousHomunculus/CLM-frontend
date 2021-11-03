@@ -24,12 +24,12 @@ export default function MatchAccordion({ pageClasses }) {
   const {
     accountState: { matches }
   } = React.useContext(AccountContext);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const [showMatchForm, setShowMatchForm] = React.useState(false);
 
   return (
     <React.Fragment>
-      {accountID === userId && (
+      {accountID === userID && (
         <CreateMatchForm
           open={showMatchForm}
           toggleOpen={() => setShowMatchForm((prevState) => !prevState)}
@@ -103,7 +103,7 @@ export default function MatchAccordion({ pageClasses }) {
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {accountID === userId && (
+        {accountID === userID && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowMatchForm(true)}>
               Create a Match

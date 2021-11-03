@@ -10,11 +10,11 @@ import { MatchContext } from '../../contexts/match-context';
 export default function Intermission() {
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     React.useState(false);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const { matchState, ready, toggleMainboardSideboardMatch } =
     React.useContext(MatchContext);
 
-  const player = matchState.players.find((plr) => plr.account._id === userId);
+  const player = matchState.players.find((plr) => plr.account._id === userID);
 
   return player ? (
     <React.Fragment>
@@ -42,7 +42,7 @@ export default function Intermission() {
 
       <DeckDisplay
         add={() => null}
-        authorizedID={userId}
+        authorizedID={userID}
         deck={{ mainboard: player.mainboard, sideboard: player.sideboard }}
         remove={() => null}
         toggle={toggleMainboardSideboardMatch}

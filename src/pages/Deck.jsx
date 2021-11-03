@@ -10,7 +10,7 @@ import { AuthenticationContext } from '../contexts/authentication-context';
 import { DeckContext } from '../contexts/deck-context';
 
 export default function Deck() {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const {
     loading,
     deckState,
@@ -25,7 +25,7 @@ export default function Deck() {
     <React.Fragment>
       <DeckInfo />
 
-      {deckState.creator._id === userId && (
+      {deckState.creator._id === userID && (
         <React.Fragment>
           <BasicLandAdder
             submitFunction={(cardData) =>

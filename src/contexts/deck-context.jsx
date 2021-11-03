@@ -49,7 +49,6 @@ export default function ContextualizedDeckPage() {
   });
   const cardQuery = `
     _id
-    name
     scryfall_id
   `;
   const deckQuery = `

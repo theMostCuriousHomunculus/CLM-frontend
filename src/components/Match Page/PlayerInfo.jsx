@@ -46,7 +46,7 @@ export default function PlayerInfo({ player, position, setClickedPlayer }) {
   const avatarRef = React.useRef();
   const classes = useStyles();
   const [dragging, setDragging] = React.useState(false);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const {
     adjustEnergyCounters,
     adjustLifeTotal,
@@ -100,7 +100,7 @@ export default function PlayerInfo({ player, position, setClickedPlayer }) {
       });
     }
 
-    if (avatarRef.current && userId === player.account._id) {
+    if (avatarRef.current && userID === player.account._id) {
       const energyBadge = avatarRef.current.getElementsByClassName(
         'MuiBadge-anchorOriginBottomRightCircle'
       )[0];
@@ -132,7 +132,7 @@ export default function PlayerInfo({ player, position, setClickedPlayer }) {
     player.poison,
     setClickedPlayer,
     setNumberInputDialogInfo,
-    userId
+    userID
   ]);
 
   return (

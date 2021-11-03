@@ -7,7 +7,7 @@ import { AuthenticationContext } from '../../contexts/authentication-context';
 import { MatchContext } from '../../contexts/match-context';
 
 export default function CardMenu({ rightClickedCard, setRightClickedCard }) {
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const {
     matchState: { players },
     setNumberInputDialogInfo,
@@ -109,7 +109,7 @@ export default function CardMenu({ rightClickedCard, setRightClickedCard }) {
         }
         style={{ zIndex: 2147483647 }}
       >
-        {rightClickedCard.controller === userId && (
+        {rightClickedCard.controller === userID && (
           <React.Fragment>
             <MUIMenuItem
               onClick={() => {
@@ -185,7 +185,7 @@ export default function CardMenu({ rightClickedCard, setRightClickedCard }) {
         )}
         {!rightClickedCard.visibility
           .map((plr) => plr._id)
-          .includes(userId) && (
+          .includes(userID) && (
           <MUIMenuItem
             onClick={() => {
               viewCard(
@@ -199,7 +199,7 @@ export default function CardMenu({ rightClickedCard, setRightClickedCard }) {
             View Card
           </MUIMenuItem>
         )}
-        {rightClickedCard.controller !== userId && (
+        {rightClickedCard.controller !== userID && (
           <MUIMenuItem
             onClick={() => {
               gainControlOfCard(

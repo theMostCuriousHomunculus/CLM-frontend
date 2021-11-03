@@ -52,9 +52,13 @@ export default function App() {
   const classes = useStyles();
   const { sendRequest } = useRequest();
   const [errorMessages, setErrorMessages] = React.useState([]);
-  const [isAdmin, setIsAdmin] = React.useState(false);
-  const [token, setToken] = React.useState(null);
-  const [userId, setUserId] = React.useState(null);
+  const [authenticationState, setAuthenticationState] = React.useState({
+    avatar: null,
+    isAdmin: false,
+    token: null,
+    userID: null,
+    userName: null
+  });
 
   const addCardsToCache = React.useCallback(
     async (scryfall_ids) => {
@@ -97,60 +101,112 @@ export default function App() {
     [sendRequest]
   );
 
-  const login = React.useCallback((admin, tkn, uid) => {
-    setIsAdmin(admin);
-    Cookies.set('is_admin', admin);
-    setToken(tkn);
-    Cookies.set('authentication_token', tkn);
-    setUserId(uid);
-    Cookies.set('user_id', uid);
-  }, []);
+  const storeUserInfo = React.useCallback(
+    async function (email, password) {
+      // store on server
+      await sendRequest({
+        callback: ({ _id, avatar, name, admin, token }) => {
+          // store in running application
+          setAuthenticationState({
+            avatar,
+            isAdmin: admin,
+            token,
+            userID: _id,
+            userName: name
+          });
 
-  const handleLogout = React.useCallback(() => {
-    // not awaiting for this response because it can only cause problems.  if the user's token was deleted on the server already, this request will throw an error, preventing this function from then removing cookies and updating context, which I don't want.
-    const operation = 'logoutAllDevices';
+          // store in browser
+          Cookies.set('authentication_token', token);
+          Cookies.set('avatar', avatar);
+          Cookies.set('is_admin', admin);
+          Cookies.set('user_id', _id);
+          Cookies.set('user_name', name);
+        },
+        load: true,
+        operation: 'login',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  email: "${email}",
+                  password: "${password}"
+                ) {
+                  _id
+                  avatar
+                  name
+                  admin
+                  token
+                }
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest]
+  );
+
+  const clearUserInfo = React.useCallback(() => {
+    // clear from server
     sendRequest({
-      operation,
-      body: {
-        query: `
-          mutation {
-            ${operation}
-          }
-        `
+      operation: 'logoutAllDevices',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation}
+            }
+          `
+        };
       }
     });
-    setIsAdmin(false);
-    Cookies.remove('is_admin');
-    setToken(null);
-    Cookies.remove('authentication_token');
-    setUserId(null);
-    Cookies.remove('user_id');
+
+    // clear from running application
+    setAuthenticationState({
+      avatar: null,
+      isAdmin: false,
+      token: null,
+      userID: null,
+      userName: null
+    });
+
+    // clear from browser
+    for (const cookie of [
+      'is_admin',
+      'authentication_token',
+      'avatar',
+      'user_id',
+      'user_name'
+    ]) {
+      Cookies.remove(cookie);
+    }
   }, [sendRequest]);
 
   React.useEffect(() => {
-    if (Cookies.get('user_id') && Cookies.get('authentication_token')) {
-      login(
-        Cookies.get('is_admin') === 'true',
-        Cookies.get('authentication_token'),
-        Cookies.get('user_id')
-      );
+    if (Cookies.get('authentication_token')) {
+      setAuthenticationState({
+        avatar: Cookies.get('avatar'),
+        isAdmin: Cookies.get('is_admin') === 'true',
+        token: Cookies.get('authentication_token'),
+        userID: Cookies.get('user_id'),
+        userName: Cookies.get('user_name')
+      });
     }
-  }, [login]);
+  }, []);
 
   return (
-    <AuthenticationContext.Provider
+    <ErrorContext.Provider
       value={{
-        isAdmin,
-        isLoggedIn: !!token,
-        login,
-        logout: handleLogout,
-        token,
-        userId
+        setErrorMessages
       }}
     >
-      <ErrorContext.Provider
+      <AuthenticationContext.Provider
         value={{
-          setErrorMessages
+          ...authenticationState,
+          clearUserInfo,
+          isLoggedIn: !!authenticationState.token,
+          storeUserInfo
         }}
       >
         <CardCacheContext.Provider
@@ -212,7 +268,7 @@ export default function App() {
             <Footer />
           </BrowserRouter>
         </CardCacheContext.Provider>
-      </ErrorContext.Provider>
-    </AuthenticationContext.Provider>
+      </AuthenticationContext.Provider>
+    </ErrorContext.Provider>
   );
 }

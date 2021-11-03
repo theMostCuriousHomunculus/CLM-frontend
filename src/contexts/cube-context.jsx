@@ -83,7 +83,6 @@ export default function ContextualizedCubePage() {
     _id
     cmc
     color_identity
-    name
     notes
     scryfall_id
     type_line

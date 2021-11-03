@@ -53,7 +53,7 @@ const SortableZone = SortableContainer(
     zone
   }) => {
     const classes = useStyles();
-    const { userId } = React.useContext(AuthenticationContext);
+    const { userID } = React.useContext(AuthenticationContext);
 
     return (
       <div
@@ -66,7 +66,7 @@ const SortableZone = SortableContainer(
             <SortableCard
               card={card}
               customStyle={customStyle}
-              disabled={player.account._id !== userId}
+              disabled={player.account._id !== userID}
               index={index}
               key={card._id}
               setRightClickedCard={setRightClickedCard}
@@ -97,18 +97,18 @@ const SortableZone = SortableContainer(
 
 const SortableCard = SortableElement(
   ({ card, customStyle, setRightClickedCard, zone }) => {
-    const { userId } = React.useContext(AuthenticationContext);
+    const { userID } = React.useContext(AuthenticationContext);
     const { flipCard } = React.useContext(MatchContext);
     const style = { ...customStyle };
 
-    if (card.controller._id === userId) style.cursor = 'grab';
+    if (card.controller._id === userID) style.cursor = 'grab';
 
     return (
       <MagicCard
         cardData={card}
         customStyle={style}
         flipHandler={
-          card.controller._id === userId
+          card.controller._id === userID
             ? () => flipCard(card._id, zone.toLowerCase())
             : () => null
         }

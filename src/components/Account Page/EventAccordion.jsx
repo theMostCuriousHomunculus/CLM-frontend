@@ -24,12 +24,12 @@ export default function EventAccordion({ pageClasses }) {
   const {
     accountState: { buds, cubes, events }
   } = React.useContext(AccountContext);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const [showEventForm, setShowEventForm] = React.useState(false);
 
   return (
     <React.Fragment>
-      {accountID === userId && cubes.length > 0 && (
+      {accountID === userID && cubes.length > 0 && (
         <CreateEventForm
           buds={buds}
           cubes={cubes}
@@ -102,7 +102,7 @@ export default function EventAccordion({ pageClasses }) {
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {accountID === userId && (
+        {accountID === userID && (
           <MUIAccordionActions>
             <MUIButton
               disabled={cubes.length === 0}

@@ -157,7 +157,7 @@ export default function Blog() {
                 >
                   Read
                 </MUIButton>
-                {blogPost.author._id === authentication.userId && (
+                {blogPost.author._id === authentication.userID && (
                   <WarningButton
                     onClick={() =>
                       setBlogPostToDelete({

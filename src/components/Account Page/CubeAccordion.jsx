@@ -26,7 +26,7 @@ export default function CubeAccordion({ pageClasses }) {
     accountState: { _id, cubes },
     deleteCube
   } = React.useContext(AccountContext);
-  const { userId } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const [cubeToDelete, setCubeToDelete] = React.useState({
     _id: null,
     name: null
@@ -69,7 +69,7 @@ export default function CubeAccordion({ pageClasses }) {
                 <MUITableRow>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Description</MUITableCell>
-                  {_id === userId && <MUITableCell>Delete</MUITableCell>}
+                  {_id === userID && <MUITableCell>Delete</MUITableCell>}
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
@@ -79,7 +79,7 @@ export default function CubeAccordion({ pageClasses }) {
                       <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
                     </MUITableCell>
                     <MUITableCell>{cube.description}</MUITableCell>
-                    {_id === userId && (
+                    {_id === userID && (
                       <MUITableCell>
                         <MUIIconButton
                           className={pageClasses.iconButton}
@@ -99,7 +99,7 @@ export default function CubeAccordion({ pageClasses }) {
           </MUITableContainer>
         </MUIAccordionDetails>
 
-        {_id === userId && (
+        {_id === userID && (
           <MUIAccordionActions>
             <MUIButton onClick={() => setShowCubeForm(true)}>
               Create a Cube

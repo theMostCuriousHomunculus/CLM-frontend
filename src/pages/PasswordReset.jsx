@@ -44,15 +44,15 @@ export default function PasswordReset() {
                 ) {
                   isAdmin
                   token
-                  userId
+                  userID
                 }
               }
             `
           }
         });
 
-        authentication.login(response.isAdmin, response.token, response.userId);
-        history.push(`/account/${response.userId}`);
+        authentication.login(response.isAdmin, response.token, response.userID);
+        history.push(`/account/${response.userID}`);
       }
     } catch (error) {}
   }
