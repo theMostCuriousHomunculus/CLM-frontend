@@ -26,7 +26,6 @@
     "requireConfigFile": false,
     "sourceType": "module"
   },
-  "plugins": ["plugin:react/recommended"],
   "root": true,
   "rules": {
     "comma-dangle": "off",
