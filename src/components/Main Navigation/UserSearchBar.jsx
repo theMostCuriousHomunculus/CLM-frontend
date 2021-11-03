@@ -78,7 +78,7 @@ export default function UserSearchBar({ history, orientation, setDrawerOpen }) {
   async function searchAccounts(event) {
     if (event.target.value.length > 2) {
       await sendRequest({
-        callback: setUserSearchResults(data),
+        callback: setUserSearchResults,
         load: true,
         operation: 'searchAccounts',
         get body() {
