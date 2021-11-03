@@ -35,7 +35,6 @@ export const CubeContext = createContext({
     activeComponentID: null,
     filter: ''
   },
-  setCubeState: () => null,
   setDisplayState: () => null,
   addCardToCube: () => null,
   cloneCube: () => null,
@@ -543,7 +542,6 @@ export default function ContextualizedCubePage() {
         activeComponentState,
         cubeState,
         displayState,
-        setCubeState,
         setDisplayState,
         addCardToCube,
         cloneCube,

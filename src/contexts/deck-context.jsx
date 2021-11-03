@@ -22,7 +22,6 @@ export const DeckContext = createContext({
     name: null,
     sideboard: []
   },
-  setDeckState: () => null,
   addCardsToDeck: () => null,
   cloneDeck: () => null,
   editDeck: () => null,
@@ -255,7 +254,6 @@ export default function ContextualizedDeckPage() {
       value={{
         loading,
         deckState,
-        setDeckState,
         addCardsToDeck,
         cloneDeck,
         editDeck,

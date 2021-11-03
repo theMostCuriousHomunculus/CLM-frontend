@@ -6,7 +6,30 @@ import useSubscribe from '../hooks/subscribe-hook';
 import BlogPost from '../pages/BlogPost';
 import { AuthenticationContext } from './authentication-context';
 
-export const BlogPostContext = createContext({});
+export const BlogPostContext = createContext({
+  loading: false,
+  blogPostState: {
+    _id: null,
+    author: {
+      _id: null,
+      avatar: null,
+      name: null
+    },
+    body: null,
+    comments: [],
+    image: null,
+    subtitle: null,
+    title: null,
+    createdAt: null,
+    updatedAt: null
+  },
+  createBlogPost: () => null,
+  createComment: () => null,
+  editBlogPost: () => null,
+  setBlogPostState: () => null,
+  setViewMode: () => null,
+  viewMode: null
+});
 
 export default function ContextualizedBlogPostPage() {
   const history = useHistory();
@@ -27,6 +50,7 @@ export default function ContextualizedBlogPostPage() {
     createdAt: null,
     updatedAt: null
   });
+  const [viewMode, setViewMode] = React.useState('Live');
   const blogPostQuery = `
     _id
     author {
@@ -55,7 +79,7 @@ export default function ContextualizedBlogPostPage() {
   const { requestSubscription } = useSubscribe();
 
   const createBlogPost = React.useCallback(
-    async function (body, image, subtitle, title) {
+    async function () {
       await sendRequest({
         callback: () => {
           setTimeout(() => history.push('/blog'), 0);
@@ -66,10 +90,10 @@ export default function ContextualizedBlogPostPage() {
             query: `
             mutation {
               ${this.operation}(
-                body: """${body}""",
-                image: "${image}",
-                subtitle: "${subtitle}",
-                title: "${title}"
+                body: """${blogPostState.body}""",
+                image: "${blogPostState.image}",
+                subtitle: "${blogPostState.subtitle}",
+                title: "${blogPostState.title}"
               ) {
                 _id
               }
@@ -82,8 +106,33 @@ export default function ContextualizedBlogPostPage() {
     [sendRequest]
   );
 
+  const createComment = React.useCallback(
+    async function (newComment) {
+      await sendRequest({
+        callback: () => {
+          newComment.current.value = '';
+          newComment.current.focus();
+        },
+        headers: { BlogPostID: blogPostID },
+        operation: 'createComment',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(body: "${newComment.current.value}") {
+                  _id
+                }
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest]
+  );
+
   const editBlogPost = React.useCallback(
-    async function (body, image, subtitle, title) {
+    async function () {
       await sendRequest({
         callback: () => {
           setTimeout(() => history.push('/blog'), 0);
@@ -95,17 +144,17 @@ export default function ContextualizedBlogPostPage() {
         get body() {
           return {
             query: `
-            mutation {
-              ${this.operation}(
-                body: """${body}""",
-                image: "${image}",
-                subtitle: "${subtitle}",
-                title: "${title}"
-              ) {
-                _id
+              mutation {
+                ${this.operation}(
+                  body: """${blogPostState.body}""",
+                  image: "${blogPostState.image}",
+                  subtitle: "${blogPostState.subtitle}",
+                  title: "${blogPostState.title}"
+                ) {
+                  _id
+                }
               }
-            }
-          `
+            `
           };
         }
       });
@@ -140,12 +189,14 @@ export default function ContextualizedBlogPostPage() {
     if (blogPostID === 'new-post') {
       setBlogPostState((prevState) => ({
         ...prevState,
+        _id: 'new-post',
         author: {
           _id: userID,
           avatar,
           name: userName
         }
       }));
+      setViewMode('Edit');
     } else {
       requestSubscription({
         headers: { blogPostID },
@@ -155,10 +206,21 @@ export default function ContextualizedBlogPostPage() {
         update: setBlogPostState
       });
     }
-  }, [deckID, deckQuery, fetchDeckByID, requestSubscription, updateDeckState]);
+  }, [blogPostID, blogPostQuery, fetchBlogPostByID, requestSubscription]);
 
   return (
-    <BlogPostContext.Provider value={{}}>
+    <BlogPostContext.Provider
+      value={{
+        loading,
+        blogPostState,
+        createBlogPost,
+        createComment,
+        editBlogPost,
+        setBlogPostState,
+        setViewMode,
+        viewMode
+      }}
+    >
       <BlogPost />
     </BlogPostContext.Provider>
   );

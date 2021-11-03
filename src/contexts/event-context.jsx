@@ -42,7 +42,6 @@ export const EventContext = createContext({
     mainboard: [],
     sideboard: []
   },
-  setEventState: () => null,
   setMyState: () => null,
   addBasics: () => null,
   removeBasics: () => null,
@@ -316,7 +315,6 @@ export default function ContextualizedEventPage() {
         loading,
         eventState,
         myState,
-        setEventState,
         setMyState,
         addBasics,
         removeBasics,

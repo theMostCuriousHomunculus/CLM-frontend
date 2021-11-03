@@ -14,8 +14,10 @@ import { ErrorContext } from './contexts/error-context';
 import { CardCacheContext } from './contexts/card-cache-context';
 
 const Blog = React.lazy(() => import('./pages/Blog'));
-const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const Classy = React.lazy(() => import('./pages/Classy'));
+const ContextualizedBlogPostPage = React.lazy(() =>
+  import('./contexts/blog-post-context')
+);
 const ContextualizedCubePage = React.lazy(() =>
   import('./contexts/cube-context')
 );
@@ -50,7 +52,7 @@ const useStyles = makeStyles({
 export default function App() {
   const scryfallCardDataCache = React.useRef(Object.create(null));
   const classes = useStyles();
-  const { sendRequest } = useRequest();
+  const { loading, sendRequest } = useRequest();
   const [errorMessages, setErrorMessages] = React.useState([]);
   const [authenticationState, setAuthenticationState] = React.useState({
     avatar: null,
@@ -101,27 +103,35 @@ export default function App() {
     [sendRequest]
   );
 
-  const storeUserInfo = React.useCallback(
-    async function (email, password) {
-      // store on server
-      await sendRequest({
-        callback: ({ _id, avatar, name, admin, token }) => {
-          // store in running application
-          setAuthenticationState({
-            avatar,
-            isAdmin: admin,
-            token,
-            userID: _id,
-            userName: name
-          });
+  const storeUserInfo = React.useCallback(function ({
+    _id,
+    avatar,
+    name,
+    admin,
+    token
+  }) {
+    // store in running application
+    setAuthenticationState({
+      avatar,
+      isAdmin: admin,
+      token,
+      userID: _id,
+      userName: name
+    });
 
-          // store in browser
-          Cookies.set('authentication_token', token);
-          Cookies.set('avatar', avatar);
-          Cookies.set('is_admin', admin);
-          Cookies.set('user_id', _id);
-          Cookies.set('user_name', name);
-        },
+    // store in browser
+    Cookies.set('authentication_token', token);
+    Cookies.set('avatar', avatar);
+    Cookies.set('is_admin', admin);
+    Cookies.set('user_id', _id);
+    Cookies.set('user_name', name);
+  },
+  []);
+
+  const login = React.useCallback(
+    async function (email, password) {
+      await sendRequest({
+        callback: storeUserInfo,
         load: true,
         operation: 'login',
         get body() {
@@ -133,9 +143,9 @@ export default function App() {
                   password: "${password}"
                 ) {
                   _id
+                  admin
                   avatar
                   name
-                  admin
                   token
                 }
               }
@@ -144,10 +154,10 @@ export default function App() {
         }
       });
     },
-    [sendRequest]
+    [sendRequest, storeUserInfo]
   );
 
-  const clearUserInfo = React.useCallback(() => {
+  const logout = React.useCallback(() => {
     // clear from server
     sendRequest({
       operation: 'logoutAllDevices',
@@ -183,6 +193,119 @@ export default function App() {
     }
   }, [sendRequest]);
 
+  const register = React.useCallback(
+    async function (email, name, password) {
+      const avatar = {
+        prints_search_uri: null,
+        printings: []
+      };
+
+      await sendRequest({
+        callback: (data) => {
+          avatar.prints_search_uri = data.prints_search_uri;
+        },
+        load: true,
+        method: 'GET',
+        url: 'https://api.scryfall.com/cards/random'
+      });
+
+      await sendRequest({
+        callback: (data) => {
+          avatar.printings = data.data;
+        },
+        load: true,
+        method: 'GET',
+        url: avatar.prints_search_uri
+      });
+
+      const randomIndex = Math.floor(Math.random() * avatar.printings.length);
+
+      await sendRequest({
+        callback: storeUserInfo,
+        load: true,
+        operation: 'register',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  avatar: "${avatar.printings[randomIndex].image_uris.art_crop}",
+                  email: "${email}",
+                  name: "${name}",
+                  password: "${password}"
+                ) {
+                  _id
+                  admin
+                  avatar
+                  name
+                  token
+                }
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest, storeUserInfo]
+  );
+
+  const requestPasswordReset = React.useCallback(
+    async function (email) {
+      await sendRequest({
+        callback: () => {
+          setErrorMessages((prevState) => {
+            return [
+              ...prevState,
+              'A link to reset your password has been sent.  Please check your email inbox and your spam folder.'
+            ];
+          });
+        },
+        load: true,
+        operation: 'requestPasswordReset',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(email: "${email}")
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest]
+  );
+
+  const submitPasswordReset = React.useCallback(
+    async function (email, password, reset_token) {
+      await sendRequest({
+        callback: storeUserInfo,
+        load: true,
+        operation: 'submitPasswordReset',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  email: "${email}"
+                  password: "${password}"
+                  reset_token: "${reset_token}"
+                ) {
+                  _id
+                  admin
+                  avatar
+                  name
+                  token
+                }
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest, storeUserInfo]
+  );
+
   React.useEffect(() => {
     if (Cookies.get('authentication_token')) {
       setAuthenticationState({
@@ -204,9 +327,13 @@ export default function App() {
       <AuthenticationContext.Provider
         value={{
           ...authenticationState,
-          clearUserInfo,
           isLoggedIn: !!authenticationState.token,
-          storeUserInfo
+          loading,
+          login,
+          logout,
+          register,
+          requestPasswordReset,
+          submitPasswordReset
         }}
       >
         <CardCacheContext.Provider
@@ -236,7 +363,7 @@ export default function App() {
                     <ContextualizedAccountPage />
                   </Route>
                   <Route path="/blog/:blogPostID">
-                    <BlogPost />
+                    <ContextualizedBlogPostPage />
                   </Route>
                   <Route path="/blog">
                     <Blog />

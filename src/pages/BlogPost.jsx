@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useParams } from 'react-router-dom';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
@@ -13,10 +12,10 @@ import rehypeRaw from 'rehype-raw';
 import { makeStyles } from '@mui/styles';
 
 import theme, { backgroundColor } from '../theme';
-import useRequest from '../hooks/request-hook';
 import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/authentication-context';
+import { BlogPostContext } from '../contexts/blog-post-context';
 
 const useStyles = makeStyles({
   article: {
@@ -99,67 +98,40 @@ const useStyles = makeStyles({
 });
 
 export default function BlogPost() {
-  const authentication = React.useContext(AuthenticationContext);
-  const { blogPostID } = useParams();
+  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
+  const {
+    loading,
+    blogPostState: {
+      _id: blogPostID,
+      author,
+      body,
+      comments,
+      createdAt,
+      image,
+      subtitle,
+      title,
+      updatedAt
+    },
+    createBlogPost,
+    createComment,
+    editBlogPost,
+    setBlogPostState,
+    setViewMode,
+    viewMode
+  } = React.useContext(BlogPostContext);
   const classes = useStyles();
   const newComment = React.useRef();
-  const { loading, sendRequest } = useRequest();
-  const [viewMode, setViewMode] = React.useState('Live');
-  const [blogPost, setBlogPost] = React.useState({
-    _id: null,
-    author: {
-      _id: '',
-      avatar: '',
-      name: '...'
-    },
-    body: '',
-    comments: [],
-    image: '',
-    subtitle: '',
-    title: '',
-    createdAt: null,
-    updatedAt: null
-  });
-
-  async function submitComment(event) {
-    event.preventDefault();
-    await sendRequest({
-      callback: () => {
-        newComment.current.value = '';
-        newComment.current.focus();
-      },
-      headers: {
-        BlogPostID: blogPostID
-      },
-      operation: 'createComment',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(body: "${newComment.current.value}") {
-                _id
-              }
-            }
-          `
-        };
-      }
-    });
-  }
 
   return loading ? (
     <LoadingSpinner />
   ) : (
     <React.Fragment>
       <MUICard>
-        {blogPost.author._id === authentication.userID ? (
-          <form onSubmit={submitBlogPost}>
+        {author._id === userID ? (
+          <React.Fragment>
             <MUICardHeader
               avatar={
-                <Avatar
-                  alt={blogPost.author.name}
-                  size="large"
-                  src={blogPost.author.avatar}
-                />
+                <Avatar alt={author.name} size="large" src={author.avatar} />
               }
               className={classes.cardHeader}
               title={
@@ -168,13 +140,13 @@ export default function BlogPost() {
                   label="Title"
                   onChange={(event) => {
                     event.persist();
-                    setBlogPost((prevState) => ({
+                    setBlogPostState((prevState) => ({
                       ...prevState,
                       title: event.target.value
                     }));
                   }}
                   type="text"
-                  value={blogPost.title}
+                  value={title}
                 />
               }
               subheader={
@@ -184,38 +156,37 @@ export default function BlogPost() {
                     label="Subtitle"
                     onChange={(event) => {
                       event.persist();
-                      setBlogPost((prevState) => ({
+                      setBlogPostState((prevState) => ({
                         ...prevState,
                         subtitle: event.target.value
                       }));
                     }}
                     style={{ marginTop: 16 }}
                     type="text"
-                    value={blogPost.subtitle}
+                    value={subtitle}
                   />
                   <MUITextField
                     fullWidth
                     label="Image"
                     onChange={(event) => {
                       event.persist();
-                      setBlogPost((prevState) => ({
+                      setBlogPostState((prevState) => ({
                         ...prevState,
                         image: event.target.value
                       }));
                     }}
                     style={{ marginTop: 16 }}
                     type="text"
-                    value={blogPost.image}
+                    value={image}
                   />
                   <MUITypography color="textSecondary" variant="body2">
-                    A work of genius by {blogPost.author.name}.
+                    A work of genius by {author.name}.
                   </MUITypography>
-                  {blogPost.updatedAt && (
-                    <MUITypography color="textSecondary" variant="body2">
-                      Last updated{' '}
-                      {new Date(parseInt(blogPost.updatedAt)).toLocaleString()}.
-                    </MUITypography>
-                  )}
+                  <MUITypography color="textSecondary" variant="body2">
+                    {`Last updated ${new Date(
+                      parseInt(updatedAt)
+                    ).toLocaleString()}.`}
+                  </MUITypography>
                 </React.Fragment>
               }
               action={
@@ -241,47 +212,47 @@ export default function BlogPost() {
                   multiline
                   onChange={(event) => {
                     event.persist();
-                    setBlogPost((prevState) => ({
+                    setBlogPostState((prevState) => ({
                       ...prevState,
                       body: event.target.value
                     }));
                   }}
                   rows={20}
                   type="text"
-                  value={blogPost.body}
+                  value={body}
                 />
               ) : (
                 <article className={classes.article}>
                   <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                    {blogPost.body}
+                    {body}
                   </ReactMarkdown>
                 </article>
               )}
             </MUICardContent>
             <MUICardActions>
-              <MUIButton type="submit">
-                {blogPostID === 'new-post' ? 'Publish' : <MUISyncIcon />}
-              </MUIButton>
+              {blogPostID === 'new-post' ? (
+                <MUIButton onClick={createBlogPost}>Publish</MUIButton>
+              ) : (
+                <MUIButton onClick={editBlogPost}>
+                  <MUISyncIcon />
+                </MUIButton>
+              )}
             </MUICardActions>
-          </form>
+          </React.Fragment>
         ) : (
           <React.Fragment>
             <MUICardHeader
               avatar={
-                <Avatar
-                  alt={blogPost.author.name}
-                  size="large"
-                  src={blogPost.author.avatar}
-                />
+                <Avatar alt={author.name} size="large" src={author.avatar} />
               }
               className={classes.cardHeader}
-              title={blogPost.title}
-              subheader={blogPost.subtitle}
+              title={title}
+              subheader={subtitle}
             />
             <MUICardContent>
               <article className={classes.article}>
                 <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                  {blogPost.body}
+                  {body}
                 </ReactMarkdown>
               </article>
             </MUICardContent>
@@ -293,7 +264,7 @@ export default function BlogPost() {
         <MUICard className={classes.commentCard}>
           <MUICardHeader title="Community Reaction" />
           <MUICardContent className={classes.commentSection}>
-            {blogPost.comments
+            {comments
               .map((comment, index, array) => array[array.length - 1 - index])
               .map((comment) => (
                 <div
@@ -309,19 +280,19 @@ export default function BlogPost() {
                 </div>
               ))}
           </MUICardContent>
-          {authentication.isLoggedIn && (
-            <MUICardActions>
-              <form className={classes.commentForm} onSubmit={submitComment}>
-                <MUITextField
-                  autoComplete="off"
-                  fullWidth
-                  inputRef={newComment}
-                  multiline
-                  rows={2}
-                  type="text"
-                />
-                <MUIButton type="submit">Preach!</MUIButton>
-              </form>
+          {isLoggedIn && (
+            <MUICardActions className={classes.commentForm}>
+              <MUITextField
+                autoComplete="off"
+                fullWidth
+                inputRef={newComment}
+                multiline
+                rows={2}
+                type="text"
+              />
+              <MUIButton onClick={() => createComment(newComment)}>
+                Preach!
+              </MUIButton>
             </MUICardActions>
           )}
         </MUICard>

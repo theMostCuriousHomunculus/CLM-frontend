@@ -31,7 +31,7 @@ export default function NavigationLinks({
   setAuthenticateFormDisplayed,
   toggleDrawer
 }) {
-  const { clearUserInfo, isLoggedIn, userID } = React.useContext(
+  const { isLoggedIn, logout, userID } = React.useContext(
     AuthenticationContext
   );
   const classes = useStyles();
@@ -65,7 +65,7 @@ export default function NavigationLinks({
     {
       icon: <MUIExitToAppIcon />,
       name: 'Logout',
-      onClick: clearUserInfo
+      onClick: logout
     }
   ];
 

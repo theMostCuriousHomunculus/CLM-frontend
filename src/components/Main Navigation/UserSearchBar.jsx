@@ -72,16 +72,13 @@ const useStyles = makeStyles({
 
 export default function UserSearchBar({ history, orientation, setDrawerOpen }) {
   const { loading, sendRequest } = useRequest();
-  // const [open, setOpen] = React.useState(false);
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
 
   async function searchAccounts(event) {
     if (event.target.value.length > 2) {
       await sendRequest({
-        callback: (data) => {
-          setUserSearchResults(data);
-        },
+        callback: setUserSearchResults(data),
         load: true,
         operation: 'searchAccounts',
         get body() {
