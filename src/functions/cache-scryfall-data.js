@@ -1,5 +1,5 @@
 export default async function populateScryfallData(scryfallCardData) {
-  let art_crop, back_image, image, mana_cost, type_line;
+  let art_crop, back_image, image, mana_cost, meldResult, type_line;
   switch (scryfallCardData.layout) {
     case 'adventure':
       // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
@@ -28,7 +28,7 @@ export default async function populateScryfallData(scryfallCardData) {
       mana_cost = scryfallCardData.mana_cost;
       type_line = scryfallCardData.type_line;
 
-      const meldResult = await fetch(
+      meldResult = await fetch(
         scryfallCardData.all_parts.find(
           (part) => part.component === 'meld_result'
         ).uri

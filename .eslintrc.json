@@ -16,9 +16,6 @@
   ],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
-    "babelOptions": {
-      "presets": ["@babel/preset-react"]
-    },
     "ecmaFeatures": {
       "jsx": true
     },
@@ -26,6 +23,7 @@
     "requireConfigFile": false,
     "sourceType": "module"
   },
+  "plugins": ["import"],
   "root": true,
   "rules": {
     "comma-dangle": "off",
