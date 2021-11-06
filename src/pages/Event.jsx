@@ -3,7 +3,7 @@ import MUIPaper from '@mui/material/Paper';
 import MUITab from '@mui/material/Tab';
 import MUITabs from '@mui/material/Tabs';
 import MUITypography from '@mui/material/Typography';
-import arrayMove from 'array-move';
+import { arrayMoveImmutable } from 'array-move';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
@@ -41,7 +41,11 @@ export default function Event() {
     if (newIndex !== oldIndex) {
       setMyState((prevState) => ({
         ...prevState,
-        [collection]: arrayMove(prevState[collection], oldIndex, newIndex)
+        [collection]: arrayMoveImmutable(
+          prevState[collection],
+          oldIndex,
+          newIndex
+        )
       }));
     }
   }

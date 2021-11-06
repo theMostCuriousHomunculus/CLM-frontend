@@ -10,6 +10,7 @@ import MUIListItem from '@mui/material/ListItem';
 import MUIListItemIcon from '@mui/material/ListItemIcon';
 import MUIListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router-dom';
 
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/authentication-context';
@@ -27,7 +28,6 @@ const useStyles = makeStyles({
 });
 
 export default function NavigationLinks({
-  history,
   setAuthenticateFormDisplayed,
   toggleDrawer
 }) {
@@ -35,32 +35,33 @@ export default function NavigationLinks({
     AuthenticationContext
   );
   const classes = useStyles();
+  const navigate = useNavigate();
 
   const loggedInOptions = [
     {
       icon: <MUIHomeIcon />,
       name: 'Home',
-      onClick: () => history.push('/')
+      onClick: () => navigate('/')
     },
     {
       icon: <MUIAccountCircleIcon />,
       name: 'My Profile',
-      onClick: () => history.push(`/account/${userID}`)
+      onClick: () => navigate(`/account/${userID}`)
     },
     {
       icon: <MUIChatOutlinedIcon />,
       name: 'Blog',
-      onClick: () => history.push('/blog')
+      onClick: () => navigate('/blog')
     },
     {
       icon: <MUIHelpOutlineIcon />,
       name: "What's Classy?",
-      onClick: () => history.push('/classy')
+      onClick: () => navigate('/classy')
     },
     {
       icon: <MUIAllInclusiveIcon />,
       name: 'Resources',
-      onClick: () => history.push('/resources')
+      onClick: () => navigate('/resources')
     },
     {
       icon: <MUIExitToAppIcon />,
@@ -73,22 +74,22 @@ export default function NavigationLinks({
     {
       icon: <MUIHomeIcon />,
       name: 'Home',
-      onClick: () => history.push('/')
+      onClick: () => navigate('/')
     },
     {
       icon: <MUIChatOutlinedIcon />,
       name: 'Blog',
-      onClick: () => history.push('/blog')
+      onClick: () => navigate('/blog')
     },
     {
       icon: <MUIHelpOutlineIcon />,
       name: "What's Classy?",
-      onClick: () => history.push('/classy')
+      onClick: () => navigate('/classy')
     },
     {
       icon: <MUIAllInclusiveIcon />,
       name: 'Resources',
-      onClick: () => history.push('/resources')
+      onClick: () => navigate('/resources')
     },
     {
       icon: <MUIExitToAppIcon />,

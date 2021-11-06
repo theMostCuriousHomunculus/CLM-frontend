@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
@@ -18,7 +18,7 @@ export default function PasswordReset() {
   const { setErrorMessages } = React.useContext(ErrorContext);
   const confirmPasswordInput = React.useRef();
   const emailInput = React.useRef();
-  const history = useHistory();
+  const navigate = useNavigate();
   const passwordInput = React.useRef();
   const { resetToken } = useParams();
 
@@ -35,7 +35,7 @@ export default function PasswordReset() {
         passwordInput.current.value,
         resetToken
       );
-      history.push('/');
+      navigate('/');
     }
   }
 

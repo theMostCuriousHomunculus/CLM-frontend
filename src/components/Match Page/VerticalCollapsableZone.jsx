@@ -2,7 +2,7 @@ import React from 'react';
 import MUIBadge from '@mui/material/Badge';
 import MUISvgIcon from '@mui/material/SvgIcon';
 import MUITooltip from '@mui/material/Tooltip';
-import arrayMove from 'array-move';
+import { arrayMoveImmutable } from 'array-move';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { makeStyles } from '@mui/styles';
 
@@ -149,7 +149,7 @@ export default function VerticalCollapsableZone({
     if (newIndex !== oldIndex) {
       setBottomPlayerState((prevState) => ({
         ...prevState,
-        [zone.toLowerCase()]: arrayMove(
+        [zone.toLowerCase()]: arrayMoveImmutable(
           prevState[zone.toLowerCase()],
           oppositeIndex - oldIndex,
           oppositeIndex - newIndex

@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import Account from '../pages/Account';
@@ -23,7 +23,7 @@ export const AccountContext = createContext({
 
 export default function ContextualizedAccountPage() {
   const { accountID } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [accountState, setAccountState] = React.useState({
     _id: accountID,
     avatar: '',
@@ -149,7 +149,7 @@ export default function ContextualizedAccountPage() {
 
       await sendRequest({
         callback: (data) => {
-          history.push(`/cube/${data._id}`);
+          navigate(`/cube/${data._id}`);
         },
         load: true,
         operation: 'createCube',
@@ -170,7 +170,7 @@ export default function ContextualizedAccountPage() {
         }
       });
     },
-    [history, sendRequest]
+    [navigate, sendRequest]
   );
 
   const createDeck = React.useCallback(
@@ -179,7 +179,7 @@ export default function ContextualizedAccountPage() {
 
       await sendRequest({
         callback: (data) => {
-          history.push(`/deck/${data._id}`);
+          navigate(`/deck/${data._id}`);
         },
         load: true,
         operation: 'createDeck',
@@ -205,7 +205,7 @@ export default function ContextualizedAccountPage() {
         }
       });
     },
-    [history, sendRequest]
+    [navigate, sendRequest]
   );
 
   const createEvent = React.useCallback(
@@ -223,7 +223,7 @@ export default function ContextualizedAccountPage() {
 
       await sendRequest({
         callback: (data) => {
-          history.push(`/event/${data._id}`);
+          navigate(`/event/${data._id}`);
         },
         headers: { CubeID: cubeID },
         load: true,
@@ -248,7 +248,7 @@ export default function ContextualizedAccountPage() {
         }
       });
     },
-    [history, sendRequest]
+    [navigate, sendRequest]
   );
 
   const createMatch = React.useCallback(
@@ -257,7 +257,7 @@ export default function ContextualizedAccountPage() {
 
       await sendRequest({
         callback: (data) => {
-          history.push(`/match/${data._id}`);
+          navigate(`/match/${data._id}`);
         },
         load: true,
         operation: 'createMatch',
@@ -278,7 +278,7 @@ export default function ContextualizedAccountPage() {
         }
       });
     },
-    [history, sendRequest]
+    [navigate, sendRequest]
   );
 
   const deleteCube = React.useCallback(

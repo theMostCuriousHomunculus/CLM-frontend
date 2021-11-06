@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
@@ -50,7 +50,7 @@ export const CubeContext = createContext({
 });
 
 export default function ContextualizedCubePage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [activeComponentState, setActiveComponentState] = React.useState({
     _id: 'mainboard',
     displayedCards: [],
@@ -244,8 +244,7 @@ export default function ContextualizedCubePage() {
     async function () {
       await sendRequest({
         callback: (data) => {
-          history.push(`/cube/${data._id}`);
-          setCubeState(data);
+          navigate(`/cube/${data._id}`);
         },
         headers: { CubeID: cubeState._id },
         load: true,
@@ -263,7 +262,7 @@ export default function ContextualizedCubePage() {
         }
       });
     },
-    [cubeQuery, cubeState._id, history, sendRequest]
+    [cubeQuery, cubeState._id, navigate, sendRequest]
   );
 
   const createModule = React.useCallback(

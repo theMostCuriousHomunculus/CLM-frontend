@@ -5,7 +5,7 @@ import MUIToolbar from '@mui/material/Toolbar';
 import MUITypography from '@mui/material/Typography';
 import MUIMenuIcon from '@mui/icons-material/Menu';
 import { makeStyles } from '@mui/styles';
-import { withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import AuthenticateForm from './AuthenticateForm';
 import NavigationLinks from './NavigationLinks';
@@ -43,12 +43,12 @@ const useStyles = makeStyles({
   }
 });
 
-function Navigation(props) {
+export default function Navigation() {
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] =
     React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const classes = useStyles();
-  const { history } = props;
+  const navigate = useNavigate();
 
   function toggleDrawer(event) {
     if (
@@ -79,11 +79,7 @@ function Navigation(props) {
             </MUITypography>
           </div>
           <div className={classes.topBarContainer}>
-            <UserSearchBar
-              history={history}
-              orientation="top"
-              setDrawerOpen={setDrawerOpen}
-            />
+            <UserSearchBar orientation="top" setDrawerOpen={setDrawerOpen} />
           </div>
         </MUIToolbar>
         <MUIDrawer
@@ -93,13 +89,8 @@ function Navigation(props) {
           onClose={() => setDrawerOpen(false)}
           open={drawerOpen}
         >
-          <UserSearchBar
-            history={history}
-            orientation="side"
-            setDrawerOpen={setDrawerOpen}
-          />
+          <UserSearchBar orientation="side" setDrawerOpen={setDrawerOpen} />
           <NavigationLinks
-            history={history}
             setAuthenticateFormDisplayed={setAuthenticateFormDisplayed}
             toggleDrawer={toggleDrawer}
           />
@@ -108,5 +99,3 @@ function Navigation(props) {
     </React.Fragment>
   );
 }
-
-export default withRouter(Navigation);

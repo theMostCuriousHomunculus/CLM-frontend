@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
@@ -32,7 +32,7 @@ export const BlogPostContext = createContext({
 });
 
 export default function ContextualizedBlogPostPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { blogPostID } = useParams();
   const { avatar, userID, userName } = React.useContext(AuthenticationContext);
   const [blogPostState, setBlogPostState] = React.useState({
@@ -82,7 +82,7 @@ export default function ContextualizedBlogPostPage() {
     async function () {
       await sendRequest({
         callback: () => {
-          setTimeout(() => history.push('/blog'), 0);
+          setTimeout(() => navigate('/blog'), 0);
         },
         operation: 'createBlogPost',
         get body() {
@@ -103,7 +103,7 @@ export default function ContextualizedBlogPostPage() {
         }
       });
     },
-    [sendRequest]
+    [navigate, sendRequest]
   );
 
   const createComment = React.useCallback(
@@ -135,7 +135,7 @@ export default function ContextualizedBlogPostPage() {
     async function () {
       await sendRequest({
         callback: () => {
-          setTimeout(() => history.push('/blog'), 0);
+          setTimeout(() => navigate('/blog'), 0);
         },
         header: {
           BlogPostID: blogPostID
@@ -159,7 +159,7 @@ export default function ContextualizedBlogPostPage() {
         }
       });
     },
-    [blogPostID, sendRequest]
+    [blogPostID, navigate, sendRequest]
   );
 
   const fetchBlogPostByID = React.useCallback(

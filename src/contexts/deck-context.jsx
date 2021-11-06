@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
@@ -30,7 +30,7 @@ export const DeckContext = createContext({
 });
 
 export default function ContextualizedDeckPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { deckID } = useParams();
   const { addCardsToCache } = React.useContext(CardCacheContext);
   const [deckState, setDeckState] = React.useState({
@@ -124,8 +124,7 @@ export default function ContextualizedDeckPage() {
     async function () {
       await sendRequest({
         callback: (data) => {
-          history.push(`/deck/${data._id}`);
-          setDeckState(data);
+          navigate(`/deck/${data._id}`);
         },
         headers: { DeckID: deckState._id },
         load: true,
@@ -143,7 +142,7 @@ export default function ContextualizedDeckPage() {
         }
       });
     },
-    [deckQuery, deckState._id, history, sendRequest]
+    [deckQuery, deckState._id, navigate, sendRequest]
   );
 
   const editDeck = React.useCallback(

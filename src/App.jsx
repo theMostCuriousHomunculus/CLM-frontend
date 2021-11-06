@@ -1,6 +1,6 @@
 import React from 'react';
 import Cookies from 'js-cookie';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 
 import cacheScryfallData from './functions/cache-scryfall-data';
@@ -355,41 +355,40 @@ export default function App() {
                   }
                   messages={errorMessages}
                 />
-                <Switch>
-                  <Route path="/" exact>
-                    <Home />
-                  </Route>
-                  <Route path="/account/:accountID">
-                    <ContextualizedAccountPage />
-                  </Route>
-                  <Route path="/blog/:blogPostID">
-                    <ContextualizedBlogPostPage />
-                  </Route>
-                  <Route path="/blog">
-                    <Blog />
-                  </Route>
-                  <Route path="/classy">
-                    <Classy />
-                  </Route>
-                  <Route path="/cube/:cubeID">
-                    <ContextualizedCubePage />
-                  </Route>
-                  <Route path="/deck/:deckID">
-                    <ContextualizedDeckPage />
-                  </Route>
-                  <Route path="/event/:eventID">
-                    <ContextualizedEventPage />
-                  </Route>
-                  <Route path="/match/:matchID">
-                    <ContextualizedMatchPage />
-                  </Route>
-                  <Route path="/reset/:resetToken">
-                    <PasswordReset />
-                  </Route>
-                  <Route path="/resources" exact>
-                    <Resources />
-                  </Route>
-                </Switch>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route
+                    path="/account/:accountID"
+                    element={<ContextualizedAccountPage />}
+                  />
+                  <Route
+                    path="/blog/:blogPostID"
+                    element={<ContextualizedBlogPostPage />}
+                  />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/classy" element={<Classy />} />
+                  <Route
+                    path="/cube/:cubeID"
+                    element={<ContextualizedCubePage />}
+                  />
+                  <Route
+                    path="/deck/:deckID"
+                    element={<ContextualizedDeckPage />}
+                  />
+                  <Route
+                    path="/event/:eventID"
+                    element={<ContextualizedEventPage />}
+                  />
+                  <Route
+                    path="/match/:matchID"
+                    element={<ContextualizedMatchPage />}
+                  />
+                  <Route
+                    path="/reset/:resetToken"
+                    element={<PasswordReset />}
+                  />
+                  <Route path="/resources" element={<Resources />} />
+                </Routes>
               </React.Suspense>
             </main>
             <Footer />

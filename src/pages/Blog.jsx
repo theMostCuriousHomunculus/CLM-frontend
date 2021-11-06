@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardHeader from '@mui/material/CardHeader';
@@ -25,7 +25,7 @@ export default function Blog() {
     _id: null,
     title: null
   });
-  const history = useHistory();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     async function fetchBlogPosts() {
@@ -119,7 +119,7 @@ export default function Blog() {
               <MUICardMedia image="https://c1.scryfall.com/file/scryfall-cards/art_crop/front/c/b/cb3b35b8-f321-46d8-a441-6b9a6efa9021.jpg?1562304347" />
               <MUICardActions>
                 <MUIButton
-                  onClick={() => history.push('/blog/new-post')}
+                  onClick={() => navigate('/blog/new-post')}
                   startIcon={<MUICreateIcon />}
                 >
                   Write
@@ -152,9 +152,7 @@ export default function Blog() {
               />
               <MUICardMedia image={blogPost.image} />
               <MUICardActions>
-                <MUIButton
-                  onClick={() => history.push(`/blog/${blogPost._id}`)}
-                >
+                <MUIButton onClick={() => navigate(`/blog/${blogPost._id}`)}>
                   Read
                 </MUIButton>
                 {blogPost.author._id === authentication.userID && (

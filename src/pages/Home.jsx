@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MUIArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
@@ -13,7 +13,7 @@ import MUIListItemText from '@mui/material/ListItemText';
 import MUITypography from '@mui/material/Typography';
 
 export default function Home() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const features = [
     'Provides a simple UI to create and manage Magic the Gathering cubes with innovative, exclusive features termed "modules" and "rotations"',
     'Allows you to connect with your friends by sending and receiving bud requests',
@@ -40,9 +40,7 @@ export default function Home() {
         </MUIList>
       </MUICardContent>
       <MUICardActions>
-        <MUIButton
-          onClick={() => history.push('/cube/60e4a02d0347dc0017bfab0e')}
-        >
+        <MUIButton onClick={() => navigate('/cube/60e4a02d0347dc0017bfab0e')}>
           Casey's Cube
         </MUIButton>
       </MUICardActions>

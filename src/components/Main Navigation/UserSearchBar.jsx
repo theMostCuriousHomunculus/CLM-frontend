@@ -6,6 +6,7 @@ import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router';
 
 import theme from '../../theme';
 import useRequest from '../../hooks/request-hook';
@@ -70,10 +71,11 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UserSearchBar({ history, orientation, setDrawerOpen }) {
+export default function UserSearchBar({ orientation, setDrawerOpen }) {
   const { loading, sendRequest } = useRequest();
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
+  const navigate = useNavigate();
 
   async function searchAccounts(event) {
     if (event.target.value.length > 2) {
@@ -118,7 +120,7 @@ export default function UserSearchBar({ history, orientation, setDrawerOpen }) {
         loading={loading}
         onChange={function (event, value, reason) {
           if (reason === 'selectOption') {
-            history.push(`/account/${value._id}`);
+            navigate(`/account/${value._id}`);
             setUserSearchResults([]);
             setDrawerOpen(false);
           }
