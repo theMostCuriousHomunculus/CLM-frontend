@@ -1,10 +1,13 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
 import MUICardHeader from '@mui/material/CardHeader';
+import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
+import MUISwitch from '@mui/material/Switch';
 import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
@@ -20,6 +23,7 @@ import MatchAccordion from '../components/Account Page/MatchAccordion';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/authentication-context';
+import { ErrorContext } from '../contexts/error-context';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -47,15 +51,53 @@ export default function Account() {
       avatar,
       buds,
       email,
+      location,
       name,
       received_bud_requests,
       sent_bud_requests
     },
     setAccountState,
     editAccount,
-    fetchAccountByID
+    fetchAccountByID,
+    setLocation,
+    unsetLocation
   } = React.useContext(AccountContext);
+  const { setErrorMessages } = React.useContext(ErrorContext);
   const classes = useStyles();
+
+  const hideLocation = React.useCallback(() => {
+    if (Cookies.get('geolocation_id')) {
+      navigator.geolocation.clearWatch(Cookies.get('geolocation_id'));
+      Cookies.remove('geolocation_id');
+    }
+    unsetLocation();
+  }, []);
+
+  const shareLocation = React.useCallback(() => {
+    function error() {
+      setErrorMessages((prevState) => {
+        return [...prevState, 'Unable to retrieve your location.'];
+      });
+    }
+
+    function success(position) {
+      setLocation(position.coords.latitude, position.coords.longitude);
+      Cookies.set('geolocation_id', geolocationID);
+    }
+
+    if (!navigator.geolocation) {
+      setErrorMessages((prevState) => {
+        return [
+          ...prevState,
+          'Geolocation is not supported by your cave man browser.'
+        ];
+      });
+    }
+
+    const geolocationID = navigator.geolocation.watchPosition(success, error, {
+      enableHighAccuracy: true
+    });
+  }, []);
 
   React.useEffect(() => {
     async function initialize() {
@@ -71,6 +113,21 @@ export default function Account() {
     <React.Fragment>
       <MUICard>
         <MUICardHeader
+          action={
+            accountID === userID && (
+              <MUIFormControlLabel
+                control={
+                  <MUISwitch
+                    checked={location}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                    onChange={location ? hideLocation : shareLocation}
+                  />
+                }
+                label="Location Services"
+                labelPlacement="start"
+              />
+            )
+          }
           avatar={<Avatar alt={name} size="large" src={avatar} />}
           className={classes.cardHeader}
           title={

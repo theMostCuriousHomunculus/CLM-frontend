@@ -181,11 +181,17 @@ export default function App() {
       userName: null
     });
 
+    // stop watching user's location
+    if (Cookies.get('geolocation_id')) {
+      navigator.geolocation.clearWatch(Cookies.get('geolocation_id'));
+    }
+
     // clear from browser
     for (const cookie of [
       'is_admin',
       'authentication_token',
       'avatar',
+      'geolocation_id',
       'user_id',
       'user_name'
     ]) {

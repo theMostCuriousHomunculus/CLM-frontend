@@ -18,7 +18,9 @@ export const AccountContext = createContext({
   // deleteEvent: () => null,
   // deleteMatch: () => null,
   editAccount: () => null,
-  fetchAccountByID: () => null
+  fetchAccountByID: () => null,
+  setLocation: () => null,
+  unsetLocation: () => null
 });
 
 export default function ContextualizedAccountPage() {
@@ -32,6 +34,7 @@ export default function ContextualizedAccountPage() {
     decks: [],
     email: '',
     events: [],
+    location: false,
     matches: [],
     name: '...',
     received_bud_requests: [],
@@ -105,6 +108,7 @@ export default function ContextualizedAccountPage() {
         }
       }
     }
+    location
     matches {
       _id
       createdAt
@@ -329,9 +333,7 @@ export default function ContextualizedAccountPage() {
             query: `
             mutation {
               ${this.operation}(
-                input: {
-                  ${changes}
-                }
+                ${changes}
               ) {
                 ${accountQuery}
               }
@@ -366,6 +368,51 @@ export default function ContextualizedAccountPage() {
     [accountQuery, accountID, sendRequest]
   );
 
+  const setLocation = React.useCallback(
+    async function (latitude, longitude) {
+      await sendRequest({
+        callback: setAccountState,
+        operation: 'setLocation',
+        get body() {
+          return {
+            query: `
+            mutation {
+              ${this.operation}(
+                latitude: ${latitude},
+                longitude: ${longitude}
+              ) {
+                ${accountQuery}
+              }
+            }
+          `
+          };
+        }
+      });
+    },
+    [accountQuery, sendRequest]
+  );
+
+  const unsetLocation = React.useCallback(
+    async function () {
+      await sendRequest({
+        callback: setAccountState,
+        operation: 'unsetLocation',
+        get body() {
+          return {
+            query: `
+            mutation {
+              ${this.operation} {
+                ${accountQuery}
+              }
+            }
+          `
+          };
+        }
+      });
+    },
+    [accountQuery, sendRequest]
+  );
+
   return (
     <AccountContext.Provider
       value={{
@@ -380,7 +427,9 @@ export default function ContextualizedAccountPage() {
         deleteCube,
         deleteDeck,
         editAccount,
-        fetchAccountByID
+        fetchAccountByID,
+        setLocation,
+        unsetLocation
       }}
     >
       <Account />
