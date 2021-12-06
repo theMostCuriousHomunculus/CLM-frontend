@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
@@ -9,6 +9,7 @@ import MUIWarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import { makeStyles } from '@mui/styles';
 
 import theme from '../../theme';
+import { ErrorContext } from '../../contexts/Error';
 
 const useStyles = makeStyles({
   title: {
@@ -19,11 +20,15 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ErrorDialog({ clearAll, clearOne, messages }) {
+export default function ErrorDialog() {
   const classes = useStyles();
+  const { errorMessages, setErrorMessages } = useContext(ErrorContext);
 
   return (
-    <MUIDialog open={messages.length > 0} onClose={clearAll}>
+    <MUIDialog
+      open={errorMessages.length > 0}
+      onClose={() => setErrorMessages([])}
+    >
       <MUIDialogTitle className={classes.title}>
         <span>Error</span>
         <MUIWarningRoundedIcon
@@ -35,10 +40,18 @@ export default function ErrorDialog({ clearAll, clearOne, messages }) {
         />
       </MUIDialogTitle>
       <MUIDialogContent>
-        <MUIDialogContentText>{messages[0]}</MUIDialogContentText>
+        <MUIDialogContentText>{errorMessages[0]}</MUIDialogContentText>
       </MUIDialogContent>
       <MUIDialogActions>
-        <MUIButton onClick={clearOne}>Dismiss</MUIButton>
+        <MUIButton
+          onClick={() =>
+            setErrorMessages((prevState) =>
+              prevState.slice(0, prevState.length - 1)
+            )
+          }
+        >
+          Dismiss
+        </MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );

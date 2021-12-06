@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { ErrorContext } from '../contexts/error-context';
+import { AuthenticationContext } from '../contexts/Authentication';
+import { ErrorContext } from '../contexts/Error';
 
 export default function useRequest() {
   const { setErrorMessages } = useContext(ErrorContext);

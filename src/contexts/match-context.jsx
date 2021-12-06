@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Match from '../pages/Match';
-import { AuthenticationContext } from './authentication-context';
+import { AuthenticationContext } from './Authentication';
 
 export const MatchContext = createContext({
   loading: false,

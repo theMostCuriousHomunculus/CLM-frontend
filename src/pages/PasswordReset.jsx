@@ -8,8 +8,8 @@ import MUICardHeader from '@mui/material/CardHeader';
 import MUITextField from '@mui/material/TextField';
 
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { ErrorContext } from '../contexts/error-context';
+import { AuthenticationContext } from '../contexts/Authentication';
+import { ErrorContext } from '../contexts/Error';
 
 export default function PasswordReset() {
   const { loading, submitPasswordReset } = React.useContext(

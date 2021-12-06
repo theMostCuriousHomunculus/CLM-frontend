@@ -15,7 +15,7 @@ import Avatar from '../components/miscellaneous/Avatar';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import WarningButton from '../components/miscellaneous/WarningButton';
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 
 export default function Blog() {
   const authentication = React.useContext(AuthenticationContext);
@@ -103,7 +103,7 @@ export default function Blog() {
       </ConfirmationDialog>
 
       <MUIGrid container spacing={0}>
-        {authentication.isAdmin && (
+        {authentication.admin && (
           <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
             <MUICard>
               <MUICardHeader

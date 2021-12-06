@@ -17,7 +17,7 @@ import MUITypography from '@mui/material/Typography';
 import Avatar from '../miscellaneous/Avatar';
 import CreateMatchForm from './CreateMatchForm';
 import { AccountContext } from '../../contexts/account-context';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 export default function MatchAccordion({ pageClasses }) {
   const { accountID } = useParams();

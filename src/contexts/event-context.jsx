@@ -5,8 +5,8 @@ import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
-import { AuthenticationContext } from './authentication-context';
-import { CardCacheContext } from './card-cache-context';
+import { AuthenticationContext } from './Authentication';
+import { CardCacheContext } from './CardCache';
 
 export const EventContext = createContext({
   loading: false,

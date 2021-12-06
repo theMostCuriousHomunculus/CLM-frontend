@@ -9,7 +9,7 @@ import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   loadingSpinnerContainer: {

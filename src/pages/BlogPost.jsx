@@ -14,7 +14,7 @@ import { makeStyles } from '@mui/styles';
 import theme, { backgroundColor } from '../theme';
 import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 import { BlogPostContext } from '../contexts/blog-post-context';
 
 const useStyles = makeStyles({

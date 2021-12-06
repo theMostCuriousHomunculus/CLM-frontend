@@ -14,7 +14,7 @@ import PlayZone from '../components/Match Page/PlayZone';
 import ScryfallTokenSearchDialog from '../components/Match Page/ScryfallTokenSearchDialog';
 import TheStack from '../components/Match Page/TheStack';
 import ZoneInspectionDialog from '../components/Match Page/ZoneInspectionDialog';
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 import { MatchContext } from '../contexts/match-context';
 
 const useStyles = makeStyles({

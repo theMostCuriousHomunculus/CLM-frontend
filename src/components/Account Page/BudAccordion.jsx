@@ -18,7 +18,7 @@ import customSort from '../../functions/custom-sort';
 import Avatar from '../miscellaneous/Avatar';
 import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import { AccountContext } from '../../contexts/account-context';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   badge: {
@@ -130,6 +130,51 @@ export default function BudAccordion() {
         <MUIAccordionDetails style={{ display: 'block' }}>
           {accountID === userID && (
             <React.Fragment>
+              <MUIListSubheader component="div" id="nearby-users">
+                Nearby Users
+              </MUIListSubheader>
+              <MUIList className={classes.budList}>
+                {customSort(buds, ['name']).map((bud) => (
+                  <MUIListItem key={bud._id}>
+                    {accountID === userID ? (
+                      <MUIBadge
+                        anchorOrigin={{
+                          horizontal: 'right',
+                          vertical: 'bottom'
+                        }}
+                        badgeContent={
+                          <MUIDeleteForeverIcon className={classes.badgeIcon} />
+                        }
+                        className={classes.badge}
+                        color="secondary"
+                        onClick={(event) => {
+                          if (
+                            event.target
+                              .closest('span')
+                              .classList.contains('MuiBadge-colorSecondary')
+                          ) {
+                            setBudToDelete(bud);
+                          }
+                        }}
+                        overlap="circular"
+                      >
+                        <Link to={`/account/${bud._id}`}>
+                          <Avatar
+                            alt={bud.name}
+                            size="large"
+                            src={bud.avatar}
+                          />
+                        </Link>
+                      </MUIBadge>
+                    ) : (
+                      <Link to={`/account/${bud._id}`}>
+                        <Avatar alt={bud.name} size="large" src={bud.avatar} />
+                      </Link>
+                    )}
+                  </MUIListItem>
+                ))}
+              </MUIList>
+
               <MUIListSubheader component="div" id="aspiring-buds">
                 Aspiring
               </MUIListSubheader>

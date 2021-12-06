@@ -1,6 +1,6 @@
 import { useCallback, useContext } from 'react';
 
-import { CardCacheContext } from '../contexts/card-cache-context';
+import { CardCacheContext } from '../contexts/CardCache';
 
 export default function usePopulate() {
   const { scryfallCardDataCache } = useContext(CardCacheContext);

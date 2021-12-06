@@ -21,7 +21,7 @@ import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AccountContext } from '../../contexts/account-context';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   flex: {

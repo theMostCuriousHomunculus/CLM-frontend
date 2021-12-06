@@ -8,7 +8,7 @@ import yellow from '@mui/material/colors/yellow';
 import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 import { MatchContext } from '../../contexts/match-context';
 import { ReactComponent as EnergySymbol } from '../../svgs/energy.svg';
 import { ReactComponent as PoisonSymbol } from '../../svgs/poison.svg';

@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import Avatar from '../miscellaneous/Avatar';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 import { DeckContext } from '../../contexts/deck-context';
 import { CSVLink } from 'react-csv';
 

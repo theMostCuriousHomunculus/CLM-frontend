@@ -6,7 +6,7 @@ import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import DeckInfo from '../components/Deck Page/DeckInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 import { DeckContext } from '../contexts/deck-context';
 
 export default function Deck() {

@@ -7,7 +7,7 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { makeStyles } from '@mui/styles';
 
 import MagicCard from '../miscellaneous/MagicCard';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 import { MatchContext } from '../../contexts/match-context';
 
 const useStyles = makeStyles({

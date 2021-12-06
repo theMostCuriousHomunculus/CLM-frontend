@@ -12,7 +12,7 @@ import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import SortableList from '../components/Event Page/SortableList';
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 import { EventContext } from '../contexts/event-context';
 
 export default function Event() {

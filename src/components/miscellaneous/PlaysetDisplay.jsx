@@ -12,7 +12,7 @@ import { useParams } from 'react-router';
 import theme, { backgroundColor } from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   iconButton: {

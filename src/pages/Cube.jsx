@@ -6,7 +6,7 @@ import Dashboard from '../components/Cube Page/Dashboard';
 import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 import { CubeContext } from '../contexts/cube-context';
 
 export default function Cube() {

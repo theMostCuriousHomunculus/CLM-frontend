@@ -13,7 +13,7 @@ import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 
 import theme from '../../theme';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   item: {

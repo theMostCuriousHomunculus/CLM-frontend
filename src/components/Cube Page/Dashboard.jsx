@@ -30,7 +30,7 @@ import randomSampleWOReplacement from '../../functions/random-sample-wo-replacem
 import Avatar from '../miscellaneous/Avatar';
 import CreateComponentForm from './CreateComponentForm';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function Dashboard() {

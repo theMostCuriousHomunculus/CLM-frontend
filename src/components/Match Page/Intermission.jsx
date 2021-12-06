@@ -4,7 +4,7 @@ import MUITypography from '@mui/material/Typography';
 import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../miscellaneous/DeckDisplay';
 import WarningButton from '../miscellaneous/WarningButton';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 import { MatchContext } from '../../contexts/match-context';
 
 export default function Intermission() {

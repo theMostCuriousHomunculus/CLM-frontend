@@ -19,7 +19,7 @@ import MUITypography from '@mui/material/Typography';
 import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import CreateDeckForm from './CreateDeckForm';
 import { AccountContext } from '../../contexts/account-context';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 export default function DeckAccordion({ pageClasses }) {
   const {

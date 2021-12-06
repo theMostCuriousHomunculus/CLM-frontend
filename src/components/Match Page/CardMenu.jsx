@@ -3,7 +3,7 @@ import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
 
 import CountersDialog from './CountersDialog';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 import { MatchContext } from '../../contexts/match-context';
 
 export default function CardMenu({ rightClickedCard, setRightClickedCard }) {

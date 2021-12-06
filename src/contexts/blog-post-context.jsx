@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import BlogPost from '../pages/BlogPost';
-import { AuthenticationContext } from './authentication-context';
+import { AuthenticationContext } from './Authentication';
 
 export const BlogPostContext = createContext({
   loading: false,

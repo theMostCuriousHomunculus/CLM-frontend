@@ -1,7 +1,7 @@
 import { useCallback, useContext } from 'react';
 import { createClient } from 'graphql-ws';
 
-import { AuthenticationContext } from '../contexts/authentication-context';
+import { AuthenticationContext } from '../contexts/Authentication';
 
 export default function useSubscribe() {
   const { token } = useContext(AuthenticationContext);

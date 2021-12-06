@@ -5,7 +5,7 @@ import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Deck from '../pages/Deck';
-import { CardCacheContext } from './card-cache-context';
+import { CardCacheContext } from './CardCache';
 
 export const DeckContext = createContext({
   loading: false,

@@ -22,8 +22,8 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import MatchAccordion from '../components/Account Page/MatchAccordion';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AccountContext } from '../contexts/account-context';
-import { AuthenticationContext } from '../contexts/authentication-context';
-import { ErrorContext } from '../contexts/error-context';
+import { AuthenticationContext } from '../contexts/Authentication';
+import { ErrorContext } from '../contexts/Error';
 
 const useStyles = makeStyles({
   cardHeader: {

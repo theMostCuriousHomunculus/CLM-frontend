@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import React, { createContext, useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
@@ -6,7 +6,6 @@ import Account from '../pages/Account';
 
 export const AccountContext = createContext({
   loading: false,
-  accountQuery: '',
   accountState: null,
   setAccountState: () => null,
   createCube: () => null,
@@ -26,7 +25,7 @@ export const AccountContext = createContext({
 export default function ContextualizedAccountPage() {
   const { accountID } = useParams();
   const navigate = useNavigate();
-  const [accountState, setAccountState] = React.useState({
+  const [accountState, setAccountState] = useState({
     _id: accountID,
     avatar: '',
     buds: [],
@@ -134,6 +133,11 @@ export default function ContextualizedAccountPage() {
       }
     }
     name
+    nearby_users {
+      _id
+      avatar
+      name
+    }
     received_bud_requests {
       _id
       avatar
@@ -144,10 +148,15 @@ export default function ContextualizedAccountPage() {
       avatar
       name
     }
+    settings {
+      location_services
+      measurement_system
+      radius
+    }
   `;
   const { loading, sendRequest } = useRequest();
 
-  const createCube = React.useCallback(
+  const createCube = useCallback(
     async function (event, cobraID, description, name) {
       event.preventDefault();
 
@@ -177,7 +186,7 @@ export default function ContextualizedAccountPage() {
     [navigate, sendRequest]
   );
 
-  const createDeck = React.useCallback(
+  const createDeck = useCallback(
     async function (event, description, existingListID, format, name) {
       event.preventDefault();
 
@@ -212,7 +221,7 @@ export default function ContextualizedAccountPage() {
     [navigate, sendRequest]
   );
 
-  const createEvent = React.useCallback(
+  const createEvent = useCallback(
     async function (
       event,
       cubeID,
@@ -255,7 +264,7 @@ export default function ContextualizedAccountPage() {
     [navigate, sendRequest]
   );
 
-  const createMatch = React.useCallback(
+  const createMatch = useCallback(
     async function (event, deckIDs, eventID, playerIDs) {
       event.preventDefault();
 
@@ -285,7 +294,7 @@ export default function ContextualizedAccountPage() {
     [navigate, sendRequest]
   );
 
-  const deleteCube = React.useCallback(
+  const deleteCube = useCallback(
     async function (cubeID) {
       await sendRequest({
         headers: { CubeID: cubeID },
@@ -304,7 +313,7 @@ export default function ContextualizedAccountPage() {
     [sendRequest]
   );
 
-  const deleteDeck = React.useCallback(
+  const deleteDeck = useCallback(
     async function (deckID) {
       await sendRequest({
         headers: { DeckID: deckID },
@@ -323,7 +332,7 @@ export default function ContextualizedAccountPage() {
     [sendRequest]
   );
 
-  const editAccount = React.useCallback(
+  const editAccount = useCallback(
     async function (changes) {
       await sendRequest({
         callback: setAccountState,
@@ -346,7 +355,7 @@ export default function ContextualizedAccountPage() {
     [accountQuery, sendRequest]
   );
 
-  const fetchAccountByID = React.useCallback(
+  const fetchAccountByID = useCallback(
     async function () {
       await sendRequest({
         callback: setAccountState,
@@ -368,7 +377,7 @@ export default function ContextualizedAccountPage() {
     [accountQuery, accountID, sendRequest]
   );
 
-  const setLocation = React.useCallback(
+  const setLocation = useCallback(
     async function (latitude, longitude) {
       await sendRequest({
         callback: setAccountState,
@@ -392,7 +401,7 @@ export default function ContextualizedAccountPage() {
     [accountQuery, sendRequest]
   );
 
-  const unsetLocation = React.useCallback(
+  const unsetLocation = useCallback(
     async function () {
       await sendRequest({
         callback: setAccountState,
@@ -417,7 +426,6 @@ export default function ContextualizedAccountPage() {
     <AccountContext.Provider
       value={{
         loading,
-        accountQuery,
         accountState,
         setAccountState,
         createCube,

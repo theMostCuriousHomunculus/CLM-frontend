@@ -17,7 +17,7 @@ import MUITypography from '@mui/material/Typography';
 import CreateEventForm from './CreateEventForm';
 import Avatar from '../miscellaneous/Avatar';
 import { AccountContext } from '../../contexts/account-context';
-import { AuthenticationContext } from '../../contexts/authentication-context';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 export default function EventAccordion({ pageClasses }) {
   const { accountID } = useParams();

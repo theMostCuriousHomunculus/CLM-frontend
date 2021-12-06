@@ -65,6 +65,13 @@ export default function Resources() {
       link: 'https://www.youtube.com/playlist?list=PL5d1KNNFArSNcPm8nmlDOuFpe6u3QYYAL',
       name: 'The 540',
       platform: 'YouTube'
+    },
+    {
+      description:
+        'A completely free map tool to help players find both events and Wizards Play Network locations.',
+      link: 'https://locator.wizards.com/',
+      name: 'Wizards of the Coast Store & Event Locator',
+      platform: 'Web Site'
     }
   ];
 
