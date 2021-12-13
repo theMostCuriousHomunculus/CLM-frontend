@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionDetails from '@mui/material/AccordionDetails';
@@ -48,18 +48,26 @@ export default function BudAccordion() {
   const { accountID } = useParams();
   const classes = useStyles();
   const {
-    accountState: { buds, received_bud_requests, sent_bud_requests },
+    accountState: {
+      buds,
+      nearby_users,
+      received_bud_requests,
+      sent_bud_requests
+    },
     editAccount
-  } = React.useContext(AccountContext);
-  const { userID } = React.useContext(AuthenticationContext);
-  const [budToDelete, setBudToDelete] = React.useState({
+  } = useContext(AccountContext);
+  const {
+    settings: { location_services },
+    userID
+  } = useContext(AuthenticationContext);
+  const [budToDelete, setBudToDelete] = useState({
     _id: null,
     avatar: null,
     name: null
   });
-  const [potentialBuds, setPotentialBuds] = React.useState([]);
+  const [potentialBuds, setPotentialBuds] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const pbObject = {};
 
     for (const bud of buds) {
@@ -130,50 +138,50 @@ export default function BudAccordion() {
         <MUIAccordionDetails style={{ display: 'block' }}>
           {accountID === userID && (
             <React.Fragment>
-              <MUIListSubheader component="div" id="nearby-users">
-                Nearby Users
-              </MUIListSubheader>
-              <MUIList className={classes.budList}>
-                {customSort(buds, ['name']).map((bud) => (
-                  <MUIListItem key={bud._id}>
-                    {accountID === userID ? (
-                      <MUIBadge
-                        anchorOrigin={{
-                          horizontal: 'right',
-                          vertical: 'bottom'
-                        }}
-                        badgeContent={
-                          <MUIDeleteForeverIcon className={classes.badgeIcon} />
-                        }
-                        className={classes.badge}
-                        color="secondary"
-                        onClick={(event) => {
-                          if (
-                            event.target
-                              .closest('span')
-                              .classList.contains('MuiBadge-colorSecondary')
-                          ) {
-                            setBudToDelete(bud);
+              {location_services && nearby_users && (
+                <React.Fragment>
+                  <MUIListSubheader component="div" id="nearby-users">
+                    Nearby Users
+                  </MUIListSubheader>
+                  <MUIList className={classes.budList}>
+                    {customSort(nearby_users, ['name']).map((nearby_user) => (
+                      <MUIListItem key={nearby_user._id}>
+                        <MUIBadge
+                          anchorOrigin={{
+                            horizontal: 'right',
+                            vertical: 'top'
+                          }}
+                          badgeContent={
+                            <MUIPersonAddIcon className={classes.badgeIcon} />
                           }
-                        }}
-                        overlap="circular"
-                      >
-                        <Link to={`/account/${bud._id}`}>
-                          <Avatar
-                            alt={bud.name}
-                            size="large"
-                            src={bud.avatar}
-                          />
-                        </Link>
-                      </MUIBadge>
-                    ) : (
-                      <Link to={`/account/${bud._id}`}>
-                        <Avatar alt={bud.name} size="large" src={bud.avatar} />
-                      </Link>
-                    )}
-                  </MUIListItem>
-                ))}
-              </MUIList>
+                          className={classes.badge}
+                          color="primary"
+                          onClick={(event) => {
+                            if (
+                              event.target
+                                .closest('span')
+                                .classList.contains('MuiBadge-colorPrimary')
+                            ) {
+                              editAccount(
+                                `action: "send",\nother_user_id: "${nearby_user._id}"`
+                              );
+                            }
+                          }}
+                          overlap="circular"
+                        >
+                          <Link to={`/account/${nearby_user._id}`}>
+                            <Avatar
+                              alt={nearby_user.name}
+                              size="large"
+                              src={nearby_user.avatar}
+                            />
+                          </Link>
+                        </MUIBadge>
+                      </MUIListItem>
+                    ))}
+                  </MUIList>
+                </React.Fragment>
+              )}
 
               <MUIListSubheader component="div" id="aspiring-buds">
                 Aspiring

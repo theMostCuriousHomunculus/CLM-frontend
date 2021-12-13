@@ -5,7 +5,7 @@ import { ErrorContext } from '../contexts/Error';
 
 export default function useRequest() {
   const { setErrorMessages } = useContext(ErrorContext);
-  const { token } = useContext(AuthenticationContext);
+  const { isLoggedIn, token } = useContext(AuthenticationContext);
   const [loading, setLoading] = useState(false);
   const activeRequests = useRef([]);
 
@@ -19,7 +19,7 @@ export default function useRequest() {
       operation = null,
       url = process.env.REACT_APP_HTTP_URL
     }) {
-      if (token && url === process.env.REACT_APP_HTTP_URL) {
+      if (url === process.env.REACT_APP_HTTP_URL && isLoggedIn) {
         headers.Authorization = `Bearer ${token}`;
       }
 
@@ -71,7 +71,7 @@ export default function useRequest() {
         setLoading(false);
       }
     },
-    [setErrorMessages, token]
+    [setErrorMessages]
   );
 
   useEffect(() => {

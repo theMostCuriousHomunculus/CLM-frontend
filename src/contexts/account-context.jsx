@@ -17,9 +17,7 @@ export const AccountContext = createContext({
   // deleteEvent: () => null,
   // deleteMatch: () => null,
   editAccount: () => null,
-  fetchAccountByID: () => null,
-  setLocation: () => null,
-  unsetLocation: () => null
+  fetchAccountByID: () => null
 });
 
 export default function ContextualizedAccountPage() {
@@ -36,6 +34,7 @@ export default function ContextualizedAccountPage() {
     location: false,
     matches: [],
     name: '...',
+    nearby_users: null,
     received_bud_requests: [],
     sent_bud_requests: []
   });
@@ -107,7 +106,9 @@ export default function ContextualizedAccountPage() {
         }
       }
     }
-    location
+    location {
+      coordinates
+    }
     matches {
       _id
       createdAt
@@ -377,51 +378,6 @@ export default function ContextualizedAccountPage() {
     [accountQuery, accountID, sendRequest]
   );
 
-  const setLocation = useCallback(
-    async function (latitude, longitude) {
-      await sendRequest({
-        callback: setAccountState,
-        operation: 'setLocation',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                latitude: ${latitude},
-                longitude: ${longitude}
-              ) {
-                ${accountQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [accountQuery, sendRequest]
-  );
-
-  const unsetLocation = useCallback(
-    async function () {
-      await sendRequest({
-        callback: setAccountState,
-        operation: 'unsetLocation',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation} {
-                ${accountQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [accountQuery, sendRequest]
-  );
-
   return (
     <AccountContext.Provider
       value={{
@@ -435,9 +391,7 @@ export default function ContextualizedAccountPage() {
         deleteCube,
         deleteDeck,
         editAccount,
-        fetchAccountByID,
-        setLocation,
-        unsetLocation
+        fetchAccountByID
       }}
     >
       <Account />

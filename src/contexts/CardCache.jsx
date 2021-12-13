@@ -7,7 +7,7 @@ export const CardCacheContext = createContext({
   scryfallCardDataCache: { current: null }
 });
 
-export function CardCacheProvider() {
+export function CardCacheProvider({ children }) {
   const { sendRequest } = useRequest();
   const scryfallCardDataCache = React.useRef(Object.create(null));
 

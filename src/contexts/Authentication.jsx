@@ -1,6 +1,14 @@
-import React, { createContext, useCallback, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react';
+import Cookies from 'js-cookie';
 
 import useRequest from '../hooks/request-hook';
+import { ErrorContext } from './Error';
 
 const unauthenticatedUserInfo = {
   admin: false,
@@ -17,7 +25,7 @@ const unauthenticatedUserInfo = {
 
 export const AuthenticationContext = createContext({
   ...unauthenticatedUserInfo,
-  authenticate: () => null,
+  hideLocation: () => null,
   // a convenience field; just makes code a bit easier to reason about
   isLoggedIn: false,
   loading: false,
@@ -25,11 +33,14 @@ export const AuthenticationContext = createContext({
   logout: () => null,
   register: () => null,
   requestPasswordReset: () => null,
+  shareLocation: () => null,
   submitPasswordReset: () => null
 });
 
 export function AuthenticationProvider({ children }) {
+  const { setErrorMessages } = useContext(ErrorContext);
   const { loading, sendRequest } = useRequest();
+  const [geolocationID, setGeolocationID] = useState(null);
   const [userInfo, setUserInfo] = useState({
     ...unauthenticatedUserInfo
   });
@@ -73,6 +84,9 @@ export function AuthenticationProvider({ children }) {
     async function () {
       await sendRequest({
         callback: storeUserInfo,
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authentication_token')}`
+        },
         load: true,
         operation: 'authenticate',
         get body() {
@@ -88,7 +102,7 @@ export function AuthenticationProvider({ children }) {
         }
       });
     },
-    [sendRequest, storeUserInfo]
+    [sendRequest]
   );
 
   const login = useCallback(
@@ -113,7 +127,7 @@ export function AuthenticationProvider({ children }) {
         }
       });
     },
-    [sendRequest, storeUserInfo]
+    [sendRequest]
   );
 
   const logout = useCallback(() => {
@@ -131,15 +145,16 @@ export function AuthenticationProvider({ children }) {
       }
     });
 
+    // stop watching user's location
+    if (geolocationID) {
+      navigator.geolocation.clearWatch(geolocationID);
+    }
+
     // clear from running application
+    setGeolocationID(null);
     setUserInfo({
       ...unauthenticatedUserInfo
     });
-
-    // stop watching user's location
-    if (Cookies.get('geolocation_id')) {
-      navigator.geolocation.clearWatch(Cookies.get('geolocation_id'));
-    }
 
     // clear from browser
     Cookies.remove('authentication_token');
@@ -194,7 +209,7 @@ export function AuthenticationProvider({ children }) {
         }
       });
     },
-    [sendRequest, storeUserInfo]
+    [sendRequest]
   );
 
   const requestPasswordReset = useCallback(
@@ -224,6 +239,73 @@ export function AuthenticationProvider({ children }) {
     [sendRequest]
   );
 
+  // this is the function that is called to send the user's location to the backend
+  const postLocation = useCallback(
+    async function (latitude, longitude) {
+      await sendRequest({
+        callback: (data) => {
+          setUserInfo((prevState) => ({
+            ...prevState,
+            settings: {
+              ...prevState.settings,
+              location_services: data.settings.location_services
+            }
+          }));
+        },
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authentication_token')}`
+        },
+        operation: 'postLocation',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}(
+                  latitude: ${latitude},
+                  longitude: ${longitude}
+                ) {
+                  settings {
+                    location_services
+                  }
+                }
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest]
+  );
+
+  // this is the function that is called when a user opts to turn on location services, and when they log in and their account settings indicate that they want to share their location
+  const shareLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setErrorMessages((prevState) => {
+        return [
+          ...prevState,
+          'Geolocation is not supported by your cave man browser.'
+        ];
+      });
+    }
+
+    const GLID = navigator.geolocation.watchPosition(
+      // success
+      (position) => {
+        postLocation(position.coords.latitude, position.coords.longitude);
+        setGeolocationID(GLID);
+      },
+      // failure
+      () => {
+        setErrorMessages((prevState) => {
+          return [...prevState, 'Unable to retrieve your location.'];
+        });
+      },
+      {
+        enableHighAccuracy: true
+      }
+    );
+  }, [postLocation]);
+
   const submitPasswordReset = useCallback(
     async function (email, password, reset_token) {
       await sendRequest({
@@ -247,20 +329,82 @@ export function AuthenticationProvider({ children }) {
         }
       });
     },
-    [sendRequest, storeUserInfo]
+    [sendRequest]
   );
+
+  // this is the function that is called to remove the user's location from the backend
+  const deleteLocation = useCallback(
+    async function () {
+      await sendRequest({
+        callback: (data) => {
+          setUserInfo((prevState) => ({
+            ...prevState,
+            settings: {
+              ...prevState.settings,
+              location_services: data.settings.location_services
+            }
+          }));
+        },
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authentication_token')}`
+        },
+        operation: 'deleteLocation',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation} {
+                  settings {
+                    location_services
+                  }
+                }
+              }
+            `
+          };
+        }
+      });
+    },
+    [sendRequest]
+  );
+
+  // this is the function that is called when the user elects to turn off location services
+  const hideLocation = useCallback(() => {
+    if (geolocationID) {
+      navigator.geolocation.clearWatch(geolocationID);
+    }
+    setGeolocationID(null);
+    deleteLocation();
+  }, [deleteLocation]);
+
+  useEffect(() => {
+    if (Cookies.get('authentication_token')) {
+      authenticate();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userInfo.settings.location_services) {
+      shareLocation();
+    }
+    return () => {
+      if (geolocationID) {
+        navigator.geolocation.clearWatch(geolocationID);
+      }
+    };
+  }, [userInfo.settings.location_services]);
 
   return (
     <AuthenticationContext.Provider
       value={{
         ...userInfo,
-        authenticate,
+        hideLocation,
         isLoggedIn: !!userInfo.token,
         loading,
         login,
         logout,
         register,
         requestPasswordReset,
+        shareLocation,
         submitPasswordReset
       }}
     >

@@ -1,5 +1,4 @@
 import React from 'react';
-import Cookies from 'js-cookie';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 
@@ -46,18 +45,6 @@ const useStyles = makeStyles({
 
 export default function App() {
   const classes = useStyles();
-
-  React.useEffect(() => {
-    if (Cookies.get('authentication_token')) {
-      setAuthenticationState({
-        avatar: Cookies.get('avatar'),
-        isAdmin: Cookies.get('is_admin') === 'true',
-        token: Cookies.get('authentication_token'),
-        userID: Cookies.get('user_id'),
-        userName: Cookies.get('user_name')
-      });
-    }
-  }, []);
 
   return (
     <BrowserRouter>
