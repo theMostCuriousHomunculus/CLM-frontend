@@ -44,7 +44,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function BudAccordion() {
+export default function BudAccordion({ toggleState }) {
   const { accountID } = useParams();
   const classes = useStyles();
   const {
@@ -65,17 +65,17 @@ export default function BudAccordion() {
     avatar: null,
     name: null
   });
-  const [potentialBuds, setPotentialBuds] = useState([]);
+  const [recommendedBuds, setRecommendedBuds] = useState([]);
 
   useEffect(() => {
-    const pbObject = {};
+    const rbObject = {};
 
     for (const bud of buds) {
       for (const budsBud of bud.buds) {
-        if (pbObject[budsBud._id]) {
-          pbObject[budsBud._id].priority++;
+        if (rbObject[budsBud._id]) {
+          rbObject[budsBud._id].priority++;
         } else {
-          pbObject[budsBud._id] = {
+          rbObject[budsBud._id] = {
             avatar: budsBud.avatar,
             name: budsBud.name,
             priority: 1
@@ -84,18 +84,18 @@ export default function BudAccordion() {
       }
     }
 
-    setPotentialBuds(
-      Object.entries(pbObject)
+    setRecommendedBuds(
+      Object.entries(rbObject)
         .sort((a, b) => b[1].priority - a[1].priority)
-        .map((pb) => ({ _id: pb[0], avatar: pb[1].avatar, name: pb[1].name }))
+        .map((rb) => ({ _id: rb[0], avatar: rb[1].avatar, name: rb[1].name }))
         .filter(
-          (pb) =>
+          (rb) =>
             !buds
               .map((bud) => bud._id)
               .concat([accountID])
               .concat(received_bud_requests.map((req) => req._id))
               .concat(sent_bud_requests.map((req) => req._id))
-              .includes(pb._id)
+              .includes(rb._id)
         )
     );
   }, [accountID, buds, received_bud_requests, sent_bud_requests]);
@@ -138,48 +138,54 @@ export default function BudAccordion() {
         <MUIAccordionDetails style={{ display: 'block' }}>
           {accountID === userID && (
             <React.Fragment>
-              {location_services && nearby_users && (
+              {toggleState && (
                 <React.Fragment>
                   <MUIListSubheader component="div" id="nearby-users">
                     Nearby Users
                   </MUIListSubheader>
-                  <MUIList className={classes.budList}>
-                    {customSort(nearby_users, ['name']).map((nearby_user) => (
-                      <MUIListItem key={nearby_user._id}>
-                        <MUIBadge
-                          anchorOrigin={{
-                            horizontal: 'right',
-                            vertical: 'top'
-                          }}
-                          badgeContent={
-                            <MUIPersonAddIcon className={classes.badgeIcon} />
-                          }
-                          className={classes.badge}
-                          color="primary"
-                          onClick={(event) => {
-                            if (
-                              event.target
-                                .closest('span')
-                                .classList.contains('MuiBadge-colorPrimary')
-                            ) {
-                              editAccount(
-                                `action: "send",\nother_user_id: "${nearby_user._id}"`
-                              );
+                  {location_services && nearby_users ? (
+                    <MUIList className={classes.budList}>
+                      {customSort(nearby_users, ['name']).map((nearby_user) => (
+                        <MUIListItem key={nearby_user._id}>
+                          <MUIBadge
+                            anchorOrigin={{
+                              horizontal: 'right',
+                              vertical: 'top'
+                            }}
+                            badgeContent={
+                              <MUIPersonAddIcon className={classes.badgeIcon} />
                             }
-                          }}
-                          overlap="circular"
-                        >
-                          <Link to={`/account/${nearby_user._id}`}>
-                            <Avatar
-                              alt={nearby_user.name}
-                              size="large"
-                              src={nearby_user.avatar}
-                            />
-                          </Link>
-                        </MUIBadge>
-                      </MUIListItem>
-                    ))}
-                  </MUIList>
+                            className={classes.badge}
+                            color="primary"
+                            onClick={(event) => {
+                              if (
+                                event.target
+                                  .closest('span')
+                                  .classList.contains('MuiBadge-colorPrimary')
+                              ) {
+                                editAccount(
+                                  `action: "send",\nother_user_id: "${nearby_user._id}"`
+                                );
+                              }
+                            }}
+                            overlap="circular"
+                          >
+                            <Link to={`/account/${nearby_user._id}`}>
+                              <Avatar
+                                alt={nearby_user.name}
+                                size="large"
+                                src={nearby_user.avatar}
+                              />
+                            </Link>
+                          </MUIBadge>
+                        </MUIListItem>
+                      ))}
+                    </MUIList>
+                  ) : (
+                    <MUITypography variant="body1">
+                      Determining Location...
+                    </MUITypography>
+                  )}
                 </React.Fragment>
               )}
 
@@ -270,10 +276,10 @@ export default function BudAccordion() {
               </MUIList>
 
               <MUIListSubheader component="div" id="potential-buds">
-                Potential
+                Recommended
               </MUIListSubheader>
               <MUIList className={classes.budList}>
-                {potentialBuds.map(function (pb) {
+                {recommendedBuds.map(function (pb) {
                   return (
                     <MUIListItem key={pb._id}>
                       <MUIBadge

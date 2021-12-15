@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
@@ -64,7 +64,16 @@ export default function Account() {
     editAccount,
     fetchAccountByID
   } = useContext(AccountContext);
+  const [toggleState, setToggleState] = useState(location_services);
   const classes = useStyles();
+  const toggleLS = useCallback((event) => {
+    setToggleState(event.target.checked);
+    if (!event.target.checked) {
+      hideLocation();
+    } else {
+      shareLocation();
+    }
+  });
 
   useEffect(() => {
     async function initialize() {
@@ -85,15 +94,9 @@ export default function Account() {
               <MUIFormControlLabel
                 control={
                   <MUISwitch
-                    checked={location_services}
+                    checked={toggleState}
                     inputProps={{ 'aria-label': 'controlled' }}
-                    onChange={() => {
-                      if (location_services) {
-                        hideLocation();
-                      } else {
-                        shareLocation();
-                      }
-                    }}
+                    onChange={toggleLS}
                   />
                 }
                 label="Location Services"
@@ -163,7 +166,7 @@ export default function Account() {
           )}
       </MUICard>
 
-      <BudAccordion />
+      <BudAccordion toggleState={toggleState} />
 
       <CubeAccordion pageClasses={classes} />
 
