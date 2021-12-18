@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MUIAppBar from '@mui/material/AppBar';
 import MUIDrawer from '@mui/material/Drawer';
+import MUIIconButton from '@mui/material/IconButton';
 import MUIToolbar from '@mui/material/Toolbar';
+import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import MUIMenuIcon from '@mui/icons-material/Menu';
 import { makeStyles } from '@mui/styles';
@@ -11,6 +14,7 @@ import AuthenticateForm from './AuthenticateForm';
 import NavigationLinks from './NavigationLinks';
 import theme from '../../theme';
 import UserSearchBar from './UserSearchBar';
+import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   appBar: {
@@ -21,8 +25,9 @@ const useStyles = makeStyles({
       background: `linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`
     }
   },
-  headlineContainer: {
-    textAlign: 'left'
+  leftContainer: {
+    display: 'flex',
+    flexGrow: 2
   },
   menuIcon: {
     border: '1px solid',
@@ -36,7 +41,7 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
     padding: 8
   },
-  topBarContainer: {
+  rightContainer: {
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'flex-end'
@@ -44,9 +49,10 @@ const useStyles = makeStyles({
 });
 
 export default function Navigation() {
+  const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] =
-    React.useState(false);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+    useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -68,18 +74,33 @@ export default function Navigation() {
       />
       <MUIAppBar className={classes.appBar} id="app-bar" position="static">
         <MUIToolbar className={classes.toolbar}>
-          <MUIMenuIcon
-            className={classes.menuIcon}
-            color="secondary"
-            onClick={() => setDrawerOpen(true)}
-          />
-          <div className={classes.headlineContainer}>
-            <MUITypography color="secondary" variant="h3">
+          <div className={classes.leftContainer}>
+            <MUIMenuIcon
+              className={classes.menuIcon}
+              color="secondary"
+              onClick={() => setDrawerOpen(true)}
+            />
+            <MUITypography
+              color="secondary"
+              style={{ whiteSpace: 'nowrap' }}
+              variant="h3"
+            >
               Cube Level Midnight
             </MUITypography>
           </div>
-          <div className={classes.topBarContainer}>
+          <div className={classes.rightContainer}>
             <UserSearchBar orientation="top" setDrawerOpen={setDrawerOpen} />
+            {isLoggedIn && (
+              <MUITooltip title="My Profile">
+                <MUIIconButton
+                  color="secondary"
+                  onClick={() => navigate(`/account/${userID}`)}
+                  size="small"
+                >
+                  <MUIAccountCircleIcon />
+                </MUIIconButton>
+              </MUITooltip>
+            )}
           </div>
         </MUIToolbar>
         <MUIDrawer

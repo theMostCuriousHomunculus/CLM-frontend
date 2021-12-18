@@ -14,13 +14,12 @@ import Avatar from '../miscellaneous/Avatar';
 
 const useStyles = makeStyles({
   input: {
-    margin: '8px 8px 8px 56px',
+    margin: 8,
     '& input[type=text]': {
       color: '#ffffff'
     },
-    '& .MuiInputBase-root': {
-      padding: '8px 40px 8px 8px !important'
-    }
+    minWidth: 300,
+    width: 'calc(100% - 16px)'
   },
   option: {
     alignItems: 'flex-end',
@@ -34,40 +33,18 @@ const useStyles = makeStyles({
     position: 'relative',
     '&:hover': {
       backgroundColor: alpha(theme.palette.common.white, 0.25)
-    },
-    '& .MuiAutocomplete-root': {
-      [theme.breakpoints.down('sm')]: {
-        width: 286
-      },
-      [theme.breakpoints.up('md')]: {
-        width: 576
-      }
-    },
-    '& .MuiFormControl-root': {
-      marginLeft: 56
     }
-  },
-  searchIcon: {
-    alignItems: 'center',
-    color: '#ffffff',
-    display: 'flex',
-    height: '100%',
-    justifyContent: 'center',
-    padding: theme.spacing(0, 2),
-    pointerEvents: 'none',
-    position: 'absolute'
   },
   sideBar: {
     [theme.breakpoints.up('md')]: {
       display: 'none'
-    },
-    width: 350
+    }
   },
   topBar: {
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none'
     },
-    width: 640
+    flexGrow: 1
   }
 });
 
@@ -86,14 +63,14 @@ export default function UserSearchBar({ orientation, setDrawerOpen }) {
         get body() {
           return {
             query: `
-                query {
-                  ${this.operation}(name: "${event.target.value}") {
-                    _id
-                    avatar
-                    name
-                  }
+              query {
+                ${this.operation}(name: "${event.target.value}") {
+                  _id
+                  avatar
+                  name
                 }
-              `
+              }
+            `
           };
         }
       });
@@ -103,56 +80,49 @@ export default function UserSearchBar({ orientation, setDrawerOpen }) {
   }
 
   return (
-    <div
-      className={
-        (orientation === 'side' ? classes.sideBar : classes.topBar) +
-        ' ' +
-        classes.search
-      }
-    >
-      <div className={classes.searchIcon}>
-        <MUISearchIcon />
-      </div>
-      <MUIAutocomplete
-        clearOnBlur={false}
-        clearOnEscape={true}
-        getOptionLabel={(option) => option.name}
-        loading={loading}
-        onChange={function (event, value, reason) {
-          if (reason === 'selectOption') {
-            navigate(`/account/${value._id}`);
-            setUserSearchResults([]);
-            setDrawerOpen(false);
-          }
-        }}
-        options={userSearchResults}
-        renderInput={(params) => (
-          <MUITextField
-            {...params}
-            className={classes.input}
-            color="secondary"
-            label="Search for Other Users!"
-            onKeyUp={searchAccounts}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <React.Fragment>
-                  {loading && <MUICircularProgress color="inherit" size={20} />}
-                  {params.InputProps.endAdornment}
-                </React.Fragment>
-              )
-            }}
-          />
-        )}
-        renderOption={(props, option) => {
-          return (
-            <li className={classes.option} {...props}>
-              <Avatar alt={option.name} size="small" src={option.avatar} />
-              <MUITypography variant="body1">{option.name}</MUITypography>
-            </li>
-          );
-        }}
-      />
-    </div>
+    <MUIAutocomplete
+      className={`${
+        orientation === 'side' ? classes.sideBar : classes.topBar
+      } ${classes.search}`}
+      clearOnBlur={false}
+      clearOnEscape={true}
+      getOptionLabel={(option) => option.name}
+      loading={loading}
+      onChange={function (event, value, reason) {
+        if (reason === 'selectOption') {
+          navigate(`/account/${value._id}`);
+          setUserSearchResults([]);
+          setDrawerOpen(false);
+        }
+      }}
+      options={userSearchResults}
+      renderInput={(params) => (
+        <MUITextField
+          {...params}
+          className={classes.input}
+          color="secondary"
+          label="Search for Other Users!"
+          onKeyUp={searchAccounts}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <React.Fragment>
+                {loading && <MUICircularProgress color="inherit" size={20} />}
+                {params.InputProps.endAdornment}
+              </React.Fragment>
+            ),
+            startAdornment: <MUISearchIcon style={{ color: 'white' }} />
+          }}
+        />
+      )}
+      renderOption={(props, option) => {
+        return (
+          <li className={classes.option} {...props}>
+            <Avatar alt={option.name} size="small" src={option.avatar} />
+            <MUITypography variant="body1">{option.name}</MUITypography>
+          </li>
+        );
+      }}
+    />
   );
 }
