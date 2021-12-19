@@ -7,10 +7,12 @@ import MUIToolbar from '@mui/material/Toolbar';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import MUIMenuIcon from '@mui/icons-material/Menu';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import { useNavigate } from 'react-router-dom';
 
 import AuthenticateForm from './AuthenticateForm';
+import Avatar from '../miscellaneous/Avatar';
 import NavigationLinks from './NavigationLinks';
 import theme from '../../theme';
 import UserSearchBar from './UserSearchBar';
@@ -42,6 +44,7 @@ const useStyles = makeStyles({
     padding: 8
   },
   rightContainer: {
+    alignItems: 'center',
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'flex-end'
@@ -49,12 +52,16 @@ const useStyles = makeStyles({
 });
 
 export default function Navigation() {
-  const { isLoggedIn, userID } = useContext(AuthenticationContext);
+  const { isLoggedIn, avatar, userID, userName } = useContext(
+    AuthenticationContext
+  );
+  const searchBarLocation = useMediaQuery(theme.breakpoints.up('md'))
+    ? 'top'
+    : 'side';
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] =
     useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const classes = useStyles();
-  const navigate = useNavigate();
 
   function toggleDrawer(event) {
     if (
@@ -89,15 +96,21 @@ export default function Navigation() {
             </MUITypography>
           </div>
           <div className={classes.rightContainer}>
-            <UserSearchBar orientation="top" setDrawerOpen={setDrawerOpen} />
-            {isLoggedIn && (
-              <MUITooltip title="My Profile">
+            {searchBarLocation === 'top' && (
+              <UserSearchBar setDrawerOpen={setDrawerOpen} />
+            )}
+            {isLoggedIn ? (
+              <Link to={`/account/${userID}`}>
+                <Avatar alt={userName} size="small" src={avatar} />
+              </Link>
+            ) : (
+              <MUITooltip title="Login / Register">
                 <MUIIconButton
                   color="secondary"
-                  onClick={() => navigate(`/account/${userID}`)}
-                  size="small"
+                  onClick={() => setAuthenticateFormDisplayed(true)}
+                  size="large"
                 >
-                  <MUIAccountCircleIcon />
+                  <MUIAccountCircleIcon fontSize="large" />
                 </MUIIconButton>
               </MUITooltip>
             )}
@@ -110,11 +123,10 @@ export default function Navigation() {
           onClose={() => setDrawerOpen(false)}
           open={drawerOpen}
         >
-          <UserSearchBar orientation="side" setDrawerOpen={setDrawerOpen} />
-          <NavigationLinks
-            setAuthenticateFormDisplayed={setAuthenticateFormDisplayed}
-            toggleDrawer={toggleDrawer}
-          />
+          {searchBarLocation === 'side' && (
+            <UserSearchBar setDrawerOpen={setDrawerOpen} />
+          )}
+          <NavigationLinks toggleDrawer={toggleDrawer} />
         </MUIDrawer>
       </MUIAppBar>
     </React.Fragment>

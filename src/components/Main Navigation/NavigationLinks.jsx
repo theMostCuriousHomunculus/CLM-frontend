@@ -1,5 +1,4 @@
 import React from 'react';
-import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MUIAllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import MUIExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -23,17 +22,12 @@ const useStyles = makeStyles({
     }
   },
   list: {
-    width: 350
+    width: 300
   }
 });
 
-export default function NavigationLinks({
-  setAuthenticateFormDisplayed,
-  toggleDrawer
-}) {
-  const { isLoggedIn, logout, userID } = React.useContext(
-    AuthenticationContext
-  );
+export default function NavigationLinks({ toggleDrawer }) {
+  const { isLoggedIn, logout } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -42,11 +36,6 @@ export default function NavigationLinks({
       icon: <MUIHomeIcon />,
       name: 'Home',
       onClick: () => navigate('/')
-    },
-    {
-      icon: <MUIAccountCircleIcon />,
-      name: 'My Profile',
-      onClick: () => navigate(`/account/${userID}`)
     },
     {
       icon: <MUIChatOutlinedIcon />,
@@ -90,11 +79,6 @@ export default function NavigationLinks({
       icon: <MUIAllInclusiveIcon />,
       name: 'Resources',
       onClick: () => navigate('/resources')
-    },
-    {
-      icon: <MUIExitToAppIcon />,
-      name: 'Login / Register',
-      onClick: () => setAuthenticateFormDisplayed(true)
     }
   ];
 

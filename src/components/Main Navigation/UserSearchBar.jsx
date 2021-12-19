@@ -28,27 +28,20 @@ const useStyles = makeStyles({
     justifyContent: 'space-between'
   },
   search: {
+    [theme.breakpoints.up('md')]: {
+      flexGrow: 1,
+      marginRight: 8
+    },
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
     position: 'relative',
     '&:hover': {
       backgroundColor: alpha(theme.palette.common.white, 0.25)
     }
-  },
-  sideBar: {
-    [theme.breakpoints.up('md')]: {
-      display: 'none'
-    }
-  },
-  topBar: {
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    },
-    flexGrow: 1
   }
 });
 
-export default function UserSearchBar({ orientation, setDrawerOpen }) {
+export default function UserSearchBar({ setDrawerOpen }) {
   const { loading, sendRequest } = useRequest();
   const [userSearchResults, setUserSearchResults] = React.useState([]);
   const classes = useStyles();
@@ -81,9 +74,7 @@ export default function UserSearchBar({ orientation, setDrawerOpen }) {
 
   return (
     <MUIAutocomplete
-      className={`${
-        orientation === 'side' ? classes.sideBar : classes.topBar
-      } ${classes.search}`}
+      className={classes.search}
       clearOnBlur={false}
       clearOnEscape={true}
       getOptionLabel={(option) => option.name}

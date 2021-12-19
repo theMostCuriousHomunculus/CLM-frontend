@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
@@ -21,14 +21,14 @@ const useStyles = makeStyles({
 });
 
 export default function AuthenticateForm({ open, toggleOpen }) {
-  const { loading, login, register, requestPasswordReset } = React.useContext(
+  const { loading, login, register, requestPasswordReset } = useContext(
     AuthenticationContext
   );
   const classes = useStyles();
-  const [mode, setMode] = React.useState('Login');
-  const [emailInput, setEmailInput] = React.useState();
-  const [nameInput, setNameInput] = React.useState();
-  const [passwordInput, setPasswordInput] = React.useState();
+  const [mode, setMode] = useState('Login');
+  const [emailInput, setEmailInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
 
   function submitForm(event) {
     event.preventDefault();
