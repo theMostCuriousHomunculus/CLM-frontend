@@ -205,7 +205,7 @@ export default function Classy() {
       id: 'core-values-and-guiding-principles',
       info: (
         <React.Fragment>
-          <MUITypography align="center" variant="subtitle1">
+          <MUITypography align="center" variant="h3">
             No "Gotcha" Cards.
           </MUITypography>
           <MUITypography
@@ -245,7 +245,7 @@ export default function Classy() {
             pretty much just win or lose based on the luck of the draw. If
             you're into that kind of thing, Modern is a great format!
           </MUITypography>
-          <MUITypography align="center" variant="subtitle1">
+          <MUITypography align="center" variant="h3">
             No Free Spells.
           </MUITypography>
           <MUITypography
@@ -392,7 +392,7 @@ export default function Classy() {
             decks seek to play by the "normal" rules of the game (casting
             spells, playing to the board, etc...). Recursive cards are classy.
           </MUITypography>
-          <MUITypography align="center" variant="subtitle1">
+          <MUITypography align="center" variant="h3">
             No Companions.
           </MUITypography>
           <MUITypography
@@ -403,7 +403,7 @@ export default function Classy() {
             If I wanted to play commander, which I don't, then I'd play
             commander. Companions are NOT classy.
           </MUITypography>
-          <MUITypography align="center" variant="subtitle1">
+          <MUITypography align="center" variant="h3">
             No Tier 0 Cards.
           </MUITypography>
           <MUITypography
@@ -590,7 +590,7 @@ export default function Classy() {
             was to control decks before it was finally banned. Cards like this
             homogenize decks and are NOT classy.
           </MUITypography>
-          <MUITypography align="center" variant="subtitle1">
+          <MUITypography align="center" variant="h3">
             No Snow.
           </MUITypography>
           <MUITypography
@@ -633,7 +633,7 @@ export default function Classy() {
             because there is so much cool artwork on basic lands. My format, my
             rules; snow is NOT classy.
           </MUITypography>
-          <MUITypography align="center" variant="subtitle1">
+          <MUITypography align="center" variant="h3">
             No Dredge.
           </MUITypography>
           <MUITypography
@@ -823,7 +823,7 @@ export default function Classy() {
     <React.Fragment>
       <MUICard>
         <MUICardHeader
-          title="Classy"
+          title={<MUITypography variant="h2">Classy</MUITypography>}
           subheader="The hot new MTG format the cool kids can't get enough of"
         />
         <MUICardContent>
@@ -852,7 +852,9 @@ export default function Classy() {
       </MUICard>
       {sections.map((section) => (
         <MUICard id={section.id} key={section.id}>
-          <MUICardHeader title={section.title} />
+          <MUICardHeader
+            title={<MUITypography variant="h2">{section.title}</MUITypography>}
+          />
           <MUICardContent>{section.info}</MUICardContent>
         </MUICard>
       ))}

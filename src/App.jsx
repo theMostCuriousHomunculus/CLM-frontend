@@ -24,9 +24,9 @@ const ContextualizedAccountPage = React.lazy(() =>
 const ContextualizedDeckPage = React.lazy(() =>
   import('./contexts/deck-context')
 );
-const ContextualizedMatchPage = React.lazy(() =>
-  import('./contexts/match-context')
-);
+// const ContextualizedMatchPage = React.lazy(() =>
+//   import('./contexts/match-context')
+// );
 const Home = React.lazy(() => import('./pages/Home'));
 const PasswordReset = React.lazy(() => import('./pages/PasswordReset'));
 const Resources = React.lazy(() => import('./pages/Resources'));
@@ -70,10 +70,10 @@ export default function App() {
               path="/event/:eventID"
               element={<ContextualizedEventPage />}
             />
-            <Route
+            {/* <Route
               path="/match/:matchID"
               element={<ContextualizedMatchPage />}
-            />
+            /> */}
             <Route path="/reset/:resetToken" element={<PasswordReset />} />
             <Route path="/resources" element={<Resources />} />
           </Routes>

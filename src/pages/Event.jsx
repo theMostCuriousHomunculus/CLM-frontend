@@ -145,6 +145,7 @@ export default function Event() {
           {tabNumber === 1 && (
             <React.Fragment>
               <BasicLandAdder
+                labelText="Add basic lands to your deck"
                 submitFunction={(cardData) =>
                   addBasics(cardData, 'mainboard', 1)
                 }
@@ -168,6 +169,7 @@ export default function Event() {
         <React.Fragment>
           <CardPoolDownloadLinks me={myState} others={others} />
           <BasicLandAdder
+            labelText="Add basic lands to your deck"
             submitFunction={(cardData) => addBasics(cardData, 'mainboard', 1)}
           />
           <DeckDisplay

@@ -1,9 +1,9 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { deepPurple, orange, yellow } from '@mui/material/colors';
 
 const backgroundColor = '#efefef';
 
-const theme = createTheme({
+let theme = createTheme({
   components: {
     MuiAccordion: {
       styleOverrides: {
@@ -186,8 +186,25 @@ const theme = createTheme({
     }
   },
   typography: {
-    fontFamily: ['Ubuntu', 'Roboto', 'Arial', 'sans-serif'].join(',')
+    fontFamily: ['Ubuntu', 'Roboto', 'Arial', 'sans-serif'].join(','),
+    h1: {
+      fontSize: '3rem'
+    },
+    h2: {
+      fontSize: '2.5rem'
+    },
+    h3: {
+      fontSize: '2rem'
+    },
+    h4: {
+      fontSize: '1.5rem'
+    },
+    h5: {
+      fontSize: '1rem'
+    }
   }
 });
+
+theme = responsiveFontSizes(theme);
 
 export { backgroundColor, theme as default };

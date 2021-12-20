@@ -17,9 +17,10 @@ export default function Home() {
   const features = [
     'Provides a simple UI to create and manage Magic the Gathering cubes with innovative, exclusive features termed "modules" and "rotations"',
     'Allows you to connect with your friends by sending and receiving bud requests',
+    'Allows you to locate and connect with nearby players if you opt in to location services (opt out any time)',
     'Allows you and your buds to draft your cubes in real time or generate sealed pools',
     'Provides a simple deck building tool for both limited decks you assemble on CLM and for various constructed formats',
-    'Allows you to play matches with your buds in real time using either decks from a limited event or constructed decks stored on CLM',
+    // 'Allows you to play matches with your buds in real time using either decks from a limited event or constructed decks stored on CLM',
     'Introduces "Classy", an independently managed, constructed format and brewer\'s paradise'
   ];
 

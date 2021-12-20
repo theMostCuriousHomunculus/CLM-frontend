@@ -18,7 +18,7 @@ import CubeAccordion from '../components/Account Page/CubeAccordion';
 import DeckAccordion from '../components/Account Page/DeckAccordion';
 import EventAccordion from '../components/Account Page/EventAccordion';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import MatchAccordion from '../components/Account Page/MatchAccordion';
+// import MatchAccordion from '../components/Account Page/MatchAccordion';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/Authentication';
@@ -47,7 +47,6 @@ export default function Account() {
     isLoggedIn,
     settings: { location_services },
     shareLocation,
-    token,
     userID
   } = useContext(AuthenticationContext);
   const {
@@ -174,7 +173,7 @@ export default function Account() {
 
       <EventAccordion pageClasses={classes} />
 
-      <MatchAccordion pageClasses={classes} />
+      {/* <MatchAccordion pageClasses={classes} /> */}
     </React.Fragment>
   );
 }

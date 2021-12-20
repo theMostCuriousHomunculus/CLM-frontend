@@ -13,6 +13,11 @@ import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
+  activeTab: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   loadingSpinnerContainer: {
     alignContent: 'center',
     display: 'flex',
@@ -82,26 +87,18 @@ export default function AuthenticateForm({ open, toggleOpen }) {
           <MUIDialogContent>
             <div
               aria-labelledby="login-tab"
+              className={selectedTab === 0 ? classes.activeTab : undefined}
               hidden={selectedTab !== 0}
               id="authentication-options-tabpanel-0"
               role="tabpanel"
-              style={
-                selectedTab === 0
-                  ? {
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around'
-                    }
-                  : undefined
-              }
             >
               <MUITextField
                 autoComplete="off"
-                autoFocus
+                autoFocus={selectedTab === 0}
                 fullWidth
                 label="Email Address"
                 onChange={(event) => setEmailInput(event.target.value)}
-                required={true}
+                required={selectedTab === 0}
                 style={{ marginTop: 16 }}
                 type="email"
                 value={emailInput}
@@ -112,7 +109,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 fullWidth
                 label="Password"
                 onChange={(event) => setPasswordInput(event.target.value)}
-                required={true}
+                required={selectedTab === 0}
                 style={{ marginTop: 16 }}
                 type="password"
                 value={passwordInput}
@@ -121,26 +118,18 @@ export default function AuthenticateForm({ open, toggleOpen }) {
 
             <div
               aria-labelledby="password-reset-tab"
+              className={selectedTab === 1 ? classes.activeTab : undefined}
               hidden={selectedTab !== 1}
               id="authentication-options-tabpanel-1"
               role="tabpanel"
-              style={
-                selectedTab === 1
-                  ? {
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around'
-                    }
-                  : undefined
-              }
             >
               <MUITextField
                 autoComplete="off"
-                autoFocus
+                autoFocus={selectedTab === 1}
                 fullWidth
                 label="Email Address"
                 onChange={(event) => setEmailInput(event.target.value)}
-                required={true}
+                required={selectedTab === 1}
                 style={{ marginTop: 16 }}
                 type="email"
                 value={emailInput}
@@ -149,26 +138,18 @@ export default function AuthenticateForm({ open, toggleOpen }) {
 
             <div
               aria-labelledby="register-tab"
+              className={selectedTab === 2 ? classes.activeTab : undefined}
               hidden={selectedTab !== 2}
               id="authentication-options-tabpanel-2"
               role="tabpanel"
-              style={
-                selectedTab === 2
-                  ? {
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around'
-                    }
-                  : undefined
-              }
             >
               <MUITextField
                 autoComplete="off"
-                autoFocus
+                autoFocus={selectedTab === 2}
                 fullWidth
                 label="Email Address"
                 onChange={(event) => setEmailInput(event.target.value)}
-                required={true}
+                required={selectedTab === 2}
                 style={{ marginTop: 16 }}
                 type="email"
                 value={emailInput}
@@ -179,7 +160,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 fullWidth
                 label="Account Name"
                 onChange={(event) => setNameInput(event.target.value)}
-                required={true}
+                required={selectedTab === 2}
                 style={{ marginTop: 16 }}
                 type="text"
                 value={nameInput}
@@ -190,7 +171,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 fullWidth
                 label="Password"
                 onChange={(event) => setPasswordInput(event.target.value)}
-                required={true}
+                required={selectedTab === 2}
                 style={{ marginTop: 16 }}
                 type="password"
                 value={passwordInput}

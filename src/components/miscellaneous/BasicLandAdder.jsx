@@ -10,12 +10,11 @@ import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
 import MUIPaper from '@mui/material/Paper';
 import MUISelect from '@mui/material/Select';
-import MUITypography from '@mui/material/Typography';
 
 import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
 
-export default function BasicLandAdder({ submitFunction }) {
+export default function BasicLandAdder({ labelText, submitFunction }) {
   const { sendRequest } = useRequest();
   const [anchorEl, setAnchorEl] = React.useState();
   const [availablePrints, setAvailablePrints] = React.useState([]);
@@ -80,11 +79,6 @@ export default function BasicLandAdder({ submitFunction }) {
 
   return (
     <MUIPaper style={{ padding: '0 4px' }}>
-      <div style={{ padding: 4 }}>
-        <MUITypography variant="subtitle1">
-          Add Basic Lands to Deck
-        </MUITypography>
-      </div>
       <MUIGrid
         alignItems="center"
         container
@@ -94,10 +88,10 @@ export default function BasicLandAdder({ submitFunction }) {
         <MUIGrid container item xs={6} md={3}>
           <MUIFormControl variant="outlined" style={{ flexGrow: 1 }}>
             <MUIInputLabel htmlFor="basic-land-name-selector">
-              Basic Land Name
+              {labelText}
             </MUIInputLabel>
             <MUISelect
-              label="Basic Land Name"
+              label={labelText}
               native
               onChange={(event) => setBasicLandName(event.target.value)}
               value={basicLandName}
@@ -175,7 +169,7 @@ export default function BasicLandAdder({ submitFunction }) {
               </MUIMenuItem>
             ) : (
               availablePrints.map((print) => (
-                <span key={print.id}>
+                <span key={print.collector_number}>
                   <HoverPreview image={print.image}>
                     <MUIMenuItem
                       onClick={() => {

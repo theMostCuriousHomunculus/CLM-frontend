@@ -1,4 +1,10 @@
-import React, { createContext } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
@@ -51,7 +57,7 @@ export const CubeContext = createContext({
 
 export default function ContextualizedCubePage() {
   const navigate = useNavigate();
-  const [activeComponentState, setActiveComponentState] = React.useState({
+  const [activeComponentState, setActiveComponentState] = useState({
     _id: 'mainboard',
     displayedCards: [],
     maxSize: null,
@@ -59,8 +65,8 @@ export default function ContextualizedCubePage() {
     size: null
   });
   const { cubeID } = useParams();
-  const { addCardsToCache } = React.useContext(CardCacheContext);
-  const [cubeState, setCubeState] = React.useState({
+  const { addCardsToCache } = useContext(CardCacheContext);
+  const [cubeState, setCubeState] = useState({
     _id: cubeID,
     creator: {
       _id: null,
@@ -74,7 +80,7 @@ export default function ContextualizedCubePage() {
     rotations: [],
     sideboard: []
   });
-  const [displayState, setDisplayState] = React.useState({
+  const [displayState, setDisplayState] = useState({
     activeComponentID: 'mainboard',
     filter: ''
   });
@@ -122,7 +128,7 @@ export default function ContextualizedCubePage() {
   const { loading, sendRequest } = useRequest();
   const { requestSubscription } = useSubscribe();
 
-  const filterCards = React.useCallback(
+  const filterCards = useCallback(
     (cards, text) =>
       cards.filter((card) => {
         const wordArray = text.split(' ');
@@ -139,7 +145,7 @@ export default function ContextualizedCubePage() {
     []
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const state = { _id: displayState.activeComponentID };
 
     if (state._id === 'sideboard') {
@@ -172,7 +178,7 @@ export default function ContextualizedCubePage() {
     setActiveComponentState(state);
   }, [cubeState, displayState, filterCards]);
 
-  const updateCubeState = React.useCallback(
+  const updateCubeState = useCallback(
     async function (data) {
       const cardSet = new Set();
 
@@ -215,7 +221,7 @@ export default function ContextualizedCubePage() {
     [addCardsToCache, populateCachedScryfallData]
   );
 
-  const addCardToCube = React.useCallback(
+  const addCardToCube = useCallback(
     async function ({ name, scryfall_id }) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
@@ -240,7 +246,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const cloneCube = React.useCallback(
+  const cloneCube = useCallback(
     async function () {
       await sendRequest({
         callback: (data) => {
@@ -265,7 +271,7 @@ export default function ContextualizedCubePage() {
     [cubeQuery, cubeState._id, navigate, sendRequest]
   );
 
-  const createModule = React.useCallback(
+  const createModule = useCallback(
     async function (name, toggleOpen) {
       await sendRequest({
         callback: (data) => {
@@ -296,7 +302,7 @@ export default function ContextualizedCubePage() {
     [cubeState._id, sendRequest]
   );
 
-  const createRotation = React.useCallback(
+  const createRotation = useCallback(
     async function (name, toggleOpen) {
       await sendRequest({
         callback: (data) => {
@@ -328,7 +334,7 @@ export default function ContextualizedCubePage() {
     [cubeState._id, sendRequest]
   );
 
-  const deleteCard = React.useCallback(
+  const deleteCard = useCallback(
     async function (cardID, destinationID) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
@@ -353,7 +359,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const deleteModule = React.useCallback(
+  const deleteModule = useCallback(
     async function () {
       await sendRequest({
         callback: () => {
@@ -378,7 +384,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const deleteRotation = React.useCallback(
+  const deleteRotation = useCallback(
     async function () {
       await sendRequest({
         callback: () => {
@@ -403,7 +409,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const editCard = React.useCallback(
+  const editCard = useCallback(
     async function (changes) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
@@ -427,7 +433,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const editCube = React.useCallback(
+  const editCube = useCallback(
     async function (description, name, published) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
@@ -452,7 +458,7 @@ export default function ContextualizedCubePage() {
     [cubeState._id, sendRequest]
   );
 
-  const editModule = React.useCallback(
+  const editModule = useCallback(
     async function (name) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
@@ -476,7 +482,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const editRotation = React.useCallback(
+  const editRotation = useCallback(
     async function (name, size) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
@@ -501,7 +507,7 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const fetchCubeByID = React.useCallback(
+  const fetchCubeByID = useCallback(
     async function () {
       await sendRequest({
         callback: updateCubeState,
@@ -524,7 +530,7 @@ export default function ContextualizedCubePage() {
     [cubeQuery, cubeState._id, sendRequest, updateCubeState]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     requestSubscription({
       headers: { cubeID },
       queryString: cubeQuery,

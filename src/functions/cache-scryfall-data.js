@@ -1,4 +1,4 @@
-export default async function populateScryfallData(scryfallCardData) {
+export default async function cacheScryfallData(scryfallCardData) {
   let art_crop, back_image, image, mana_cost, meldResult, type_line;
   switch (scryfallCardData.layout) {
     case 'adventure':

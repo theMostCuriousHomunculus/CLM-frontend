@@ -1,4 +1,10 @@
-import React, { createContext } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
@@ -32,8 +38,8 @@ export const DeckContext = createContext({
 export default function ContextualizedDeckPage() {
   const navigate = useNavigate();
   const { deckID } = useParams();
-  const { addCardsToCache } = React.useContext(CardCacheContext);
-  const [deckState, setDeckState] = React.useState({
+  const { addCardsToCache } = useContext(CardCacheContext);
+  const [deckState, setDeckState] = useState({
     _id: deckID,
     creator: {
       _id: '',
@@ -71,7 +77,7 @@ export default function ContextualizedDeckPage() {
   const { populateCachedScryfallData } = usePopulate();
   const { requestSubscription } = useSubscribe();
 
-  const updateDeckState = React.useCallback(
+  const updateDeckState = useCallback(
     async function (data) {
       const cardSet = new Set();
 
@@ -94,7 +100,7 @@ export default function ContextualizedDeckPage() {
     [addCardsToCache, populateCachedScryfallData]
   );
 
-  const addCardsToDeck = React.useCallback(
+  const addCardsToDeck = useCallback(
     async function ({ name, scryfall_id }, component, numberOfCopies) {
       await sendRequest({
         headers: { DeckID: deckState._id },
@@ -120,7 +126,7 @@ export default function ContextualizedDeckPage() {
     [deckState._id, sendRequest]
   );
 
-  const cloneDeck = React.useCallback(
+  const cloneDeck = useCallback(
     async function () {
       await sendRequest({
         callback: (data) => {
@@ -145,7 +151,7 @@ export default function ContextualizedDeckPage() {
     [deckQuery, deckState._id, navigate, sendRequest]
   );
 
-  const editDeck = React.useCallback(
+  const editDeck = useCallback(
     async function (description, format, name) {
       await sendRequest({
         headers: { DeckID: deckState._id },
@@ -170,7 +176,7 @@ export default function ContextualizedDeckPage() {
     [deckState._id, sendRequest]
   );
 
-  const fetchDeckByID = React.useCallback(
+  const fetchDeckByID = useCallback(
     async function () {
       await sendRequest({
         callback: updateDeckState,
@@ -193,7 +199,7 @@ export default function ContextualizedDeckPage() {
     [deckQuery, deckState._id, sendRequest, updateDeckState]
   );
 
-  const removeCardsFromDeck = React.useCallback(
+  const removeCardsFromDeck = useCallback(
     async function (cardIDs, component) {
       await sendRequest({
         headers: { DeckID: deckState._id },
@@ -217,7 +223,7 @@ export default function ContextualizedDeckPage() {
     [deckState._id, sendRequest]
   );
 
-  const toggleMainboardSideboardDeck = React.useCallback(
+  const toggleMainboardSideboardDeck = useCallback(
     async function (cardID) {
       await sendRequest({
         headers: { DeckID: deckState._id },
@@ -238,7 +244,7 @@ export default function ContextualizedDeckPage() {
     [deckState._id, sendRequest]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     requestSubscription({
       headers: { deckID },
       queryString: deckQuery,

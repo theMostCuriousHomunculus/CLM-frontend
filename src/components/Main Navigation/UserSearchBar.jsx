@@ -29,8 +29,7 @@ const useStyles = makeStyles({
   },
   search: {
     [theme.breakpoints.up('md')]: {
-      flexGrow: 1,
-      marginRight: 8
+      flexGrow: 1
     },
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -92,7 +91,7 @@ export default function UserSearchBar({ setDrawerOpen }) {
           {...params}
           className={classes.input}
           color="secondary"
-          label="Search for Other Users!"
+          // label="Search for Other Users!"
           onKeyUp={searchAccounts}
           InputProps={{
             ...params.InputProps,

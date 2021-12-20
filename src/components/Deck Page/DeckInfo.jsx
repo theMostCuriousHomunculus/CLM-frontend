@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
@@ -25,15 +25,15 @@ import { DeckContext } from '../../contexts/deck-context';
 import { CSVLink } from 'react-csv';
 
 export default function DeckInfo() {
-  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const {
     deckState: { creator, description, format, mainboard, name, sideboard },
     cloneDeck,
     editDeck
-  } = React.useContext(DeckContext);
-  const [descriptionInput, setDescriptionInput] = React.useState(description);
-  const [nameInput, setNameInput] = React.useState(name);
-  const [sampleHand, setSampleHand] = React.useState([]);
+  } = useContext(DeckContext);
+  const [descriptionInput, setDescriptionInput] = useState(description);
+  const [nameInput, setNameInput] = useState(name);
+  const [sampleHand, setSampleHand] = useState([]);
 
   return (
     <React.Fragment>

@@ -1,5 +1,6 @@
-import React, { createContext } from 'react';
+import React, { createContext, useCallback, useRef } from 'react';
 
+import cacheScryfallData from '../functions/cache-scryfall-data';
 import useRequest from '../hooks/request-hook';
 
 export const CardCacheContext = createContext({
@@ -9,9 +10,9 @@ export const CardCacheContext = createContext({
 
 export function CardCacheProvider({ children }) {
   const { sendRequest } = useRequest();
-  const scryfallCardDataCache = React.useRef(Object.create(null));
+  const scryfallCardDataCache = useRef(Object.create(null));
 
-  const addCardsToCache = React.useCallback(
+  const addCardsToCache = useCallback(
     async (scryfall_ids) => {
       const newCards = [];
 

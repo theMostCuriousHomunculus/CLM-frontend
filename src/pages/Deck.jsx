@@ -13,7 +13,7 @@ export default function Deck() {
   const { userID } = React.useContext(AuthenticationContext);
   const {
     loading,
-    deckState,
+    deckState: { creator, mainboard, name, sideboard },
     addCardsToDeck,
     removeCardsFromDeck,
     toggleMainboardSideboardDeck
@@ -25,9 +25,10 @@ export default function Deck() {
     <React.Fragment>
       <DeckInfo />
 
-      {deckState.creator._id === userID && (
+      {creator._id === userID && (
         <React.Fragment>
           <BasicLandAdder
+            labelText={`Add basic lands to ${name}`}
             submitFunction={(cardData) =>
               addCardsToDeck(cardData, 'mainboard', 1)
             }
@@ -35,7 +36,7 @@ export default function Deck() {
           <MUIPaper>
             <ScryfallRequest
               buttonText="Add to Deck"
-              labelText={`Add a card to ${deckState.name}`}
+              labelText={`Add a card to ${name}`}
               onSubmit={(cardData) => addCardsToDeck(cardData, 'mainboard', 1)}
             />
           </MUIPaper>
@@ -44,10 +45,10 @@ export default function Deck() {
 
       <DeckDisplay
         add={addCardsToDeck}
-        authorizedID={deckState.creator._id}
+        authorizedID={creator._id}
         deck={{
-          mainboard: deckState.mainboard,
-          sideboard: deckState.sideboard
+          mainboard: mainboard,
+          sideboard: sideboard
         }}
         remove={removeCardsFromDeck}
         toggle={toggleMainboardSideboardDeck}

@@ -152,7 +152,7 @@ export default function CubeDisplay({ setSelectedCard }) {
               })}
               className={classes.cardHeader}
               title={
-                <MUITypography variant="h5">
+                <MUITypography variant="h3">
                   ({cards_color.length})
                 </MUITypography>
               }
@@ -168,7 +168,7 @@ export default function CubeDisplay({ setSelectedCard }) {
                       <React.Fragment>
                         <MUITypography
                           className={classes.typeText}
-                          variant="subtitle1"
+                          variant="h4"
                         >
                           {React.cloneElement(type.svg, {
                             style: { height: 20, marginRight: 8, width: 20 }
@@ -241,7 +241,7 @@ export default function CubeDisplay({ setSelectedCard }) {
           avatar={<MagicSVG style={{ height: 32, width: 32 }} />}
           className={classes.cardHeader}
           title={
-            <MUITypography variant="h5">
+            <MUITypography variant="h3">
               (
               {
                 displayedCards.filter((card) => card.color_identity.length > 1)
@@ -266,7 +266,7 @@ export default function CubeDisplay({ setSelectedCard }) {
                   >
                     <MUITypography
                       className={classes.colorComboText}
-                      variant="subtitle1"
+                      variant="h4"
                     >
                       {color.svg &&
                         React.cloneElement(color.svg, {
@@ -286,7 +286,7 @@ export default function CubeDisplay({ setSelectedCard }) {
                                 fontStyle: 'italic',
                                 textAlign: 'center'
                               }}
-                              variant="subtitle1"
+                              variant="h4"
                             >
                               {React.cloneElement(type.svg, {
                                 style: { height: 20, marginRight: 8, width: 20 }

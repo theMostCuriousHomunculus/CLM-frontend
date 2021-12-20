@@ -28,6 +28,7 @@ const useStyles = makeStyles({
     }
   },
   leftContainer: {
+    alignItems: 'center',
     display: 'flex',
     flexGrow: 2
   },
@@ -89,8 +90,8 @@ export default function Navigation() {
             />
             <MUITypography
               color="secondary"
-              style={{ whiteSpace: 'nowrap' }}
-              variant="h3"
+              // style={{ whiteSpace: 'nowrap' }}
+              variant="h1"
             >
               Cube Level Midnight
             </MUITypography>
@@ -100,7 +101,7 @@ export default function Navigation() {
               <UserSearchBar setDrawerOpen={setDrawerOpen} />
             )}
             {isLoggedIn ? (
-              <Link to={`/account/${userID}`}>
+              <Link to={`/account/${userID}`} style={{ marginLeft: 8 }}>
                 <Avatar alt={userName} size="small" src={avatar} />
               </Link>
             ) : (

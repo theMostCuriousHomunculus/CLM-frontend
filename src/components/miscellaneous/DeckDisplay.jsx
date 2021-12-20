@@ -22,7 +22,11 @@ export default function DeckDisplay({
         <MUIGrid item key={component} xs={12} md={6}>
           <MUICard>
             <MUICardHeader
-              title={`${component} (${deck[component.toLowerCase()].length})`}
+              title={
+                <MUITypography variant="h3">
+                  {component} ({deck[component.toLowerCase()].length})
+                </MUITypography>
+              }
             />
             <MUICardContent>
               {[
