@@ -33,6 +33,7 @@ export const AuthenticationContext = createContext({
   logout: () => null,
   register: () => null,
   requestPasswordReset: () => null,
+  setUserInfo: () => null,
   shareLocation: () => null,
   submitPasswordReset: () => null
 });
@@ -404,6 +405,7 @@ export function AuthenticationProvider({ children }) {
         logout,
         register,
         requestPasswordReset,
+        setUserInfo,
         shareLocation,
         submitPasswordReset
       }}

@@ -71,7 +71,7 @@ export default function useRequest() {
         setLoading(false);
       }
     },
-    [setErrorMessages]
+    [setErrorMessages, token]
   );
 
   useEffect(() => {

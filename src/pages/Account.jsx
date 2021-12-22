@@ -4,10 +4,15 @@ import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
 import MUICardHeader from '@mui/material/CardHeader';
+import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import MUIInputLabel from '@mui/material/InputLabel';
 import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
+import MUISelect from '@mui/material/Select';
 import MUISwitch from '@mui/material/Switch';
 import MUITextField from '@mui/material/TextField';
+import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
@@ -45,7 +50,7 @@ export default function Account() {
   const {
     hideLocation,
     isLoggedIn,
-    settings: { location_services },
+    settings: { location_services, measurement_system, radius },
     shareLocation,
     userID
   } = useContext(AuthenticationContext);
@@ -59,9 +64,9 @@ export default function Account() {
       received_bud_requests,
       sent_bud_requests
     },
-    setAccountState,
     editAccount,
-    fetchAccountByID
+    fetchAccountByID,
+    setAccountState
   } = useContext(AccountContext);
   const [toggleState, setToggleState] = useState(location_services);
   const classes = useStyles();
@@ -90,17 +95,84 @@ export default function Account() {
         <MUICardHeader
           action={
             accountID === userID && (
-              <MUIFormControlLabel
-                control={
-                  <MUISwitch
-                    checked={toggleState}
-                    inputProps={{ 'aria-label': 'controlled' }}
-                    onChange={toggleLS}
+              <React.Fragment>
+                <div style={{ alignItems: 'center', display: 'flex' }}>
+                  <MUITooltip title="Turning on location services reveals nearby users you are not already connected with who have also enabled location services.  Useful if you are looking to expand or join a playgroup.">
+                    <MUIHelpOutlineIcon color="primary" />
+                  </MUITooltip>
+                  <MUIFormControlLabel
+                    control={
+                      <MUISwitch
+                        checked={toggleState}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                        onChange={toggleLS}
+                      />
+                    }
+                    label="Location Services"
+                    labelPlacement="start"
+                    style={{ marginLeft: 8 }}
                   />
-                }
-                label="Location Services"
-                labelPlacement="start"
-              />
+                </div>
+                {toggleState && (
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <MUIFormControl variant="outlined">
+                      <MUIInputLabel htmlFor="measurement-system-selector">
+                        Units
+                      </MUIInputLabel>
+                      <MUISelect
+                        fullWidth
+                        label="Units"
+                        native
+                        onChange={(event) =>
+                          editAccount(
+                            `settings: {
+                              location_services: ${true},
+                              measurement_system: ${event.target.value},
+                              radius: ${radius}
+                            }`
+                          )
+                        }
+                        value={measurement_system}
+                        inputProps={{
+                          id: 'measurement-system-selector'
+                        }}
+                      >
+                        <option value="imperial">Miles</option>
+                        <option value="metric">Kilometers</option>
+                      </MUISelect>
+                    </MUIFormControl>
+                    <MUIFormControl style={{ marginTop: 8 }} variant="outlined">
+                      <MUIInputLabel htmlFor="radius-selector">
+                        Distance
+                      </MUIInputLabel>
+                      <MUISelect
+                        fullWidth
+                        label="Distance"
+                        native
+                        onChange={(event) =>
+                          editAccount(
+                            `settings: {
+                              location_services: ${true},
+                              measurement_system: ${measurement_system},
+                              radius: ${event.target.value}
+                            }`
+                          )
+                        }
+                        value={radius}
+                        inputProps={{
+                          id: 'radius-selector'
+                        }}
+                      >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={100}>100</option>
+                        <option value={1000}>1,000</option>
+                      </MUISelect>
+                    </MUIFormControl>
+                  </div>
+                )}
+              </React.Fragment>
             )
           }
           avatar={<Avatar alt={name} size="large" src={avatar} />}

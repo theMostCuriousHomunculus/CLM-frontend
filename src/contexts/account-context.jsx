@@ -1,8 +1,9 @@
-import React, { createContext, useCallback, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import Account from '../pages/Account';
+import { AuthenticationContext } from './Authentication';
 
 export const AccountContext = createContext({
   loading: false,
@@ -22,6 +23,7 @@ export const AccountContext = createContext({
 
 export default function ContextualizedAccountPage() {
   const { accountID } = useParams();
+  const { setUserInfo } = useContext(AuthenticationContext);
   const navigate = useNavigate();
   const [accountState, setAccountState] = useState({
     _id: accountID,
@@ -336,7 +338,15 @@ export default function ContextualizedAccountPage() {
   const editAccount = useCallback(
     async function (changes) {
       await sendRequest({
-        callback: setAccountState,
+        callback: (data) => {
+          setAccountState(data);
+          setUserInfo((prevState) => ({
+            ...prevState,
+            avatar: data.avatar,
+            settings: data.settings,
+            userName: data.name
+          }));
+        },
         operation: 'editAccount',
         get body() {
           return {
