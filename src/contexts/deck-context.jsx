@@ -16,16 +16,16 @@ import { CardCacheContext } from './CardCache';
 export const DeckContext = createContext({
   loading: false,
   deckState: {
-    _id: null,
+    _id: '',
     creator: {
-      _id: null,
-      avatar: null,
-      name: null
+      _id: '',
+      avatar: '',
+      name: ''
     },
-    description: null,
-    format: null,
+    description: '',
+    format: '',
     mainboard: [],
-    name: null,
+    name: '',
     sideboard: []
   },
   addCardsToDeck: () => null,

@@ -103,7 +103,14 @@ export default function ContextualizedBlogPostPage() {
         }
       });
     },
-    [navigate, sendRequest]
+    [
+      blogPostState.body,
+      blogPostState.image,
+      blogPostState.subtitle,
+      blogPostState.title,
+      navigate,
+      sendRequest
+    ]
   );
 
   const createComment = React.useCallback(
@@ -137,7 +144,7 @@ export default function ContextualizedBlogPostPage() {
         callback: () => {
           setTimeout(() => navigate('/blog'), 0);
         },
-        header: {
+        headers: {
           BlogPostID: blogPostID
         },
         operation: 'editBlogPost',
@@ -159,7 +166,15 @@ export default function ContextualizedBlogPostPage() {
         }
       });
     },
-    [blogPostID, navigate, sendRequest]
+    [
+      blogPostID,
+      blogPostState.body,
+      blogPostState.image,
+      blogPostState.subtitle,
+      blogPostState.title,
+      navigate,
+      sendRequest
+    ]
   );
 
   const fetchBlogPostByID = React.useCallback(

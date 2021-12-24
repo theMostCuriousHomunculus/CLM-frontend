@@ -81,6 +81,7 @@ let theme = createTheme({
       styleOverrides: {
         action: {
           display: 'flex',
+          flex: '0 1 auto',
           flexDirection: 'column',
           marginLeft: 8,
           marginRight: 0,

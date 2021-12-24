@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUIButton from '@mui/material/Button';
 import MUICircularProgress from '@mui/material/CircularProgress';
@@ -13,15 +13,15 @@ import useRequest from '../../hooks/request-hook';
 import HoverPreview from './HoverPreview';
 
 export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
-  const cardSearchInput = React.useRef();
+  const cardSearchInput = useRef();
   const { loading, sendRequest } = useRequest();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [availablePrintings, setAvailablePrintings] = React.useState([]);
-  const [timer, setTimer] = React.useState();
-  const [cardSearchResults, setCardSearchResults] = React.useState([]);
-  const [chosenCard, setChosenCard] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [availablePrintings, setAvailablePrintings] = useState([]);
+  const [timer, setTimer] = useState();
+  const [cardSearchResults, setCardSearchResults] = useState([]);
+  const [chosenCard, setChosenCard] = useState(null);
 
-  const scryfallCardSearch = React.useCallback(
+  const scryfallCardSearch = useCallback(
     (event) => {
       event.persist();
       setTimer(
@@ -53,7 +53,7 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
     [sendRequest]
   );
 
-  const scryfallPrintSearch = React.useCallback(
+  const scryfallPrintSearch = useCallback(
     async function (oracleID) {
       await sendRequest({
         callback: async (data) => {
@@ -168,7 +168,7 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
           clearOnEscape={true}
           fullWidth
           getOptionLabel={(option) => option.name}
-          id="card-search-input"
+          // id="card-search-input"
           loading={loading}
           onChange={function (event, value, reason) {
             if (reason === 'selectOption') {

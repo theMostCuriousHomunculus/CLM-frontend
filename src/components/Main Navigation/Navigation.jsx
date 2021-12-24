@@ -15,7 +15,7 @@ import AuthenticateForm from './AuthenticateForm';
 import Avatar from '../miscellaneous/Avatar';
 import NavigationLinks from './NavigationLinks';
 import theme from '../../theme';
-import UserSearchBar from './UserSearchBar';
+import SiteSearchBar from './SiteSearchBar';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
@@ -88,17 +88,13 @@ export default function Navigation() {
               color="secondary"
               onClick={() => setDrawerOpen(true)}
             />
-            <MUITypography
-              color="secondary"
-              // style={{ whiteSpace: 'nowrap' }}
-              variant="h1"
-            >
+            <MUITypography color="secondary" variant="h1">
               Cube Level Midnight
             </MUITypography>
           </div>
           <div className={classes.rightContainer}>
             {searchBarLocation === 'top' && (
-              <UserSearchBar setDrawerOpen={setDrawerOpen} />
+              <SiteSearchBar setDrawerOpen={setDrawerOpen} />
             )}
             {isLoggedIn ? (
               <Link to={`/account/${userID}`} style={{ marginLeft: 8 }}>
@@ -125,7 +121,7 @@ export default function Navigation() {
           open={drawerOpen}
         >
           {searchBarLocation === 'side' && (
-            <UserSearchBar setDrawerOpen={setDrawerOpen} />
+            <SiteSearchBar setDrawerOpen={setDrawerOpen} />
           )}
           <NavigationLinks toggleDrawer={toggleDrawer} />
         </MUIDrawer>

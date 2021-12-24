@@ -65,6 +65,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
               aria-label="authentication-options"
               onChange={(event, chosenTab) => setSelectedTab(chosenTab)}
               value={selectedTab}
+              variant="fullWidth"
             >
               <MUITab
                 aria-controls="authentication-options-tabpanel-0"

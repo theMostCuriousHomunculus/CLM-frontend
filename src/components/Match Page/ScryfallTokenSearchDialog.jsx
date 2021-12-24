@@ -159,7 +159,7 @@ export default function ScryfallTokenSearch({ closeDialog, openDialog }) {
           clearOnEscape={true}
           fullWidth={true}
           getOptionLabel={(option) => option.name}
-          id="card-search-input"
+          // id="card-search-input"
           loading={loading}
           onChange={function (event, value, reason) {
             if (reason === 'selectOption') {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
@@ -34,7 +34,7 @@ import { AuthenticationContext } from '../../contexts/Authentication';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function Dashboard() {
-  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const {
     activeComponentState,
     cubeState: {
@@ -55,30 +55,30 @@ export default function Dashboard() {
     editModule,
     editRotation,
     setDisplayState
-  } = React.useContext(CubeContext);
+  } = useContext(CubeContext);
   const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] =
-    React.useState(false);
-  const [cubeNameInput, setCubeNameInput] = React.useState(cubeName);
-  const [descriptionInput, setDescriptionInput] = React.useState(description);
-  const [editingComponentName, setEditingComponentName] = React.useState(false);
-  const [isPublished, setIsPublished] = React.useState(published);
-  const [samplePack, setSamplePack] = React.useState([]);
-  const [sizeInput, setSizeInput] = React.useState(activeComponentState.size);
-  const componentNameInputRef = React.useRef();
+    useState(false);
+  const [cubeNameInput, setCubeNameInput] = useState(cubeName);
+  const [descriptionInput, setDescriptionInput] = useState(description);
+  const [editingComponentName, setEditingComponentName] = useState(false);
+  const [isPublished, setIsPublished] = useState(published);
+  const [samplePack, setSamplePack] = useState([]);
+  const [sizeInput, setSizeInput] = useState(activeComponentState.size);
+  const componentNameInputRef = useRef();
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCubeNameInput(cubeName);
   }, [cubeName]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setDescriptionInput(description);
   }, [description]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsPublished(published);
   }, [published]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSizeInput(activeComponentState.size);
   }, [activeComponentState.size]);
 
@@ -195,13 +195,18 @@ export default function Dashboard() {
                   } Name`}
                   inputProps={{
                     onBlur: () => {
-                      if (Number.isInteger(activeComponentState.size)) {
-                        editRotation(
-                          componentNameInputRef.current.value,
-                          sizeInput
-                        );
-                      } else {
-                        editModule(componentNameInputRef.current.value);
+                      if (
+                        activeComponentState.name !==
+                        componentNameInputRef.current.value
+                      ) {
+                        if (Number.isInteger(activeComponentState.size)) {
+                          editRotation(
+                            componentNameInputRef.current.value,
+                            sizeInput
+                          );
+                        } else {
+                          editModule(componentNameInputRef.current.value);
+                        }
                       }
                       setEditingComponentName(false);
                     }
@@ -277,6 +282,7 @@ export default function Dashboard() {
                       />
                     }
                     label="Published"
+                    style={{ marginRight: 8 }}
                   />
                   <MUITooltip title="A published cube is visible to other users.">
                     <MUIHelpOutlineIcon color="primary" />
@@ -318,7 +324,9 @@ export default function Dashboard() {
             disabled={userID !== creator._id}
             fullWidth={true}
             inputProps={{
-              onBlur: () => editCube(descriptionInput, cubeNameInput)
+              onBlur: () => {
+                editCube(descriptionInput, cubeNameInput, isPublished);
+              }
             }}
             label="Cube Description"
             multiline
