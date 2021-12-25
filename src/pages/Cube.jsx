@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MUIPaper from '@mui/material/Paper';
 
 import CubeDisplay from '../components/Cube Page/CubeDisplay';
@@ -7,22 +7,22 @@ import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/Authentication';
+import { CardCacheContext } from '../contexts/CardCache';
 import { CubeContext } from '../contexts/cube-context';
 
 export default function Cube() {
-  const { userID } = React.useContext(AuthenticationContext);
+  const { userID } = useContext(AuthenticationContext);
+  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const { loading, activeComponentState, cubeState, addCardToCube } =
-    React.useContext(CubeContext);
-  const [editable, setEditable] = React.useState(
-    cubeState.creator._id === userID
-  );
-  const [selectedCard, setSelectedCard] = React.useState();
+    useContext(CubeContext);
+  const [editable, setEditable] = useState(cubeState.creator._id === userID);
+  const [selectedCard, setSelectedCard] = useState();
 
-  React.useEffect(() => {
+  useEffect(() => {
     setEditable(cubeState.creator._id === userID);
   }, [cubeState.creator._id, userID]);
 
-  return loading ? (
+  return loading || !scryfallCardDataCache.current[cubeState.image] ? (
     <LoadingSpinner />
   ) : (
     <React.Fragment>

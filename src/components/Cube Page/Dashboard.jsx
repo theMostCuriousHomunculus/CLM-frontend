@@ -22,24 +22,29 @@ import MUISelect from '@mui/material/Select';
 import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
-import Avatar from '../miscellaneous/Avatar';
+import theme from '../../theme';
 import CreateComponentForm from './CreateComponentForm';
+import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { CardCacheContext } from '../../contexts/CardCache';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function Dashboard() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
+  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const {
     activeComponentState,
     cubeState: {
       creator,
       description,
+      image,
       mainboard,
       modules,
       name: cubeName,
@@ -245,15 +250,26 @@ export default function Dashboard() {
             </React.Fragment>
           }
           avatar={
-            <Avatar alt={creator.name} size="large" src={creator.avatar} />
+            <img
+              alt={scryfallCardDataCache.current[image].name}
+              src={scryfallCardDataCache.current[image].art_crop}
+              style={{ borderRadius: 4 }}
+              width={useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75}
+            />
           }
           title={
             <React.Fragment>
               <MUITextField
                 disabled={userID !== creator._id}
                 inputProps={{
-                  onBlur: () =>
-                    editCube(descriptionInput, cubeNameInput, isPublished)
+                  onBlur: () => {
+                    editCube(
+                      descriptionInput,
+                      image,
+                      cubeNameInput,
+                      isPublished
+                    );
+                  }
                 }}
                 label="Cube Name"
                 onChange={(event) => setCubeNameInput(event.target.value)}
@@ -274,6 +290,7 @@ export default function Dashboard() {
                         onChange={() => {
                           editCube(
                             descriptionInput,
+                            image,
                             cubeNameInput,
                             !isPublished
                           );
@@ -325,14 +342,28 @@ export default function Dashboard() {
             fullWidth={true}
             inputProps={{
               onBlur: () => {
-                editCube(descriptionInput, cubeNameInput, isPublished);
+                editCube(descriptionInput, image, cubeNameInput, isPublished);
               }
             }}
             label="Cube Description"
             multiline
             onChange={(event) => setDescriptionInput(event.target.value)}
             rows={2}
+            style={{ marginBottom: 8 }}
             value={descriptionInput}
+          />
+
+          <ScryfallRequest
+            buttonText="Change Image"
+            labelText="Cube Image"
+            onSubmit={(chosenCard) => {
+              editCube(
+                descriptionInput,
+                chosenCard.scryfall_id,
+                cubeNameInput,
+                isPublished
+              );
+            }}
           />
 
           <MUITypography

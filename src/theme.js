@@ -87,6 +87,11 @@ let theme = createTheme({
           marginRight: 0,
           marginTop: 0
         },
+        avatar: {
+          alignItems: 'flex-start',
+          alignSelf: 'stretch',
+          marginRight: 8
+        },
         content: {
           wordBreak: 'break-word'
         },

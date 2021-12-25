@@ -15,19 +15,31 @@ import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
 import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Link } from 'react-router-dom';
 
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
-import Avatar from '../miscellaneous/Avatar';
+import theme from '../../theme';
+import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { CardCacheContext } from '../../contexts/CardCache';
 import { DeckContext } from '../../contexts/deck-context';
 import { CSVLink } from 'react-csv';
 
 export default function DeckInfo() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
+  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const {
-    deckState: { creator, description, format, mainboard, name, sideboard },
+    deckState: {
+      creator,
+      description,
+      format,
+      image,
+      mainboard,
+      name,
+      sideboard
+    },
     cloneDeck,
     editDeck
   } = useContext(DeckContext);
@@ -73,9 +85,14 @@ export default function DeckInfo() {
                 fullWidth
                 label="Format"
                 native
-                onChange={(event) =>
-                  editDeck(descriptionInput, event.target.value, nameInput)
-                }
+                onChange={(event) => {
+                  editDeck(
+                    descriptionInput,
+                    event.target.value,
+                    image,
+                    nameInput
+                  );
+                }}
                 value={format}
                 inputProps={{
                   id: 'format-selector'
@@ -93,13 +110,22 @@ export default function DeckInfo() {
             </MUIFormControl>
           }
           avatar={
-            <Avatar alt={creator.name} size="large" src={creator.avatar} />
+            image && (
+              <img
+                alt={scryfallCardDataCache.current[image].name}
+                src={scryfallCardDataCache.current[image].art_crop}
+                style={{ borderRadius: 4 }}
+                width={useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75}
+              />
+            )
           }
           title={
             <MUITextField
               disabled={creator._id !== userID}
               inputProps={{
-                onBlur: () => editDeck(descriptionInput, format, nameInput)
+                onBlur: () => {
+                  editDeck(descriptionInput, format, image, nameInput);
+                }
               }}
               label="Deck Name"
               onChange={(event) => setNameInput(event.target.value)}
@@ -131,13 +157,27 @@ export default function DeckInfo() {
             disabled={creator._id !== userID}
             fullWidth={true}
             inputProps={{
-              onBlur: () => editDeck(descriptionInput, format, nameInput)
+              onBlur: () => editDeck(descriptionInput, format, image, nameInput)
             }}
             label="Deck Description"
             multiline
             onChange={(event) => setDescriptionInput(event.target.value)}
             rows={2}
+            style={{ marginBottom: 8 }}
             value={descriptionInput}
+          />
+
+          <ScryfallRequest
+            buttonText="Change Image"
+            labelText="Deck Image"
+            onSubmit={(chosenCard) => {
+              editDeck(
+                descriptionInput,
+                format,
+                chosenCard.scryfall_id,
+                nameInput
+              );
+            }}
           />
         </MUICardContent>
 

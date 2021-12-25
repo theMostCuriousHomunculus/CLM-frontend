@@ -24,6 +24,7 @@ export const DeckContext = createContext({
     },
     description: '',
     format: '',
+    image: '',
     mainboard: [],
     name: '',
     sideboard: []
@@ -48,6 +49,7 @@ export default function ContextualizedDeckPage() {
     },
     description: '',
     format: '',
+    image: '',
     mainboard: [],
     name: '',
     sideboard: []
@@ -65,6 +67,7 @@ export default function ContextualizedDeckPage() {
     }
     description
     format
+    image
     mainboard {
       ${cardQuery}
     }
@@ -80,6 +83,8 @@ export default function ContextualizedDeckPage() {
   const updateDeckState = useCallback(
     async function (data) {
       const cardSet = new Set();
+
+      if (data.image) cardSet.add(data.image);
 
       for (const card of data.mainboard) {
         cardSet.add(card.scryfall_id);
@@ -152,23 +157,24 @@ export default function ContextualizedDeckPage() {
   );
 
   const editDeck = useCallback(
-    async function (description, format, name) {
+    async function (description, format, image, name) {
       await sendRequest({
         headers: { DeckID: deckState._id },
         operation: 'editDeck',
         get body() {
           return {
             query: `
-            mutation {
-              ${this.operation}(
-                description: "${description}",
-                format: ${format},
-                name: "${name}"
-              ) {
-                _id
+              mutation {
+                ${this.operation}(
+                  description: "${description}",
+                  format: ${format},
+                  image: "${image}",
+                  name: "${name}"
+                ) {
+                  _id
+                }
               }
-            }
-          `
+            `
           };
         }
       });

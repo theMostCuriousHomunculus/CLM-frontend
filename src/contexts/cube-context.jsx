@@ -74,6 +74,7 @@ export default function ContextualizedCubePage() {
       name: '...'
     },
     description: '',
+    image: '',
     mainboard: [],
     modules: [],
     name: '',
@@ -100,6 +101,7 @@ export default function ContextualizedCubePage() {
       name
     }
     description
+    image
     mainboard {
       ${cardQuery}
     }
@@ -181,6 +183,8 @@ export default function ContextualizedCubePage() {
   const updateCubeState = useCallback(
     async function (data) {
       const cardSet = new Set();
+
+      if (data.image) cardSet.add(data.image);
 
       for (const card of data.mainboard) {
         cardSet.add(card.scryfall_id);
@@ -434,23 +438,24 @@ export default function ContextualizedCubePage() {
   );
 
   const editCube = useCallback(
-    async function (description, name, published) {
+    async function (description, image, name, published) {
       await sendRequest({
         headers: { CubeID: cubeState._id },
         operation: 'editCube',
         get body() {
           return {
             query: `
-            mutation {
-              ${this.operation}(
-                description: "${description}",
-                name: "${name}",
-                published: ${published}
-              ) {
-                _id
+              mutation {
+                ${this.operation}(
+                  description: "${description}",
+                  image: "${image}",
+                  name: "${name}",
+                  published: ${published}
+                ) {
+                  _id
+                }
               }
-            }
-          `
+            `
           };
         }
       });

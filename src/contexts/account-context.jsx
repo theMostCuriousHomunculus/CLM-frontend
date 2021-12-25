@@ -61,6 +61,7 @@ export default function ContextualizedAccountPage() {
     cubes {
       _id
       description
+      image
       mainboard {
         _id
       }
@@ -88,6 +89,7 @@ export default function ContextualizedAccountPage() {
       _id
       description
       format
+      image
       name
     }
     email

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionActions from '@mui/material/AccordionActions';
@@ -20,18 +20,20 @@ import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import CreateCubeForm from './CreateCubeForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { CardCacheContext } from '../../contexts/CardCache';
 
 export default function CubeAccordion({ pageClasses }) {
   const {
     accountState: { _id, cubes },
     deleteCube
-  } = React.useContext(AccountContext);
-  const { userID } = React.useContext(AuthenticationContext);
-  const [cubeToDelete, setCubeToDelete] = React.useState({
+  } = useContext(AccountContext);
+  const { userID } = useContext(AuthenticationContext);
+  const { scryfallCardDataCache } = useContext(CardCacheContext);
+  const [cubeToDelete, setCubeToDelete] = useState({
     _id: null,
     name: null
   });
-  const [showCubeForm, setShowCubeForm] = React.useState(false);
+  const [showCubeForm, setShowCubeForm] = useState(false);
 
   return (
     <React.Fragment>
@@ -67,6 +69,7 @@ export default function CubeAccordion({ pageClasses }) {
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
+                  <MUITableCell>Image</MUITableCell>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Description</MUITableCell>
                   {_id === userID && <MUITableCell>Delete</MUITableCell>}
@@ -75,6 +78,19 @@ export default function CubeAccordion({ pageClasses }) {
               <MUITableBody>
                 {cubes.map((cube) => (
                   <MUITableRow key={cube._id}>
+                    <MUITableCell>
+                      {cube.image &&
+                        scryfallCardDataCache.current[cube.image] && (
+                          <img
+                            alt={scryfallCardDataCache.current[cube.image].name}
+                            src={
+                              scryfallCardDataCache.current[cube.image].art_crop
+                            }
+                            style={{ borderRadius: 4 }}
+                            width={75}
+                          />
+                        )}
+                    </MUITableCell>
                     <MUITableCell>
                       <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
                     </MUITableCell>

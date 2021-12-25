@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import MUIPaper from '@mui/material/Paper';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
@@ -7,19 +7,21 @@ import DeckInfo from '../components/Deck Page/DeckInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/Authentication';
+import { CardCacheContext } from '../contexts/CardCache';
 import { DeckContext } from '../contexts/deck-context';
 
 export default function Deck() {
-  const { userID } = React.useContext(AuthenticationContext);
+  const { userID } = useContext(AuthenticationContext);
+  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const {
     loading,
-    deckState: { creator, mainboard, name, sideboard },
+    deckState: { creator, image, mainboard, name, sideboard },
     addCardsToDeck,
     removeCardsFromDeck,
     toggleMainboardSideboardDeck
-  } = React.useContext(DeckContext);
+  } = useContext(DeckContext);
 
-  return loading ? (
+  return loading || (image && !scryfallCardDataCache.current[image]) ? (
     <LoadingSpinner />
   ) : (
     <React.Fragment>
