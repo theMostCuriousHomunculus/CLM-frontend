@@ -122,6 +122,7 @@ export default function SiteSearchBar({ setDrawerOpen }) {
                             avatar
                             name
                           }
+                          image
                           name
                         }
                         ... on DeckType {
@@ -130,6 +131,7 @@ export default function SiteSearchBar({ setDrawerOpen }) {
                             avatar
                             name
                           }
+                          image
                           name
                         }
                         ... on EventType {
