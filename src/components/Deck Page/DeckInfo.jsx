@@ -178,18 +178,20 @@ export default function DeckInfo() {
             value={descriptionInput}
           />
 
-          <ScryfallRequest
-            buttonText="Change Image"
-            labelText="Deck Image"
-            onSubmit={(chosenCard) => {
-              editDeck(
-                descriptionInput,
-                format,
-                chosenCard.scryfall_id,
-                nameInput
-              );
-            }}
-          />
+          {creator._id === userID && (
+            <ScryfallRequest
+              buttonText="Change Image"
+              labelText="Deck Image"
+              onSubmit={(chosenCard) => {
+                editDeck(
+                  descriptionInput,
+                  format,
+                  chosenCard.scryfall_id,
+                  nameInput
+                );
+              }}
+            />
+          )}
         </MUICardContent>
 
         <MUICardActions

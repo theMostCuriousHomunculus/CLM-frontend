@@ -359,18 +359,20 @@ export default function Dashboard() {
             value={descriptionInput}
           />
 
-          <ScryfallRequest
-            buttonText="Change Image"
-            labelText="Cube Image"
-            onSubmit={(chosenCard) => {
-              editCube(
-                descriptionInput,
-                chosenCard.scryfall_id,
-                cubeNameInput,
-                isPublished
-              );
-            }}
-          />
+          {userID === creator._id && (
+            <ScryfallRequest
+              buttonText="Change Image"
+              labelText="Cube Image"
+              onSubmit={(chosenCard) => {
+                editCube(
+                  descriptionInput,
+                  chosenCard.scryfall_id,
+                  cubeNameInput,
+                  isPublished
+                );
+              }}
+            />
+          )}
 
           <MUITypography
             style={{

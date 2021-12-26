@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
 import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUICircularProgress from '@mui/material/CircularProgress';
 import MUISearchIcon from '@mui/icons-material/Search';
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router';
 import theme from '../../theme';
 import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
+import { CardCacheContext } from '../../contexts/CardCache';
 
 const useStyles = makeStyles({
   input: {
@@ -42,11 +43,48 @@ const useStyles = makeStyles({
 
 export default function SiteSearchBar({ setDrawerOpen }) {
   const searchInput = useRef();
+  const { addCardsToCache, scryfallCardDataCache } =
+    useContext(CardCacheContext);
   const { loading, sendRequest } = useRequest();
   const [searchResults, setSearchResults] = useState([]);
   const [timer, setTimer] = useState();
   const classes = useStyles();
   const navigate = useNavigate();
+
+  const updateSearchResults = useCallback(
+    async function (data) {
+      const cardSet = new Set();
+
+      for (const result of data) {
+        if (
+          (result.__typename === 'CubeType' ||
+            result.__typename === 'DeckType') &&
+          result.image
+        ) {
+          cardSet.add(result.image);
+        }
+      }
+
+      await addCardsToCache([...cardSet]);
+
+      for (const result of data) {
+        if (
+          (result.__typename === 'CubeType' ||
+            result.__typename === 'DeckType') &&
+          result.image
+        ) {
+          result.image = {
+            alt: scryfallCardDataCache.current[result.image].name,
+            scryfall_id: result.image,
+            src: scryfallCardDataCache.current[result.image].art_crop
+          };
+        }
+      }
+
+      setSearchResults(data);
+    },
+    [addCardsToCache]
+  );
 
   const searchSite = useCallback(
     (event) => {
@@ -57,7 +95,7 @@ export default function SiteSearchBar({ setDrawerOpen }) {
             setSearchResults([]);
           } else {
             await sendRequest({
-              callback: setSearchResults,
+              callback: updateSearchResults,
               load: true,
               operation: 'searchSite',
               get body() {
@@ -201,8 +239,8 @@ export default function SiteSearchBar({ setDrawerOpen }) {
                   <img
                     alt={option.subtitle}
                     src={option.image}
-                    height={50}
                     style={{ borderRadius: 4 }}
+                    width={75}
                   />
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
@@ -219,7 +257,12 @@ export default function SiteSearchBar({ setDrawerOpen }) {
             {option.__typename === 'CubeType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  <div></div>
+                  <img
+                    alt={option.alt}
+                    src={option.src}
+                    style={{ borderRadius: 4 }}
+                    width={75}
+                  />
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Cube
@@ -233,7 +276,12 @@ export default function SiteSearchBar({ setDrawerOpen }) {
             {option.__typename === 'DeckType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  <div></div>
+                  <img
+                    alt={option.alt}
+                    src={option.src}
+                    style={{ borderRadius: 4 }}
+                    width={75}
+                  />
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Deck

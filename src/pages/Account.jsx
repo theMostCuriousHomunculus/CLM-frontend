@@ -208,10 +208,10 @@ export default function Account() {
           <MUICardActions>
             <ScryfallRequest
               buttonText="Change Avatar"
-              labelText="Change your avatar"
-              onSubmit={(chosenCard) =>
-                editAccount(`avatar: "${chosenCard.art_crop}"`)
-              }
+              labelText="Avatar"
+              onSubmit={(chosenCard) => {
+                editAccount(`avatar: "${chosenCard.art_crop}"`);
+              }}
             />
           </MUICardActions>
         )}
