@@ -23,13 +23,11 @@ import randomSampleWOReplacement from '../../functions/random-sample-wo-replacem
 import theme from '../../theme';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../../contexts/Authentication';
-import { CardCacheContext } from '../../contexts/CardCache';
 import { DeckContext } from '../../contexts/deck-context';
 import { CSVLink } from 'react-csv';
 
 export default function DeckInfo() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
-  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const {
     deckState: {
       creator,
@@ -46,6 +44,7 @@ export default function DeckInfo() {
   const [descriptionInput, setDescriptionInput] = useState(description);
   const [nameInput, setNameInput] = useState(name);
   const [sampleHand, setSampleHand] = useState([]);
+  const deckImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
 
   return (
     <React.Fragment>
@@ -89,7 +88,7 @@ export default function DeckInfo() {
                   editDeck(
                     descriptionInput,
                     event.target.value,
-                    image,
+                    image.scryfall_id,
                     nameInput
                   );
                 }}
@@ -110,21 +109,26 @@ export default function DeckInfo() {
             </MUIFormControl>
           }
           avatar={
-            image && (
+            image ? (
               <img
-                alt={scryfallCardDataCache.current[image].name}
-                src={scryfallCardDataCache.current[image].art_crop}
+                alt={image.alt}
+                src={image.src}
                 style={{ borderRadius: 4 }}
-                width={useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75}
+                width={deckImageWidth}
               />
-            )
+            ) : undefined
           }
           title={
             <MUITextField
               disabled={creator._id !== userID}
               inputProps={{
                 onBlur: () => {
-                  editDeck(descriptionInput, format, image, nameInput);
+                  editDeck(
+                    descriptionInput,
+                    format,
+                    image.scryfall_id,
+                    nameInput
+                  );
                 }
               }}
               label="Deck Name"
@@ -157,7 +161,14 @@ export default function DeckInfo() {
             disabled={creator._id !== userID}
             fullWidth={true}
             inputProps={{
-              onBlur: () => editDeck(descriptionInput, format, image, nameInput)
+              onBlur: () => {
+                editDeck(
+                  descriptionInput,
+                  format,
+                  image.scryfall_id,
+                  nameInput
+                );
+              }
             }}
             label="Deck Description"
             multiline

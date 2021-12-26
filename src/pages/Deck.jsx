@@ -7,12 +7,10 @@ import DeckInfo from '../components/Deck Page/DeckInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/Authentication';
-import { CardCacheContext } from '../contexts/CardCache';
 import { DeckContext } from '../contexts/deck-context';
 
 export default function Deck() {
   const { userID } = useContext(AuthenticationContext);
-  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const {
     loading,
     deckState: { creator, image, mainboard, name, sideboard },
@@ -21,7 +19,7 @@ export default function Deck() {
     toggleMainboardSideboardDeck
   } = useContext(DeckContext);
 
-  return loading || (image && !scryfallCardDataCache.current[image]) ? (
+  return loading ? (
     <LoadingSpinner />
   ) : (
     <React.Fragment>

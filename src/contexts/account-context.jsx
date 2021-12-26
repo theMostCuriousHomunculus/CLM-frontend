@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useRequest from '../hooks/request-hook';
 import Account from '../pages/Account';
 import { AuthenticationContext } from './Authentication';
+import { CardCacheContext } from './CardCache';
 
 export const AccountContext = createContext({
   loading: false,
@@ -23,6 +24,8 @@ export const AccountContext = createContext({
 
 export default function ContextualizedAccountPage() {
   const { accountID } = useParams();
+  const { addCardsToCache, scryfallCardDataCache } =
+    useContext(CardCacheContext);
   const { setUserInfo } = useContext(AuthenticationContext);
   const navigate = useNavigate();
   const [accountState, setAccountState] = useState({
@@ -160,6 +163,45 @@ export default function ContextualizedAccountPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
+
+  const updateAccountState = useCallback(
+    async function (data) {
+      const cardSet = new Set();
+
+      for (const cube of data.cubes) {
+        if (cube.image) cardSet.add(cube.image);
+      }
+
+      for (const deck of data.decks) {
+        if (deck.image) cardSet.add(deck.image);
+      }
+
+      await addCardsToCache([...cardSet]);
+
+      for (const cube of data.cubes) {
+        if (cube.image) {
+          cube.image = {
+            alt: scryfallCardDataCache.current[cube.image].name,
+            scryfall_id: cube.image,
+            src: scryfallCardDataCache.current[cube.image].art_crop
+          };
+        }
+      }
+
+      for (const deck of data.decks) {
+        if (deck.image) {
+          deck.image = {
+            alt: scryfallCardDataCache.current[deck.image].name,
+            scryfall_id: deck.image,
+            src: scryfallCardDataCache.current[deck.image].art_crop
+          };
+        }
+      }
+
+      setAccountState(data);
+    },
+    [addCardsToCache]
+  );
 
   const createCube = useCallback(
     async function (event, cobraID, description, name) {
@@ -371,7 +413,7 @@ export default function ContextualizedAccountPage() {
   const fetchAccountByID = useCallback(
     async function () {
       await sendRequest({
-        callback: setAccountState,
+        callback: updateAccountState,
         load: true,
         operation: 'fetchAccountByID',
         get body() {

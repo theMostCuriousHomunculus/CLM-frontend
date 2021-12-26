@@ -7,12 +7,10 @@ import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/Authentication';
-import { CardCacheContext } from '../contexts/CardCache';
 import { CubeContext } from '../contexts/cube-context';
 
 export default function Cube() {
   const { userID } = useContext(AuthenticationContext);
-  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const { loading, activeComponentState, cubeState, addCardToCube } =
     useContext(CubeContext);
   const [editable, setEditable] = useState(cubeState.creator._id === userID);
@@ -22,7 +20,7 @@ export default function Cube() {
     setEditable(cubeState.creator._id === userID);
   }, [cubeState.creator._id, userID]);
 
-  return loading || !scryfallCardDataCache.current[cubeState.image] ? (
+  return loading ? (
     <LoadingSpinner />
   ) : (
     <React.Fragment>

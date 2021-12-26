@@ -24,7 +24,11 @@ export const DeckContext = createContext({
     },
     description: '',
     format: '',
-    image: '',
+    image: {
+      alt: undefined,
+      scryfall_id: undefined,
+      src: undefined
+    },
     mainboard: [],
     name: '',
     sideboard: []
@@ -39,7 +43,8 @@ export const DeckContext = createContext({
 export default function ContextualizedDeckPage() {
   const navigate = useNavigate();
   const { deckID } = useParams();
-  const { addCardsToCache } = useContext(CardCacheContext);
+  const { addCardsToCache, scryfallCardDataCache } =
+    useContext(CardCacheContext);
   const [deckState, setDeckState] = useState({
     _id: deckID,
     creator: {
@@ -49,7 +54,11 @@ export default function ContextualizedDeckPage() {
     },
     description: '',
     format: '',
-    image: '',
+    image: {
+      alt: undefined,
+      scryfall_id: undefined,
+      src: undefined
+    },
     mainboard: [],
     name: '',
     sideboard: []
@@ -95,6 +104,14 @@ export default function ContextualizedDeckPage() {
       }
 
       await addCardsToCache([...cardSet]);
+
+      if (data.image) {
+        data.image = {
+          alt: scryfallCardDataCache.current[data.image].name,
+          scryfall_id: data.image,
+          src: scryfallCardDataCache.current[data.image].art_crop
+        };
+      }
 
       data.mainboard.forEach(populateCachedScryfallData);
 

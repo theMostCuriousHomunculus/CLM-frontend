@@ -30,6 +30,11 @@ export const CubeContext = createContext({
       name: null
     },
     description: null,
+    image: {
+      alt: undefined,
+      scryfall_id: undefined,
+      src: undefined
+    },
     mainboard: [],
     modules: [],
     name: null,
@@ -65,7 +70,8 @@ export default function ContextualizedCubePage() {
     size: null
   });
   const { cubeID } = useParams();
-  const { addCardsToCache } = useContext(CardCacheContext);
+  const { addCardsToCache, scryfallCardDataCache } =
+    useContext(CardCacheContext);
   const [cubeState, setCubeState] = useState({
     _id: cubeID,
     creator: {
@@ -74,7 +80,11 @@ export default function ContextualizedCubePage() {
       name: '...'
     },
     description: '',
-    image: '',
+    image: {
+      alt: undefined,
+      scryfall_id: undefined,
+      src: undefined
+    },
     mainboard: [],
     modules: [],
     name: '',
@@ -207,6 +217,14 @@ export default function ContextualizedCubePage() {
       }
 
       await addCardsToCache([...cardSet]);
+
+      if (data.image) {
+        data.image = {
+          alt: scryfallCardDataCache.current[data.image].name,
+          scryfall_id: data.image,
+          src: scryfallCardDataCache.current[data.image].art_crop
+        };
+      }
 
       data.mainboard.forEach(populateCachedScryfallData);
 

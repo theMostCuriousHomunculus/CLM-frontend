@@ -33,12 +33,10 @@ import CreateComponentForm from './CreateComponentForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/Authentication';
-import { CardCacheContext } from '../../contexts/CardCache';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function Dashboard() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
-  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const {
     activeComponentState,
     cubeState: {
@@ -70,6 +68,7 @@ export default function Dashboard() {
   const [samplePack, setSamplePack] = useState([]);
   const [sizeInput, setSizeInput] = useState(activeComponentState.size);
   const componentNameInputRef = useRef();
+  const cubeImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
 
   useEffect(() => {
     setCubeNameInput(cubeName);
@@ -251,10 +250,10 @@ export default function Dashboard() {
           }
           avatar={
             <img
-              alt={scryfallCardDataCache.current[image].name}
-              src={scryfallCardDataCache.current[image].art_crop}
+              alt={image.alt}
+              src={image.src}
               style={{ borderRadius: 4 }}
-              width={useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75}
+              width={cubeImageWidth}
             />
           }
           title={
@@ -265,7 +264,7 @@ export default function Dashboard() {
                   onBlur: () => {
                     editCube(
                       descriptionInput,
-                      image,
+                      image.scryfall_id,
                       cubeNameInput,
                       isPublished
                     );
@@ -290,7 +289,7 @@ export default function Dashboard() {
                         onChange={() => {
                           editCube(
                             descriptionInput,
-                            image,
+                            image.scryfall_id,
                             cubeNameInput,
                             !isPublished
                           );
@@ -342,7 +341,12 @@ export default function Dashboard() {
             fullWidth={true}
             inputProps={{
               onBlur: () => {
-                editCube(descriptionInput, image, cubeNameInput, isPublished);
+                editCube(
+                  descriptionInput,
+                  image.scryfall_id,
+                  cubeNameInput,
+                  isPublished
+                );
               }
             }}
             label="Cube Description"

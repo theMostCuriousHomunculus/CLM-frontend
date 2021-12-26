@@ -67,6 +67,7 @@ export default function DeckAccordion({ pageClasses }) {
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
+                  <MUITableCell>Image</MUITableCell>
                   <MUITableCell>Name</MUITableCell>
                   <MUITableCell>Format</MUITableCell>
                   {_id === userID && <MUITableCell>Delete</MUITableCell>}
@@ -75,6 +76,16 @@ export default function DeckAccordion({ pageClasses }) {
               <MUITableBody>
                 {decks.map((deck) => (
                   <MUITableRow key={deck._id}>
+                    <MUITableCell>
+                      {deck.image && (
+                        <img
+                          alt={deck.image.alt}
+                          src={deck.image.src}
+                          style={{ borderRadius: 4 }}
+                          width={75}
+                        />
+                      )}
+                    </MUITableCell>
                     <MUITableCell>
                       <Link to={`/deck/${deck._id}`}>{deck.name}</Link>
                     </MUITableCell>

@@ -20,7 +20,6 @@ import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import CreateCubeForm from './CreateCubeForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';
-import { CardCacheContext } from '../../contexts/CardCache';
 
 export default function CubeAccordion({ pageClasses }) {
   const {
@@ -28,7 +27,6 @@ export default function CubeAccordion({ pageClasses }) {
     deleteCube
   } = useContext(AccountContext);
   const { userID } = useContext(AuthenticationContext);
-  const { scryfallCardDataCache } = useContext(CardCacheContext);
   const [cubeToDelete, setCubeToDelete] = useState({
     _id: null,
     name: null
@@ -79,17 +77,14 @@ export default function CubeAccordion({ pageClasses }) {
                 {cubes.map((cube) => (
                   <MUITableRow key={cube._id}>
                     <MUITableCell>
-                      {cube.image &&
-                        scryfallCardDataCache.current[cube.image] && (
-                          <img
-                            alt={scryfallCardDataCache.current[cube.image].name}
-                            src={
-                              scryfallCardDataCache.current[cube.image].art_crop
-                            }
-                            style={{ borderRadius: 4 }}
-                            width={75}
-                          />
-                        )}
+                      {cube.image && (
+                        <img
+                          alt={cube.image.alt}
+                          src={cube.image.src}
+                          style={{ borderRadius: 4 }}
+                          width={75}
+                        />
+                      )}
                     </MUITableCell>
                     <MUITableCell>
                       <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
