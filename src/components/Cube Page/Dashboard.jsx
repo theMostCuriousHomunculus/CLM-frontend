@@ -249,12 +249,14 @@ export default function Dashboard() {
             </React.Fragment>
           }
           avatar={
-            <img
-              alt={image.alt}
-              src={image.src}
-              style={{ borderRadius: 4 }}
-              width={cubeImageWidth}
-            />
+            image && (
+              <img
+                alt={image.alt}
+                src={image.src}
+                style={{ borderRadius: 4 }}
+                width={cubeImageWidth}
+              />
+            )
           }
           title={
             <React.Fragment>

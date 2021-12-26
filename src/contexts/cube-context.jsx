@@ -466,7 +466,7 @@ export default function ContextualizedCubePage() {
               mutation {
                 ${this.operation}(
                   description: "${description}",
-                  image: "${image}",
+                  ${image ? `image: "${image}",` : ''}
                   name: "${name}",
                   published: ${published}
                 ) {

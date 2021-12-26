@@ -184,8 +184,8 @@ export default function ContextualizedDeckPage() {
               mutation {
                 ${this.operation}(
                   description: "${description}",
-                  format: ${format},
-                  image: "${image}",
+                  ${format ? `format: ${format},` : ''}
+                  ${image ? `image: "${image}",` : ''}
                   name: "${name}"
                 ) {
                   _id
