@@ -259,12 +259,14 @@ export default function SiteSearchBar({ setDrawerOpen }) {
             {option.__typename === 'CubeType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  <img
-                    alt={option.image.alt}
-                    src={option.image.src}
-                    style={{ borderRadius: 4 }}
-                    width={75}
-                  />
+                  {option.image && (
+                    <img
+                      alt={option.image.alt}
+                      src={option.image.src}
+                      style={{ borderRadius: 4 }}
+                      width={75}
+                    />
+                  )}
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Cube
@@ -278,12 +280,14 @@ export default function SiteSearchBar({ setDrawerOpen }) {
             {option.__typename === 'DeckType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  <img
-                    alt={option.image.alt}
-                    src={option.image.src}
-                    style={{ borderRadius: 4 }}
-                    width={75}
-                  />
+                  {option.image && (
+                    <img
+                      alt={option.image.alt}
+                      src={option.image.src}
+                      style={{ borderRadius: 4 }}
+                      width={75}
+                    />
+                  )}
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Deck
