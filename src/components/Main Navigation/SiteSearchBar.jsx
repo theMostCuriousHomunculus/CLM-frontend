@@ -260,8 +260,8 @@ export default function SiteSearchBar({ setDrawerOpen }) {
               <li {...props}>
                 <span className={classes.option}>
                   <img
-                    alt={option.alt}
-                    src={option.src}
+                    alt={option.image.alt}
+                    src={option.image.src}
                     style={{ borderRadius: 4 }}
                     width={75}
                   />
@@ -279,8 +279,8 @@ export default function SiteSearchBar({ setDrawerOpen }) {
               <li {...props}>
                 <span className={classes.option}>
                   <img
-                    alt={option.alt}
-                    src={option.src}
+                    alt={option.image.alt}
+                    src={option.image.src}
                     style={{ borderRadius: 4 }}
                     width={75}
                   />
