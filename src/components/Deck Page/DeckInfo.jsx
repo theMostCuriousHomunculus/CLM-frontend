@@ -1,21 +1,26 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
+import MUICheckbox from '@mui/material/Checkbox';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIFormControl from '@mui/material/FormControl';
+import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MUIImageList from '@mui/material/ImageList';
 import MUIImageListItem from '@mui/material/ImageListItem';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
 import MUITextField from '@mui/material/TextField';
+import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
 import generateCSVList from '../../functions/generate-csv-list';
@@ -24,7 +29,6 @@ import theme from '../../theme';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { DeckContext } from '../../contexts/deck-context';
-import { CSVLink } from 'react-csv';
 
 export default function DeckInfo() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
@@ -35,16 +39,30 @@ export default function DeckInfo() {
       format,
       image,
       mainboard,
-      name,
+      name: deckName,
+      published,
       sideboard
     },
     cloneDeck,
     editDeck
   } = useContext(DeckContext);
   const [descriptionInput, setDescriptionInput] = useState(description);
-  const [nameInput, setNameInput] = useState(name);
+  const [isPublished, setIsPublished] = useState(published);
+  const [deckNameInput, setDeckNameInput] = useState(deckName);
   const [sampleHand, setSampleHand] = useState([]);
   const deckImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
+
+  useEffect(() => {
+    setDeckNameInput(deckName);
+  }, [deckName]);
+
+  useEffect(() => {
+    setDescriptionInput(description);
+  }, [description]);
+
+  useEffect(() => {
+    setIsPublished(published);
+  }, [published]);
 
   return (
     <React.Fragment>
@@ -85,19 +103,20 @@ export default function DeckInfo() {
                 label="Format"
                 native
                 onChange={(event) => {
-                  editDeck(
-                    descriptionInput,
-                    event.target.value,
-                    image.scryfall_id,
-                    nameInput
-                  );
+                  editDeck({
+                    description: descriptionInput,
+                    format: event.target.value,
+                    image: image.scryfall_id,
+                    name: deckNameInput,
+                    published: isPublished
+                  });
                 }}
                 value={format}
                 inputProps={{
                   id: 'format-selector'
                 }}
               >
-                <option value={undefined}>Freeform</option>
+                <option value="Freeform">Freeform</option>
                 <option value="Classy">Classy</option>
                 <option value="Legacy">Legacy</option>
                 <option value="Modern">Modern</option>
@@ -119,23 +138,57 @@ export default function DeckInfo() {
             ) : undefined
           }
           title={
-            <MUITextField
-              disabled={creator._id !== userID}
-              inputProps={{
-                onBlur: () => {
-                  editDeck(
-                    descriptionInput,
-                    format,
-                    image.scryfall_id,
-                    nameInput
-                  );
-                }
-              }}
-              label="Deck Name"
-              onChange={(event) => setNameInput(event.target.value)}
-              type="text"
-              value={nameInput}
-            />
+            <React.Fragment>
+              <MUITextField
+                disabled={creator._id !== userID}
+                inputProps={{
+                  onBlur: () => {
+                    editDeck({
+                      description: descriptionInput,
+                      format,
+                      image: image.scryfall_id,
+                      name: deckNameInput,
+                      published: isPublished
+                    });
+                  }
+                }}
+                label="Deck Name"
+                onChange={(event) => setDeckNameInput(event.target.value)}
+                type="text"
+                value={deckNameInput}
+              />
+              {creator._id === userID && (
+                <div
+                  style={{
+                    alignItems: 'center',
+                    display: 'flex'
+                  }}
+                >
+                  <MUIFormControlLabel
+                    control={
+                      <MUICheckbox
+                        checked={isPublished}
+                        onChange={() => {
+                          editDeck({
+                            description: descriptionInput,
+                            format,
+                            image: image.scryfall_id,
+                            name: deckNameInput,
+                            published: !isPublished
+                          });
+                          setIsPublished((prevState) => !prevState);
+                        }}
+                      />
+                    }
+                    label="Published"
+                    style={{ marginRight: 8 }}
+                  />
+                  <MUITooltip title="A published deck is visible to other users.">
+                    <MUIHelpOutlineIcon color="primary" />
+                  </MUITooltip>
+                </div>
+              )}
+            </React.Fragment>
           }
           subheader={
             <React.Fragment>
@@ -146,10 +199,10 @@ export default function DeckInfo() {
               <MUITypography variant="subtitle1">
                 <CSVLink
                   data={generateCSVList(mainboard, sideboard)}
-                  filename={`${name}.csv`}
+                  filename={`${deckName}.csv`}
                   target="_blank"
                 >
-                  Export Deck List to CSV
+                  Export to CSV
                 </CSVLink>
               </MUITypography>
             </React.Fragment>
@@ -162,12 +215,13 @@ export default function DeckInfo() {
             fullWidth={true}
             inputProps={{
               onBlur: () => {
-                editDeck(
-                  descriptionInput,
+                editDeck({
+                  description: descriptionInput,
                   format,
-                  image.scryfall_id,
-                  nameInput
-                );
+                  image: image.scryfall_id,
+                  name: deckNameInput,
+                  published: isPublished
+                });
               }
             }}
             label="Deck Description"
@@ -183,12 +237,13 @@ export default function DeckInfo() {
               buttonText="Change Image"
               labelText="Deck Image"
               onSubmit={(chosenCard) => {
-                editDeck(
-                  descriptionInput,
+                editDeck({
+                  description: descriptionInput,
                   format,
-                  chosenCard.scryfall_id,
-                  nameInput
-                );
+                  image: chosenCard.scryfall_id,
+                  name: deckNameInput,
+                  published: isPublished
+                });
               }}
             />
           )}

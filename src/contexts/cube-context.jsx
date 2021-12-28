@@ -88,6 +88,7 @@ export default function ContextualizedCubePage() {
     mainboard: [],
     modules: [],
     name: '',
+    published: false,
     rotations: [],
     sideboard: []
   });

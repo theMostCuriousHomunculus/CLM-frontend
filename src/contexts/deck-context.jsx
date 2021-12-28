@@ -31,6 +31,7 @@ export const DeckContext = createContext({
     },
     mainboard: [],
     name: '',
+    published: false,
     sideboard: []
   },
   addCardsToDeck: () => null,
@@ -61,6 +62,7 @@ export default function ContextualizedDeckPage() {
     },
     mainboard: [],
     name: '',
+    published: false,
     sideboard: []
   });
   const cardQuery = `
@@ -81,6 +83,7 @@ export default function ContextualizedDeckPage() {
       ${cardQuery}
     }
     name
+    published
     sideboard {
       ${cardQuery}
     }
@@ -174,7 +177,7 @@ export default function ContextualizedDeckPage() {
   );
 
   const editDeck = useCallback(
-    async function (description, format, image, name) {
+    async function ({ description, format, image, name, published }) {
       await sendRequest({
         headers: { DeckID: deckState._id },
         operation: 'editDeck',
@@ -184,8 +187,9 @@ export default function ContextualizedDeckPage() {
               mutation {
                 ${this.operation}(
                   description: "${description}",
-                  ${format ? `format: ${format},` : ''}
+                  format: ${format},
                   ${image ? `image: "${image}",` : ''}
+                  published: ${published},
                   name: "${name}"
                 ) {
                   _id

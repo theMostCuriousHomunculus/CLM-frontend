@@ -80,8 +80,8 @@ export default function CreateCubeForm({ open, toggleOpen }) {
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
             <MUIButton type="submit">Create!</MUIButton>
+            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
           </MUIDialogActions>
         </form>
       )}

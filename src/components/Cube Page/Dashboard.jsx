@@ -277,11 +277,11 @@ export default function Dashboard() {
                 type="text"
                 value={cubeNameInput}
               />
-              {userID === creator._id && (
+              {creator._id === userID && (
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    display: 'flex'
                   }}
                 >
                   <MUIFormControlLabel
@@ -330,7 +330,7 @@ export default function Dashboard() {
                   filename={`${cubeName}.csv`}
                   target="_blank"
                 >
-                  Export Cube List to CSV
+                  Export to CSV
                 </CSVLink>
               </MUITypography>
             </React.Fragment>

@@ -15,6 +15,8 @@ import MUIListItem from '@mui/material/ListItem';
 import MUIListItemText from '@mui/material/ListItemText';
 import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
+import MUIRadio from '@mui/material/Radio';
+import MUIRadioGroup from '@mui/material/RadioGroup';
 import MUISwitch from '@mui/material/Switch';
 import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
@@ -26,17 +28,6 @@ import WarningButton from '../miscellaneous/WarningButton';
 import { AccountContext } from '../../contexts/account-context';
 
 const useStyles = makeStyles({
-  budSwitch: {
-    padding: 4
-  },
-  flex: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'space-between'
-  },
-  formControl: {
-    display: 'block'
-  },
   loadingSpinnerContainer: {
     alignContent: 'center',
     display: 'flex',
@@ -50,7 +41,6 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
   const classes = useStyles();
   const [cardsPerPack, setCardsPerPack] = React.useState(1);
   const [cubeAnchorEl, setCubeAnchorEl] = React.useState(null);
-  const [eventAnchorEl, setEventAnchorEl] = React.useState(null);
   const [eventName, setEventName] = React.useState('');
   const [eventType, setEventType] = React.useState('draft');
   const [includedModules, setIncludedModules] = React.useState([]);
@@ -60,7 +50,6 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
-      <MUIDialogTitle>Host an Event</MUIDialogTitle>
       {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
@@ -80,7 +69,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
             );
           }}
         >
-          <MUIDialogContent>
+          <MUIDialogTitle>
             <MUITextField
               autoComplete="off"
               autoFocus
@@ -91,152 +80,188 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
               type="text"
               value={eventName}
             />
+          </MUIDialogTitle>
 
-            <MUIList component="nav">
-              <MUIListItem
-                button
-                aria-haspopup="true"
-                aria-controls="lock-menu"
-                onClick={(event) => setCubeAnchorEl(event.currentTarget)}
-              >
-                <MUIListItemText
-                  primary="Cube to Use"
-                  secondary={selectedCube.name}
-                />
-              </MUIListItem>
-            </MUIList>
-            <MUIMenu
-              anchorEl={cubeAnchorEl}
-              keepMounted
-              open={Boolean(cubeAnchorEl)}
-              onClose={() => setCubeAnchorEl(null)}
-            >
-              {cubes.map((cube) => (
-                <MUIMenuItem
-                  key={cube._id}
-                  onClick={() => {
-                    setCubeAnchorEl(null);
-                    setSelectedCube(cube);
-                  }}
-                  selected={selectedCube._id === cube._id}
-                >
-                  {cube.name}
-                </MUIMenuItem>
-              ))}
-            </MUIMenu>
-
-            <MUIList component="nav">
-              <MUIListItem
-                button
-                aria-haspopup="true"
-                aria-controls="lock-menu"
-                onClick={(event) => setEventAnchorEl(event.currentTarget)}
-              >
-                <MUIListItemText primary="Event Type" secondary={eventType} />
-              </MUIListItem>
-            </MUIList>
-            <MUIMenu
-              anchorEl={eventAnchorEl}
-              keepMounted
-              open={Boolean(eventAnchorEl)}
-              onClose={() => setEventAnchorEl(null)}
-            >
-              <MUIMenuItem
-                onClick={() => {
-                  setEventType('draft');
-                  setEventAnchorEl(null);
-                }}
-                selected={eventType === 'draft'}
-              >
-                Draft
-              </MUIMenuItem>
-
-              <MUIMenuItem
-                onClick={() => {
-                  setEventType('sealed');
-                  setEventAnchorEl(null);
-                }}
-                selected={eventType === 'sealed'}
-              >
-                Sealed
-              </MUIMenuItem>
-            </MUIMenu>
-
-            <MUIFormControl
-              component="fieldset"
-              className={classes.formControl}
-            >
-              <MUIFormLabel component="legend">Buds to Invite</MUIFormLabel>
-              <MUIFormGroup>
-                {buds.map((bud) => (
-                  <MUIFormControlLabel
-                    className={classes.budSwitch}
-                    control={
-                      <MUISwitch
-                        onChange={() => {
-                          if (otherPlayers.includes(bud._id)) {
-                            setOtherPlayers((prevState) =>
-                              prevState.filter((plr) => plr !== bud._id)
-                            );
-                          } else {
-                            setOtherPlayers((prevState) => [
-                              ...prevState,
-                              bud._id
-                            ]);
-                          }
-                        }}
-                        value={bud._id}
-                      />
-                    }
-                    key={bud._id}
-                    label={
-                      <span className={classes.flex}>
-                        <Avatar alt={bud.name} size="small" src={bud.avatar} />
-                        <MUITypography variant="subtitle1">
-                          {bud.name}
-                        </MUITypography>
-                      </span>
-                    }
-                  />
-                ))}
-              </MUIFormGroup>
-            </MUIFormControl>
-
-            <MUIFormControl
-              component="fieldset"
-              className={classes.formControl}
-            >
-              <MUIFormLabel component="legend">Modules to Include</MUIFormLabel>
-              <MUIFormGroup>
-                {selectedCube &&
-                  selectedCube.modules.map((module) => (
-                    <MUIFormControlLabel
-                      control={
-                        <MUICheckbox
-                          onChange={() => {
-                            if (includedModules.includes(module._id)) {
-                              setIncludedModules((prevState) =>
-                                prevState.filter((mdl) => mdl !== module._id)
-                              );
-                            } else {
-                              setIncludedModules((prevState) => [
-                                ...prevState,
-                                module._id
-                              ]);
-                            }
-                          }}
-                          value={module._id}
-                        />
-                      }
-                      key={module._id}
-                      label={module.name}
+          <MUIDialogContent>
+            <MUIGrid container spacing={1}>
+              <MUIGrid item xs={12} sm={6}>
+                <MUIList component="nav" style={{ padding: 0 }}>
+                  <MUIListItem
+                    button
+                    aria-haspopup="true"
+                    aria-controls="lock-menu"
+                    onClick={(event) => setCubeAnchorEl(event.currentTarget)}
+                    style={{ padding: 0 }}
+                  >
+                    <MUIListItemText
+                      primary="Cube"
+                      secondary={selectedCube.name}
                     />
+                  </MUIListItem>
+                </MUIList>
+                <MUIMenu
+                  anchorEl={cubeAnchorEl}
+                  keepMounted
+                  open={Boolean(cubeAnchorEl)}
+                  onClose={() => setCubeAnchorEl(null)}
+                >
+                  {cubes.map((cube) => (
+                    <MUIMenuItem
+                      key={cube._id}
+                      onClick={() => {
+                        setCubeAnchorEl(null);
+                        setSelectedCube(cube);
+                      }}
+                      selected={selectedCube._id === cube._id}
+                      style={{
+                        alignItems: 'flex-end',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '4px 8px'
+                      }}
+                    >
+                      {cube.image && (
+                        <img
+                          alt={cube.image.alt}
+                          src={cube.image.src}
+                          style={{ borderRadius: 4, marginRight: 8 }}
+                          width={75}
+                        />
+                      )}
+                      <span style={{ flexGrow: 1, textAlign: 'right' }}>
+                        {cube.name}
+                      </span>
+                    </MUIMenuItem>
                   ))}
+                </MUIMenu>
+              </MUIGrid>
+              <MUIGrid item xs={12} sm={6}>
+                <MUIFormControl component="fieldset" required={true}>
+                  <MUIFormLabel component="legend">Event Type</MUIFormLabel>
+
+                  <MUIRadioGroup
+                    name="Event Type"
+                    onChange={(event) => setEventType(event.target.value)}
+                    row
+                    value={eventType}
+                  >
+                    <MUIFormControlLabel
+                      value="draft"
+                      control={<MUIRadio />}
+                      label="Draft"
+                    />
+
+                    <MUIFormControlLabel
+                      value="sealed"
+                      control={<MUIRadio />}
+                      label="Sealed"
+                    />
+                  </MUIRadioGroup>
+                </MUIFormControl>
+              </MUIGrid>
+            </MUIGrid>
+
+            <hr style={{ margin: 8 }} />
+
+            <MUIFormControl component="fieldset">
+              <MUIFormLabel component="legend" style={{ paddingLeft: 8 }}>
+                Buds
+              </MUIFormLabel>
+              <MUIFormGroup>
+                <MUIGrid container spacing={1}>
+                  {buds.map((bud) => (
+                    <MUIGrid
+                      container
+                      item
+                      justifyContent="center"
+                      key={bud._id}
+                      xs={6}
+                      sm={4}
+                      md={3}
+                      lg={2}
+                    >
+                      <MUIFormControlLabel
+                        control={
+                          <MUICheckbox
+                            onChange={() => {
+                              if (otherPlayers.includes(bud._id)) {
+                                setOtherPlayers((prevState) =>
+                                  prevState.filter((plr) => plr !== bud._id)
+                                );
+                              } else {
+                                setOtherPlayers((prevState) => [
+                                  ...prevState,
+                                  bud._id
+                                ]);
+                              }
+                            }}
+                            value={bud._id}
+                          />
+                        }
+                        label={
+                          <Avatar
+                            alt={bud.name}
+                            size="small"
+                            src={bud.avatar}
+                          />
+                        }
+                      />
+                    </MUIGrid>
+                  ))}
+                </MUIGrid>
               </MUIFormGroup>
             </MUIFormControl>
 
-            <MUIGrid container spacing={2}>
-              <MUIGrid item xs={12} md={6}>
+            <hr style={{ margin: 8 }} />
+
+            <MUIFormControl component="fieldset">
+              <MUIFormLabel component="legend" style={{ paddingLeft: 8 }}>
+                Modules
+              </MUIFormLabel>
+              <MUIFormGroup>
+                <MUIGrid container spacing={1}>
+                  {selectedCube &&
+                    selectedCube.modules.map((module) => (
+                      <MUIGrid
+                        item
+                        key={module._id}
+                        xs={12}
+                        sm={6}
+                        md={4}
+                        lg={3}
+                      >
+                        <MUIFormControlLabel
+                          control={
+                            <MUICheckbox
+                              onChange={() => {
+                                if (includedModules.includes(module._id)) {
+                                  setIncludedModules((prevState) =>
+                                    prevState.filter(
+                                      (mdl) => mdl !== module._id
+                                    )
+                                  );
+                                } else {
+                                  setIncludedModules((prevState) => [
+                                    ...prevState,
+                                    module._id
+                                  ]);
+                                }
+                              }}
+                              value={module._id}
+                            />
+                          }
+                          label={module.name}
+                        />
+                      </MUIGrid>
+                    ))}
+                </MUIGrid>
+              </MUIFormGroup>
+            </MUIFormControl>
+
+            <hr style={{ margin: 8 }} />
+
+            <MUIGrid container spacing={1}>
+              <MUIGrid item xs={12} sm={6}>
                 <MUITextField
                   autoComplete="off"
                   fullWidth
@@ -254,7 +279,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                 />
               </MUIGrid>
 
-              <MUIGrid item xs={12} md={6}>
+              <MUIGrid item xs={12} sm={6}>
                 <MUITextField
                   autoComplete="off"
                   fullWidth
@@ -275,9 +300,8 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
           </MUIDialogContent>
 
           <MUIDialogActions>
-            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
-
             <MUIButton type="submit">Create!</MUIButton>
+            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
           </MUIDialogActions>
         </form>
       )}
