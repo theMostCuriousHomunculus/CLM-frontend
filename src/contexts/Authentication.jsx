@@ -14,6 +14,7 @@ const unauthenticatedUserInfo = {
   admin: false,
   avatar: null,
   settings: {
+    language: 'en',
     location_services: false,
     measurement_system: 'imperial',
     radius: 10
@@ -51,6 +52,7 @@ export function AuthenticationProvider({ children }) {
     avatar
     name
     settings {
+      language
       location_services
       measurement_system
       radius
@@ -62,6 +64,7 @@ export function AuthenticationProvider({ children }) {
     _id,
     admin,
     avatar,
+    language,
     name,
     settings,
     token
@@ -70,6 +73,7 @@ export function AuthenticationProvider({ children }) {
     setUserInfo({
       admin,
       avatar,
+      language,
       settings,
       token,
       userID: _id,
