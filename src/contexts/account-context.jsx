@@ -384,12 +384,14 @@ export default function ContextualizedAccountPage() {
       await sendRequest({
         callback: (data) => {
           setAccountState(data);
-          setUserInfo((prevState) => ({
-            ...prevState,
-            avatar: data.avatar,
-            settings: data.settings,
-            userName: data.name
-          }));
+          if (!changes.toString().includes('return_other')) {
+            setUserInfo((prevState) => ({
+              ...prevState,
+              avatar: data.avatar,
+              settings: data.settings,
+              userName: data.name
+            }));
+          }
         },
         operation: 'editAccount',
         get body() {
