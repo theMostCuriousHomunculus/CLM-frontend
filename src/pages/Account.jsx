@@ -72,10 +72,10 @@ export default function Account() {
   const classes = useStyles();
   const toggleLS = useCallback((event) => {
     setToggleState(event.target.checked);
-    if (!event.target.checked) {
-      hideLocation();
-    } else {
+    if (event.target.checked) {
       shareLocation();
+    } else {
+      hideLocation();
     }
   });
 
@@ -86,6 +86,17 @@ export default function Account() {
 
     initialize();
   }, [fetchAccountByID]);
+
+  useEffect(() => {
+    setToggleState(location_services);
+    if (isLoggedIn) {
+      if (location_services) {
+        shareLocation();
+      } else {
+        hideLocation();
+      }
+    }
+  }, [location_services]);
 
   return loading ? (
     <LoadingSpinner />

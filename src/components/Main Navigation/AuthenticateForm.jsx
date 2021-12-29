@@ -42,11 +42,13 @@ export default function AuthenticateForm({ open, toggleOpen }) {
     if (selectedTab === 0) {
       login(emailInput, passwordInput);
     }
+
     if (selectedTab === 1) {
-      register(emailInput, nameInput, passwordInput);
-    }
-    if (selectedTab === 2) {
       requestPasswordReset(emailInput);
+    }
+
+    if (selectedTab === 2) {
+      register(emailInput, nameInput, passwordInput);
     }
 
     toggleOpen();
