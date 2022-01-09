@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MUIAppBar from '@mui/material/AppBar';
+import MUIDownloadIcon from '@mui/icons-material/Download';
 import MUIDrawer from '@mui/material/Drawer';
 import MUIIconButton from '@mui/material/IconButton';
 import MUIToolbar from '@mui/material/Toolbar';
@@ -16,7 +17,6 @@ import Avatar from '../miscellaneous/Avatar';
 import NavigationLinks from './NavigationLinks';
 import theme from '../../theme';
 import SiteSearchBar from './SiteSearchBar';
-import { deferredPrompt } from '../../index';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
@@ -66,6 +66,7 @@ export default function Navigation() {
     useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const classes = useStyles();
+  const [deferredPrompt, setDeferredPrompt] = useState();
 
   function toggleDrawer(event) {
     if (
@@ -76,6 +77,25 @@ export default function Navigation() {
     }
     setDrawerOpen((prevState) => !prevState);
   }
+
+  useEffect(() => {
+    const storePrompt = (event) => {
+      event.preventDefault();
+      setDeferredPrompt(event);
+    };
+
+    const nullifyPrompt = () => {
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', storePrompt);
+    window.addEventListener('appinstalled', nullifyPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', storePrompt);
+      window.removeEventListener('appinstalled', nullifyPrompt);
+    };
+  }, []);
 
   return (
     <React.Fragment>
@@ -89,31 +109,26 @@ export default function Navigation() {
             <MUIMenuIcon
               className={classes.menuIcon}
               color="secondary"
-              onClick={() => {
-                if (deferredPrompt) {
-                  deferredPrompt.prompt();
-
-                  deferredPrompt.userChoice.then(function (choice) {
-                    if (choice.outcome === 'dismissed') {
-                      console.log(
-                        `Sadness.  If you change your mind, you can always add it yourself later by using your browser's "Add to Home Screen" feature!`
-                      );
-                    } else {
-                      console.log('Successfully added to your home screen!');
-                    }
-
-                    deferredPrompt === null;
-                  });
-                }
-
-                setDrawerOpen(true);
-              }}
+              onClick={() => setDrawerOpen(true)}
             />
             <MUITypography color="inherit" variant="h1">
               Cube Level Midnight
             </MUITypography>
           </div>
           <div className={classes.rightContainer}>
+            {deferredPrompt && (
+              <MUIIconButton
+                color="inherit"
+                onClick={async () => {
+                  deferredPrompt.prompt();
+                  await deferredPrompt.userChoice;
+                  setDeferredPrompt(null);
+                }}
+                size="large"
+              >
+                <MUIDownloadIcon fontSize="large" />
+              </MUIIconButton>
+            )}
             {searchBarLocation === 'top' && (
               <SiteSearchBar setDrawerOpen={setDrawerOpen} color="primary" />
             )}

@@ -1,10 +1,11 @@
 {
+  "id": "/index.html",
   "name": "Cube Level Midnight",
   "short_name": "CLM",
   "start_url": "/index.html",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#ff9100",
+  "background_color": "#ffffff",
   "theme_color": "#6200ea",
   "description": "One cube app to rule them all.",
   "dir": "ltr",
@@ -13,7 +14,7 @@
   "icons": [
     {
       "src": "/images/icon.svg",
-      "sizes": "2520x2520",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     }
