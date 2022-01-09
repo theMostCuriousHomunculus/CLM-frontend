@@ -16,11 +16,11 @@ import { CardCacheContext } from '../../contexts/CardCache';
 const useStyles = makeStyles({
   input: {
     margin: 8,
+    minWidth: 300,
+    width: 'calc(100% - 16px)',
     '& input[type=text]': {
       color: '#ffffff'
-    },
-    minWidth: 300,
-    width: 'calc(100% - 16px)'
+    }
   },
   option: {
     alignItems: 'flex-end',
@@ -32,8 +32,8 @@ const useStyles = makeStyles({
     [theme.breakpoints.up('md')]: {
       flexGrow: 1
     },
-    borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
+    borderRadius: theme.shape.borderRadius,
     position: 'relative',
     '&:hover': {
       backgroundColor: alpha(theme.palette.common.white, 0.25)
@@ -41,7 +41,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function SiteSearchBar({ setDrawerOpen }) {
+export default function SiteSearchBar({ color, setDrawerOpen }) {
   const searchInput = useRef();
   const { addCardsToCache, scryfallCardDataCache } =
     useContext(CardCacheContext);
@@ -200,7 +200,7 @@ export default function SiteSearchBar({ setDrawerOpen }) {
         <MUITextField
           {...params}
           className={classes.input}
-          color="secondary"
+          color={color}
           inputRef={searchInput}
           onKeyUp={(event) => {
             clearTimeout(timer);

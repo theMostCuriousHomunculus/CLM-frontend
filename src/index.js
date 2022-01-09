@@ -7,6 +7,7 @@ import theme from './theme';
 import { AuthenticationProvider } from './contexts/Authentication';
 import { CardCacheProvider } from './contexts/CardCache';
 import { ErrorProvider } from './contexts/Error';
+// import * as serviceWorker from '/service-worker.js';
 
 render(
   <ThemeProvider theme={theme}>
@@ -22,3 +23,19 @@ render(
   </ThemeProvider>,
   document.getElementById('root')
 );
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').then(function () {
+    console.log('Service worker registered!  Yee Haw!');
+  });
+}
+
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function (event) {
+  event.preventDefault();
+  deferredPrompt = event;
+  return false;
+});
+
+export { deferredPrompt };

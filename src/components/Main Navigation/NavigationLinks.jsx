@@ -11,12 +11,11 @@ import MUIListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 
-import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   item: {
-    color: theme.palette.secondary.main,
+    color: '#fff',
     '& span, & svg': {
       fontSize: '1.6rem'
     }

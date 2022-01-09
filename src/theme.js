@@ -1,5 +1,5 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
-import { deepPurple, orange, yellow } from '@mui/material/colors';
+import { deepPurple, deepOrange, yellow } from '@mui/material/colors';
 
 const backgroundColor = '#efefef';
 
@@ -158,20 +158,19 @@ let theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         head: {
-          color: orange[500]
+          color: '#fff'
         },
         root: {
           padding: '4px 8px 4px 8px'
         },
         stickyHeader: {
-          backgroundColor: deepPurple[500]
+          backgroundColor: deepPurple['A700']
         }
       }
     },
     MuiTabs: {
       styleOverrides: {
         root: {
-          backgroundColor: orange,
           borderRadius: 4
         }
       }
@@ -183,12 +182,12 @@ let theme = createTheme({
     }
   },
   palette: {
-    primary: deepPurple,
-    secondary: orange,
+    primary: {
+      main: deepPurple['A700']
+    },
+    secondary: deepOrange,
     warning: {
-      dark: '#b2a429',
-      light: '#ffef62',
-      main: yellow['A400']
+      main: yellow['A700']
     }
   },
   typography: {

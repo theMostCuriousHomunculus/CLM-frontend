@@ -16,15 +16,17 @@ import Avatar from '../miscellaneous/Avatar';
 import NavigationLinks from './NavigationLinks';
 import theme from '../../theme';
 import SiteSearchBar from './SiteSearchBar';
+import { deferredPrompt } from '../../index';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
   appBar: {
-    background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+    background: `linear-gradient(to right, ${theme.palette.primary.main}, calc(2/3 * 100%), ${theme.palette.secondary.main})`
   },
   drawer: {
     '& .MuiPaper-root': {
-      background: `linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`
+      background: `linear-gradient(to bottom, ${theme.palette.primary.main}, calc(2/3 * 100%), ${theme.palette.secondary.main})`,
+      margin: 0
     }
   },
   leftContainer: {
@@ -33,10 +35,11 @@ const useStyles = makeStyles({
     flexGrow: 2
   },
   menuIcon: {
-    border: '1px solid',
+    border: '4px solid',
     borderRadius: 4,
+    color: '#fff',
     cursor: 'pointer',
-    fontSize: '4rem',
+    fontSize: '3rem',
     marginRight: 8
   },
   toolbar: {
@@ -86,15 +89,33 @@ export default function Navigation() {
             <MUIMenuIcon
               className={classes.menuIcon}
               color="secondary"
-              onClick={() => setDrawerOpen(true)}
+              onClick={() => {
+                if (deferredPrompt) {
+                  deferredPrompt.prompt();
+
+                  deferredPrompt.userChoice.then(function (choice) {
+                    if (choice.outcome === 'dismissed') {
+                      console.log(
+                        `Sadness.  If you change your mind, you can always add it yourself later by using your browser's "Add to Home Screen" feature!`
+                      );
+                    } else {
+                      console.log('Successfully added to your home screen!');
+                    }
+
+                    deferredPrompt === null;
+                  });
+                }
+
+                setDrawerOpen(true);
+              }}
             />
-            <MUITypography color="secondary" variant="h1">
+            <MUITypography color="inherit" variant="h1">
               Cube Level Midnight
             </MUITypography>
           </div>
           <div className={classes.rightContainer}>
             {searchBarLocation === 'top' && (
-              <SiteSearchBar setDrawerOpen={setDrawerOpen} />
+              <SiteSearchBar setDrawerOpen={setDrawerOpen} color="primary" />
             )}
             {isLoggedIn ? (
               <Link to={`/account/${userID}`} style={{ marginLeft: 8 }}>
@@ -103,7 +124,7 @@ export default function Navigation() {
             ) : (
               <MUITooltip title="Login / Register">
                 <MUIIconButton
-                  color="secondary"
+                  color="inherit"
                   onClick={() => setAuthenticateFormDisplayed(true)}
                   size="large"
                 >
@@ -121,7 +142,7 @@ export default function Navigation() {
           open={drawerOpen}
         >
           {searchBarLocation === 'side' && (
-            <SiteSearchBar setDrawerOpen={setDrawerOpen} />
+            <SiteSearchBar setDrawerOpen={setDrawerOpen} color="secondary" />
           )}
           <NavigationLinks toggleDrawer={toggleDrawer} />
         </MUIDrawer>

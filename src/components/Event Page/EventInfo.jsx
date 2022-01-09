@@ -3,6 +3,7 @@ import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIGrid from '@mui/material/Grid';
+import MUITypography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
 
 import Avatar from '../miscellaneous/Avatar';
@@ -15,7 +16,9 @@ export default function InfoSection() {
 
   return (
     <MUICard>
-      <MUICardHeader title={name} />
+      <MUICardHeader
+        title={<MUITypography variant="h2">{name}</MUITypography>}
+      />
       <MUICardContent>
         <MUIGrid container justifyContent="space-around" spacing={0}>
           {players.map((player) => (

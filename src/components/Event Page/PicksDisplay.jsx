@@ -7,7 +7,6 @@ import SortableList from './SortableList';
 export default function PicksDisplay({ addBasics, onSortEnd, player }) {
   return (
     <React.Fragment>
-      {/* <MUITypography variant="h3">Add Basic Lands to Your Deck</MUITypography> */}
       <MUITypography variant="subtitle1">
         Pro Tip: add a few extra basics and move them to your sideboard!
       </MUITypography>

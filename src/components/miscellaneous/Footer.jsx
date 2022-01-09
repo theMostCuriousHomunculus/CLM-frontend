@@ -7,8 +7,10 @@ import theme from '../../theme';
 const useStyles = makeStyles({
   footer: {
     alignItems: 'center',
-    background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-    color: theme.palette.secondary.main,
+    // background: `radial-gradient(${theme.palette.primary.light}, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+    // background: `linear-gradient(to bottom, ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
+    background: theme.palette.primary.main,
+    color: '#fff',
     display: 'flex',
     flexDirection: 'column',
     flexShrink: 0,
@@ -17,7 +19,7 @@ const useStyles = makeStyles({
     textAlign: 'center',
     width: '100%',
     '& a': {
-      color: '#ffffff'
+      color: theme.palette.secondary.main
     }
   }
 });

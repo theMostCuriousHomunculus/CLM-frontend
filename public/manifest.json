@@ -1,0 +1,22 @@
+{
+  "name": "Cube Level Midnight",
+  "short_name": "CLM",
+  "start_url": "/index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#ff9100",
+  "theme_color": "#6200ea",
+  "description": "One cube app to rule them all.",
+  "dir": "ltr",
+  "lang": "en-US",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/icon.svg",
+      "sizes": "2520x2520",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["MtG", "Cube"]
+}

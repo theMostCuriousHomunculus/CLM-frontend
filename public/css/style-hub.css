@@ -6,8 +6,12 @@
   padding: 0;
 }
 
+a {
+  color: #ff3d00;
+}
+
 a:visited {
-  color: #00f;
+  color: #ff3d00;
 }
 
 body {
