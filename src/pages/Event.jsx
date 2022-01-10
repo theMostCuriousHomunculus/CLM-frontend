@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MUIPaper from '@mui/material/Paper';
 import MUITab from '@mui/material/Tab';
 import MUITabs from '@mui/material/Tabs';
@@ -12,11 +12,13 @@ import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import SortableList from '../components/Event Page/SortableList';
+// import urlBase64ToUint8Array from '../functions/url-base64-to-uint8-array';
+import useRequest from '../hooks/request-hook';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { EventContext } from '../contexts/event-context';
 
 export default function Event() {
-  const { userID } = React.useContext(AuthenticationContext);
+  const { userID } = useContext(AuthenticationContext);
   const {
     loading,
     eventState,
@@ -26,15 +28,15 @@ export default function Event() {
     removeBasics,
     selectCard,
     toggleMainboardSideboardEvent
-  } = React.useContext(EventContext);
-
-  const [selectedCard, setSelectedCard] = React.useState({
+  } = useContext(EventContext);
+  const { sendRequest } = useRequest();
+  const [selectedCard, setSelectedCard] = useState({
     _id: null,
     image: null,
     back_image: null,
     name: null
   });
-  const [tabNumber, setTabNumber] = React.useState(0);
+  const [tabNumber, setTabNumber] = useState(0);
   const others = eventState.players.filter((plr) => plr.account._id !== userID);
 
   function onSortEnd({ collection, newIndex, oldIndex }) {
@@ -49,6 +51,44 @@ export default function Event() {
       }));
     }
   }
+
+  useEffect(() => {
+    let serviceWorkerRegistration;
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready
+        .then(function (swreg) {
+          serviceWorkerRegistration = swreg;
+          return swreg.pushManager.getSubscription();
+        })
+        .then(function (sub) {
+          if (sub === null) {
+            // create a new subscription
+            // return serviceWorkerRegistration.pushManager.subscribe({
+            //   userVisibleOnly: true,
+            //   applicationServerKey: urlBase64ToUint8Array(
+            //     process.env.REACT_APP_VAPID_PUBLIC_KEY
+            //   )
+            // });
+          } else {
+            // already have a subscription
+          }
+        });
+      // .then(function (newSub) {
+      //   return sendRequest({
+      //     body: JSON.stringify(newSub)
+      //   });
+      // })
+      // .then(function (response) {
+      //   if (response.ok) {
+      //     console.log('Successfully subscribed for push notifications');
+      //   }
+      // })
+      // .catch(function (error) {
+      //   console.log(error);
+      // });
+    }
+  }, []);
 
   return loading ? (
     <LoadingSpinner />

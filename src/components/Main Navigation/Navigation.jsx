@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MUIAppBar from '@mui/material/AppBar';
+import MUIButton from '@mui/material/Button';
 import MUIDownloadIcon from '@mui/icons-material/Download';
 import MUIDrawer from '@mui/material/Drawer';
 import MUIIconButton from '@mui/material/IconButton';
+import MUINotificationsIcon from '@mui/icons-material/Notifications';
 import MUIToolbar from '@mui/material/Toolbar';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
@@ -64,9 +66,11 @@ export default function Navigation() {
     : 'side';
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] =
     useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsSupported, setNotificationsSupported] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const classes = useStyles();
-  const [deferredPrompt, setDeferredPrompt] = useState();
 
   function toggleDrawer(event) {
     if (
@@ -97,6 +101,19 @@ export default function Navigation() {
     };
   }, []);
 
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationsSupported(true);
+      if (Notification.permission === 'granted') {
+        setNotificationsEnabled(true);
+      } else {
+        setNotificationsEnabled(false);
+      }
+    } else {
+      setNotificationsSupported(false);
+    }
+  }, [window.Notification]);
+
   return (
     <React.Fragment>
       <AuthenticateForm
@@ -116,19 +133,6 @@ export default function Navigation() {
             </MUITypography>
           </div>
           <div className={classes.rightContainer}>
-            {deferredPrompt && (
-              <MUIIconButton
-                color="inherit"
-                onClick={async () => {
-                  deferredPrompt.prompt();
-                  await deferredPrompt.userChoice;
-                  setDeferredPrompt(null);
-                }}
-                size="large"
-              >
-                <MUIDownloadIcon fontSize="large" />
-              </MUIIconButton>
-            )}
             {searchBarLocation === 'top' && (
               <SiteSearchBar setDrawerOpen={setDrawerOpen} color="primary" />
             )}
@@ -160,6 +164,58 @@ export default function Navigation() {
             <SiteSearchBar setDrawerOpen={setDrawerOpen} color="secondary" />
           )}
           <NavigationLinks toggleDrawer={toggleDrawer} />
+          {notificationsSupported && !notificationsEnabled && (
+            <MUIButton
+              fullWidth
+              onClick={() => {
+                Notification.requestPermission((result) => {
+                  if (result === 'granted') {
+                    setNotificationsEnabled(true);
+                  }
+                });
+                setDrawerOpen(false);
+              }}
+              startIcon={<MUINotificationsIcon />}
+              style={{
+                marginBottom: 8
+              }}
+            >
+              Enable Notifications
+            </MUIButton>
+          )}
+          {notificationsSupported && notificationsEnabled && (
+            <MUIButton
+              fullWidth
+              onClick={() => {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.ready.then(function (swreg) {
+                    swreg.showNotification('A CLM Notification', {
+                      body: 'This is the body of the notification',
+                      icon: '/images/icon.png',
+                      vibrate: [400, 200, 400],
+                      badge: '/images/icon.png'
+                    });
+                  });
+                }
+              }}
+            >
+              Notify!
+            </MUIButton>
+          )}
+          {deferredPrompt && (
+            <MUIButton
+              fullWidth
+              onClick={async () => {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                setDeferredPrompt(null);
+                setDrawerOpen(false);
+              }}
+              startIcon={<MUIDownloadIcon />}
+            >
+              Install the App!
+            </MUIButton>
+          )}
         </MUIDrawer>
       </MUIAppBar>
     </React.Fragment>

@@ -19,5 +19,11 @@
       "purpose": "any"
     }
   ],
-  "categories": ["MtG", "Cube"]
+  "categories": ["MtG", "Cube"],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "http://cubelevelmidnight.com/manifest.json"
+    }
+  ]
 }

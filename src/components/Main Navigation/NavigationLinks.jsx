@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import MUIAllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import MUIExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -21,12 +21,13 @@ const useStyles = makeStyles({
     }
   },
   list: {
+    flexGrow: 1,
     width: 300
   }
 });
 
 export default function NavigationLinks({ toggleDrawer }) {
-  const { isLoggedIn, logout } = React.useContext(AuthenticationContext);
+  const { isLoggedIn, logout } = useContext(AuthenticationContext);
   const classes = useStyles();
   const navigate = useNavigate();
 
