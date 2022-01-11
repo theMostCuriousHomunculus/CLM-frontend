@@ -185,18 +185,18 @@ export default function ContextualizedEventPage() {
         get body() {
           return {
             query: `
-            mutation {
-              ${this.operation}(
-                component: ${component},
-                name: "${name}",
-                numberOfCopies: ${numberOfCopies},
-                oracle_id: "${oracle_id}",
-                scryfall_id: "${scryfall_id}"
-              ) {
-                _id
+              mutation {
+                ${this.operation}(
+                  component: ${component},
+                  name: "${name}",
+                  numberOfCopies: ${numberOfCopies},
+                  oracle_id: "${oracle_id}",
+                  scryfall_id: "${scryfall_id}"
+                ) {
+                  _id
+                }
               }
-            }
-          `
+            `
           };
         }
       });

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MUIAppBar from '@mui/material/AppBar';
 import MUIButton from '@mui/material/Button';
@@ -17,8 +17,9 @@ import { makeStyles } from '@mui/styles';
 import AuthenticateForm from './AuthenticateForm';
 import Avatar from '../miscellaneous/Avatar';
 import NavigationLinks from './NavigationLinks';
-import theme from '../../theme';
 import SiteSearchBar from './SiteSearchBar';
+import theme from '../../theme';
+import urlBase64ToUint8Array from '../../functions/url-base64-to-uint8-array';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
@@ -82,6 +83,49 @@ export default function Navigation() {
     setDrawerOpen((prevState) => !prevState);
   }
 
+  const turnOnNotificationsAndSubscribeToPushMessaging =
+    useCallback(async () => {
+      setDrawerOpen(false);
+      const decision = await Notification.requestPermission();
+      if (decision === 'granted') {
+        setNotificationsEnabled(true);
+
+        if ('serviceWorker' in navigator) {
+          const swreg = await navigator.serviceWorker.ready;
+          const existingSubscription =
+            await swreg.pushManager.getSubscription();
+          if (!existingSubscription) {
+            const newSubscription = await swreg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(
+                process.env.REACT_APP_VAPID_PUBLIC_KEY
+              ),
+              userID
+            });
+            console.log(JSON.parse(JSON.stringify(newSubscription)));
+            // sendRequest({
+            //   operation: 'subscribeToPush',
+            //   get body() {
+            //     return {
+            //       query: `
+            //         mutation {
+            //           ${this.operation}(
+            //             auth: "${newSubscription.keys.auth}",
+            //             endpoint: "${newSubscription.endpoint}",
+            //             p256dh: "${newSubscription.keys.p256dh}"
+            //           ) {
+
+            //           }
+            //         }
+            //       `
+            //     };
+            //   }
+            // });
+          }
+        }
+      }
+    }, []);
+
   useEffect(() => {
     const storePrompt = (event) => {
       event.preventDefault();
@@ -112,7 +156,7 @@ export default function Navigation() {
     } else {
       setNotificationsSupported(false);
     }
-  }, [window.Notification]);
+  }, [Notification]);
 
   return (
     <React.Fragment>
@@ -164,17 +208,10 @@ export default function Navigation() {
             <SiteSearchBar setDrawerOpen={setDrawerOpen} color="secondary" />
           )}
           <NavigationLinks toggleDrawer={toggleDrawer} />
-          {notificationsSupported && !notificationsEnabled && (
+          {notificationsSupported && !notificationsEnabled && isLoggedIn && (
             <MUIButton
               fullWidth
-              onClick={() => {
-                Notification.requestPermission((result) => {
-                  if (result === 'granted') {
-                    setNotificationsEnabled(true);
-                  }
-                });
-                setDrawerOpen(false);
-              }}
+              onClick={turnOnNotificationsAndSubscribeToPushMessaging}
               startIcon={<MUINotificationsIcon />}
               style={{
                 marginBottom: 8
