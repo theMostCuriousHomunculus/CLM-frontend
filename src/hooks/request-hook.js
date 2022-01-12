@@ -75,8 +75,9 @@ export default function useRequest() {
   );
 
   useEffect(() => {
-    return () =>
+    return () => {
       activeRequests.current.forEach((controller) => controller.abort());
+    };
   }, []);
 
   return { loading, sendRequest };

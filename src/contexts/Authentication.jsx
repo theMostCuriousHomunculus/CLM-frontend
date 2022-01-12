@@ -146,6 +146,22 @@ export function AuthenticationProvider({ children }) {
       }
     });
 
+    // if the logged in user had a push subscription, unsubscribe from it
+    (async function () {
+      if ('Notification' in window && 'serviceWorker' in navigator) {
+        const swreg = await navigator.serviceWorker.ready;
+        const existingSubscription = await swreg.pushManager.getSubscription();
+        if (existingSubscription) {
+          try {
+            // TODO: send request to backend to remove subscription from user's push_subscribed_devices array
+            await existingSubscription.unsubscribe();
+          } catch (error) {
+            setErrorMessages((prevState) => [...prevState, error.message]);
+          }
+        }
+      }
+    })();
+
     // stop watching user's location
     if (geolocationID) {
       navigator.geolocation.clearWatch(geolocationID);

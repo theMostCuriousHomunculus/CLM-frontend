@@ -6,6 +6,7 @@ import MUIDownloadIcon from '@mui/icons-material/Download';
 import MUIDrawer from '@mui/material/Drawer';
 import MUIIconButton from '@mui/material/IconButton';
 import MUINotificationsIcon from '@mui/icons-material/Notifications';
+import MUINotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import MUIToolbar from '@mui/material/Toolbar';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
@@ -19,8 +20,10 @@ import Avatar from '../miscellaneous/Avatar';
 import NavigationLinks from './NavigationLinks';
 import SiteSearchBar from './SiteSearchBar';
 import theme from '../../theme';
+import useRequest from '../../hooks/request-hook';
 import urlBase64ToUint8Array from '../../functions/url-base64-to-uint8-array';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { ErrorContext } from '../../contexts/Error';
 
 const useStyles = makeStyles({
   appBar: {
@@ -62,6 +65,8 @@ export default function Navigation() {
   const { isLoggedIn, avatar, userID, userName } = useContext(
     AuthenticationContext
   );
+  const { setErrorMessages } = useContext(ErrorContext);
+  const { sendRequest } = useRequest();
   const searchBarLocation = useMediaQuery(theme.breakpoints.up('md'))
     ? 'top'
     : 'side';
@@ -83,48 +88,64 @@ export default function Navigation() {
     setDrawerOpen((prevState) => !prevState);
   }
 
-  const turnOnNotificationsAndSubscribeToPushMessaging =
-    useCallback(async () => {
-      setDrawerOpen(false);
-      const decision = await Notification.requestPermission();
-      if (decision === 'granted') {
-        setNotificationsEnabled(true);
+  async function turnOnNotificationsAndSubscribeToPushMessaging() {
+    setDrawerOpen(false);
+    const decision = await Notification.requestPermission();
+    if (decision === 'granted') {
+      setNotificationsEnabled(true);
 
-        if ('serviceWorker' in navigator) {
-          const swreg = await navigator.serviceWorker.ready;
-          const existingSubscription =
-            await swreg.pushManager.getSubscription();
-          if (!existingSubscription) {
-            const newSubscription = await swreg.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(
-                process.env.REACT_APP_VAPID_PUBLIC_KEY
-              ),
-              userID
-            });
-            console.log(JSON.parse(JSON.stringify(newSubscription)));
-            // sendRequest({
-            //   operation: 'subscribeToPush',
-            //   get body() {
-            //     return {
-            //       query: `
-            //         mutation {
-            //           ${this.operation}(
-            //             auth: "${newSubscription.keys.auth}",
-            //             endpoint: "${newSubscription.endpoint}",
-            //             p256dh: "${newSubscription.keys.p256dh}"
-            //           ) {
-
-            //           }
-            //         }
-            //       `
-            //     };
-            //   }
-            // });
+      const swreg = await navigator.serviceWorker.ready;
+      const existingSubscription = await swreg.pushManager.getSubscription();
+      if (!existingSubscription) {
+        const newSubscription = await swreg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            process.env.REACT_APP_VAPID_PUBLIC_KEY
+          ),
+          userID
+        });
+        const parsedNewSubscription = JSON.parse(
+          JSON.stringify(newSubscription)
+        );
+        sendRequest({
+          operation: 'subscribeToPush',
+          get body() {
+            return {
+              query: `
+                mutation {
+                  ${this.operation}(
+                    push_subscription: {
+                      endpoint: "${parsedNewSubscription.endpoint}",
+                      keys: {
+                        auth: "${parsedNewSubscription.keys.auth}",
+                        p256dh: "${parsedNewSubscription.keys.p256dh}"
+                      }
+                    }
+                  ) {
+                    _id
+                  }
+                }
+              `
+            };
           }
-        }
+        });
       }
-    }, []);
+    }
+  }
+
+  async function unsubscribeFromPushSubscription() {
+    const swreg = await navigator.serviceWorker.ready;
+    const existingSubscription = await swreg.pushManager.getSubscription();
+    if (existingSubscription) {
+      try {
+        // TODO: send request to backend to remove subscription from user's push_subscribed_devices array
+        await existingSubscription.unsubscribe();
+        setNotificationsEnabled(false);
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      }
+    }
+  }
 
   useEffect(() => {
     const storePrompt = (event) => {
@@ -146,17 +167,21 @@ export default function Navigation() {
   }, []);
 
   useEffect(() => {
-    if ('Notification' in window) {
-      setNotificationsSupported(true);
-      if (Notification.permission === 'granted') {
-        setNotificationsEnabled(true);
+    (async function () {
+      if ('Notification' in window && 'serviceWorker' in navigator) {
+        setNotificationsSupported(true);
+        const swreg = await navigator.serviceWorker.ready;
+        const existingSubscription = await swreg.pushManager.getSubscription();
+        if (Notification.permission === 'granted' && existingSubscription) {
+          setNotificationsEnabled(true);
+        } else {
+          setNotificationsEnabled(false);
+        }
       } else {
-        setNotificationsEnabled(false);
+        setNotificationsSupported(false);
       }
-    } else {
-      setNotificationsSupported(false);
-    }
-  }, [Notification]);
+    })();
+  }, [Notification, navigator.serviceWorker]);
 
   return (
     <React.Fragment>
@@ -218,6 +243,18 @@ export default function Navigation() {
               }}
             >
               Enable Notifications
+            </MUIButton>
+          )}
+          {notificationsSupported && notificationsEnabled && isLoggedIn && (
+            <MUIButton
+              fullWidth
+              onClick={unsubscribeFromPushSubscription}
+              startIcon={<MUINotificationsOffIcon />}
+              style={{
+                marginBottom: 8
+              }}
+            >
+              Disable Notifications
             </MUIButton>
           )}
           {notificationsSupported && notificationsEnabled && (
