@@ -1,11 +1,8 @@
 import { useCallback, useContext } from 'react';
 import { createClient } from 'graphql-ws';
-
-import { AuthenticationContext } from '../contexts/Authentication';
+import Cookies from 'js-cookie';
 
 export default function useSubscribe() {
-  const { token } = useContext(AuthenticationContext);
-
   const requestSubscription = useCallback(
     function ({
       headers = {},
@@ -22,7 +19,7 @@ export default function useSubscribe() {
 
       const client = createClient({
         connectionParams: {
-          authToken: token,
+          authToken: Cookies.get('authentication_token'),
           ...headers
         },
         url: process.env.REACT_APP_WS_URL
@@ -53,7 +50,7 @@ export default function useSubscribe() {
 
       return client.dispose;
     },
-    [token]
+    [Cookies.get('authentication_token')]
   );
 
   return { requestSubscription };

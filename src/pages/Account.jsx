@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
@@ -17,6 +17,7 @@ import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import theme, { backgroundColor } from '../theme';
+import useRequest from '../hooks/request-hook';
 import Avatar from '../components/miscellaneous/Avatar';
 import BudAccordion from '../components/Account Page/BudAccordion';
 import CubeAccordion from '../components/Account Page/CubeAccordion';
@@ -47,11 +48,12 @@ const useStyles = makeStyles({
 
 export default function Account() {
   const { accountID } = useParams();
+  const { sendRequest } = useRequest();
   const {
-    hideLocation,
+    geolocationEnabled,
     isLoggedIn,
-    settings: { location_services, measurement_system, radius },
-    shareLocation,
+    setGeolocationEnabled,
+    settings: { measurement_system, radius },
     userID
   } = useContext(AuthenticationContext);
   const {
@@ -68,35 +70,13 @@ export default function Account() {
     fetchAccountByID,
     setAccountState
   } = useContext(AccountContext);
-  const [toggleState, setToggleState] = useState(location_services);
   const classes = useStyles();
-  const toggleLS = useCallback((event) => {
-    setToggleState(event.target.checked);
-    if (event.target.checked) {
-      shareLocation();
-    } else {
-      hideLocation();
-    }
-  });
 
   useEffect(() => {
-    async function initialize() {
+    (async function () {
       await fetchAccountByID();
-    }
-
-    initialize();
+    })();
   }, [fetchAccountByID]);
-
-  useEffect(() => {
-    setToggleState(location_services);
-    if (isLoggedIn) {
-      if (location_services) {
-        shareLocation();
-      } else {
-        hideLocation();
-      }
-    }
-  }, [location_services]);
 
   return loading ? (
     <LoadingSpinner />
@@ -114,9 +94,27 @@ export default function Account() {
                   <MUIFormControlLabel
                     control={
                       <MUISwitch
-                        checked={toggleState}
+                        checked={geolocationEnabled}
                         inputProps={{ 'aria-label': 'controlled' }}
-                        onChange={toggleLS}
+                        onChange={(event) => {
+                          setGeolocationEnabled(event.target.checked);
+                          if (!event.target.checked) {
+                            sendRequest({
+                              operation: 'deleteLocation',
+                              get body() {
+                                return {
+                                  query: `
+                                    mutation {
+                                      ${this.operation} {
+                                        _id
+                                      }
+                                    }
+                                  `
+                                };
+                              }
+                            });
+                          }
+                        }}
                       />
                     }
                     label="Location Services"
@@ -124,7 +122,7 @@ export default function Account() {
                     style={{ marginLeft: 8 }}
                   />
                 </div>
-                {toggleState && (
+                {geolocationEnabled && (
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <MUIFormControl variant="outlined">
                       <MUIInputLabel htmlFor="measurement-system-selector">
@@ -137,7 +135,6 @@ export default function Account() {
                         onChange={(event) =>
                           editAccount(
                             `settings: {
-                              location_services: ${true},
                               measurement_system: ${event.target.value},
                               radius: ${radius}
                             }`
@@ -163,7 +160,6 @@ export default function Account() {
                         onChange={(event) =>
                           editAccount(
                             `settings: {
-                              location_services: ${true},
                               measurement_system: ${measurement_system},
                               radius: ${event.target.value}
                             }`
@@ -248,7 +244,7 @@ export default function Account() {
           )}
       </MUICard>
 
-      <BudAccordion toggleState={toggleState} />
+      <BudAccordion />
 
       <CubeAccordion pageClasses={classes} />
 

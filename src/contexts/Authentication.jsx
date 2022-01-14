@@ -8,13 +8,13 @@ import React, {
 import Cookies from 'js-cookie';
 
 import useRequest from '../hooks/request-hook';
+import useWatchPosition from '../hooks/watch-position-hook';
 import { ErrorContext } from './Error';
 
 const unauthenticatedUserInfo = {
   admin: false,
   avatar: null,
   settings: {
-    location_services: false,
     measurement_system: 'imperial',
     radius: 10
   },
@@ -25,7 +25,6 @@ const unauthenticatedUserInfo = {
 
 export const AuthenticationContext = createContext({
   ...unauthenticatedUserInfo,
-  hideLocation: () => null,
   // a convenience field; just makes code a bit easier to reason about
   isLoggedIn: false,
   loading: false,
@@ -34,24 +33,22 @@ export const AuthenticationContext = createContext({
   register: () => null,
   requestPasswordReset: () => null,
   setUserInfo: () => null,
-  shareLocation: () => null,
   submitPasswordReset: () => null
 });
 
 export function AuthenticationProvider({ children }) {
   const { setErrorMessages } = useContext(ErrorContext);
   const { loading, sendRequest } = useRequest();
-  const [geolocationID, setGeolocationID] = useState(null);
   const [userInfo, setUserInfo] = useState({
     ...unauthenticatedUserInfo
   });
+  const { geolocationEnabled, setGeolocationEnabled } = useWatchPosition();
   const authenticationQuery = `
     _id
     admin
     avatar
     name
     settings {
-      location_services
       measurement_system
       radius
     }
@@ -85,9 +82,6 @@ export function AuthenticationProvider({ children }) {
     async function () {
       await sendRequest({
         callback: storeUserInfo,
-        headers: {
-          Authorization: `Bearer ${Cookies.get('authentication_token')}`
-        },
         load: true,
         operation: 'authenticate',
         get body() {
@@ -131,51 +125,54 @@ export function AuthenticationProvider({ children }) {
     [sendRequest]
   );
 
-  const logout = useCallback(() => {
-    // clear from server
-    sendRequest({
-      operation: 'logoutAllDevices',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}
-            }
-          `
-        };
-      }
-    });
+  const logout = useCallback(
+    async function () {
+      // ensure we don't send any unauthorized requests
+      setGeolocationEnabled(false);
 
-    // if the logged in user had a push subscription, unsubscribe from it
-    (async function () {
+      // unsubscribe from push notifications if subscribed
+      let subscription;
+
       if ('Notification' in window && 'serviceWorker' in navigator) {
         const swreg = await navigator.serviceWorker.ready;
-        const existingSubscription = await swreg.pushManager.getSubscription();
-        if (existingSubscription) {
+        subscription = await swreg.pushManager.getSubscription();
+        if (subscription) {
           try {
-            // TODO: send request to backend to remove subscription from user's push_subscribed_devices array
-            await existingSubscription.unsubscribe();
+            await subscription.unsubscribe();
           } catch (error) {
             setErrorMessages((prevState) => [...prevState, error.message]);
           }
         }
       }
-    })();
 
-    // stop watching user's location
-    if (geolocationID) {
-      navigator.geolocation.clearWatch(geolocationID);
-    }
+      // if the logged in user had a push subscription, remove it and the token from the server
+      await sendRequest({
+        operation: 'logoutSingleDevice',
+        get body() {
+          return {
+            query: `
+              mutation {
+                ${this.operation}${
+              subscription
+                ? `(
+                  endpoint: "${subscription.endpoint}"
+                )`
+                : ''
+            }
+              }
+            `
+          };
+        }
+      });
 
-    // clear from running application
-    setGeolocationID(null);
-    setUserInfo({
-      ...unauthenticatedUserInfo
-    });
-
-    // clear from browser
-    Cookies.remove('authentication_token');
-  }, [sendRequest]);
+      // clear from browser and running application
+      setUserInfo({
+        ...unauthenticatedUserInfo
+      });
+      Cookies.remove('authentication_token');
+    },
+    [sendRequest]
+  );
 
   const register = useCallback(
     async function (email, name, password) {
@@ -256,73 +253,6 @@ export function AuthenticationProvider({ children }) {
     [sendRequest]
   );
 
-  // this is the function that is called to send the user's location to the backend
-  const postLocation = useCallback(
-    async function (latitude, longitude) {
-      await sendRequest({
-        callback: (data) => {
-          setUserInfo((prevState) => ({
-            ...prevState,
-            settings: {
-              ...prevState.settings,
-              location_services: data.settings.location_services
-            }
-          }));
-        },
-        headers: {
-          Authorization: `Bearer ${Cookies.get('authentication_token')}`
-        },
-        operation: 'postLocation',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  latitude: ${latitude},
-                  longitude: ${longitude}
-                ) {
-                  settings {
-                    location_services
-                  }
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
-  // this is the function that is called when a user opts to turn on location services, and when they log in and their account settings indicate that they want to share their location
-  const shareLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setErrorMessages((prevState) => {
-        return [
-          ...prevState,
-          'Geolocation is not supported by your cave man browser.'
-        ];
-      });
-    }
-
-    const GLID = navigator.geolocation.watchPosition(
-      // success
-      (position) => {
-        postLocation(position.coords.latitude, position.coords.longitude);
-        setGeolocationID(GLID);
-      },
-      // failure
-      () => {
-        setErrorMessages((prevState) => {
-          return [...prevState, 'Unable to retrieve your location.'];
-        });
-      },
-      {
-        enableHighAccuracy: true
-      }
-    );
-  }, [postLocation]);
-
   const submitPasswordReset = useCallback(
     async function (email, password, reset_token) {
       await sendRequest({
@@ -349,80 +279,25 @@ export function AuthenticationProvider({ children }) {
     [sendRequest]
   );
 
-  // this is the function that is called to remove the user's location from the backend
-  const deleteLocation = useCallback(
-    async function () {
-      await sendRequest({
-        callback: (data) => {
-          setUserInfo((prevState) => ({
-            ...prevState,
-            settings: {
-              ...prevState.settings,
-              location_services: data.settings.location_services
-            }
-          }));
-        },
-        headers: {
-          Authorization: `Bearer ${Cookies.get('authentication_token')}`
-        },
-        operation: 'deleteLocation',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation} {
-                  settings {
-                    location_services
-                  }
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
-  // this is the function that is called when the user elects to turn off location services
-  const hideLocation = useCallback(() => {
-    if (geolocationID) {
-      navigator.geolocation.clearWatch(geolocationID);
-    }
-    setGeolocationID(null);
-    deleteLocation();
-  }, [deleteLocation]);
-
   useEffect(() => {
     if (Cookies.get('authentication_token')) {
       authenticate();
     }
   }, []);
 
-  useEffect(() => {
-    if (userInfo.settings.location_services) {
-      shareLocation();
-    }
-    return () => {
-      if (geolocationID) {
-        navigator.geolocation.clearWatch(geolocationID);
-      }
-    };
-  }, [userInfo.settings.location_services]);
-
   return (
     <AuthenticationContext.Provider
       value={{
         ...userInfo,
-        hideLocation,
+        geolocationEnabled,
         isLoggedIn: !!userInfo.token,
         loading,
         login,
         logout,
         register,
         requestPasswordReset,
+        setGeolocationEnabled,
         setUserInfo,
-        shareLocation,
         submitPasswordReset
       }}
     >

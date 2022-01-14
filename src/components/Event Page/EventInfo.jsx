@@ -34,7 +34,7 @@ export default function InfoSection() {
               <Link to={`/account/${player.account._id}`}>
                 <Avatar
                   alt={player.account.name}
-                  size="small"
+                  size="large"
                   src={player.account.avatar}
                 />
               </Link>

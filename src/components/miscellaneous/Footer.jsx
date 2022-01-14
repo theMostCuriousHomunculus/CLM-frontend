@@ -44,14 +44,14 @@ export default function Footer() {
         display Magic cards, but is not affiliated with, produced or endorsed by
         Scryfall LLC.
       </MUITypography>
-      <MUITypography variant="body2">
+      {/* <MUITypography variant="body2">
         Opinions expressed by users in comments are not necessarily opinions
         shared by Cube Level Midnight.
       </MUITypography>
       <MUITypography variant="body2">
         Cube Level Midnight was built by Casey Johnson using MongoDB, Express,
         React, Node, GraphQL and Material UI.
-      </MUITypography>
+  </MUITypography> */}
     </footer>
   );
 }

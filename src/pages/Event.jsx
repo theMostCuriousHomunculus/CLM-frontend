@@ -1,9 +1,12 @@
 import React, { useContext, useState } from 'react';
-import MUIPaper from '@mui/material/Paper';
+import MUICard from '@mui/material/Card';
+import MUICardContent from '@mui/material/CardContent';
+import MUICardHeader from '@mui/material/CardHeader';
+import MUIGrid from '@mui/material/Grid';
 import MUITab from '@mui/material/Tab';
 import MUITabs from '@mui/material/Tabs';
 import MUITypography from '@mui/material/Typography';
-import { arrayMoveImmutable } from 'array-move';
+import { makeStyles } from '@mui/styles';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
@@ -11,9 +14,18 @@ import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import SortableList from '../components/Event Page/SortableList';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { EventContext } from '../contexts/event-context';
+
+const useStyles = makeStyles({
+  selectableCard: {
+    borderRadius: 16,
+    cursor: 'pointer'
+  },
+  selectedCard: {
+    borderRadius: 16
+  }
+});
 
 export default function Event() {
   const { userID } = useContext(AuthenticationContext);
@@ -21,7 +33,6 @@ export default function Event() {
     loading,
     eventState,
     myState,
-    setMyState,
     addBasics,
     removeBasics,
     selectCard,
@@ -34,20 +45,8 @@ export default function Event() {
     name: null
   });
   const [tabNumber, setTabNumber] = useState(0);
+  const classes = useStyles();
   const others = eventState.players.filter((plr) => plr.account._id !== userID);
-
-  function onSortEnd({ collection, newIndex, oldIndex }) {
-    if (newIndex !== oldIndex) {
-      setMyState((prevState) => ({
-        ...prevState,
-        [collection]: arrayMoveImmutable(
-          prevState[collection],
-          oldIndex,
-          newIndex
-        )
-      }));
-    }
-  }
 
   return loading ? (
     <LoadingSpinner />
@@ -77,14 +76,16 @@ export default function Event() {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <img
             alt={selectedCard.name}
+            className={classes.selectedCard}
             src={selectedCard.image}
-            style={{ height: 264 }}
+            width={300}
           />
           {selectedCard.back_image && (
             <img
               alt={selectedCard.name}
+              className={classes.selectedCard}
               src={selectedCard.back_image}
-              style={{ height: 264 }}
+              width={300}
             />
           )}
         </div>
@@ -93,62 +94,67 @@ export default function Event() {
       <EventInfo />
 
       {!eventState.finished && (
-        <React.Fragment>
-          <MUITabs
-            indicatorColor="primary"
-            onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
-            style={{ margin: 4 }}
-            textColor="primary"
-            value={tabNumber}
-            variant="fullWidth"
-          >
-            <MUITab label="Current Pack" />
-            <MUITab label="My Picks" />
-          </MUITabs>
+        <MUICard>
+          <MUICardHeader
+            title={
+              <MUITabs
+                aria-label="ongoing-event-tabs"
+                onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
+                style={{ margin: 4 }}
+                value={tabNumber}
+                variant="fullWidth"
+              >
+                <MUITab label="Current Pack" />
+                <MUITab label="My Picks" />
+              </MUITabs>
+            }
+          />
 
-          {tabNumber === 0 && myState.current_pack && (
-            <MUIPaper>
-              <MUITypography variant="h3">Select a Card to Draft</MUITypography>
-              <SortableList
-                axis="xy"
-                cards={myState.current_pack}
-                clickFunction={(cardData) =>
-                  setSelectedCard({
-                    _id: cardData._id,
-                    back_image: cardData.back_image,
-                    image: cardData.image,
-                    name: cardData.name
-                  })
-                }
-                collection="current_pack"
-                distance={2}
-                onSortEnd={onSortEnd}
-              />
-            </MUIPaper>
-          )}
+          <MUICardContent>
+            {tabNumber === 0 && myState.current_pack && (
+              <MUIGrid container justifyContent="center" spacing={1}>
+                {myState.current_pack.map((card) => (
+                  <MUIGrid
+                    container
+                    justifyContent="center"
+                    item
+                    key={card._id}
+                    xs={12}
+                    md={6}
+                    lg={4}
+                  >
+                    <img
+                      alt={card.name}
+                      className={classes.selectableCard}
+                      onClick={() =>
+                        setSelectedCard({
+                          _id: card._id,
+                          back_image: card.back_image,
+                          image: card.image,
+                          name: card.name
+                        })
+                      }
+                      src={card.image}
+                      width={300}
+                    />
+                  </MUIGrid>
+                ))}
+              </MUIGrid>
+            )}
 
-          {tabNumber === 0 && !myState.current_pack && (
-            <MUIPaper>
-              <MUITypography variant="h3">
-                Other drafters are still making their picks...
-              </MUITypography>
-              <MUITypography variant="body1">
-                Yell at them to hurry up!
-              </MUITypography>
-              <MUITypography variant="body1">
-                While you're waiting, review the picks you've already made.
-              </MUITypography>
-            </MUIPaper>
-          )}
+            {tabNumber === 0 && !myState.current_pack && (
+              <React.Fragment>
+                <MUITypography variant="h3">
+                  Other drafters are still making their picks...
+                </MUITypography>
+                <MUITypography variant="body1">
+                  Yell at them to hurry up! Also tell them to turn notifications
+                  on so they will be alerted when they have a selection to make.
+                </MUITypography>
+              </React.Fragment>
+            )}
 
-          {tabNumber === 1 && (
-            <React.Fragment>
-              <BasicLandAdder
-                labelText="Add basic lands to your deck"
-                submitFunction={(cardData) =>
-                  addBasics(cardData, 'mainboard', 1)
-                }
-              />
+            {tabNumber === 1 && (
               <DeckDisplay
                 add={addBasics}
                 authorizedID={myState.account._id}
@@ -159,9 +165,9 @@ export default function Event() {
                 remove={removeBasics}
                 toggle={toggleMainboardSideboardEvent}
               />
-            </React.Fragment>
-          )}
-        </React.Fragment>
+            )}
+          </MUICardContent>
+        </MUICard>
       )}
 
       {eventState.finished && (

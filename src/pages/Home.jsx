@@ -15,20 +15,27 @@ import MUITypography from '@mui/material/Typography';
 export default function Home() {
   const navigate = useNavigate();
   const features = [
-    'Provides a simple UI to create and manage Magic the Gathering cubes with innovative, exclusive features termed "modules" and "rotations"',
-    'Allows you to connect with your friends by sending and receiving bud requests',
-    'Allows you to locate and connect with nearby players if you opt in to location services (opt out any time)',
-    'Allows you and your buds to draft your cubes in real time or generate sealed pools',
-    'Provides a simple deck building tool for both limited decks you assemble on CLM and for various constructed formats',
-    // 'Allows you to play matches with your buds in real time using either decks from a limited event or constructed decks stored on CLM',
-    'Introduces "Classy", an independently managed, constructed format and brewer\'s paradise'
+    'Enjoy a simple UI to create, manage and discover Magic the Gathering cubes and decks',
+    'Connect with your friends by sending and receiving bud requests',
+    'Connect with nearby players if you opt in to location services (opt out any time)',
+    'Draft your cubes in real time or generate sealed pools',
+    'Turn on notifications and be alerted whenever you have a pick to make',
+    'Export deck lists to CSV files then upload to MTGO and duke it out with your buds',
+    // 'Play matches with your buds in real time using either decks from a limited event or constructed decks stored on CLM',
+    'Check out "Classy", an independently managed, constructed format and brewer\'s paradise',
+    'Dive into topical and set review articles from our brialliant contributors'
   ];
 
   return (
     <MUICard>
-      <MUICardHeader title="A New Website for Cube Curators and Magic the Gathering Enthusiasts" />
+      <MUICardHeader
+        title={
+          <MUITypography variant="h2">
+            A Feature Rich Application for Cube Enthusiasts
+          </MUITypography>
+        }
+      />
       <MUICardContent>
-        <MUITypography variant="body1">Cube Level Midnight</MUITypography>
         <MUIList>
           {features.map((feature, index) => (
             <MUIListItem key={`feature-${index}`}>
@@ -40,11 +47,11 @@ export default function Home() {
           ))}
         </MUIList>
       </MUICardContent>
-      <MUICardActions>
+      {/* <MUICardActions>
         <MUIButton onClick={() => navigate('/cube/60e4a02d0347dc0017bfab0e')}>
           Casey's Cube
         </MUIButton>
-      </MUICardActions>
+      </MUICardActions> */}
     </MUICard>
   );
 }

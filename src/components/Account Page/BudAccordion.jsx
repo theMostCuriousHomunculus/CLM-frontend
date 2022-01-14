@@ -44,7 +44,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function BudAccordion({ toggleState }) {
+export default function BudAccordion() {
   const { accountID } = useParams();
   const classes = useStyles();
   const {
@@ -56,10 +56,7 @@ export default function BudAccordion({ toggleState }) {
     },
     editAccount
   } = useContext(AccountContext);
-  const {
-    settings: { location_services },
-    userID
-  } = useContext(AuthenticationContext);
+  const { geolocationEnabled, userID } = useContext(AuthenticationContext);
   const [budToDelete, setBudToDelete] = useState({
     _id: null,
     avatar: null,
@@ -138,12 +135,12 @@ export default function BudAccordion({ toggleState }) {
         <MUIAccordionDetails style={{ display: 'block' }}>
           {accountID === userID && (
             <React.Fragment>
-              {toggleState && (
+              {geolocationEnabled && (
                 <React.Fragment>
                   <MUIListSubheader component="div" id="nearby-users">
                     Nearby Users
                   </MUIListSubheader>
-                  {location_services && nearby_users ? (
+                  {nearby_users ? (
                     <MUIList className={classes.budList}>
                       {customSort(nearby_users, ['name']).map((nearby_user) => (
                         <MUIListItem key={nearby_user._id}>

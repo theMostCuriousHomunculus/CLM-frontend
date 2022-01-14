@@ -138,7 +138,22 @@ export default function Navigation() {
     const existingSubscription = await swreg.pushManager.getSubscription();
     if (existingSubscription) {
       try {
-        // TODO: send request to backend to remove subscription from user's push_subscribed_devices array
+        await sendRequest({
+          operation: 'unsubscribeFromPush',
+          get body() {
+            return {
+              query: `
+                mutation {
+                  ${this.operation}(
+                    endpoint: "${existingSubscription.endpoint}"
+                  ) {
+                    _id
+                  }
+                }
+              `
+            };
+          }
+        });
         await existingSubscription.unsubscribe();
         setNotificationsEnabled(false);
       } catch (error) {
@@ -255,25 +270,6 @@ export default function Navigation() {
               }}
             >
               Disable Notifications
-            </MUIButton>
-          )}
-          {notificationsSupported && notificationsEnabled && (
-            <MUIButton
-              fullWidth
-              onClick={() => {
-                if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.ready.then(function (swreg) {
-                    swreg.showNotification('A CLM Notification', {
-                      body: 'This is the body of the notification',
-                      icon: '/images/icon.png',
-                      vibrate: [400, 200, 400],
-                      badge: '/images/icon.png'
-                    });
-                  });
-                }
-              }}
-            >
-              Notify!
             </MUIButton>
           )}
           {deferredPrompt && (

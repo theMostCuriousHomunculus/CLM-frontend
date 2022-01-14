@@ -157,7 +157,6 @@ export default function ContextualizedAccountPage() {
       name
     }
     settings {
-      location_services
       measurement_system
       radius
     }

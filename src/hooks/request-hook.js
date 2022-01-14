@@ -1,11 +1,10 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import Cookies from 'js-cookie';
 
-import { AuthenticationContext } from '../contexts/Authentication';
 import { ErrorContext } from '../contexts/Error';
 
 export default function useRequest() {
   const { setErrorMessages } = useContext(ErrorContext);
-  const { isLoggedIn, token } = useContext(AuthenticationContext);
   const [loading, setLoading] = useState(false);
   const activeRequests = useRef([]);
 
@@ -19,8 +18,11 @@ export default function useRequest() {
       operation = null,
       url = process.env.REACT_APP_HTTP_URL
     }) {
-      if (url === process.env.REACT_APP_HTTP_URL && isLoggedIn) {
-        headers.Authorization = `Bearer ${token}`;
+      if (
+        url === process.env.REACT_APP_HTTP_URL &&
+        !!Cookies.get('authentication_token')
+      ) {
+        headers.Authorization = `Bearer ${Cookies.get('authentication_token')}`;
       }
 
       if (body && !headers['Content-Type']) {
@@ -71,7 +73,7 @@ export default function useRequest() {
         setLoading(false);
       }
     },
-    [setErrorMessages, token]
+    [Cookies.get('authentication_token'), setErrorMessages]
   );
 
   useEffect(() => {
