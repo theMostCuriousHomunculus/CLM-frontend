@@ -8,7 +8,6 @@ import React, {
 import Cookies from 'js-cookie';
 
 import useRequest from '../hooks/request-hook';
-import useWatchPosition from '../hooks/watch-position-hook';
 import { ErrorContext } from './Error';
 
 const unauthenticatedUserInfo = {
@@ -18,7 +17,6 @@ const unauthenticatedUserInfo = {
     measurement_system: 'imperial',
     radius: 10
   },
-  token: null,
   userID: null,
   userName: null
 };
@@ -42,7 +40,6 @@ export function AuthenticationProvider({ children }) {
   const [userInfo, setUserInfo] = useState({
     ...unauthenticatedUserInfo
   });
-  const { geolocationEnabled, setGeolocationEnabled } = useWatchPosition();
   const authenticationQuery = `
     _id
     admin
@@ -68,7 +65,6 @@ export function AuthenticationProvider({ children }) {
       admin,
       avatar,
       settings,
-      token,
       userID: _id,
       userName: name
     });
@@ -127,9 +123,6 @@ export function AuthenticationProvider({ children }) {
 
   const logout = useCallback(
     async function () {
-      // ensure we don't send any unauthorized requests
-      setGeolocationEnabled(false);
-
       // unsubscribe from push notifications if subscribed
       let subscription;
 
@@ -289,14 +282,12 @@ export function AuthenticationProvider({ children }) {
     <AuthenticationContext.Provider
       value={{
         ...userInfo,
-        geolocationEnabled,
-        isLoggedIn: !!userInfo.token,
+        isLoggedIn: !!userInfo.userID,
         loading,
         login,
         logout,
         register,
         requestPasswordReset,
-        setGeolocationEnabled,
         setUserInfo,
         submitPasswordReset
       }}

@@ -6,8 +6,9 @@ import MUICardActions from '@mui/material/CardActions';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
-import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MUIInputLabel from '@mui/material/InputLabel';
+import MUILocationOnIcon from '@mui/icons-material/LocationOn';
+import MUINotificationsIcon from '@mui/icons-material/Notifications';
 import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
 import MUISelect from '@mui/material/Select';
 import MUISwitch from '@mui/material/Switch';
@@ -17,7 +18,6 @@ import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import theme, { backgroundColor } from '../theme';
-import useRequest from '../hooks/request-hook';
 import Avatar from '../components/miscellaneous/Avatar';
 import BudAccordion from '../components/Account Page/BudAccordion';
 import CubeAccordion from '../components/Account Page/CubeAccordion';
@@ -28,6 +28,7 @@ import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/Authentication';
+import { PermissionsContext } from '../contexts/Permissions';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -48,11 +49,8 @@ const useStyles = makeStyles({
 
 export default function Account() {
   const { accountID } = useParams();
-  const { sendRequest } = useRequest();
   const {
-    geolocationEnabled,
     isLoggedIn,
-    setGeolocationEnabled,
     settings: { measurement_system, radius },
     userID
   } = useContext(AuthenticationContext);
@@ -70,6 +68,16 @@ export default function Account() {
     fetchAccountByID,
     setAccountState
   } = useContext(AccountContext);
+  const {
+    clearAndDeleteLocation,
+    geolocationEnabled,
+    geolocationSupported,
+    notificationsEnabled,
+    notificationsSupported,
+    turnOnNotificationsAndSubscribeToPushMessaging,
+    unsubscribeFromPushSubscription,
+    watchAndPostLocation
+  } = useContext(PermissionsContext);
   const classes = useStyles();
 
   useEffect(() => {
@@ -87,97 +95,117 @@ export default function Account() {
           action={
             accountID === userID && (
               <React.Fragment>
-                <div style={{ alignItems: 'center', display: 'flex' }}>
-                  <MUITooltip title="Turning on location services reveals nearby users you are not already connected with who have also enabled location services.  Useful if you are looking to expand or join a playgroup.">
-                    <MUIHelpOutlineIcon color="primary" />
-                  </MUITooltip>
+                {notificationsSupported && (
                   <MUIFormControlLabel
                     control={
                       <MUISwitch
-                        checked={geolocationEnabled}
+                        checked={notificationsEnabled}
                         inputProps={{ 'aria-label': 'controlled' }}
                         onChange={(event) => {
-                          setGeolocationEnabled(event.target.checked);
-                          if (!event.target.checked) {
-                            sendRequest({
-                              operation: 'deleteLocation',
-                              get body() {
-                                return {
-                                  query: `
-                                    mutation {
-                                      ${this.operation} {
-                                        _id
-                                      }
-                                    }
-                                  `
-                                };
-                              }
-                            });
+                          if (event.target.checked) {
+                            turnOnNotificationsAndSubscribeToPushMessaging();
+                          } else {
+                            unsubscribeFromPushSubscription();
                           }
                         }}
                       />
                     }
-                    label="Location Services"
+                    label={
+                      <MUITooltip title="Notifications">
+                        <MUINotificationsIcon
+                          color={notificationsEnabled ? 'primary' : 'secondary'}
+                        />
+                      </MUITooltip>
+                    }
                     labelPlacement="start"
-                    style={{ marginLeft: 8 }}
                   />
-                </div>
-                {geolocationEnabled && (
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <MUIFormControl variant="outlined">
-                      <MUIInputLabel htmlFor="measurement-system-selector">
-                        Units
-                      </MUIInputLabel>
-                      <MUISelect
-                        fullWidth
-                        label="Units"
-                        native
-                        onChange={(event) =>
-                          editAccount(
-                            `settings: {
+                )}
+                {geolocationSupported && (
+                  <React.Fragment>
+                    <MUIFormControlLabel
+                      control={
+                        <MUISwitch
+                          checked={geolocationEnabled}
+                          inputProps={{ 'aria-label': 'controlled' }}
+                          onChange={(event) => {
+                            if (event.target.checked) {
+                              watchAndPostLocation();
+                            } else {
+                              clearAndDeleteLocation();
+                            }
+                          }}
+                        />
+                      }
+                      label={
+                        <MUITooltip title="Location Services">
+                          <MUILocationOnIcon
+                            color={geolocationEnabled ? 'primary' : 'secondary'}
+                          />
+                        </MUITooltip>
+                      }
+                      labelPlacement="start"
+                    />
+                    {geolocationEnabled && (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <MUIFormControl variant="outlined">
+                          <MUIInputLabel htmlFor="measurement-system-selector">
+                            Units
+                          </MUIInputLabel>
+                          <MUISelect
+                            fullWidth
+                            label="Units"
+                            native
+                            onChange={(event) =>
+                              editAccount(
+                                `settings: {
                               measurement_system: ${event.target.value},
                               radius: ${radius}
                             }`
-                          )
-                        }
-                        value={measurement_system}
-                        inputProps={{
-                          id: 'measurement-system-selector'
-                        }}
-                      >
-                        <option value="imperial">Miles</option>
-                        <option value="metric">Kilometers</option>
-                      </MUISelect>
-                    </MUIFormControl>
-                    <MUIFormControl style={{ marginTop: 8 }} variant="outlined">
-                      <MUIInputLabel htmlFor="radius-selector">
-                        Distance
-                      </MUIInputLabel>
-                      <MUISelect
-                        fullWidth
-                        label="Distance"
-                        native
-                        onChange={(event) =>
-                          editAccount(
-                            `settings: {
+                              )
+                            }
+                            value={measurement_system}
+                            inputProps={{
+                              id: 'measurement-system-selector'
+                            }}
+                          >
+                            <option value="imperial">Miles</option>
+                            <option value="metric">Kilometers</option>
+                          </MUISelect>
+                        </MUIFormControl>
+                        <MUIFormControl
+                          style={{ marginTop: 8 }}
+                          variant="outlined"
+                        >
+                          <MUIInputLabel htmlFor="radius-selector">
+                            Distance
+                          </MUIInputLabel>
+                          <MUISelect
+                            fullWidth
+                            label="Distance"
+                            native
+                            onChange={(event) =>
+                              editAccount(
+                                `settings: {
                               measurement_system: ${measurement_system},
                               radius: ${event.target.value}
                             }`
-                          )
-                        }
-                        value={radius}
-                        inputProps={{
-                          id: 'radius-selector'
-                        }}
-                      >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={100}>100</option>
-                        <option value={1000}>1,000</option>
-                      </MUISelect>
-                    </MUIFormControl>
-                  </div>
+                              )
+                            }
+                            value={radius}
+                            inputProps={{
+                              id: 'radius-selector'
+                            }}
+                          >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={100}>100</option>
+                            <option value={1000}>1,000</option>
+                          </MUISelect>
+                        </MUIFormControl>
+                      </div>
+                    )}
+                  </React.Fragment>
                 )}
               </React.Fragment>
             )

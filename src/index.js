@@ -5,6 +5,7 @@ import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import theme from './theme';
 import { AuthenticationProvider } from './contexts/Authentication';
+import { PermissionsProvider } from './contexts/Permissions';
 import { CardCacheProvider } from './contexts/CardCache';
 import { ErrorProvider } from './contexts/Error';
 
@@ -13,9 +14,11 @@ render(
     <StyledEngineProvider injectFirst>
       <ErrorProvider>
         <AuthenticationProvider>
-          <CardCacheProvider>
-            <App />
-          </CardCacheProvider>
+          <PermissionsProvider>
+            <CardCacheProvider>
+              <App />
+            </CardCacheProvider>
+          </PermissionsProvider>
         </AuthenticationProvider>
       </ErrorProvider>
     </StyledEngineProvider>

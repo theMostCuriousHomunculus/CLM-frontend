@@ -1,13 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import MUIAllInclusiveIcon from '@mui/icons-material/AllInclusive';
-import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import MUIExitToAppIcon from '@mui/icons-material/ExitToApp';
+import MUIArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+// import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import MUIHomeIcon from '@mui/icons-material/Home';
+import MUIHomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import MUIList from '@mui/material/List';
 import MUIListItem from '@mui/material/ListItem';
 import MUIListItemIcon from '@mui/material/ListItemIcon';
 import MUIListItemText from '@mui/material/ListItemText';
+import MUILogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,14 +32,14 @@ export default function NavigationLinks({ toggleDrawer }) {
   const classes = useStyles();
   const navigate = useNavigate();
 
-  const loggedInOptions = [
+  const options = [
     {
-      icon: <MUIHomeIcon />,
+      icon: <MUIHomeOutlinedIcon />,
       name: 'Home',
       onClick: () => navigate('/')
     },
     {
-      icon: <MUIChatOutlinedIcon />,
+      icon: <MUIArticleOutlinedIcon />,
       name: 'Blog',
       onClick: () => navigate('/blog')
     },
@@ -51,36 +52,16 @@ export default function NavigationLinks({ toggleDrawer }) {
       icon: <MUIAllInclusiveIcon />,
       name: 'Resources',
       onClick: () => navigate('/resources')
-    },
-    {
-      icon: <MUIExitToAppIcon />,
-      name: 'Logout',
-      onClick: logout
     }
   ];
 
-  const loggedOutOptions = [
-    {
-      icon: <MUIHomeIcon />,
-      name: 'Home',
-      onClick: () => navigate('/')
-    },
-    {
-      icon: <MUIChatOutlinedIcon />,
-      name: 'Blog',
-      onClick: () => navigate('/blog')
-    },
-    {
-      icon: <MUIHelpOutlineIcon />,
-      name: "What's Classy?",
-      onClick: () => navigate('/classy')
-    },
-    {
-      icon: <MUIAllInclusiveIcon />,
-      name: 'Resources',
-      onClick: () => navigate('/resources')
-    }
-  ];
+  if (isLoggedIn) {
+    options.push({
+      icon: <MUILogoutOutlinedIcon />,
+      name: 'Logout',
+      onClick: logout
+    });
+  }
 
   return (
     <MUIList
@@ -88,7 +69,7 @@ export default function NavigationLinks({ toggleDrawer }) {
       onClick={toggleDrawer}
       onKeyDown={toggleDrawer}
     >
-      {(isLoggedIn ? loggedInOptions : loggedOutOptions).map(function (option) {
+      {options.map(function (option) {
         return (
           <MUIListItem button key={option.name} onClick={option.onClick}>
             <MUIListItemIcon className={classes.item}>
