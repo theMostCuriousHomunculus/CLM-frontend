@@ -131,7 +131,7 @@ export default function BlogPost() {
           <React.Fragment>
             <MUICardHeader
               avatar={
-                <Avatar alt={author.name} size="large" src={author.avatar} />
+                <Avatar alt={author.name} size="medium" src={author.avatar} />
               }
               className={classes.cardHeader}
               title={
@@ -243,7 +243,7 @@ export default function BlogPost() {
           <React.Fragment>
             <MUICardHeader
               avatar={
-                <Avatar alt={author.name} size="large" src={author.avatar} />
+                <Avatar alt={author.name} size="medium" src={author.avatar} />
               }
               className={classes.cardHeader}
               title={title}

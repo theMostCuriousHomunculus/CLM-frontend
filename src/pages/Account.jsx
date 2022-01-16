@@ -210,7 +210,7 @@ export default function Account() {
               </React.Fragment>
             )
           }
-          avatar={<Avatar alt={name} size="large" src={avatar} />}
+          avatar={<Avatar alt={name} size="medium" src={avatar} />}
           className={classes.cardHeader}
           title={
             <MUITextField

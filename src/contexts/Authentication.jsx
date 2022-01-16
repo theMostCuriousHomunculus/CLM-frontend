@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState
 } from 'react';
 import Cookies from 'js-cookie';
@@ -26,20 +27,48 @@ export const AuthenticationContext = createContext({
   // a convenience field; just makes code a bit easier to reason about
   isLoggedIn: false,
   loading: false,
-  login: () => null,
-  logout: () => null,
-  register: () => null,
-  requestPasswordReset: () => null,
-  setUserInfo: () => null,
-  submitPasswordReset: () => null
+  localStream: null,
+  login: () => {
+    // don't return anything
+  },
+  logout: () => {
+    // don't return anything
+  },
+  peerConnection: null,
+  register: () => {
+    // don't return anything
+  },
+  requestPasswordReset: () => {
+    // don't return anything
+  },
+  setLocalStream: () => {
+    // don't return anything
+  },
+  setUserInfo: () => {
+    // don't return anything
+  },
+  submitPasswordReset: () => {
+    // don't return anything
+  }
 });
 
 export function AuthenticationProvider({ children }) {
   const { setErrorMessages } = useContext(ErrorContext);
   const { loading, sendRequest } = useRequest();
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStreams, setRemoteStreams] = useState([]);
   const [userInfo, setUserInfo] = useState({
     ...unauthenticatedUserInfo
   });
+  const servers = useRef({
+    iceServers: [
+      {
+        urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302']
+      }
+    ],
+    iceCandidatePoolSize: 10
+  });
+  const peerConnection = useRef(new RTCPeerConnection(servers.current));
   const authenticationQuery = `
     _id
     admin
@@ -284,10 +313,13 @@ export function AuthenticationProvider({ children }) {
         ...userInfo,
         isLoggedIn: !!userInfo.userID,
         loading,
+        localStream,
         login,
         logout,
+        peerConnection,
         register,
         requestPasswordReset,
+        setLocalStream,
         setUserInfo,
         submitPasswordReset
       }}

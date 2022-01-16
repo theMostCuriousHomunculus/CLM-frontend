@@ -4,7 +4,15 @@ import MUITooltip from '@mui/material/Tooltip';
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
+  extraLarge: {
+    height: 150,
+    width: 150
+  },
   large: {
+    height: 100,
+    width: 100
+  },
+  medium: {
     height: 75,
     width: 75
   },

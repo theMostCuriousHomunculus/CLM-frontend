@@ -113,7 +113,7 @@ export default function BudAccordion() {
         <div style={{ display: 'flex' }}>
           <Avatar
             alt={budToDelete.name}
-            size="large"
+            size="medium"
             src={budToDelete.avatar}
             style={{ marginRight: 16 }}
           />
@@ -170,7 +170,7 @@ export default function BudAccordion() {
                             <Link to={`/account/${nearby_user._id}`}>
                               <Avatar
                                 alt={nearby_user.name}
-                                size="large"
+                                size="medium"
                                 src={nearby_user.avatar}
                               />
                             </Link>
@@ -242,7 +242,7 @@ export default function BudAccordion() {
                           <Link to={`/account/${request._id}`}>
                             <Avatar
                               alt={request.name}
-                              size="large"
+                              size="medium"
                               src={request.avatar}
                             />
                           </Link>
@@ -263,7 +263,7 @@ export default function BudAccordion() {
                       <Link to={`/account/${request._id}`}>
                         <Avatar
                           alt={request.name}
-                          size="large"
+                          size="medium"
                           src={request.avatar}
                         />
                       </Link>
@@ -300,7 +300,7 @@ export default function BudAccordion() {
                         overlap="circular"
                       >
                         <Link to={`/account/${pb._id}`}>
-                          <Avatar alt={pb.name} size="large" src={pb.avatar} />
+                          <Avatar alt={pb.name} size="medium" src={pb.avatar} />
                         </Link>
                       </MUIBadge>
                     </MUIListItem>
@@ -336,12 +336,12 @@ export default function BudAccordion() {
                     overlap="circular"
                   >
                     <Link to={`/account/${bud._id}`}>
-                      <Avatar alt={bud.name} size="large" src={bud.avatar} />
+                      <Avatar alt={bud.name} size="medium" src={bud.avatar} />
                     </Link>
                   </MUIBadge>
                 ) : (
                   <Link to={`/account/${bud._id}`}>
-                    <Avatar alt={bud.name} size="large" src={bud.avatar} />
+                    <Avatar alt={bud.name} size="medium" src={bud.avatar} />
                   </Link>
                 )}
               </MUIListItem>

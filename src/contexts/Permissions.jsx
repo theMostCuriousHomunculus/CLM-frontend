@@ -12,22 +12,30 @@ import { AuthenticationContext } from './Authentication';
 import { ErrorContext } from './Error';
 
 export const PermissionsContext = createContext({
+  cameraEnabled: false,
+  cameraSupported: false,
   clearAndDeleteLocation: () => {
     // don't return anything
   },
   deferredPrompt: null,
   finding: false,
-  geolocationPermission: undefined,
   geolocationEnabled: false,
   geolocationSupported: false,
   location: {
     latitude: undefined,
     longitude: undefined
   },
-  notificationsPermission: undefined,
+  microphoneEnabled: false,
+  microphoneSupported: false,
   notificationsEnabled: false,
   notificationsSupported: false,
+  setCameraEnabled: () => {
+    // don't return anything
+  },
   setDeferredPrompt: () => {
+    // don't return anything
+  },
+  setMicrophoneEnabled: () => {
     // don't return anything
   },
   turnOnNotificationsAndSubscribeToPushMessaging: () => {
@@ -46,6 +54,9 @@ export function PermissionsProvider({ children }) {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const locationWatchID = useRef(null);
+  const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState();
+  const [cameraSupported, setCameraSupported] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState();
   const [finding, setFinding] = useState();
   const [geolocationEnabled, setGeolocationEnabled] = useState(false);
@@ -55,6 +66,9 @@ export function PermissionsProvider({ children }) {
     latitude: undefined,
     longitude: undefined
   });
+  const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
+  const [microphonePermission, setMicrophonePermission] = useState();
+  const [microphoneSupported, setMicrophoneSupported] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationsPermission, setNotificationsPermission] = useState();
   const notificationsSupported =
@@ -325,23 +339,43 @@ export function PermissionsProvider({ children }) {
       setGeolocationPermission(G.state);
       const N = await navigator.permissions.query({ name: 'notifications' });
       setNotificationsPermission(N.state);
+
+      const devices =
+        navigator.mediaDevices &&
+        (await navigator.mediaDevices.enumerateDevices());
+
+      if (devices.some((device) => device.kind === 'videoinput')) {
+        setCameraSupported(true);
+        const C = await navigator.permissions.query({ name: 'camera' });
+        setCameraPermission(C.state);
+      }
+
+      if (devices.some((device) => device.kind === 'audioinput')) {
+        setMicrophoneSupported(true);
+        const M = await navigator.permissions.query({ name: 'microphone' });
+        setMicrophonePermission(M.state);
+      }
     })();
   }, []);
 
   return (
     <PermissionsContext.Provider
       value={{
+        cameraEnabled,
+        cameraSupported,
         clearAndDeleteLocation,
         deferredPrompt,
         finding,
         geolocationEnabled,
-        geolocationPermission,
         geolocationSupported,
         location,
+        microphoneEnabled,
+        microphoneSupported,
         notificationsEnabled,
-        notificationsPermission,
         notificationsSupported,
+        setCameraEnabled,
         setDeferredPrompt,
+        setMicrophoneEnabled,
         turnOnNotificationsAndSubscribeToPushMessaging,
         unsubscribeFromPushSubscription,
         watchAndPostLocation
