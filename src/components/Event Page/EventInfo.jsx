@@ -1,59 +1,60 @@
 import React, { useContext } from 'react';
-import MUIBadge from '@mui/material/Badge';
+// import MUIBadge from '@mui/material/Badge';
 import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIGrid from '@mui/material/Grid';
-import MUIMicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
-import MUIMicOffOutlinedIcon from '@mui/icons-material/MicOffOutlined';
+// import MUIMicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
+// import MUIMicOffOutlinedIcon from '@mui/icons-material/MicOffOutlined';
 import MUITypography from '@mui/material/Typography';
-import MUIVideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
-import MUIVideocamOffOutlinedIcon from '@mui/icons-material/VideocamOffOutlined';
-import { Link } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
+// import MUIVideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
+// import MUIVideocamOffOutlinedIcon from '@mui/icons-material/VideocamOffOutlined';
+// import { Link } from 'react-router-dom';
+// import { makeStyles } from '@mui/styles';
 
-import AudioStream from '../miscellaneous/AudioStream';
-import Avatar from '../miscellaneous/Avatar';
-import VideoStream from '../miscellaneous/VideoStream';
-import { AuthenticationContext } from '../../contexts/Authentication';
-import { ErrorContext } from '../../contexts/Error';
+// import AudioStream from '../miscellaneous/AudioStream';
+// import Avatar from '../miscellaneous/Avatar';
+// import VideoStream from '../miscellaneous/VideoStream';
+import VideoAvatar from '../miscellaneous/VideoAvatar';
+// import { AuthenticationContext } from '../../contexts/Authentication';
+// import { ErrorContext } from '../../contexts/Error';
 import { EventContext } from '../../contexts/event-context';
-import { PermissionsContext } from '../../contexts/Permissions';
+// import { PermissionsContext } from '../../contexts/Permissions';
 
-const useStyles = makeStyles({
-  badge: {
-    '& > .MuiBadge-badge': {
-      borderRadius: '100%',
-      color: 'white',
-      cursor: 'pointer',
-      height: 36,
-      padding: 4,
-      width: 36
-    }
-  },
-  badgeIcon: {
-    height: 24,
-    width: 24
-  }
-});
+// const useStyles = makeStyles({
+//   badge: {
+//     '& > .MuiBadge-badge': {
+//       borderRadius: '100%',
+//       color: 'white',
+//       cursor: 'pointer',
+//       height: 36,
+//       padding: 4,
+//       width: 36
+//     }
+//   },
+//   badgeIcon: {
+//     height: 24,
+//     width: 24
+//   }
+// });
 
 export default function InfoSection() {
-  const { localStream, peerConnection, setLocalStream, userID } = useContext(
-    AuthenticationContext
-  );
-  const { setErrorMessages } = useContext(ErrorContext);
+  // const { localStream, peerConnection, setLocalStream, userID } = useContext(
+  //   AuthenticationContext
+  // );
+  // const { setErrorMessages } = useContext(ErrorContext);
   const {
     eventState: { name, players }
   } = useContext(EventContext);
-  const {
-    cameraEnabled,
-    cameraSupported,
-    microphoneEnabled,
-    microphoneSupported,
-    setCameraEnabled,
-    setMicrophoneEnabled
-  } = useContext(PermissionsContext);
-  const classes = useStyles();
+  // const {
+  //   cameraEnabled,
+  //   cameraSupported,
+  //   microphoneEnabled,
+  //   microphoneSupported,
+  //   setCameraEnabled,
+  //   setMicrophoneEnabled
+  // } = useContext(PermissionsContext);
+  // const classes = useStyles();
 
   return (
     <MUICard>
@@ -72,7 +73,12 @@ export default function InfoSection() {
               sm={3}
               md={1}
             >
-              {player.account._id === userID &&
+              <VideoAvatar
+                account={player.account}
+                // mediaStream={null}
+                size={150}
+              />
+              {/* player.account._id === userID &&
               cameraSupported &&
               microphoneSupported ? (
                 <MUIBadge
@@ -245,7 +251,7 @@ export default function InfoSection() {
                     src={player.account.avatar}
                   />
                 </Link>
-              )}
+              ) */}
             </MUIGrid>
           ))}
         </MUIGrid>

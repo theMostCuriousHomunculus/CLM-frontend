@@ -29,7 +29,7 @@ export default function LargeAvatar({ alt, size, ...rest }) {
     <MUITooltip title={alt}>
       <MUIAvatar
         alt={alt}
-        className={classes[size]}
+        className={size && classes[size]}
         imgProps={{ draggable: false }}
         {...rest}
       />
