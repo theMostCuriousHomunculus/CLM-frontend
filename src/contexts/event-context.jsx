@@ -36,6 +36,7 @@ export const EventContext = createContext({
         },
         answers: [],
         current_pack: [],
+        ice_candidates: [],
         mainboard: [],
         offers: [],
         present: false,
@@ -63,21 +64,7 @@ export default function ContextualizedEventPage() {
       name: '...'
     },
     name: null,
-    players: [
-      {
-        account: {
-          _id: userID,
-          avatar: null,
-          name: '...'
-        },
-        answers: [],
-        current_pack: [],
-        mainboard: [],
-        offers: [],
-        present: true,
-        sideboard: []
-      }
-    ]
+    players: []
   });
   const peerConnectionsRef = useRef([]);
   const cardQuery = `
@@ -106,6 +93,12 @@ export default function ContextualizedEventPage() {
       }
       current_pack {
         ${cardQuery}
+      }
+      ice_candidates {
+        candidate
+        sdpMLineIndex
+        sdpMid
+        usernameFragment
       }
       mainboard {
         ${cardQuery}
@@ -167,7 +160,6 @@ export default function ContextualizedEventPage() {
       }
 
       const me = data.players.find((plr) => plr.account._id === userID);
-      // const others = data.players.filter((plr) => plr.account._id !== userID);
 
       for (let offerIndex = 0; offerIndex < me.offers.length; offerIndex++) {
         const { remote_account, type, sdp } = me.offers[offerIndex];
@@ -225,6 +217,29 @@ export default function ContextualizedEventPage() {
         }
       }
 
+      for (
+        let playerIndex = 0;
+        playerIndex < data.players.length;
+        playerIndex++
+      ) {
+        if (
+          !!peerConnectionsRef.current[playerIndex] &&
+          data.players[playerIndex].ice_candidates &&
+          eventState.players[playerIndex]
+        ) {
+          for (
+            let candidateIndex =
+              eventState.players[playerIndex].ice_candidates.length;
+            candidateIndex < data.players[playerIndex].ice_candidates.length;
+            candidateIndex++
+          ) {
+            peerConnectionsRef.current[playerIndex].addIceCandidate(
+              data.players[playerIndex].ice_candidates[candidateIndex]
+            );
+          }
+        }
+      }
+
       setEventState(data);
     },
     [addCardsToCache, populateCachedScryfallData]
@@ -262,15 +277,84 @@ export default function ContextualizedEventPage() {
   );
 
   function onIceCandidate(event) {
-    console.log(event);
-    console.log(event.candidate);
+    if (!event.candidate) {
+      return;
+    }
+
+    const {
+      candidate: {
+        address,
+        candidate,
+        component,
+        foundation,
+        port,
+        priority,
+        protocol,
+        relatedAddress,
+        relatedPort,
+        sdpMLineIndex,
+        sdpMid,
+        tcpType,
+        type,
+        usernameFragment
+      }
+    } = event;
     // fancyFetch({
-    //   args: `candidate: ${candidate}`,
-    //   headers: { EventID: eventState._id },
+    //   args: `
+    //     address: "${address}",
+    //     candidate: "${candidate}",
+    //     component: "${component}",
+    //     foundation: "${foundation}",
+    //     port: ${port},
+    //     priority: ${priority},
+    //     protocol: "${protocol}",
+    //     relatedAddress: ${
+    //       relatedAddress ? `"${relatedAddress}"` : relatedAddress
+    //     },
+    //     relatedPort: ${relatedPort},
+    //     sdpMLineIndex: ${sdpMLineIndex},
+    //     sdpMid: "${sdpMid}",
+    //     tcpType: "${tcpType}",
+    //     type: "${type}",
+    //     usernameFragment: "${usernameFragment}"
+    //   `,
+    //   headers: { EventID: eventID },
     //   operation: 'mutation',
-    //   query: eventQuery,
+    //   query: '_id',
     //   resolver: 'addICECandidate'
     // });
+    // fancyFetch({
+    //   args: `
+    //     candidate: "${candidate}",
+    //     sdpMLineIndex: ${sdpMLineIndex},
+    //     sdpMid: "${sdpMid}",
+    //     usernameFragment: "${usernameFragment}"
+    //   `,
+    //   headers: { EventID: eventID },
+    //   operation: 'mutation',
+    //   query: '_id',
+    //   resolver: 'addICECandidate'
+    // });
+    sendRequest({
+      headers: { EventID: eventID },
+      operation: 'addICECandidate',
+      get body() {
+        return {
+          query: `
+            mutation {
+              ${this.operation} (
+                candidate: "${candidate}",
+                sdpMLineIndex: ${sdpMLineIndex},
+                sdpMid: "${sdpMid}",
+                usernameFragment: "${usernameFragment}"
+              ) {
+                ${eventQuery}
+              }
+            }
+          `
+        };
+      }
+    });
   }
 
   async function onNegotiationNeeded() {

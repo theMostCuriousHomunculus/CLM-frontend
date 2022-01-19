@@ -43,7 +43,7 @@ export default function VideoAvatar({
   const [audioEnabled, setAudioEnabled] = useState(account._id !== userID);
   const [videoAvailable, setVideoAvailable] = useState(account._id === userID);
   const [videoEnabled, setVideoEnabled] = useState(account._id !== userID);
-  const mediaStreamRef = useRef();
+  const mediaStreamRef = useRef(new MediaStream());
   const audioSendersRef = useRef([]);
   const videoSendersRef = useRef([]);
   const audioBadge = useRef();
@@ -182,34 +182,54 @@ export default function VideoAvatar({
   }
 
   useEffect(() => {
-    if (account._id === userID) {
-      mediaStreamRef.current = new MediaStream();
-    } else {
-      pc.ontrack = ({ track: addedTrack, streams: [stream] }) => {
-        if (addedTrack.kind === 'audio') {
-          setAudioAvailable(true);
-        }
-
-        if (addedTrack.kind === 'video') {
-          setVideoAvailable(true);
-        }
-
-        stream.onremovetrack = ({ track: removedTrack }) => {
-          if (stream.getAudioTracks().length === 0) {
-            setAudioAvailable(false);
-          }
-
-          if (stream.getVideoTracks().length === 0) {
-            setVideoAvailable(false);
-          }
-
-          // mediaStreamRef.current.removeTrack(removedTrack);
-        };
-
-        mediaStreamRef.current = stream;
-        // mediaStreamRef.current.addTrack(addedTrack);
-      };
-    }
+    // if (account._id === userID) {
+    //   mediaStreamRef.current = new MediaStream();
+    // } else {
+    //   pc.ontrack = ({ track: addedTrack, streams }) => {
+    //     if (addedTrack.kind === 'audio') {
+    //       setAudioAvailable(true);
+    //     }
+    //     if (addedTrack.kind === 'video') {
+    //       setVideoAvailable(true);
+    //     }
+    //     if (streams.length > 0) {
+    //       streams[0].onremovetrack = ({ track: removedTrack }) => {
+    //         if (streams[0].getAudioTracks().length === 0) {
+    //           setAudioAvailable(false);
+    //         }
+    //         if (streams[0].getVideoTracks().length === 0) {
+    //           setVideoAvailable(false);
+    //         }
+    //         // mediaStreamRef.current.removeTrack(removedTrack);
+    //       };
+    //     }
+    //     mediaStreamRef.current = streams[0];
+    //     // mediaStreamRef.current.addTrack(addedTrack);
+    //   };
+    // }
+    // if (account._id !== userID) {
+    //   pc.ontrack = ({ track: addedTrack, streams }) => {
+    //     if (addedTrack.kind === 'audio') {
+    //       setAudioAvailable(true);
+    //     }
+    //     if (addedTrack.kind === 'video') {
+    //       setVideoAvailable(true);
+    //     }
+    //     if (streams.length > 0) {
+    //       streams[0].onremovetrack = ({ track: removedTrack }) => {
+    //         if (streams[0].getAudioTracks().length === 0) {
+    //           setAudioAvailable(false);
+    //         }
+    //         if (streams[0].getVideoTracks().length === 0) {
+    //           setVideoAvailable(false);
+    //         }
+    //         mediaStreamRef.current.removeTrack(removedTrack);
+    //       };
+    //     }
+    //     // mediaStreamRef.current = streams[0];
+    //     mediaStreamRef.current.addTrack(addedTrack);
+    //   };
+    // }
   }, []);
 
   if (!audioAvailable && !videoAvailable) {
