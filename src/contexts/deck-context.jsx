@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
@@ -90,7 +84,6 @@ export default function ContextualizedDeckPage() {
   `;
   const { loading, sendRequest } = useRequest();
   const { populateCachedScryfallData } = usePopulate();
-  const { requestSubscription } = useSubscribe();
 
   const updateDeckState = useCallback(
     async function (data) {
@@ -271,15 +264,13 @@ export default function ContextualizedDeckPage() {
     [deckState._id, sendRequest]
   );
 
-  useEffect(() => {
-    requestSubscription({
-      headers: { deckID },
-      queryString: deckQuery,
-      setup: fetchDeckByID,
-      subscriptionType: 'subscribeDeck',
-      update: updateDeckState
-    });
-  }, [deckID, deckQuery, fetchDeckByID, requestSubscription, updateDeckState]);
+  useSubscribe({
+    headers: { deckID },
+    queryString: deckQuery,
+    setup: fetchDeckByID,
+    subscriptionType: 'subscribeDeck',
+    update: updateDeckState
+  });
 
   return (
     <DeckContext.Provider

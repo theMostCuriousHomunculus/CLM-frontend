@@ -29,7 +29,6 @@ export default function Event() {
   const {
     loading,
     eventState,
-    myState,
     addBasics,
     removeBasics,
     selectCard,
@@ -43,6 +42,7 @@ export default function Event() {
   });
   const [tabNumber, setTabNumber] = useState(0);
   const classes = useStyles();
+  const me = eventState.players.find((plr) => plr.account._id === userID);
   const others = eventState.players.filter((plr) => plr.account._id !== userID);
 
   return loading ? (
@@ -103,9 +103,9 @@ export default function Event() {
             <MUITab label="My Picks" />
           </MUITabs>
 
-          {tabNumber === 0 && myState.current_pack && (
+          {tabNumber === 0 && me.current_pack && (
             <MUIGrid container justifyContent="center" spacing={1}>
-              {myState.current_pack.map((card) => (
+              {me.current_pack.map((card) => (
                 <MUIGrid
                   container
                   justifyContent="center"
@@ -134,7 +134,7 @@ export default function Event() {
             </MUIGrid>
           )}
 
-          {tabNumber === 0 && !myState.current_pack && (
+          {tabNumber === 0 && !me.current_pack && (
             <React.Fragment>
               <MUITypography variant="h3">
                 Other drafters are still making their picks...
@@ -149,10 +149,10 @@ export default function Event() {
           {tabNumber === 1 && (
             <DeckDisplay
               add={addBasics}
-              authorizedID={myState.account._id}
+              authorizedID={me.account._id}
               deck={{
-                mainboard: myState.mainboard,
-                sideboard: myState.sideboard
+                mainboard: me.mainboard,
+                sideboard: me.sideboard
               }}
               remove={removeBasics}
               toggle={toggleMainboardSideboardEvent}
@@ -163,17 +163,17 @@ export default function Event() {
 
       {eventState.finished && (
         <React.Fragment>
-          <CardPoolDownloadLinks me={myState} others={others} />
+          <CardPoolDownloadLinks me={me} others={others} />
           <BasicLandAdder
             labelText="Add basic lands to your deck"
             submitFunction={(cardData) => addBasics(cardData, 'mainboard', 1)}
           />
           <DeckDisplay
             add={addBasics}
-            authorizedID={myState.account._id}
+            authorizedID={me.account._id}
             deck={{
-              mainboard: myState.mainboard,
-              sideboard: myState.sideboard
+              mainboard: me.mainboard,
+              sideboard: me.sideboard
             }}
             remove={removeBasics}
             toggle={toggleMainboardSideboardEvent}

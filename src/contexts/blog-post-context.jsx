@@ -1,4 +1,10 @@
-import React, { createContext } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
@@ -34,8 +40,8 @@ export const BlogPostContext = createContext({
 export default function ContextualizedBlogPostPage() {
   const navigate = useNavigate();
   const { blogPostID } = useParams();
-  const { avatar, userID, userName } = React.useContext(AuthenticationContext);
-  const [blogPostState, setBlogPostState] = React.useState({
+  const { avatar, userID, userName } = useContext(AuthenticationContext);
+  const [blogPostState, setBlogPostState] = useState({
     _id: null,
     author: {
       _id: '',
@@ -50,7 +56,7 @@ export default function ContextualizedBlogPostPage() {
     createdAt: null,
     updatedAt: null
   });
-  const [viewMode, setViewMode] = React.useState('Live');
+  const [viewMode, setViewMode] = useState('Live');
   const blogPostQuery = `
     _id
     author {
@@ -76,9 +82,8 @@ export default function ContextualizedBlogPostPage() {
     updatedAt
   `;
   const { loading, sendRequest } = useRequest();
-  const { requestSubscription } = useSubscribe();
 
-  const createBlogPost = React.useCallback(
+  const createBlogPost = useCallback(
     async function () {
       await sendRequest({
         callback: () => {
@@ -113,7 +118,7 @@ export default function ContextualizedBlogPostPage() {
     ]
   );
 
-  const createComment = React.useCallback(
+  const createComment = useCallback(
     async function (newComment) {
       await sendRequest({
         callback: () => {
@@ -138,7 +143,7 @@ export default function ContextualizedBlogPostPage() {
     [sendRequest]
   );
 
-  const editBlogPost = React.useCallback(
+  const editBlogPost = useCallback(
     async function () {
       await sendRequest({
         callback: () => {
@@ -177,7 +182,7 @@ export default function ContextualizedBlogPostPage() {
     ]
   );
 
-  const fetchBlogPostByID = React.useCallback(
+  const fetchBlogPostByID = useCallback(
     async function () {
       await sendRequest({
         callback: setBlogPostState,
@@ -200,7 +205,17 @@ export default function ContextualizedBlogPostPage() {
     [blogPostQuery, blogPostID, sendRequest]
   );
 
-  React.useEffect(() => {
+  if (blogPostID !== 'new-post') {
+    useSubscribe({
+      headers: { blogPostID },
+      queryString: blogPostQuery,
+      setup: fetchBlogPostByID,
+      subscriptionType: 'subscribeBlogPost',
+      update: setBlogPostState
+    });
+  }
+
+  useEffect(() => {
     if (blogPostID === 'new-post') {
       setBlogPostState((prevState) => ({
         ...prevState,
@@ -212,16 +227,8 @@ export default function ContextualizedBlogPostPage() {
         }
       }));
       setViewMode('Edit');
-    } else {
-      requestSubscription({
-        headers: { blogPostID },
-        queryString: blogPostQuery,
-        setup: fetchBlogPostByID,
-        subscriptionType: 'subscribeBlogPost',
-        update: setBlogPostState
-      });
     }
-  }, [blogPostID, blogPostQuery, fetchBlogPostByID, requestSubscription]);
+  }, [blogPostID]);
 
   return (
     <BlogPostContext.Provider

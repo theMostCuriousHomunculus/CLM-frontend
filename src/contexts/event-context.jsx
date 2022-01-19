@@ -1,4 +1,11 @@
-import React, { createContext } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import { useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
@@ -7,6 +14,7 @@ import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
 import { AuthenticationContext } from './Authentication';
 import { CardCacheContext } from './CardCache';
+import { fancyFetch } from '../functions/fancy-fetch';
 
 export const EventContext = createContext({
   loading: false,
@@ -26,33 +34,27 @@ export const EventContext = createContext({
           avatar: null,
           name: '...'
         },
+        answers: [],
         current_pack: [],
         mainboard: [],
+        offers: [],
+        present: false,
         sideboard: []
       }
     ]
   },
-  myState: {
-    account: {
-      _id: null,
-      avatar: null,
-      name: null
-    },
-    current_pack: [],
-    mainboard: [],
-    sideboard: []
-  },
   addBasics: () => null,
   removeBasics: () => null,
+  peerConnectionsRef: { current: [] },
   selectCard: () => null,
   toggleMainboardSideboardEvent: () => null
 });
 
 export default function ContextualizedEventPage() {
   const { eventID } = useParams();
-  const { addCardsToCache } = React.useContext(CardCacheContext);
-  const { userID } = React.useContext(AuthenticationContext);
-  const [eventState, setEventState] = React.useState({
+  const { addCardsToCache } = useContext(CardCacheContext);
+  const { userID } = useContext(AuthenticationContext);
+  const [eventState, setEventState] = useState({
     _id: eventID,
     finished: false,
     host: {
@@ -68,22 +70,16 @@ export default function ContextualizedEventPage() {
           avatar: null,
           name: '...'
         },
+        answers: [],
         current_pack: [],
         mainboard: [],
+        offers: [],
+        present: true,
         sideboard: []
       }
     ]
   });
-  const [myState, setMyState] = React.useState({
-    account: {
-      _id: userID,
-      avatar: null,
-      name: null
-    },
-    current_pack: [],
-    mainboard: [],
-    sideboard: []
-  });
+  const peerConnectionsRef = useRef([]);
   const cardQuery = `
     _id
     scryfall_id
@@ -101,12 +97,27 @@ export default function ContextualizedEventPage() {
         avatar
         name
       }
+      answers {
+        remote_account {
+          _id
+        }
+        sdp
+        type
+      }
       current_pack {
         ${cardQuery}
       }
       mainboard {
         ${cardQuery}
       }
+      offers {
+        remote_account {
+          _id
+        }
+        sdp
+        type
+      }
+      present
       sideboard {
         ${cardQuery}
       }
@@ -114,20 +125,8 @@ export default function ContextualizedEventPage() {
   `;
   const { loading, sendRequest } = useRequest();
   const { populateCachedScryfallData } = usePopulate();
-  const { requestSubscription } = useSubscribe();
 
-  React.useEffect(() => {
-    const me = eventState.players.find((plr) => plr.account._id === userID);
-    const updateNeeded =
-      (me.current_pack ? me.current_pack.length : -1) !==
-        (myState.current_pack ? myState.current_pack.length : -1) ||
-      me.mainboard.length !== myState.mainboard.length ||
-      me.sideboard.length !== myState.sideboard.length;
-
-    if (updateNeeded) setMyState(me);
-  }, [eventState, myState, userID]);
-
-  const updateEventState = React.useCallback(
+  const updateEventState = useCallback(
     async function (data) {
       const cardSet = new Set();
 
@@ -167,12 +166,71 @@ export default function ContextualizedEventPage() {
         }
       }
 
+      const me = data.players.find((plr) => plr.account._id === userID);
+      // const others = data.players.filter((plr) => plr.account._id !== userID);
+
+      for (let offerIndex = 0; offerIndex < me.offers.length; offerIndex++) {
+        const { remote_account, type, sdp } = me.offers[offerIndex];
+        const remoteAccountIndex = data.players.findIndex(
+          (plr) => plr.account._id === remote_account._id
+        );
+
+        if (!peerConnectionsRef.current[remoteAccountIndex].remoteDescription) {
+          await peerConnectionsRef.current[
+            remoteAccountIndex
+          ].setRemoteDescription({ type, sdp });
+          const answer = await peerConnectionsRef.current[
+            remoteAccountIndex
+          ].createAnswer();
+          await peerConnectionsRef.current[
+            remoteAccountIndex
+          ].setLocalDescription(answer);
+
+          sendRequest({
+            headers: { EventID: eventID },
+            operation: 'createAnswerEvent',
+            get body() {
+              return {
+                query: `
+                  mutation($accountID: ID!, $sdp: String!) {
+                    ${this.operation} (accountID: $accountID, sdp: $sdp) {
+                      ${eventQuery}
+                    }
+                  }
+                `,
+                variables: {
+                  accountID: data.players[remoteAccountIndex].account._id,
+                  sdp: answer.sdp
+                }
+              };
+            }
+          });
+        }
+      }
+
+      for (
+        let answerIndex = 0;
+        answerIndex < me.answers.length;
+        answerIndex++
+      ) {
+        const { remote_account, type, sdp } = me.answers[answerIndex];
+        const remoteAccountIndex = data.players.findIndex(
+          (plr) => plr.account._id === remote_account._id
+        );
+
+        if (!peerConnectionsRef.current[remoteAccountIndex].remoteDescription) {
+          await peerConnectionsRef.current[
+            remoteAccountIndex
+          ].setRemoteDescription({ type, sdp });
+        }
+      }
+
       setEventState(data);
     },
     [addCardsToCache, populateCachedScryfallData]
   );
 
-  const addBasics = React.useCallback(
+  const addBasics = useCallback(
     async function (
       { name, oracle_id, scryfall_id },
       component,
@@ -203,30 +261,88 @@ export default function ContextualizedEventPage() {
     [eventState._id, sendRequest]
   );
 
-  const fetchEventByID = React.useCallback(
+  function onIceCandidate(event) {
+    console.log(event);
+    console.log(event.candidate);
+    // fancyFetch({
+    //   args: `candidate: ${candidate}`,
+    //   headers: { EventID: eventState._id },
+    //   operation: 'mutation',
+    //   query: eventQuery,
+    //   resolver: 'addICECandidate'
+    // });
+  }
+
+  async function onNegotiationNeeded() {
+    const { _id: accountID } = this.account;
+    const offer = await this.createOffer();
+    await this.setLocalDescription(offer);
+    sendRequest({
+      headers: { EventID: eventID },
+      operation: 'createOfferEvent',
+      get body() {
+        return {
+          query: `
+            mutation($accountID: ID!, $sdp: String!) {
+              ${this.operation} (accountID: $accountID, sdp: $sdp) {
+                ${eventQuery}
+              }
+            }
+          `,
+          variables: {
+            accountID,
+            sdp: offer.sdp
+          }
+        };
+      }
+    });
+  }
+
+  const fetchEventByID = useCallback(
     async function () {
       await sendRequest({
-        callback: updateEventState,
-        headers: { EventID: eventState._id },
+        callback: async (data) => {
+          updateEventState(data);
+          for (let index = 0; index < data.players.length; index++) {
+            const newPeerConnection = new RTCPeerConnection({
+              iceServers: [
+                {
+                  urls: [
+                    'stun:stun.stunprotocol.org',
+                    'stun:stun1.l.google.com:19302',
+                    'stun:stun2.l.google.com:19302'
+                  ]
+                }
+              ]
+            });
+
+            newPeerConnection.account = data.players[index].account;
+            newPeerConnection.onicecandidate = onIceCandidate;
+            newPeerConnection.onnegotiationneeded = onNegotiationNeeded;
+
+            peerConnectionsRef.current[index] = newPeerConnection;
+          }
+        },
+        headers: { EventID: eventID },
         load: true,
         operation: 'fetchEventByID',
         get body() {
           return {
             query: `
-            query {
-              ${this.operation} {
-                ${eventQuery}
+              query {
+                ${this.operation} {
+                  ${eventQuery}
+                }
               }
-            }
-          `
+            `
           };
         }
       });
     },
-    [eventQuery, eventState._id, sendRequest, updateEventState]
+    [eventQuery, sendRequest, updateEventState]
   );
 
-  const removeBasics = React.useCallback(
+  const removeBasics = useCallback(
     async function (cardIDs, component) {
       await sendRequest({
         headers: { EventID: eventState._id },
@@ -250,7 +366,7 @@ export default function ContextualizedEventPage() {
     [eventState._id, sendRequest]
   );
 
-  const selectCard = React.useCallback(
+  const selectCard = useCallback(
     async function (cardID) {
       await sendRequest({
         headers: { EventID: eventState._id },
@@ -271,7 +387,7 @@ export default function ContextualizedEventPage() {
     [eventState._id, sendRequest]
   );
 
-  const toggleMainboardSideboardEvent = React.useCallback(
+  const toggleMainboardSideboardEvent = useCallback(
     async function (cardID) {
       await sendRequest({
         headers: { EventID: eventState._id },
@@ -292,30 +408,71 @@ export default function ContextualizedEventPage() {
     [eventState._id, sendRequest]
   );
 
-  React.useEffect(() => {
-    requestSubscription({
-      headers: { eventID },
-      queryString: eventQuery,
-      setup: fetchEventByID,
-      subscriptionType: 'subscribeEvent',
-      update: updateEventState
-    });
-  }, [
-    eventID,
-    eventQuery,
-    fetchEventByID,
-    requestSubscription,
-    updateEventState
-  ]);
+  useSubscribe({
+    cleanup: () => {
+      for (const peerConnection of peerConnectionsRef.current) {
+        peerConnection.close();
+      }
+      // not using sendRequest hook because it is async (it awaits the response); can't have asynchronous processes in a cleanup function
+      fancyFetch({
+        headers: { EventID: eventState._id },
+        operation: 'mutation',
+        resolver: 'leaveEvent'
+      });
+    },
+    headers: { eventID },
+    queryString: eventQuery,
+    setup: fetchEventByID,
+    subscriptionType: 'subscribeEvent',
+    update: updateEventState
+  });
+
+  // useEffect(() => {
+  //   peerConnectionRef.current = new RTCPeerConnection({
+  //     iceServers: [
+  //       {
+  //         urls: [
+  //           'stun:stun1.l.google.com:19302',
+  //           'stun:stun2.l.google.com:19302'
+  //         ]
+  //       }
+  //     ]
+  //   });
+
+  //   function onIceCandidate(event) {
+  //     if (!event.candidate) {
+  //       return;
+  //     } else {
+  //       // send ICECandidate to server
+  //       console.log(event.candidate);
+  //     }
+  //   }
+
+  //   function onTrack(event) {}
+
+  //   peerConnectionRef.current.addEventListener('icecandidate', onIceCandidate);
+  //   peerConnectionRef.current.addEventListener('track', onTrack);
+
+  //   return () => {
+  //     peerConnectionRef.current.removeEventListener(
+  //       'icecandidate',
+  //       onIceCandidate
+  //     );
+  //     peerConnectionRef.current.removeEventListener('track', onTrack);
+  //     // remove ICECandidates from server
+  //     peerConnectionRef.current.close();
+  //     peerConnectionRef.current = null;
+  //   };
+  // }, []);
 
   return (
     <EventContext.Provider
       value={{
         loading,
         eventState,
-        myState,
         addBasics,
         removeBasics,
+        peerConnectionsRef,
         selectCard,
         toggleMainboardSideboardEvent
       }}

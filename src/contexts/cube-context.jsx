@@ -139,7 +139,6 @@ export default function ContextualizedCubePage() {
   `;
   const { populateCachedScryfallData } = usePopulate();
   const { loading, sendRequest } = useRequest();
-  const { requestSubscription } = useSubscribe();
 
   const filterCards = useCallback(
     (cards, text) =>
@@ -554,15 +553,13 @@ export default function ContextualizedCubePage() {
     [cubeQuery, cubeState._id, sendRequest, updateCubeState]
   );
 
-  useEffect(() => {
-    requestSubscription({
-      headers: { cubeID },
-      queryString: cubeQuery,
-      setup: fetchCubeByID,
-      subscriptionType: 'subscribeCube',
-      update: updateCubeState
-    });
-  }, [cubeID, cubeQuery, fetchCubeByID, requestSubscription, updateCubeState]);
+  useSubscribe({
+    headers: { cubeID },
+    queryString: cubeQuery,
+    setup: fetchCubeByID,
+    subscriptionType: 'subscribeCube',
+    update: updateCubeState
+  });
 
   return (
     <CubeContext.Provider

@@ -30,74 +30,34 @@ const useStyles = makeStyles({
   }
 });
 
-export default function VideoAvatar({ account, mediaStream, size }) {
+export default function VideoAvatar({
+  account,
+  context,
+  rtcConnectionIndex,
+  size
+}) {
   const { userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
-  // const [streamState, setStreamState] = useState(mediaStream);
+  const { peerConnectionsRef } = useContext(context);
+  const [audioAvailable, setAudioAvailable] = useState(account._id === userID);
   const [audioEnabled, setAudioEnabled] = useState(account._id !== userID);
+  const [videoAvailable, setVideoAvailable] = useState(account._id === userID);
   const [videoEnabled, setVideoEnabled] = useState(account._id !== userID);
-  const mediaStreamRef = useRef(mediaStream);
+  const mediaStreamRef = useRef();
+  const audioSendersRef = useRef([]);
+  const videoSendersRef = useRef([]);
   const audioBadge = useRef();
   const videoBadge = useRef();
   const classes = useStyles();
-  // const videoTracks = !!streamState ? streamState.getVideoTracks() : [];
-  // const audioTracks = !!streamState ? streamState.getAudioTracks() : [];
   const audioTracks = !!mediaStreamRef.current
     ? mediaStreamRef.current.getAudioTracks()
     : [];
   const videoTracks = !!mediaStreamRef.current
     ? mediaStreamRef.current.getVideoTracks()
     : [];
-
+  const pc = peerConnectionsRef.current[rtcConnectionIndex];
+  // if (pc && account._id !== userID) console.log(pc.remoteDescription);
   async function toggleAudio() {
-    // if (account._id === userID) {
-    //   try {
-    //     if (streamState) {
-    //       if (audioTracks.length === 0) {
-    //         const microphoneStream = await navigator.mediaDevices.getUserMedia({
-    //           audio: true
-    //         });
-    //         setStreamState((prevState) => {
-    //           const prevStateClone = prevState.clone();
-    //           prevStateClone.addTrack(microphoneStream.getAudioTracks()[0]);
-    //           prevState = null;
-    //           return prevStateClone;
-    //         });
-    //       } else {
-    //         setStreamState((prevState) => {
-    //           if (prevState.getVideoTracks().length === 0) {
-    //             prevState = null;
-    //             return null;
-    //           } else {
-    //             const prevStateClone = prevState.clone();
-    //             prevStateClone.getAudioTracks()[0].stop();
-    //             prevStateClone.removeTrack(prevStateClone.getAudioTracks()[0]);
-    //             prevState = null;
-    //             return prevStateClone;
-    //           }
-    //         });
-    //       }
-    //     } else {
-    //       const microphoneStream = await navigator.mediaDevices.getUserMedia({
-    //         audio: true
-    //       });
-    //       setStreamState(microphoneStream);
-    //     }
-
-    //     // setMicrophoneEnabled((prevState) => !prevState);
-    //   } catch (error) {
-    //     setErrorMessages((prevState) => [...prevState, error.message]);
-    //   }
-    // } else {
-    //   setStreamState((prevState) => {
-    //     const prevStateClone = prevState.clone();
-    //     const prevStateCloneAudioTracks = prevStateClone.getAudioTracks();
-    //     prevStateCloneAudioTracks[0].enabled =
-    //       !prevStateCloneAudioTracks[0].enabled;
-    //     prevState = null;
-    //     return prevStateClone;
-    //   });
-    // }
     if (account._id === userID) {
       try {
         if (!!mediaStreamRef.current) {
@@ -108,77 +68,59 @@ export default function VideoAvatar({ account, mediaStream, size }) {
             mediaStreamRef.current.addTrack(
               microphoneStream.getAudioTracks()[0]
             );
+            for (
+              let index = 0;
+              index < peerConnectionsRef.current.length;
+              index++
+            ) {
+              audioSendersRef.current[index] = peerConnectionsRef.current[
+                index
+              ].addTrack(microphoneStream.getAudioTracks()[0]);
+            }
           } else {
             audioTracks[0].stop();
             mediaStreamRef.current.removeTrack(audioTracks[0]);
+            for (
+              let index = 0;
+              index < peerConnectionsRef.current.length;
+              index++
+            ) {
+              peerConnectionsRef.current[index].removeTrack(
+                audioSendersRef.current[index]
+              );
+              audioSendersRef.current[index] = null;
+            }
             // if (videoTracks.length === 0) {
             //   mediaStreamRef.current = null;
             // }
           }
         } else {
-          mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
+          const microphoneStream = await navigator.mediaDevices.getUserMedia({
             audio: true
           });
+          mediaStreamRef.current = new MediaStream();
+          mediaStreamRef.current.addTrack(microphoneStream.getAudioTracks()[0]);
+          for (
+            let index = 0;
+            index < peerConnectionsRef.current.length;
+            index++
+          ) {
+            audioSendersRef.current[index] = peerConnectionsRef.current[
+              index
+            ].addTrack(microphoneStream.getAudioTracks()[0]);
+          }
         }
+        setAudioEnabled((prevState) => !prevState);
       } catch (error) {
         setErrorMessages((prevState) => [...prevState, error.message]);
       }
     } else {
-      audioTracks[0].enabled = !audioTracks[0].enabled;
+      //   audioTracks[0].enabled = !audioTracks[0].enabled;
+      setAudioEnabled((prevState) => !prevState);
     }
-
-    setAudioEnabled((prevState) => !prevState);
   }
 
   async function toggleVideo() {
-    // if (account._id === userID) {
-    //   try {
-    //     if (streamState) {
-    //       if (videoTracks.length === 0) {
-    //         const cameraStream = await navigator.mediaDevices.getUserMedia({
-    //           video: true
-    //         });
-    //         setStreamState((prevState) => {
-    //           const prevStateClone = prevState.clone();
-    //           prevStateClone.addTrack(cameraStream.getVideoTracks()[0]);
-    //           prevState = null;
-    //           return prevStateClone;
-    //         });
-    //       } else {
-    //         setStreamState((prevState) => {
-    //           if (prevState.getAudioTracks().length === 0) {
-    //             prevState = null;
-    //             return null;
-    //           } else {
-    //             const prevStateClone = prevState.clone();
-    //             prevStateClone.getVideoTracks()[0].stop();
-    //             prevStateClone.removeTrack(prevStateClone.getVideoTracks()[0]);
-    //             prevState = null;
-    //             return prevStateClone;
-    //           }
-    //         });
-    //       }
-    //     } else {
-    //       const cameraStream = await navigator.mediaDevices.getUserMedia({
-    //         video: true
-    //       });
-    //       setStreamState(cameraStream);
-    //     }
-
-    //     // setCameraEnabled((prevState) => !prevState);
-    //   } catch (error) {
-    //     setErrorMessages((prevState) => [...prevState, error.message]);
-    //   }
-    // } else {
-    //   setStreamState((prevState) => {
-    //     const prevStateClone = prevState.clone();
-    //     const prevStateCloneVideoTracks = prevStateClone.getVideoTracks();
-    //     prevStateCloneVideoTracks[0].enabled =
-    //       !prevStateCloneVideoTracks[0].enabled;
-    //     prevState = null;
-    //     return prevStateClone;
-    //   });
-    // }
     if (account._id === userID) {
       try {
         if (!!mediaStreamRef.current) {
@@ -187,63 +129,90 @@ export default function VideoAvatar({ account, mediaStream, size }) {
               video: true
             });
             mediaStreamRef.current.addTrack(cameraStream.getVideoTracks()[0]);
+            for (
+              let index = 0;
+              index < peerConnectionsRef.current.length;
+              index++
+            ) {
+              videoSendersRef.current[index] = peerConnectionsRef.current[
+                index
+              ].addTrack(cameraStream.getVideoTracks()[0]);
+            }
           } else {
             videoTracks[0].stop();
             mediaStreamRef.current.removeTrack(videoTracks[0]);
+            for (
+              let index = 0;
+              index < peerConnectionsRef.current.length;
+              index++
+            ) {
+              peerConnectionsRef.current[index].removeTrack(
+                videoSendersRef.current[index]
+              );
+              videoSendersRef.current[index] = null;
+            }
             // if (audioTracks.length === 0) {
             //   mediaStreamRef.current = null;
             // }
           }
         } else {
-          mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
+          const cameraStream = await navigator.mediaDevices.getUserMedia({
             video: true
           });
+          mediaStreamRef.current = new MediaStream();
+          mediaStreamRef.current.addTrack(cameraStream.getVideoTracks()[0]);
+          for (
+            let index = 0;
+            index < peerConnectionsRef.current.length;
+            index++
+          ) {
+            videoSendersRef.current[index] = peerConnectionsRef.current[
+              index
+            ].addTrack(microphoneStream.getVideoTracks()[0]);
+          }
         }
+        setVideoEnabled((prevState) => !prevState);
       } catch (error) {
         setErrorMessages((prevState) => [...prevState, error.message]);
       }
     } else {
-      videoTracks[0].enabled = !videoTracks[0].enabled;
+      // videoTracks[0].enabled = !videoTracks[0].enabled;
+      setVideoEnabled((prevState) => !prevState);
     }
-
-    setVideoEnabled((prevState) => !prevState);
   }
 
   useEffect(() => {
-    // the other user may mute their microphone or cut their video feed, so we need to update when changes come from outside this component.  but we also need to be careful not to override this user's mute selections for that other user
-    // setStreamState((prevState) => {
-    //   const mediaStreamClone = mediaStream ? mediaStream.clone() : null;
+    if (account._id === userID) {
+      mediaStreamRef.current = new MediaStream();
+    } else {
+      pc.ontrack = ({ track: addedTrack, streams: [stream] }) => {
+        if (addedTrack.kind === 'audio') {
+          setAudioAvailable(true);
+        }
 
-    //   if (!!mediaStreamClone) {
-    //     const audioDisabledLocally = !prevState.getAudioTracks()[0].enabled;
-    //     const videoDisabledLocally = !prevState.getVideoTracks()[0].enabled;
+        if (addedTrack.kind === 'video') {
+          setVideoAvailable(true);
+        }
 
-    //     if (audioDisabledLocally) {
-    //       mediaStreamClone.getAudioTracks()[0].enabled = false;
-    //     }
+        stream.onremovetrack = ({ track: removedTrack }) => {
+          if (stream.getAudioTracks().length === 0) {
+            setAudioAvailable(false);
+          }
 
-    //     if (videoDisabledLocally) {
-    //       mediaStreamClone.getVideoTracks()[0].enabled = false;
-    //     }
-    //   }
-    //   prevState = null;
-    //   return mediaStreamClone;
-    // });
+          if (stream.getVideoTracks().length === 0) {
+            setVideoAvailable(false);
+          }
 
-    const clone = !!mediaStream ? mediaStream.clone() : new MediaStream();
+          // mediaStreamRef.current.removeTrack(removedTrack);
+        };
 
-    if (!audioEnabled && clone.getAudioTracks().length > 0) {
-      clone.getAudioTracks()[0].enabled = false;
+        mediaStreamRef.current = stream;
+        // mediaStreamRef.current.addTrack(addedTrack);
+      };
     }
+  }, []);
 
-    if (!videoEnabled && clone.getVideoTracks().length > 0) {
-      clone.getVideoTracks()[0].enabled = false;
-    }
-
-    mediaStreamRef.current = clone;
-  }, [mediaStream]);
-
-  if (!mediaStreamRef.current && account._id !== userID) {
+  if (!audioAvailable && !videoAvailable) {
     return (
       <Link to={`/account/${account._id}`}>
         <Avatar
@@ -256,11 +225,7 @@ export default function VideoAvatar({ account, mediaStream, size }) {
         />
       </Link>
     );
-  } else if (
-    audioTracks.length > 0 &&
-    videoTracks.length === 0 &&
-    account._id !== userID
-  ) {
+  } else if (audioAvailable && !videoAvailable) {
     return (
       <MUIBadge
         anchorOrigin={{
@@ -296,11 +261,7 @@ export default function VideoAvatar({ account, mediaStream, size }) {
         />
       </MUIBadge>
     );
-  } else if (
-    audioTracks.length === 0 &&
-    videoTracks.length > 0 &&
-    account._id !== userID
-  ) {
+  } else if (!audioAvailable && videoAvailable) {
     return (
       <MUIBadge
         anchorOrigin={{
@@ -425,14 +386,12 @@ export default function VideoAvatar({ account, mediaStream, size }) {
                   width: size
                 }}
               />
-              {audioEnabled && (
-                <AudioStream
-                  autoPlay
-                  muted={!audioEnabled}
-                  srcObject={mediaStreamRef.current}
-                  style={{ display: 'none' }}
-                />
-              )}
+              <AudioStream
+                autoPlay
+                muted={!audioEnabled}
+                srcObject={mediaStreamRef.current}
+                style={{ display: 'none' }}
+              />
             </React.Fragment>
           )}
         </MUIBadge>

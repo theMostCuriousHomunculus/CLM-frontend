@@ -394,7 +394,6 @@ export default function ContextualizedMatchPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
-  const { requestSubscription } = useSubscribe();
 
   React.useEffect(() => {
     // this allows a more smooth drag and drop experience
@@ -1033,15 +1032,13 @@ export default function ContextualizedMatchPage() {
     [matchState._id, sendRequest]
   );
 
-  React.useEffect(() => {
-    requestSubscription({
-      headers: { matchID },
-      queryString: matchQuery,
-      setup: fetchMatchByID,
-      subscriptionType: 'subscribeMatch',
-      update: setMatchState
-    });
-  }, [matchID, matchQuery, fetchMatchByID, requestSubscription]);
+  useSubscribe({
+    headers: { matchID },
+    queryString: matchQuery,
+    setup: fetchMatchByID,
+    subscriptionType: 'subscribeMatch',
+    update: setMatchState
+  });
 
   return (
     <MatchContext.Provider
