@@ -41,10 +41,8 @@ export default function Intermission() {
       </WarningButton>
 
       <DeckDisplay
-        add={() => null}
         authorizedID={userID}
         deck={{ mainboard: player.mainboard, sideboard: player.sideboard }}
-        remove={() => null}
         toggle={toggleMainboardSideboardMatch}
       />
     </React.Fragment>

@@ -10,10 +10,14 @@ import specificCardType from '../../functions/specific-card-type';
 import PlaysetDisplay from './PlaysetDisplay';
 
 export default function DeckDisplay({
-  add,
+  add = () => {
+    // default: don't do anything
+  },
   authorizedID,
   deck,
-  remove,
+  remove = () => {
+    // default: don't do anything
+  },
   toggle
 }) {
   return (

@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
@@ -44,10 +37,7 @@ export const EventContext = createContext({
       }
     ]
   },
-  addBasics: () => null,
-  removeBasics: () => null,
   peerConnectionsRef: { current: [] },
-  selectCard: () => null,
   toggleMainboardSideboardEvent: () => null
 });
 
@@ -119,168 +109,198 @@ export default function ContextualizedEventPage() {
   const { loading, sendRequest } = useRequest();
   const { populateCachedScryfallData } = usePopulate();
 
-  const updateEventState = useCallback(
-    async function (data) {
-      const cardSet = new Set();
+  async function updateEventState(data) {
+    const cardSet = new Set();
 
-      for (const player of data.players) {
-        if (player.current_pack) {
-          for (const card of player.current_pack) {
-            cardSet.add(card.scryfall_id);
-          }
-        }
-
-        if (player.mainboard) {
-          for (const card of player.mainboard) {
-            cardSet.add(card.scryfall_id);
-          }
-        }
-
-        if (player.sideboard) {
-          for (const card of player.sideboard) {
-            cardSet.add(card.scryfall_id);
-          }
+    for (const player of data.players) {
+      if (player.current_pack) {
+        for (const card of player.current_pack) {
+          cardSet.add(card.scryfall_id);
         }
       }
 
-      await addCardsToCache([...cardSet]);
-
-      for (const player of data.players) {
-        if (player.current_pack) {
-          player.current_pack.forEach(populateCachedScryfallData);
-        }
-
-        if (player.mainboard) {
-          player.mainboard.forEach(populateCachedScryfallData);
-        }
-
-        if (player.sideboard) {
-          player.sideboard.forEach(populateCachedScryfallData);
+      if (player.mainboard) {
+        for (const card of player.mainboard) {
+          cardSet.add(card.scryfall_id);
         }
       }
 
-      const me = data.players.find((plr) => plr.account._id === userID);
+      if (player.sideboard) {
+        for (const card of player.sideboard) {
+          cardSet.add(card.scryfall_id);
+        }
+      }
+    }
 
-      for (let offerIndex = 0; offerIndex < me.offers.length; offerIndex++) {
-        const { remote_account, type, sdp } = me.offers[offerIndex];
-        const remoteAccountIndex = data.players.findIndex(
-          (plr) => plr.account._id === remote_account._id
-        );
+    await addCardsToCache([...cardSet]);
 
-        if (!peerConnectionsRef.current[remoteAccountIndex].remoteDescription) {
-          await peerConnectionsRef.current[
-            remoteAccountIndex
-          ].setRemoteDescription({ type, sdp });
-          const answer = await peerConnectionsRef.current[
-            remoteAccountIndex
-          ].createAnswer();
-          await peerConnectionsRef.current[
-            remoteAccountIndex
-          ].setLocalDescription(answer);
+    for (const player of data.players) {
+      if (player.current_pack) {
+        player.current_pack.forEach(populateCachedScryfallData);
+      }
 
-          sendRequest({
-            headers: { EventID: eventID },
-            operation: 'createAnswerEvent',
-            get body() {
-              return {
-                query: `
+      if (player.mainboard) {
+        player.mainboard.forEach(populateCachedScryfallData);
+      }
+
+      if (player.sideboard) {
+        player.sideboard.forEach(populateCachedScryfallData);
+      }
+    }
+
+    const me = data.players.find((plr) => plr.account._id === userID);
+
+    for (let offerIndex = 0; offerIndex < me.offers.length; offerIndex++) {
+      const { remote_account, type, sdp } = me.offers[offerIndex];
+      const remoteAccountIndex = data.players.findIndex(
+        (plr) => plr.account._id === remote_account._id
+      );
+
+      if (!peerConnectionsRef.current[remoteAccountIndex].remoteDescription) {
+        console.log('initial offer received');
+        await peerConnectionsRef.current[
+          remoteAccountIndex
+        ].setRemoteDescription({ type, sdp });
+        console.log('initial remote description set');
+        const answer = await peerConnectionsRef.current[
+          remoteAccountIndex
+        ].createAnswer();
+        console.log('initial answer set');
+        await peerConnectionsRef.current[
+          remoteAccountIndex
+        ].setLocalDescription(answer);
+        console.log('initial local description set');
+
+        sendRequest({
+          headers: { EventID: eventID },
+          operation: 'createAnswerEvent',
+          get body() {
+            return {
+              query: `
                   mutation($accountID: ID!, $sdp: String!) {
                     ${this.operation} (accountID: $accountID, sdp: $sdp) {
                       ${eventQuery}
                     }
                   }
                 `,
-                variables: {
-                  accountID: data.players[remoteAccountIndex].account._id,
-                  sdp: answer.sdp
-                }
-              };
-            }
-          });
-        }
-      }
-
-      for (
-        let answerIndex = 0;
-        answerIndex < me.answers.length;
-        answerIndex++
-      ) {
-        const { remote_account, type, sdp } = me.answers[answerIndex];
-        const remoteAccountIndex = data.players.findIndex(
-          (plr) => plr.account._id === remote_account._id
-        );
-
-        if (!peerConnectionsRef.current[remoteAccountIndex].remoteDescription) {
-          await peerConnectionsRef.current[
-            remoteAccountIndex
-          ].setRemoteDescription({ type, sdp });
-        }
-      }
-
-      for (
-        let playerIndex = 0;
-        playerIndex < data.players.length;
-        playerIndex++
-      ) {
-        if (
-          !!peerConnectionsRef.current[playerIndex] &&
-          data.players[playerIndex].ice_candidates &&
-          eventState.players[playerIndex]
-        ) {
-          for (
-            let candidateIndex =
-              eventState.players[playerIndex].ice_candidates.length;
-            candidateIndex < data.players[playerIndex].ice_candidates.length;
-            candidateIndex++
-          ) {
-            peerConnectionsRef.current[playerIndex].addIceCandidate(
-              data.players[playerIndex].ice_candidates[candidateIndex]
-            );
-          }
-        }
-      }
-
-      setEventState(data);
-    },
-    [addCardsToCache, populateCachedScryfallData]
-  );
-
-  const addBasics = useCallback(
-    async function (
-      { name, oracle_id, scryfall_id },
-      component,
-      numberOfCopies
-    ) {
-      await sendRequest({
-        headers: { EventID: eventState._id },
-        operation: 'addBasics',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  component: ${component},
-                  name: "${name}",
-                  numberOfCopies: ${numberOfCopies},
-                  oracle_id: "${oracle_id}",
-                  scryfall_id: "${scryfall_id}"
-                ) {
-                  _id
-                }
+              variables: {
+                accountID: data.players[remoteAccountIndex].account._id,
+                sdp: answer.sdp
               }
-            `
-          };
+            };
+          }
+        });
+      } else {
+        const newPeerConnection = new RTCPeerConnection({
+          iceServers: [
+            {
+              urls: [
+                'stun:stun.stunprotocol.org',
+                'stun:stun1.l.google.com:19302',
+                'stun:stun2.l.google.com:19302'
+              ]
+            }
+          ]
+        });
+
+        newPeerConnection.account = data.players[remoteAccountIndex].account;
+        newPeerConnection.onicecandidate = onIceCandidate;
+        newPeerConnection.onnegotiationneeded = onNegotiationNeeded;
+
+        const oldPeerConnection =
+          peerConnectionsRef.current[remoteAccountIndex];
+        peerConnectionsRef.current[remoteAccountIndex] = newPeerConnection;
+        oldPeerConnection.close();
+        await peerConnectionsRef.current[
+          remoteAccountIndex
+        ].setRemoteDescription({ type, sdp });
+        console.log('new peer connection object created; old destroyed');
+        const answer = await peerConnectionsRef.current[
+          remoteAccountIndex
+        ].createAnswer();
+        console.log('new answer created');
+        await peerConnectionsRef.current[
+          remoteAccountIndex
+        ].setLocalDescription(answer);
+        console.log('new local description set');
+
+        sendRequest({
+          headers: { EventID: eventID },
+          operation: 'createAnswerEvent',
+          get body() {
+            return {
+              query: `
+                  mutation($accountID: ID!, $sdp: String!) {
+                    ${this.operation} (accountID: $accountID, sdp: $sdp) {
+                      ${eventQuery}
+                    }
+                  }
+                `,
+              variables: {
+                accountID: data.players[remoteAccountIndex].account._id,
+                sdp: answer.sdp
+              }
+            };
+          }
+        });
+      }
+    }
+
+    for (let answerIndex = 0; answerIndex < me.answers.length; answerIndex++) {
+      const { remote_account, type, sdp } = me.answers[answerIndex];
+      const remoteAccountIndex = data.players.findIndex(
+        (plr) => plr.account._id === remote_account._id
+      );
+
+      await peerConnectionsRef.current[remoteAccountIndex].setRemoteDescription(
+        { type, sdp }
+      );
+      console.log('remote description set');
+    }
+
+    for (
+      let playerIndex = 0;
+      playerIndex < data.players.length;
+      playerIndex++
+    ) {
+      // if (
+      //   !!peerConnectionsRef.current[playerIndex] &&
+      //   data.players[playerIndex].ice_candidates &&
+      //   eventState.players[playerIndex]
+      // ) {
+      //   for (
+      //     let candidateIndex =
+      //       eventState.players[playerIndex].ice_candidates.length;
+      //     candidateIndex < data.players[playerIndex].ice_candidates.length;
+      //     candidateIndex++
+      //   ) {
+      //     peerConnectionsRef.current[playerIndex].addIceCandidate(
+      //       data.players[playerIndex].ice_candidates[candidateIndex]
+      //     );
+      //   }
+      // }
+      for (
+        let candidateIndex = 0;
+        candidateIndex < data.players[playerIndex].ice_candidates.length;
+        candidateIndex++
+      ) {
+        if (!!peerConnectionsRef.current[playerIndex]) {
+          peerConnectionsRef.current[playerIndex].addIceCandidate(
+            data.players[playerIndex].ice_candidates[candidateIndex]
+          );
+          console.log('ice candidate added');
         }
-      });
-    },
-    [eventState._id, sendRequest]
-  );
+      }
+    }
+
+    setEventState(data);
+  }
 
   function onIceCandidate(event) {
     if (!event.candidate) {
       return;
     }
-
+    console.log('ice candidate found');
     const {
       candidate: {
         address,
@@ -358,6 +378,7 @@ export default function ContextualizedEventPage() {
   }
 
   async function onNegotiationNeeded() {
+    console.log('negotiation needed');
     const { _id: accountID } = this.account;
     const offer = await this.createOffer();
     await this.setLocalDescription(offer);
@@ -382,12 +403,12 @@ export default function ContextualizedEventPage() {
     });
   }
 
-  const fetchEventByID = useCallback(
-    async function () {
-      await sendRequest({
-        callback: async (data) => {
-          updateEventState(data);
-          for (let index = 0; index < data.players.length; index++) {
+  async function fetchEventByID() {
+    await sendRequest({
+      callback: async (data) => {
+        updateEventState(data);
+        for (let index = 0; index < data.players.length; index++) {
+          if (data.players[index].account._id !== userID) {
             const newPeerConnection = new RTCPeerConnection({
               iceServers: [
                 {
@@ -403,99 +424,53 @@ export default function ContextualizedEventPage() {
             newPeerConnection.account = data.players[index].account;
             newPeerConnection.onicecandidate = onIceCandidate;
             newPeerConnection.onnegotiationneeded = onNegotiationNeeded;
-
             peerConnectionsRef.current[index] = newPeerConnection;
+          } else {
+            peerConnectionsRef.current[index] = null;
           }
-        },
-        headers: { EventID: eventID },
-        load: true,
-        operation: 'fetchEventByID',
-        get body() {
-          return {
-            query: `
+        }
+      },
+      headers: { EventID: eventID },
+      load: true,
+      operation: 'fetchEventByID',
+      get body() {
+        return {
+          query: `
               query {
                 ${this.operation} {
                   ${eventQuery}
                 }
               }
             `
-          };
-        }
-      });
-    },
-    [eventQuery, sendRequest, updateEventState]
-  );
+        };
+      }
+    });
+  }
 
-  const removeBasics = useCallback(
-    async function (cardIDs, component) {
-      await sendRequest({
-        headers: { EventID: eventState._id },
-        operation: 'removeBasics',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                cardIDs: [${cardIDs.map((cardID) => '"' + cardID + '"')}],
-                component: ${component}
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [eventState._id, sendRequest]
-  );
-
-  const selectCard = useCallback(
-    async function (cardID) {
-      await sendRequest({
-        headers: { EventID: eventState._id },
-        operation: 'selectCard',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(_id: "${cardID}") {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [eventState._id, sendRequest]
-  );
-
-  const toggleMainboardSideboardEvent = useCallback(
-    async function (cardID) {
-      await sendRequest({
-        headers: { EventID: eventState._id },
-        operation: 'toggleMainboardSideboardEvent',
-        get body() {
-          return {
-            query: `
+  async function toggleMainboardSideboardEvent(cardID) {
+    await sendRequest({
+      headers: { EventID: eventState._id },
+      operation: 'toggleMainboardSideboardEvent',
+      get body() {
+        return {
+          query: `
             mutation {
               ${this.operation}(cardID: "${cardID}") {
                 _id
               }
             }
           `
-          };
-        }
-      });
-    },
-    [eventState._id, sendRequest]
-  );
+        };
+      }
+    });
+  }
 
   useSubscribe({
     cleanup: () => {
       for (const peerConnection of peerConnectionsRef.current) {
-        peerConnection.close();
+        if (peerConnection) {
+          peerConnection.close();
+        }
       }
       // not using sendRequest hook because it is async (it awaits the response); can't have asynchronous processes in a cleanup function
       fancyFetch({
@@ -511,53 +486,12 @@ export default function ContextualizedEventPage() {
     update: updateEventState
   });
 
-  // useEffect(() => {
-  //   peerConnectionRef.current = new RTCPeerConnection({
-  //     iceServers: [
-  //       {
-  //         urls: [
-  //           'stun:stun1.l.google.com:19302',
-  //           'stun:stun2.l.google.com:19302'
-  //         ]
-  //       }
-  //     ]
-  //   });
-
-  //   function onIceCandidate(event) {
-  //     if (!event.candidate) {
-  //       return;
-  //     } else {
-  //       // send ICECandidate to server
-  //       console.log(event.candidate);
-  //     }
-  //   }
-
-  //   function onTrack(event) {}
-
-  //   peerConnectionRef.current.addEventListener('icecandidate', onIceCandidate);
-  //   peerConnectionRef.current.addEventListener('track', onTrack);
-
-  //   return () => {
-  //     peerConnectionRef.current.removeEventListener(
-  //       'icecandidate',
-  //       onIceCandidate
-  //     );
-  //     peerConnectionRef.current.removeEventListener('track', onTrack);
-  //     // remove ICECandidates from server
-  //     peerConnectionRef.current.close();
-  //     peerConnectionRef.current = null;
-  //   };
-  // }, []);
-
   return (
     <EventContext.Provider
       value={{
         loading,
         eventState,
-        addBasics,
-        removeBasics,
         peerConnectionsRef,
-        selectCard,
         toggleMainboardSideboardEvent
       }}
     >

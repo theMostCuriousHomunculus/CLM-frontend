@@ -43,7 +43,7 @@ export default function VideoAvatar({
   const [audioEnabled, setAudioEnabled] = useState(account._id !== userID);
   const [videoAvailable, setVideoAvailable] = useState(account._id === userID);
   const [videoEnabled, setVideoEnabled] = useState(account._id !== userID);
-  const mediaStreamRef = useRef(new MediaStream());
+  const mediaStreamRef = useRef();
   const audioSendersRef = useRef([]);
   const videoSendersRef = useRef([]);
   const audioBadge = useRef();
@@ -73,22 +73,32 @@ export default function VideoAvatar({
               index < peerConnectionsRef.current.length;
               index++
             ) {
-              audioSendersRef.current[index] = peerConnectionsRef.current[
-                index
-              ].addTrack(microphoneStream.getAudioTracks()[0]);
+              if (peerConnectionsRef.current[index]) {
+                audioSendersRef.current[index] = peerConnectionsRef.current[
+                  index
+                ].addTrack(
+                  microphoneStream.getAudioTracks()[0],
+                  microphoneStream
+                );
+                console.log('audio track added to PC');
+              }
             }
           } else {
-            audioTracks[0].stop();
-            mediaStreamRef.current.removeTrack(audioTracks[0]);
+            for (let index = 0; index < audioTracks.length; index++) {
+              audioTracks[index].stop();
+              mediaStreamRef.current.removeTrack(audioTracks[index]);
+            }
             for (
               let index = 0;
               index < peerConnectionsRef.current.length;
               index++
             ) {
-              peerConnectionsRef.current[index].removeTrack(
-                audioSendersRef.current[index]
-              );
-              audioSendersRef.current[index] = null;
+              if (peerConnectionsRef.current[index]) {
+                peerConnectionsRef.current[index].removeTrack(
+                  audioSendersRef.current[index]
+                );
+                audioSendersRef.current[index] = null;
+              }
             }
             // if (videoTracks.length === 0) {
             //   mediaStreamRef.current = null;
@@ -98,16 +108,21 @@ export default function VideoAvatar({
           const microphoneStream = await navigator.mediaDevices.getUserMedia({
             audio: true
           });
-          mediaStreamRef.current = new MediaStream();
-          mediaStreamRef.current.addTrack(microphoneStream.getAudioTracks()[0]);
+          mediaStreamRef.current = microphoneStream;
           for (
             let index = 0;
             index < peerConnectionsRef.current.length;
             index++
           ) {
-            audioSendersRef.current[index] = peerConnectionsRef.current[
-              index
-            ].addTrack(microphoneStream.getAudioTracks()[0]);
+            if (peerConnectionsRef.current[index]) {
+              audioSendersRef.current[index] = peerConnectionsRef.current[
+                index
+              ].addTrack(
+                microphoneStream.getAudioTracks()[0],
+                microphoneStream
+              );
+              console.log('audio track added to PC');
+            }
           }
         }
         setAudioEnabled((prevState) => !prevState);
@@ -134,22 +149,29 @@ export default function VideoAvatar({
               index < peerConnectionsRef.current.length;
               index++
             ) {
-              videoSendersRef.current[index] = peerConnectionsRef.current[
-                index
-              ].addTrack(cameraStream.getVideoTracks()[0]);
+              if (peerConnectionsRef.current[index]) {
+                videoSendersRef.current[index] = peerConnectionsRef.current[
+                  index
+                ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
+                console.log('video track added to PC');
+              }
             }
           } else {
-            videoTracks[0].stop();
-            mediaStreamRef.current.removeTrack(videoTracks[0]);
+            for (let index = 0; index < videoTracks.length; index++) {
+              videoTracks[index].stop();
+              mediaStreamRef.current.removeTrack(videoTracks[index]);
+            }
             for (
               let index = 0;
               index < peerConnectionsRef.current.length;
               index++
             ) {
-              peerConnectionsRef.current[index].removeTrack(
-                videoSendersRef.current[index]
-              );
-              videoSendersRef.current[index] = null;
+              if (peerConnectionsRef.current[index]) {
+                peerConnectionsRef.current[index].removeTrack(
+                  videoSendersRef.current[index]
+                );
+                videoSendersRef.current[index] = null;
+              }
             }
             // if (audioTracks.length === 0) {
             //   mediaStreamRef.current = null;
@@ -159,16 +181,18 @@ export default function VideoAvatar({
           const cameraStream = await navigator.mediaDevices.getUserMedia({
             video: true
           });
-          mediaStreamRef.current = new MediaStream();
-          mediaStreamRef.current.addTrack(cameraStream.getVideoTracks()[0]);
+          mediaStreamRef.current = cameraStream;
           for (
             let index = 0;
             index < peerConnectionsRef.current.length;
             index++
           ) {
-            videoSendersRef.current[index] = peerConnectionsRef.current[
-              index
-            ].addTrack(microphoneStream.getVideoTracks()[0]);
+            if (peerConnectionsRef.current[index]) {
+              videoSendersRef.current[index] = peerConnectionsRef.current[
+                index
+              ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
+              console.log('video track added to PC');
+            }
           }
         }
         setVideoEnabled((prevState) => !prevState);
@@ -207,29 +231,36 @@ export default function VideoAvatar({
     //     // mediaStreamRef.current.addTrack(addedTrack);
     //   };
     // }
-    // if (account._id !== userID) {
-    //   pc.ontrack = ({ track: addedTrack, streams }) => {
-    //     if (addedTrack.kind === 'audio') {
-    //       setAudioAvailable(true);
-    //     }
-    //     if (addedTrack.kind === 'video') {
-    //       setVideoAvailable(true);
-    //     }
-    //     if (streams.length > 0) {
-    //       streams[0].onremovetrack = ({ track: removedTrack }) => {
-    //         if (streams[0].getAudioTracks().length === 0) {
-    //           setAudioAvailable(false);
-    //         }
-    //         if (streams[0].getVideoTracks().length === 0) {
-    //           setVideoAvailable(false);
-    //         }
-    //         mediaStreamRef.current.removeTrack(removedTrack);
-    //       };
-    //     }
-    //     // mediaStreamRef.current = streams[0];
-    //     mediaStreamRef.current.addTrack(addedTrack);
-    //   };
-    // }
+    if (pc) {
+      pc.ontrack = ({ track: addedTrack, streams }) => {
+        console.log(streams);
+        addedTrack.onunmute = () => {
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.addTrack(addedTrack);
+          } else {
+            mediaStreamRef.current = streams[0];
+          }
+
+          if (addedTrack.kind === 'audio') {
+            setAudioAvailable(true);
+          }
+          if (addedTrack.kind === 'video') {
+            setVideoAvailable(true);
+          }
+        };
+
+        streams[0].onremovetrack = ({ track: removedTrack }) => {
+          console.log(removedTrack);
+          console.log(streams);
+          if (streams[0].getAudioTracks().length === 0) {
+            setAudioAvailable(false);
+          }
+          if (streams[0].getVideoTracks().length === 0) {
+            setVideoAvailable(false);
+          }
+        };
+      };
+    }
   }, []);
 
   if (!audioAvailable && !videoAvailable) {

@@ -76,6 +76,64 @@ export default function useRequest() {
     [Cookies.get('authentication_token'), setErrorMessages]
   );
 
+  // const sendRequest = useCallback(
+  //   async function ({
+  //     body,
+  //     headers = {},
+  //     method = 'POST',
+  //     url = process.env.REACT_APP_HTTP_URL
+  //   }) {
+  //     if (
+  //       url === process.env.REACT_APP_HTTP_URL &&
+  //       !!Cookies.get('authentication_token')
+  //     ) {
+  //       headers.Authorization = `Bearer ${Cookies.get('authentication_token')}`;
+  //     }
+
+  //     if (!!body && !headers['Content-Type']) {
+  //       headers['Content-Type'] = 'application/json';
+  //     }
+
+  //     setLoading(true);
+
+  //     try {
+  //       const abortController = new AbortController();
+  //       activeRequests.current.push(abortController);
+
+  //       const rawResponse = await fetch(url, {
+  //         method,
+  //         body: JSON.stringify(body),
+  //         headers,
+  //         signal: abortController.signal
+  //       });
+
+  //       let parsedResponse;
+
+  //       if (rawResponse.status === 204) {
+  //         // 204 is successful response but no content
+  //         parsedResponse = {};
+  //       } else {
+  //         parsedResponse = await rawResponse.json();
+  //       }
+
+  //       activeRequests.current = activeRequests.current.filter(
+  //         (controller) => controller !== abortController
+  //       );
+
+  //       if (parsedResponse.errors) {
+  //         setErrorMessages((prevState) => [...prevState, ...parsedResponse.errors]);
+  //       } else {
+  //         return parsedResponse;
+  //       }
+  //     } catch (error) {
+  //       setErrorMessages((prevState) => [...prevState, error.message]);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  //   [Cookies.get('authentication_token'), setErrorMessages]
+  // );
+
   useEffect(() => {
     return () => {
       activeRequests.current.forEach((controller) => controller.abort());

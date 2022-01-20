@@ -4,6 +4,7 @@ import MUITab from '@mui/material/Tab';
 import MUITabs from '@mui/material/Tabs';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
+import { useParams } from 'react-router-dom';
 
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
@@ -13,6 +14,8 @@ import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { EventContext } from '../contexts/event-context';
+import { addBasics } from '../graphql/mutations/add-basics';
+import { selectCard } from '../graphql/mutations/select-card';
 
 const useStyles = makeStyles({
   selectableCard: {
@@ -25,15 +28,10 @@ const useStyles = makeStyles({
 });
 
 export default function Event() {
+  const { eventID } = useParams();
   const { userID } = useContext(AuthenticationContext);
-  const {
-    loading,
-    eventState,
-    addBasics,
-    removeBasics,
-    selectCard,
-    toggleMainboardSideboardEvent
-  } = useContext(EventContext);
+  const { loading, eventState, toggleMainboardSideboardEvent } =
+    useContext(EventContext);
   const [selectedCard, setSelectedCard] = useState({
     _id: null,
     image: null,
@@ -44,6 +42,7 @@ export default function Event() {
   const classes = useStyles();
   const me = eventState.players.find((plr) => plr.account._id === userID);
   const others = eventState.players.filter((plr) => plr.account._id !== userID);
+  console.log('render');
 
   if (loading) {
     return <LoadingSpinner />;
@@ -54,7 +53,10 @@ export default function Event() {
       <React.Fragment>
         <ConfirmationDialog
           confirmHandler={() => {
-            selectCard(selectedCard._id);
+            selectCard({
+              headers: { EventID: eventID },
+              cardID: selectedCard._id
+            });
             setSelectedCard({
               _id: null,
               image: null,
@@ -151,13 +153,11 @@ export default function Event() {
 
             {tabNumber === 1 && (
               <DeckDisplay
-                add={addBasics}
                 authorizedID={me.account._id}
                 deck={{
                   mainboard: me.mainboard,
                   sideboard: me.sideboard
                 }}
-                remove={removeBasics}
                 toggle={toggleMainboardSideboardEvent}
               />
             )}
@@ -169,16 +169,22 @@ export default function Event() {
             <CardPoolDownloadLinks me={me} others={others} />
             <BasicLandAdder
               labelText="Add basic lands to your deck"
-              submitFunction={(cardData) => addBasics(cardData, 'mainboard', 1)}
+              submitFunction={(cardData) => {
+                addBasics({
+                  component: 'mainboard',
+                  headers: { EventID: eventID },
+                  name: cardData.name,
+                  numberOfCopies: 1,
+                  scryfall_id: cardData.scryfall_id
+                });
+              }}
             />
             <DeckDisplay
-              add={addBasics}
               authorizedID={me.account._id}
               deck={{
                 mainboard: me.mainboard,
                 sideboard: me.sideboard
               }}
-              remove={removeBasics}
               toggle={toggleMainboardSideboardEvent}
             />
           </React.Fragment>

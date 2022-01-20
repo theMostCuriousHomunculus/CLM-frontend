@@ -13,6 +13,8 @@ import theme, { backgroundColor } from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { addBasics } from '../../graphql/mutations/add-basics';
+import { removeBasics } from '../../graphql/mutations/remove-basics';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -34,6 +36,7 @@ export default function PlaysetDisplay({
   remove,
   toggle
 }) {
+  const { eventID, deckID, matchID } = useParams();
   const { userID } = React.useContext(AuthenticationContext);
   const classes = useStyles();
   const [updatedCount, setUpdatedCount] = React.useState(copies.length);
@@ -47,8 +50,27 @@ export default function PlaysetDisplay({
 
   function handleChangeNumberOfCopies() {
     if (copies.length < updatedCount) {
-      add(card, component, updatedCount - copies.length);
+      if (eventID) {
+        addBasics({
+          component,
+          headers: { EventID: eventID },
+          name: card.name,
+          numberOfCopies: updatedCount - copies.length,
+          scryfall_id: card.scryfall_id
+        });
+      } else {
+        // TODO don't pass add as props for deck
+        add(card, component, updatedCount - copies.length);
+      }
     } else if (copies.length > updatedCount) {
+      if (eventID) {
+        removeBasics({
+          headers: { EventID: eventID },
+          cardIDs: copies.slice(updatedCount),
+          component
+        });
+      }
+      // TODO don't pass remove as props for deck
       remove(copies.slice(updatedCount), component);
     } else {
       // don't do anything; no changes
