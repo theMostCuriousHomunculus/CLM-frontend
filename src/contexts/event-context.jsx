@@ -312,6 +312,7 @@ export default function ContextualizedEventPage() {
     const { _id: accountID } = this.account;
     const offer = await this.createOffer();
     await this.setLocalDescription(offer);
+
     sendRequest({
       headers: { EventID: eventID },
       operation: 'createOfferEvent',
