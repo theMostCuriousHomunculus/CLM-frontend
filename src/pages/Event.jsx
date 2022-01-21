@@ -30,8 +30,7 @@ const useStyles = makeStyles({
 export default function Event() {
   const { eventID } = useParams();
   const { userID } = useContext(AuthenticationContext);
-  const { loading, eventState, toggleMainboardSideboardEvent } =
-    useContext(EventContext);
+  const { loading, eventState } = useContext(EventContext);
   const [selectedCard, setSelectedCard] = useState({
     _id: null,
     image: null,
@@ -158,7 +157,6 @@ export default function Event() {
                   mainboard: me.mainboard,
                   sideboard: me.sideboard
                 }}
-                toggle={toggleMainboardSideboardEvent}
               />
             )}
           </React.Fragment>
@@ -185,7 +183,6 @@ export default function Event() {
                 mainboard: me.mainboard,
                 sideboard: me.sideboard
               }}
-              toggle={toggleMainboardSideboardEvent}
             />
           </React.Fragment>
         )}

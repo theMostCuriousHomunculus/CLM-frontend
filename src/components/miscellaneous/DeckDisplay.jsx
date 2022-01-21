@@ -18,7 +18,9 @@ export default function DeckDisplay({
   remove = () => {
     // default: don't do anything
   },
-  toggle
+  toggle = () => {
+    // default: don't do anything
+  }
 }) {
   return (
     <MUIGrid container spacing={0}>

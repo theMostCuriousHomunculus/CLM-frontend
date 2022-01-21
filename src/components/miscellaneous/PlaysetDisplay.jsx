@@ -15,6 +15,7 @@ import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { addBasics } from '../../graphql/mutations/add-basics';
 import { removeBasics } from '../../graphql/mutations/remove-basics';
+import { toggleMainboardSideboardEvent } from '../../graphql/mutations/toggle-mainboard-sideboard-event';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -112,7 +113,17 @@ export default function PlaysetDisplay({
         >
           <MUIIconButton
             className={classes.iconButton}
-            onClick={() => toggle(copies[0])}
+            onClick={() => {
+              if (eventID) {
+                toggleMainboardSideboardEvent({
+                  headers: { EventID: eventID },
+                  cardID: copies[0]
+                });
+              } else {
+                // TODO don't pass toggle as prop
+                toggle(copies[0]);
+              }
+            }}
             size="small"
             style={{ alignSelf: 'center' }}
           >

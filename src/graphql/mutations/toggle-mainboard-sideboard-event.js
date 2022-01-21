@@ -1,11 +1,11 @@
 import { fancyFetch, asyncFancyFetch } from '../../functions/fancy-fetch';
 
-export function selectCard({ headers, cardID }) {
+export function toggleMainboardSideboardEvent({ headers, cardID }) {
   fancyFetch({
     body: {
       query: `
         mutation($cardID: ID!) {
-          selectCard (cardID: $cardID) {
+          toggleMainboardSideboardEvent (cardID: $cardID) {
             _id
           }
         }
@@ -16,4 +16,4 @@ export function selectCard({ headers, cardID }) {
   });
 }
 
-export async function asyncSelectCard() {}
+export async function asyncToggleMainboardSideboardEvent() {}

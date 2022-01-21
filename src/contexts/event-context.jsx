@@ -5,9 +5,13 @@ import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
+import RTCPeerConnectionConfig from '../constants/rtc-peer-connection-config';
 import { AuthenticationContext } from './Authentication';
 import { CardCacheContext } from './CardCache';
+import { createAnswerEvent } from '../graphql/mutations/create-answer-event';
 import { fancyFetch } from '../functions/fancy-fetch';
+import { sendICECandidate } from '../graphql/mutations/send-ICE-candidate';
+import { sendRTCSessionDescription } from '../graphql/mutations/send-RTC-session-description';
 
 export const EventContext = createContext({
   loading: false,
@@ -32,13 +36,11 @@ export const EventContext = createContext({
         ice_candidates: [],
         mainboard: [],
         offers: [],
-        present: false,
         sideboard: []
       }
     ]
   },
-  peerConnectionsRef: { current: [] },
-  toggleMainboardSideboardEvent: () => null
+  peerConnectionsRef: { current: [] }
 });
 
 export default function ContextualizedEventPage() {
@@ -100,7 +102,6 @@ export default function ContextualizedEventPage() {
         sdp
         type
       }
-      present
       sideboard {
         ${cardQuery}
       }
@@ -148,7 +149,7 @@ export default function ContextualizedEventPage() {
       }
     }
 
-    const me = data.players.find((plr) => plr.account._id === userID);
+    /* const me = data.players.find((plr) => plr.account._id === userID);
 
     for (let offerIndex = 0; offerIndex < me.offers.length; offerIndex++) {
       const { remote_account, type, sdp } = me.offers[offerIndex];
@@ -171,37 +172,23 @@ export default function ContextualizedEventPage() {
         ].setLocalDescription(answer);
         console.log('initial local description set');
 
-        sendRequest({
-          headers: { EventID: eventID },
-          operation: 'createAnswerEvent',
-          get body() {
-            return {
-              query: `
-                  mutation($accountID: ID!, $sdp: String!) {
-                    ${this.operation} (accountID: $accountID, sdp: $sdp) {
-                      ${eventQuery}
-                    }
-                  }
-                `,
-              variables: {
-                accountID: data.players[remoteAccountIndex].account._id,
-                sdp: answer.sdp
-              }
-            };
+        // createAnswerEvent({
+        //   headers: { EventID: eventID },
+        //   accountID: data.players[remoteAccountIndex].account._id,
+        //   sdp: answer.sdp
+        // });
+        sendRTCSessionDescription({
+          variables: {
+            accountID: data.players[remoteAccountIndex].account._id,
+            room: eventID,
+            sdp: answer.sdp,
+            type: answer.type
           }
-        });
+        })
       } else {
-        const newPeerConnection = new RTCPeerConnection({
-          iceServers: [
-            {
-              urls: [
-                'stun:stun.stunprotocol.org',
-                'stun:stun1.l.google.com:19302',
-                'stun:stun2.l.google.com:19302'
-              ]
-            }
-          ]
-        });
+        const newPeerConnection = new RTCPeerConnection(
+          RTCPeerConnectionConfig
+        );
 
         newPeerConnection.account = data.players[remoteAccountIndex].account;
         newPeerConnection.onicecandidate = onIceCandidate;
@@ -224,24 +211,10 @@ export default function ContextualizedEventPage() {
         ].setLocalDescription(answer);
         console.log('new local description set');
 
-        sendRequest({
+        createAnswerEvent({
           headers: { EventID: eventID },
-          operation: 'createAnswerEvent',
-          get body() {
-            return {
-              query: `
-                  mutation($accountID: ID!, $sdp: String!) {
-                    ${this.operation} (accountID: $accountID, sdp: $sdp) {
-                      ${eventQuery}
-                    }
-                  }
-                `,
-              variables: {
-                accountID: data.players[remoteAccountIndex].account._id,
-                sdp: answer.sdp
-              }
-            };
-          }
+          accountID: data.players[remoteAccountIndex].account._id,
+          sdp: answer.sdp
         });
       }
     }
@@ -291,7 +264,7 @@ export default function ContextualizedEventPage() {
           console.log('ice candidate added');
         }
       }
-    }
+    }*/
 
     setEventState(data);
   }
@@ -319,60 +292,17 @@ export default function ContextualizedEventPage() {
         usernameFragment
       }
     } = event;
-    // fancyFetch({
-    //   args: `
-    //     address: "${address}",
-    //     candidate: "${candidate}",
-    //     component: "${component}",
-    //     foundation: "${foundation}",
-    //     port: ${port},
-    //     priority: ${priority},
-    //     protocol: "${protocol}",
-    //     relatedAddress: ${
-    //       relatedAddress ? `"${relatedAddress}"` : relatedAddress
-    //     },
-    //     relatedPort: ${relatedPort},
-    //     sdpMLineIndex: ${sdpMLineIndex},
-    //     sdpMid: "${sdpMid}",
-    //     tcpType: "${tcpType}",
-    //     type: "${type}",
-    //     usernameFragment: "${usernameFragment}"
-    //   `,
-    //   headers: { EventID: eventID },
-    //   operation: 'mutation',
-    //   query: '_id',
-    //   resolver: 'addICECandidate'
-    // });
-    // fancyFetch({
-    //   args: `
-    //     candidate: "${candidate}",
-    //     sdpMLineIndex: ${sdpMLineIndex},
-    //     sdpMid: "${sdpMid}",
-    //     usernameFragment: "${usernameFragment}"
-    //   `,
-    //   headers: { EventID: eventID },
-    //   operation: 'mutation',
-    //   query: '_id',
-    //   resolver: 'addICECandidate'
-    // });
-    sendRequest({
-      headers: { EventID: eventID },
-      operation: 'addICECandidate',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation} (
-                candidate: "${candidate}",
-                sdpMLineIndex: ${sdpMLineIndex},
-                sdpMid: "${sdpMid}",
-                usernameFragment: "${usernameFragment}"
-              ) {
-                ${eventQuery}
-              }
-            }
-          `
-        };
+
+    sendICECandidate({
+      variables: {
+        accountIDs: eventState.players
+          .map((player) => player.account._id)
+          .filter((id) => id !== userID),
+        candidate,
+        room: eventID,
+        sdpMLineIndex,
+        sdpMid,
+        usernameFragment
       }
     });
   }
@@ -409,17 +339,9 @@ export default function ContextualizedEventPage() {
         updateEventState(data);
         for (let index = 0; index < data.players.length; index++) {
           if (data.players[index].account._id !== userID) {
-            const newPeerConnection = new RTCPeerConnection({
-              iceServers: [
-                {
-                  urls: [
-                    'stun:stun.stunprotocol.org',
-                    'stun:stun1.l.google.com:19302',
-                    'stun:stun2.l.google.com:19302'
-                  ]
-                }
-              ]
-            });
+            const newPeerConnection = new RTCPeerConnection(
+              RTCPeerConnectionConfig
+            );
 
             newPeerConnection.account = data.players[index].account;
             newPeerConnection.onicecandidate = onIceCandidate;
@@ -447,24 +369,6 @@ export default function ContextualizedEventPage() {
     });
   }
 
-  async function toggleMainboardSideboardEvent(cardID) {
-    await sendRequest({
-      headers: { EventID: eventState._id },
-      operation: 'toggleMainboardSideboardEvent',
-      get body() {
-        return {
-          query: `
-            mutation {
-              ${this.operation}(cardID: "${cardID}") {
-                _id
-              }
-            }
-          `
-        };
-      }
-    });
-  }
-
   useSubscribe({
     cleanup: () => {
       for (const peerConnection of peerConnectionsRef.current) {
@@ -472,12 +376,6 @@ export default function ContextualizedEventPage() {
           peerConnection.close();
         }
       }
-      // not using sendRequest hook because it is async (it awaits the response); can't have asynchronous processes in a cleanup function
-      fancyFetch({
-        headers: { EventID: eventState._id },
-        operation: 'mutation',
-        resolver: 'leaveEvent'
-      });
     },
     headers: { eventID },
     queryString: eventQuery,
@@ -491,8 +389,7 @@ export default function ContextualizedEventPage() {
       value={{
         loading,
         eventState,
-        peerConnectionsRef,
-        toggleMainboardSideboardEvent
+        peerConnectionsRef
       }}
     >
       <Event />
