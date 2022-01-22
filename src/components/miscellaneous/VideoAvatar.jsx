@@ -65,9 +65,6 @@ export default function VideoAvatar({
             const microphoneStream = await navigator.mediaDevices.getUserMedia({
               audio: true
             });
-            mediaStreamRef.current.addTrack(
-              microphoneStream.getAudioTracks()[0]
-            );
             for (
               let index = 0;
               index < peerConnectionsRef.current.length;
@@ -78,9 +75,8 @@ export default function VideoAvatar({
                   index
                 ].addTrack(
                   microphoneStream.getAudioTracks()[0],
-                  microphoneStream
+                  mediaStreamRef.current
                 );
-                console.log('audio track added to PC');
               }
             }
           } else {
@@ -118,10 +114,9 @@ export default function VideoAvatar({
               audioSendersRef.current[index] = peerConnectionsRef.current[
                 index
               ].addTrack(
-                microphoneStream.getAudioTracks()[0],
-                microphoneStream
+                mediaStreamRef.current.getAudioTracks()[0],
+                mediaStreamRef.current
               );
-              console.log('audio track added to PC');
             }
           }
         }
@@ -130,7 +125,6 @@ export default function VideoAvatar({
         setErrorMessages((prevState) => [...prevState, error.message]);
       }
     } else {
-      //   audioTracks[0].enabled = !audioTracks[0].enabled;
       setAudioEnabled((prevState) => !prevState);
     }
   }
@@ -143,7 +137,6 @@ export default function VideoAvatar({
             const cameraStream = await navigator.mediaDevices.getUserMedia({
               video: true
             });
-            mediaStreamRef.current.addTrack(cameraStream.getVideoTracks()[0]);
             for (
               let index = 0;
               index < peerConnectionsRef.current.length;
@@ -152,12 +145,10 @@ export default function VideoAvatar({
               if (peerConnectionsRef.current[index]) {
                 videoSendersRef.current[index] = peerConnectionsRef.current[
                   index
-                  // ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
                 ].addTrack(
                   cameraStream.getVideoTracks()[0],
                   mediaStreamRef.current
                 );
-                console.log('video track added to PC');
               }
             }
           } else {
@@ -174,8 +165,6 @@ export default function VideoAvatar({
                 peerConnectionsRef.current[index].removeTrack(
                   videoSendersRef.current[index]
                 );
-                // peerConnectionsRef.current[index].close();
-                // peerConnectionsRef.current[index] = null;
                 videoSendersRef.current[index] = null;
               }
             }
@@ -196,12 +185,10 @@ export default function VideoAvatar({
             if (peerConnectionsRef.current[index]) {
               videoSendersRef.current[index] = peerConnectionsRef.current[
                 index
-                // ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
               ].addTrack(
                 mediaStreamRef.current.getVideoTracks()[0],
                 mediaStreamRef.current
               );
-              console.log('video track added to PC');
             }
           }
         }
@@ -210,7 +197,6 @@ export default function VideoAvatar({
         setErrorMessages((prevState) => [...prevState, error.message]);
       }
     } else {
-      // videoTracks[0].enabled = !videoTracks[0].enabled;
       setVideoEnabled((prevState) => !prevState);
     }
   }
@@ -218,7 +204,6 @@ export default function VideoAvatar({
   useEffect(() => {
     if (pc) {
       pc.ontrack = ({ track: addedTrack, streams }) => {
-        console.log(streams);
         addedTrack.onunmute = () => {
           if (mediaStreamRef.current) {
             mediaStreamRef.current.addTrack(addedTrack);
@@ -235,8 +220,6 @@ export default function VideoAvatar({
         };
 
         streams[0].onremovetrack = ({ track: removedTrack }) => {
-          console.log(removedTrack);
-          console.log(streams);
           if (streams[0].getAudioTracks().length === 0) {
             setAudioAvailable(false);
           }

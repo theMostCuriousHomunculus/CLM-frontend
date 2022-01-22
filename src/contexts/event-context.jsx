@@ -149,7 +149,10 @@ export default function ContextualizedEventPage() {
     const playerIndex = eventState.players.findIndex(
       (player) => player.account._id === data.remote_account._id
     );
-    if (!!peerConnectionsRef.current[playerIndex]) {
+    if (
+      Number.isInteger(playerIndex) &&
+      !!peerConnectionsRef.current[playerIndex]
+    ) {
       switch (data.__typename) {
         case 'ICECandidate':
           const { candidate, sdpMLineIndex, sdpMid, usernameFragment } = data;
@@ -159,74 +162,34 @@ export default function ContextualizedEventPage() {
             sdpMid,
             usernameFragment
           });
-          console.log('ice candidate added');
           break;
         case 'RTCSessionDescription':
           const { sdp, type } = data;
           switch (type) {
             case 'offer':
-              if (!!peerConnectionsRef.current[playerIndex].remoteDescription) {
-                console.log('new peer connection required');
-                const newPeerConnection = new RTCPeerConnection(
-                  RTCPeerConnectionConfig
-                );
-                peerConnectionsRef.current[playerIndex].close();
-                peerConnectionsRef.current[playerIndex] = newPeerConnection;
-                newPeerConnection.onicecandidate = onIceCandidate;
-                newPeerConnection.onnegotiationneeded = onNegotiationNeeded;
-                console.log(
-                  'new peer connection object created; old destroyed'
-                );
-                await peerConnectionsRef.current[
-                  playerIndex
-                ].setRemoteDescription({ sdp, type });
-                console.log('new remote description set');
-                const answer = await peerConnectionsRef.current[
-                  playerIndex
-                ].createAnswer();
-                console.log('new answer created');
-                await peerConnectionsRef.current[
-                  playerIndex
-                ].setLocalDescription(answer);
-                console.log('new local description set');
-                sendRTCSessionDescription({
-                  variables: {
-                    accountIDs: [eventState.players[playerIndex].account._id],
-                    room: eventID,
-                    sdp: answer.sdp,
-                    type: answer.type
-                  }
-                });
-              } else {
-                console.log('initial offer received');
-                await peerConnectionsRef.current[
-                  playerIndex
-                ].setRemoteDescription({ type, sdp });
-                console.log('initial remote description set');
-                const answer = await peerConnectionsRef.current[
-                  playerIndex
-                ].createAnswer();
-                console.log('initial answer set');
-                await peerConnectionsRef.current[
-                  playerIndex
-                ].setLocalDescription(answer);
-                console.log('initial local description set');
-                sendRTCSessionDescription({
-                  variables: {
-                    accountIDs: [eventState.players[playerIndex].account._id],
-                    room: eventID,
-                    sdp: answer.sdp,
-                    type: answer.type
-                  }
-                });
-              }
+              await peerConnectionsRef.current[
+                playerIndex
+              ].setRemoteDescription({ type, sdp });
+              const answer = await peerConnectionsRef.current[
+                playerIndex
+              ].createAnswer();
+              await peerConnectionsRef.current[playerIndex].setLocalDescription(
+                answer
+              );
+              sendRTCSessionDescription({
+                variables: {
+                  accountIDs: [eventState.players[playerIndex].account._id],
+                  room: eventID,
+                  sdp: answer.sdp,
+                  type: answer.type
+                }
+              });
               break;
             case 'answer':
               peerConnectionsRef.current[playerIndex].setRemoteDescription({
                 type,
                 sdp
               });
-              console.log('remote description set');
               break;
             default:
               setErrorMessages((prevState) => [
@@ -248,7 +211,7 @@ export default function ContextualizedEventPage() {
     if (!event.candidate) {
       return;
     }
-    console.log('ice candidate found');
+
     const {
       candidate: {
         address,
@@ -283,7 +246,6 @@ export default function ContextualizedEventPage() {
   }
 
   async function onNegotiationNeeded() {
-    console.log('negotiation needed');
     const offer = await this.createOffer();
     await this.setLocalDescription(offer);
     sendRTCSessionDescription({
@@ -331,7 +293,6 @@ export default function ContextualizedEventPage() {
       for (const peerConnection of peerConnectionsRef.current) {
         if (peerConnection) {
           peerConnection.close();
-          console.log('peer connection closed');
         }
       }
     },
@@ -368,7 +329,6 @@ export default function ContextualizedEventPage() {
           newPeerConnection.onicecandidate = onIceCandidate;
           newPeerConnection.onnegotiationneeded = onNegotiationNeeded;
           peerConnectionsRef.current[index] = newPeerConnection;
-          console.log('peer connection created');
         }
       }
     },

@@ -27,7 +27,6 @@ export function sendICECandidate({
       }
     }
   });
-  console.log('ICECandidate sent!');
 }
 
 export async function asyncSendICECandidate() {}

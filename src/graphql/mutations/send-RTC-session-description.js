@@ -13,7 +13,6 @@ export function sendRTCSessionDescription({
       variables: { accountIDs, room, sdp, type }
     }
   });
-  console.log('RTCSessionDescription sent!');
 }
 
 export async function asyncSendRTCSessionDescription() {}
