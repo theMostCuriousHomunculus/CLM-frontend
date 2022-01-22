@@ -554,7 +554,7 @@ export default function ContextualizedCubePage() {
   );
 
   useSubscribe({
-    headers: { cubeID },
+    connectionInfo: { cubeID },
     queryString: cubeQuery,
     setup: fetchCubeByID,
     subscriptionType: 'subscribeCube',

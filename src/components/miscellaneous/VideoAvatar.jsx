@@ -56,7 +56,7 @@ export default function VideoAvatar({
     ? mediaStreamRef.current.getVideoTracks()
     : [];
   const pc = peerConnectionsRef.current[rtcConnectionIndex];
-  // if (pc && account._id !== userID) console.log(pc.remoteDescription);
+
   async function toggleAudio() {
     if (account._id === userID) {
       try {
@@ -152,7 +152,11 @@ export default function VideoAvatar({
               if (peerConnectionsRef.current[index]) {
                 videoSendersRef.current[index] = peerConnectionsRef.current[
                   index
-                ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
+                  // ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
+                ].addTrack(
+                  cameraStream.getVideoTracks()[0],
+                  mediaStreamRef.current
+                );
                 console.log('video track added to PC');
               }
             }
@@ -170,6 +174,8 @@ export default function VideoAvatar({
                 peerConnectionsRef.current[index].removeTrack(
                   videoSendersRef.current[index]
                 );
+                // peerConnectionsRef.current[index].close();
+                // peerConnectionsRef.current[index] = null;
                 videoSendersRef.current[index] = null;
               }
             }
@@ -190,7 +196,11 @@ export default function VideoAvatar({
             if (peerConnectionsRef.current[index]) {
               videoSendersRef.current[index] = peerConnectionsRef.current[
                 index
-              ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
+                // ].addTrack(cameraStream.getVideoTracks()[0], cameraStream);
+              ].addTrack(
+                mediaStreamRef.current.getVideoTracks()[0],
+                mediaStreamRef.current
+              );
               console.log('video track added to PC');
             }
           }
@@ -206,31 +216,6 @@ export default function VideoAvatar({
   }
 
   useEffect(() => {
-    // if (account._id === userID) {
-    //   mediaStreamRef.current = new MediaStream();
-    // } else {
-    //   pc.ontrack = ({ track: addedTrack, streams }) => {
-    //     if (addedTrack.kind === 'audio') {
-    //       setAudioAvailable(true);
-    //     }
-    //     if (addedTrack.kind === 'video') {
-    //       setVideoAvailable(true);
-    //     }
-    //     if (streams.length > 0) {
-    //       streams[0].onremovetrack = ({ track: removedTrack }) => {
-    //         if (streams[0].getAudioTracks().length === 0) {
-    //           setAudioAvailable(false);
-    //         }
-    //         if (streams[0].getVideoTracks().length === 0) {
-    //           setVideoAvailable(false);
-    //         }
-    //         // mediaStreamRef.current.removeTrack(removedTrack);
-    //       };
-    //     }
-    //     mediaStreamRef.current = streams[0];
-    //     // mediaStreamRef.current.addTrack(addedTrack);
-    //   };
-    // }
     if (pc) {
       pc.ontrack = ({ track: addedTrack, streams }) => {
         console.log(streams);

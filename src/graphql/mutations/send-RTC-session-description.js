@@ -1,18 +1,19 @@
 import { fancyFetch, asyncFancyFetch } from '../../functions/fancy-fetch';
 
 export function sendRTCSessionDescription({
-  variables: { accountID, room, sdp, type }
+  variables: { accountIDs, room, sdp, type }
 }) {
   fancyFetch({
     body: {
       query: `
-        mutation($accountID: ID!, $room: String!, $sdp: String!, $type: RTCSessionDescriptionTypeEnum!) {
-          sendRTCSessionDescription (accountID: $accountID, room: $room, sdp: $sdp, type: $type)
+        mutation($accountIDs: [ID]!, $room: String!, $sdp: String!, $type: RTCSessionDescriptionTypeEnum!) {
+          sendRTCSessionDescription (accountIDs: $accountIDs, room: $room, sdp: $sdp, type: $type)
         }
       `,
-      variables: { accountID, room, sdp, type }
+      variables: { accountIDs, room, sdp, type }
     }
   });
+  console.log('RTCSessionDescription sent!');
 }
 
 export async function asyncSendRTCSessionDescription() {}

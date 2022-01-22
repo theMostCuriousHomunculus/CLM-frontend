@@ -1,49 +1,33 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import MUITypography from '@mui/material/Typography';
 import { CSVLink } from 'react-csv';
 
 import generateCSVList from '../../functions/generate-csv-list';
+import { AuthenticationContext } from '../../contexts/Authentication';
+import { EventContext } from '../../contexts/event-context';
 
-export default function CardPoolDownloadLinks({ me, others }) {
+export default function CardPoolDownloadLinks() {
+  const { userID } = useContext(AuthenticationContext);
+  const { eventState } = useContext(EventContext);
+
   return (
     <div style={{ margin: 4 }}>
-      <MUITypography variant="body1">
-        <CSVLink
-          data={generateCSVList(me.mainboard, me.sideboard)}
-          filename={`${me.account.name}.csv`}
-          target="_blank"
-        >
-          Download your card pool in CSV format for MTGO play!
-        </CSVLink>
-      </MUITypography>
-      {others.map(function (plr) {
-        const cardpool = [];
-
-        if (plr.mainboard) {
-          for (const card of plr.mainboard) {
-            cardpool.push(card);
-          }
-        }
-
-        if (plr.sideboard) {
-          for (const card of plr.sideboard) {
-            cardpool.push(card);
-          }
-        }
-
-        if (cardpool.length > 0) {
+      {eventState.players.map(function (plr) {
+        if (plr.mainboard && plr.sideboard) {
+          // only show download links for yourself, unless you are the host, then show for everyone
           return (
             <MUITypography key={plr.account._id} variant="body1">
+              {'Download '}
               <CSVLink
-                data={cardpool.reduce(function (a, c) {
-                  return a + ' ,1,' + c.mtgo_id + ', , , , ,No,0\n';
-                }, 'Card Name,Quantity,ID #,Rarity,Set,Collector #,Premium,Sideboarded,Annotation\n')}
-                filename={`${plr.account.name}.csv`}
+                data={generateCSVList(plr.mainboard, plr.sideboard)}
+                filename={`${plr.account.name}-${eventState._id}.csv`}
                 target="_blank"
               >
-                Download {plr.account.name}'s card pool in CSV format for MTGO
-                play!
+                {plr.account._id === userID
+                  ? 'YOUR'
+                  : `${plr.account.name.toUpperCase()}'s`}
               </CSVLink>
+              {' card pool in CSV format for MTGO play!'}
             </MUITypography>
           );
         } else {

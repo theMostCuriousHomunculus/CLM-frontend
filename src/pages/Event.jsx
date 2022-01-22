@@ -12,7 +12,6 @@ import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import { AuthenticationContext } from '../contexts/Authentication';
 import { EventContext } from '../contexts/event-context';
 import { addBasics } from '../graphql/mutations/add-basics';
 import { selectCard } from '../graphql/mutations/select-card';
@@ -29,8 +28,7 @@ const useStyles = makeStyles({
 
 export default function Event() {
   const { eventID } = useParams();
-  const { userID } = useContext(AuthenticationContext);
-  const { loading, eventState } = useContext(EventContext);
+  const { eventState, loading, me } = useContext(EventContext);
   const [selectedCard, setSelectedCard] = useState({
     _id: null,
     image: null,
@@ -39,9 +37,6 @@ export default function Event() {
   });
   const [tabNumber, setTabNumber] = useState(0);
   const classes = useStyles();
-  const me = eventState.players.find((plr) => plr.account._id === userID);
-  const others = eventState.players.filter((plr) => plr.account._id !== userID);
-  console.log('render');
 
   if (loading) {
     return <LoadingSpinner />;
@@ -164,7 +159,7 @@ export default function Event() {
 
         {eventState.finished && (
           <React.Fragment>
-            <CardPoolDownloadLinks me={me} others={others} />
+            <CardPoolDownloadLinks />
             <BasicLandAdder
               labelText="Add basic lands to your deck"
               submitFunction={(cardData) => {

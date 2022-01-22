@@ -265,7 +265,7 @@ export default function ContextualizedDeckPage() {
   );
 
   useSubscribe({
-    headers: { deckID },
+    connectionInfo: { deckID },
     queryString: deckQuery,
     setup: fetchDeckByID,
     subscriptionType: 'subscribeDeck',

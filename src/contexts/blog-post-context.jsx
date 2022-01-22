@@ -207,7 +207,7 @@ export default function ContextualizedBlogPostPage() {
 
   if (blogPostID !== 'new-post') {
     useSubscribe({
-      headers: { blogPostID },
+      connectionInfo: { blogPostID },
       queryString: blogPostQuery,
       setup: fetchBlogPostByID,
       subscriptionType: 'subscribeBlogPost',

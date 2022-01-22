@@ -1033,7 +1033,7 @@ export default function ContextualizedMatchPage() {
   );
 
   useSubscribe({
-    headers: { matchID },
+    connectionInfo: { matchID },
     queryString: matchQuery,
     setup: fetchMatchByID,
     subscriptionType: 'subscribeMatch',

@@ -4,7 +4,8 @@ import Cookies from 'js-cookie';
 
 export default function useSubscribe({
   cleanup = () => null,
-  headers = {},
+  connectionInfo = {},
+  dependencies = [],
   queryString = '',
   setup = () => null,
   subscriptionType = '',
@@ -18,7 +19,7 @@ export default function useSubscribe({
     const client = createClient({
       connectionParams: {
         authToken: Cookies.get('authentication_token'),
-        ...headers
+        ...connectionInfo
       },
       url: process.env.REACT_APP_WS_URL
     });
@@ -29,9 +30,14 @@ export default function useSubscribe({
       }
 
       await new Promise((resolve, reject) => {
-        const query = `subscription {\n${subscriptionType} {\n${queryString}\n}\n}`;
         client.subscribe(
-          { query },
+          {
+            query: `
+              subscription {
+                ${subscriptionType} {${queryString}}
+              }
+            `
+          },
           {
             complete: resolve,
             error: reject,
@@ -45,5 +51,5 @@ export default function useSubscribe({
       cleanup();
       client.dispose();
     };
-  }, [Cookies.get('authentication_token')]);
+  }, [Cookies.get('authentication_token'), ...dependencies]);
 }

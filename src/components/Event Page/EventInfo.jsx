@@ -9,19 +9,16 @@ import VideoAvatar from '../miscellaneous/VideoAvatar';
 import { EventContext } from '../../contexts/event-context';
 
 export default function InfoSection() {
-  const {
-    eventState: { name, players },
-    peerConnectionRef
-  } = useContext(EventContext);
+  const { eventState } = useContext(EventContext);
 
   return (
     <MUICard>
       <MUICardHeader
-        title={<MUITypography variant="h2">{name}</MUITypography>}
+        title={<MUITypography variant="h2">{eventState.name}</MUITypography>}
       />
       <MUICardContent>
         <MUIGrid container justifyContent="space-around" spacing={0}>
-          {players.map((player, index) => (
+          {eventState.players.map((player, index) => (
             <MUIGrid
               container
               item
@@ -35,8 +32,6 @@ export default function InfoSection() {
               <VideoAvatar
                 account={player.account}
                 context={EventContext}
-                // mediaStream={null}
-                // peerConnectionRef={peerConnectionRef}
                 rtcConnectionIndex={index}
                 size={150}
               />
