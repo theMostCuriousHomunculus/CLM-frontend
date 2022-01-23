@@ -6,6 +6,7 @@ import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
 
+import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
@@ -14,6 +15,7 @@ import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { EventContext } from '../contexts/event-context';
 import { addBasics } from '../graphql/mutations/add-basics';
+import { createChatMessageEvent } from '../graphql/mutations/create-chat-message-event';
 import { selectCard } from '../graphql/mutations/select-card';
 
 const useStyles = makeStyles({
@@ -35,7 +37,8 @@ export default function Event() {
     back_image: null,
     name: null
   });
-  const [tabNumber, setTabNumber] = useState(0);
+  const [finishedTabNumber, setFinishedTabNumber] = useState(0);
+  const [ongoingTabNumber, setOngoingTabNumber] = useState(0);
   const classes = useStyles();
 
   if (loading) {
@@ -93,16 +96,19 @@ export default function Event() {
           <React.Fragment>
             <MUITabs
               aria-label="ongoing-event-tabs"
-              onChange={(event, newTabNumber) => setTabNumber(newTabNumber)}
+              onChange={(event, newTabNumber) =>
+                setOngoingTabNumber(newTabNumber)
+              }
               style={{ margin: 4 }}
-              value={tabNumber}
+              value={ongoingTabNumber}
               variant="fullWidth"
             >
               <MUITab label="Current Pack" />
               <MUITab label="My Picks" />
+              <MUITab label="Chat" />
             </MUITabs>
 
-            {tabNumber === 0 && me.current_pack && (
+            {ongoingTabNumber === 0 && me.current_pack && (
               <MUIGrid container justifyContent="center" spacing={1}>
                 {me.current_pack.map((card) => (
                   <MUIGrid
@@ -133,7 +139,7 @@ export default function Event() {
               </MUIGrid>
             )}
 
-            {tabNumber === 0 && !me.current_pack && (
+            {ongoingTabNumber === 0 && !me.current_pack && (
               <React.Fragment>
                 <MUITypography variant="h3">
                   Other drafters are still making their picks...
@@ -145,7 +151,7 @@ export default function Event() {
               </React.Fragment>
             )}
 
-            {tabNumber === 1 && (
+            {ongoingTabNumber === 1 && (
               <DeckDisplay
                 authorizedID={me.account._id}
                 deck={{
@@ -154,31 +160,74 @@ export default function Event() {
                 }}
               />
             )}
+
+            {ongoingTabNumber === 2 && (
+              <AutoScrollMessages
+                messages={eventState.chat_log}
+                submitFunction={(value) =>
+                  createChatMessageEvent({
+                    headers: { EventID: eventID },
+                    variables: { body: value }
+                  })
+                }
+                title="Group Chat"
+              />
+            )}
           </React.Fragment>
         )}
 
         {eventState.finished && (
           <React.Fragment>
-            <CardPoolDownloadLinks />
-            <BasicLandAdder
-              labelText="Add basic lands to your deck"
-              submitFunction={(cardData) => {
-                addBasics({
-                  component: 'mainboard',
-                  headers: { EventID: eventID },
-                  name: cardData.name,
-                  numberOfCopies: 1,
-                  scryfall_id: cardData.scryfall_id
-                });
-              }}
-            />
-            <DeckDisplay
-              authorizedID={me.account._id}
-              deck={{
-                mainboard: me.mainboard,
-                sideboard: me.sideboard
-              }}
-            />
+            <MUITabs
+              aria-label="finished-event-tabs"
+              onChange={(event, newTabNumber) =>
+                setFinishedTabNumber(newTabNumber)
+              }
+              style={{ margin: 4 }}
+              value={finishedTabNumber}
+              variant="fullWidth"
+            >
+              <MUITab label="My Picks" />
+              <MUITab label="Chat" />
+            </MUITabs>
+
+            {finishedTabNumber === 0 && (
+              <React.Fragment>
+                <CardPoolDownloadLinks />
+                <BasicLandAdder
+                  labelText="Add basic lands to your deck"
+                  submitFunction={(cardData) => {
+                    addBasics({
+                      component: 'mainboard',
+                      headers: { EventID: eventID },
+                      name: cardData.name,
+                      numberOfCopies: 1,
+                      scryfall_id: cardData.scryfall_id
+                    });
+                  }}
+                />
+                <DeckDisplay
+                  authorizedID={me.account._id}
+                  deck={{
+                    mainboard: me.mainboard,
+                    sideboard: me.sideboard
+                  }}
+                />
+              </React.Fragment>
+            )}
+
+            {finishedTabNumber === 1 && (
+              <AutoScrollMessages
+                messages={eventState.chat_log}
+                submitFunction={(value) =>
+                  createChatMessageEvent({
+                    headers: { EventID: eventID },
+                    variables: { body: value }
+                  })
+                }
+                title="Group Chat"
+              />
+            )}
           </React.Fragment>
         )}
       </React.Fragment>

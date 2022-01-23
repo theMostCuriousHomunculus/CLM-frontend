@@ -2,6 +2,8 @@ import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { deepPurple, deepOrange, yellow } from '@mui/material/colors';
 
 const backgroundColor = '#efefef';
+const primaryColor = deepPurple;
+const secondaryColor = deepOrange;
 
 let theme = createTheme({
   components: {
@@ -164,7 +166,7 @@ let theme = createTheme({
           padding: '4px 8px 4px 8px'
         },
         stickyHeader: {
-          backgroundColor: deepPurple['A700']
+          backgroundColor: primaryColor['A700']
         }
       }
     },
@@ -183,9 +185,9 @@ let theme = createTheme({
   },
   palette: {
     primary: {
-      main: deepPurple['A700']
+      main: primaryColor['A700']
     },
-    secondary: deepOrange,
+    secondary: secondaryColor,
     warning: {
       main: yellow['A700']
     }
@@ -212,4 +214,4 @@ let theme = createTheme({
 
 theme = responsiveFontSizes(theme);
 
-export { backgroundColor, theme as default };
+export { backgroundColor, primaryColor, secondaryColor, theme as default };

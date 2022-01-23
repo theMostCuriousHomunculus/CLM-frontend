@@ -11,9 +11,10 @@ import MUITypography from '@mui/material/Typography';
 import rehypeRaw from 'rehype-raw';
 import { makeStyles } from '@mui/styles';
 
-import theme, { backgroundColor } from '../theme';
+import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
 import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { BlogPostContext } from '../contexts/blog-post-context';
 
@@ -77,28 +78,11 @@ const useStyles = makeStyles({
       textAlign: 'justify',
       textIndent: 24
     }
-  },
-  commentCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    maxHeight: 'calc(100vh - 16px)'
-  },
-  commentForm: {
-    alignItems: 'flex-end',
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 1
-  },
-  commentSection: {
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    flexGrow: 1,
-    overflowY: 'auto'
   }
 });
 
 export default function BlogPost() {
-  const { isLoggedIn, userID } = React.useContext(AuthenticationContext);
+  const { userID } = React.useContext(AuthenticationContext);
   const {
     loading,
     blogPostState: {
@@ -106,7 +90,6 @@ export default function BlogPost() {
       author,
       body,
       comments,
-      createdAt,
       image,
       subtitle,
       title,
@@ -261,41 +244,11 @@ export default function BlogPost() {
       </MUICard>
 
       {blogPostID !== 'new-post' && (
-        <MUICard className={classes.commentCard}>
-          <MUICardHeader title="Community Reaction" />
-          <MUICardContent className={classes.commentSection}>
-            {comments
-              .map((comment, index, array) => array[array.length - 1 - index])
-              .map((comment) => (
-                <div
-                  key={comment._id}
-                  style={{ display: 'flex', margin: '4px 0' }}
-                >
-                  <Avatar
-                    alt={comment.author.name}
-                    size="small"
-                    src={comment.author.avatar}
-                  />
-                  <MUITypography variant="body2">{comment.body}</MUITypography>
-                </div>
-              ))}
-          </MUICardContent>
-          {isLoggedIn && (
-            <MUICardActions className={classes.commentForm}>
-              <MUITextField
-                autoComplete="off"
-                fullWidth
-                inputRef={newComment}
-                multiline
-                rows={2}
-                type="text"
-              />
-              <MUIButton onClick={() => createComment(newComment)}>
-                Preach!
-              </MUIButton>
-            </MUICardActions>
-          )}
-        </MUICard>
+        <AutoScrollMessages
+          messages={comments}
+          submitFunction={(value) => createComment(value)}
+          title="Community Reaction"
+        />
       )}
     </React.Fragment>
   );

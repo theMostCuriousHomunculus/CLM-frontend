@@ -15,6 +15,7 @@ import { sendRTCSessionDescription } from '../graphql/mutations/send-RTC-session
 export const EventContext = createContext({
   eventState: {
     _id: null,
+    chat_log: [],
     finished: false,
     host: {
       _id: null,
@@ -62,6 +63,7 @@ export default function ContextualizedEventPage() {
   const { setErrorMessages } = useContext(ErrorContext);
   const [eventState, setEventState] = useState({
     _id: eventID,
+    chat_log: [],
     finished: false,
     host: {
       _id: null,
@@ -78,6 +80,16 @@ export default function ContextualizedEventPage() {
   `;
   const eventQuery = `
     _id
+    chat_log {
+      _id
+      author {
+        _id
+        avatar
+        name
+      }
+      body
+      createdAt
+    }
     finished
     host {
       _id

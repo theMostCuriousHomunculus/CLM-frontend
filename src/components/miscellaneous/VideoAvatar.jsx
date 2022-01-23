@@ -74,8 +74,8 @@ export default function VideoAvatar({
                 audioSendersRef.current[index] = peerConnectionsRef.current[
                   index
                 ].addTrack(
-                  microphoneStream.getAudioTracks()[0],
-                  mediaStreamRef.current
+                  microphoneStream.getAudioTracks()[0]
+                  // mediaStreamRef.current
                 );
               }
             }
@@ -104,7 +104,7 @@ export default function VideoAvatar({
           const microphoneStream = await navigator.mediaDevices.getUserMedia({
             audio: true
           });
-          mediaStreamRef.current = microphoneStream;
+          // mediaStreamRef.current = microphoneStream;
           for (
             let index = 0;
             index < peerConnectionsRef.current.length;
@@ -114,8 +114,8 @@ export default function VideoAvatar({
               audioSendersRef.current[index] = peerConnectionsRef.current[
                 index
               ].addTrack(
-                mediaStreamRef.current.getAudioTracks()[0],
-                mediaStreamRef.current
+                microphoneStream.getAudioTracks()[0]
+                // mediaStreamRef.current
               );
             }
           }

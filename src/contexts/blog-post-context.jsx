@@ -73,6 +73,7 @@ export default function ContextualizedBlogPostPage() {
         name
       }
       body
+      createdAt
       updatedAt
     }
     image
@@ -121,17 +122,13 @@ export default function ContextualizedBlogPostPage() {
   const createComment = useCallback(
     async function (newComment) {
       await sendRequest({
-        callback: () => {
-          newComment.current.value = '';
-          newComment.current.focus();
-        },
         headers: { BlogPostID: blogPostID },
         operation: 'createComment',
         get body() {
           return {
             query: `
               mutation {
-                ${this.operation}(body: "${newComment.current.value}") {
+                ${this.operation}(body: "${newComment}") {
                   _id
                 }
               }
