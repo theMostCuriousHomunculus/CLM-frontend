@@ -1,63 +1,63 @@
 import { asyncFancyFetch, syncFancyFetch } from '../../functions/fancy-fetches';
 
-export async function asyncSelectCard({
+export async function asyncCreateEventChatMessage({
   headers: { EventID },
   queryString,
   signal,
-  variables: { cardID }
+  variables: { body }
 }) {
   return await asyncFancyFetch({
     body: {
       query: `
-        mutation($cardID: ID!) {
-          selectCard (cardID: $cardID) ${queryString}
+        mutation($body: String!) {
+          createEventChatMessage (body: $body) ${queryString}
         }
       `,
-      variables: { cardID }
+      variables: { body }
     },
     headers: { EventID },
     signal
   });
 }
 
-export function syncSelectCard({
+export function syncCreateEventChatMessage({
   headers: { EventID },
-  variables: { cardID }
+  variables: { body }
 }) {
   syncFancyFetch({
     body: {
       query: `
-        mutation($cardID: ID!) {
-          selectCard (cardID: $cardID) {
+        mutation($body: String!) {
+          createEventChatMessage (body: $body) {
             _id
           }
         }
       `,
-      variables: { cardID }
+      variables: { body }
     },
     headers: { EventID }
   });
 }
 
-export default function selectCard({
+export default function createEventChatMessage({
   headers: { EventID },
   queryString,
   signal,
-  variables: { cardID }
+  variables: { body }
 }) {
   if (queryString) {
     return (async function () {
-      asyncSelectCard({
+      return await asyncCreateEventChatMessage({
         headers: { EventID },
         queryString,
         signal,
-        variables: { cardID }
+        variables: { body }
       });
     })();
   } else {
-    syncSelectCard({
+    syncCreateEventChatMessage({
       headers: { EventID },
-      variables: { cardID }
+      variables: { body }
     });
   }
 }

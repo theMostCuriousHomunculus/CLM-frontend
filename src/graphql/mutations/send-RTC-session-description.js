@@ -1,9 +1,9 @@
-import { fancyFetch, asyncFancyFetch } from '../../functions/fancy-fetch';
+import { syncFancyFetch } from '../../functions/fancy-fetches';
 
-export function sendRTCSessionDescription({
+export default function sendRTCSessionDescription({
   variables: { accountIDs, room, sdp, type }
 }) {
-  fancyFetch({
+  syncFancyFetch({
     body: {
       query: `
         mutation($accountIDs: [ID]!, $room: String!, $sdp: String!, $type: RTCSessionDescriptionTypeEnum!) {
@@ -14,5 +14,3 @@ export function sendRTCSessionDescription({
     }
   });
 }
-
-export async function asyncSendRTCSessionDescription() {}

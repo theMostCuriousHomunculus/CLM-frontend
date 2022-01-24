@@ -10,7 +10,7 @@ import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
-import MUIEditIcon from '@mui/icons-material/Edit';
+import MUIEditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -142,7 +142,7 @@ export default function Dashboard() {
                           );
                         }}
                       >
-                        <MUIEditIcon />
+                        <MUIEditOutlinedIcon />
                       </MUIIconButton>
                     )}
 

@@ -4,6 +4,7 @@ export async function asyncFancyFetch({
   body,
   headers = {},
   method = 'POST',
+  signal,
   url = process.env.REACT_APP_HTTP_URL
 }) {
   if (
@@ -20,7 +21,8 @@ export async function asyncFancyFetch({
   const rawResponse = await fetch(url, {
     method,
     body: JSON.stringify(body),
-    headers
+    headers,
+    signal
   });
 
   let parsedResponse;
@@ -33,13 +35,13 @@ export async function asyncFancyFetch({
   }
 
   if (parsedResponse.errors) {
-    throw new Error(parsedResponse.errors[0]);
+    throw new Error(parsedResponse.errors[0].message);
   } else {
     return parsedResponse;
   }
 }
 
-export function fancyFetch({
+export function syncFancyFetch({
   body,
   headers = {},
   method = 'POST',

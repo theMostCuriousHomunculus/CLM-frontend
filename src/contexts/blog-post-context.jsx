@@ -15,26 +15,25 @@ import { AuthenticationContext } from './Authentication';
 export const BlogPostContext = createContext({
   loading: false,
   blogPostState: {
-    _id: null,
+    _id: '',
     author: {
-      _id: null,
-      avatar: null,
-      name: null
+      _id: '',
+      avatar: '',
+      name: ''
     },
-    body: null,
+    body: '',
     comments: [],
-    image: null,
-    subtitle: null,
-    title: null,
-    createdAt: null,
-    updatedAt: null
+    image: '',
+    published: false,
+    subtitle: '',
+    title: '',
+    createdAt: 0,
+    updatedAt: 0
   },
   createBlogPost: () => null,
   createComment: () => null,
-  editBlogPost: () => null,
-  setBlogPostState: () => null,
-  setViewMode: () => null,
-  viewMode: null
+  // editBlogPost: () => null,
+  setBlogPostState: () => null
 });
 
 export default function ContextualizedBlogPostPage() {
@@ -51,12 +50,12 @@ export default function ContextualizedBlogPostPage() {
     body: '',
     comments: [],
     image: '',
+    published: false,
     subtitle: '',
     title: '',
     createdAt: null,
     updatedAt: null
   });
-  const [viewMode, setViewMode] = useState('Live');
   const blogPostQuery = `
     _id
     author {
@@ -77,6 +76,7 @@ export default function ContextualizedBlogPostPage() {
       updatedAt
     }
     image
+    published
     subtitle
     title
     createdAt
@@ -140,45 +140,6 @@ export default function ContextualizedBlogPostPage() {
     [sendRequest]
   );
 
-  const editBlogPost = useCallback(
-    async function () {
-      await sendRequest({
-        callback: () => {
-          setTimeout(() => navigate('/blog'), 0);
-        },
-        headers: {
-          BlogPostID: blogPostID
-        },
-        operation: 'editBlogPost',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  body: """${blogPostState.body}""",
-                  image: "${blogPostState.image}",
-                  subtitle: "${blogPostState.subtitle}",
-                  title: "${blogPostState.title}"
-                ) {
-                  _id
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [
-      blogPostID,
-      blogPostState.body,
-      blogPostState.image,
-      blogPostState.subtitle,
-      blogPostState.title,
-      navigate,
-      sendRequest
-    ]
-  );
-
   const fetchBlogPostByID = useCallback(
     async function () {
       await sendRequest({
@@ -221,9 +182,10 @@ export default function ContextualizedBlogPostPage() {
           _id: userID,
           avatar,
           name: userName
-        }
+        },
+        createdAt: Number(new Date()),
+        updatedAt: Number(new Date())
       }));
-      setViewMode('Edit');
     }
   }, [blogPostID]);
 
@@ -234,10 +196,8 @@ export default function ContextualizedBlogPostPage() {
         blogPostState,
         createBlogPost,
         createComment,
-        editBlogPost,
-        setBlogPostState,
-        setViewMode,
-        viewMode
+        // editBlogPost,
+        setBlogPostState
       }}
     >
       <BlogPost />

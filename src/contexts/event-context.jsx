@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import fetchEventByID from '../graphql/queries/fetch-event-by-id';
+import sendICECandidate from '../graphql/mutations/send-ICE-candidate';
+import sendRTCSessionDescription from '../graphql/mutations/send-RTC-session-description';
 import usePopulate from '../hooks/populate-hook';
-import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
 import RTCPeerConnectionConfig from '../constants/rtc-peer-connection-config';
 import { AuthenticationContext } from './Authentication';
 import { CardCacheContext } from './CardCache';
 import { ErrorContext } from './Error';
-import { sendICECandidate } from '../graphql/mutations/send-ICE-candidate';
-import { sendRTCSessionDescription } from '../graphql/mutations/send-RTC-session-description';
 
 export const EventContext = createContext({
+  abortControllerRef: { current: new AbortController() },
   eventState: {
     _id: null,
     chat_log: [],
@@ -61,6 +62,9 @@ export default function ContextualizedEventPage() {
   const { userID } = useContext(AuthenticationContext);
   const { addCardsToCache } = useContext(CardCacheContext);
   const { setErrorMessages } = useContext(ErrorContext);
+  const { populateCachedScryfallData } = usePopulate();
+  const abortControllerRef = useRef(new AbortController());
+  const peerConnectionsRef = useRef([]);
   const [eventState, setEventState] = useState({
     _id: eventID,
     chat_log: [],
@@ -73,47 +77,46 @@ export default function ContextualizedEventPage() {
     name: null,
     players: []
   });
-  const peerConnectionsRef = useRef([]);
+  const [loading, setLoading] = useState(true);
+
   const cardQuery = `
-    _id
-    scryfall_id
-  `;
+  _id
+  scryfall_id
+`;
   const eventQuery = `
+  _id
+  chat_log {
     _id
-    chat_log {
+    author {
       _id
-      author {
-        _id
-        avatar
-        name
-      }
-      body
-      createdAt
+      avatar
+      name
     }
-    finished
-    host {
+    body
+    createdAt
+  }
+  finished
+  host {
+    _id
+  }
+  name
+  players {
+    account {
       _id
+      avatar
+      name
     }
-    name
-    players {
-      account {
-        _id
-        avatar
-        name
-      }
-      current_pack {
-        ${cardQuery}
-      }
-      mainboard {
-        ${cardQuery}
-      }
-      sideboard {
-        ${cardQuery}
-      }
+    current_pack {
+      ${cardQuery}
     }
-  `;
-  const { loading, sendRequest } = useRequest();
-  const { populateCachedScryfallData } = usePopulate();
+    mainboard {
+      ${cardQuery}
+    }
+    sideboard {
+      ${cardQuery}
+    }
+  }
+`;
 
   async function updateEventState(data) {
     const cardSet = new Set();
@@ -272,30 +275,28 @@ export default function ContextualizedEventPage() {
     });
   }
 
-  async function fetchEventByID() {
-    await sendRequest({
-      callback: updateEventState,
-      headers: { EventID: eventID },
-      load: true,
-      operation: 'fetchEventByID',
-      get body() {
-        return {
-          query: `
-              query {
-                ${this.operation} {
-                  ${eventQuery}
-                }
-              }
-            `
-        };
-      }
-    });
-  }
-
   useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
+    },
     connectionInfo: { eventID },
+    dependencies: [eventID, userID],
     queryString: eventQuery,
-    setup: fetchEventByID,
+    setup: async () => {
+      try {
+        abortControllerRef.current = new AbortController();
+        const data = await fetchEventByID({
+          headers: { EventID: eventID },
+          queryString: `{${eventQuery}}`,
+          signal: abortControllerRef.current.signal
+        });
+        await updateEventState(data.data.fetchEventByID);
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
+    },
     subscriptionType: 'subscribeEvent',
     update: updateEventState
   });
@@ -310,7 +311,9 @@ export default function ContextualizedEventPage() {
     },
     connectionInfo: { room: eventID },
     dependencies: [
-      eventState.players.map((player) => player.account._id).toString()
+      eventID,
+      eventState.players.map((player) => player.account._id).toString(),
+      userID
     ],
     queryString: `
       __typename
@@ -332,6 +335,7 @@ export default function ContextualizedEventPage() {
       }
     `,
     setup: () => {
+      peerConnectionsRef.current = [];
       for (let index = 0; index < eventState.players.length; index++) {
         if (eventState.players[index].account._id !== userID) {
           const newPeerConnection = new RTCPeerConnection(
@@ -351,6 +355,7 @@ export default function ContextualizedEventPage() {
   return (
     <EventContext.Provider
       value={{
+        abortControllerRef,
         eventState,
         loading,
         me: eventState.players.find((player) => player.account._id === userID),

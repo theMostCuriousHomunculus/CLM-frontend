@@ -14,9 +14,9 @@ import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { EventContext } from '../contexts/event-context';
-import { addBasics } from '../graphql/mutations/add-basics';
-import { createChatMessageEvent } from '../graphql/mutations/create-chat-message-event';
-import { selectCard } from '../graphql/mutations/select-card';
+import addBasics from '../graphql/mutations/add-basics';
+import createEventChatMessage from '../graphql/mutations/create-event-chat-message';
+import selectCard from '../graphql/mutations/select-card';
 
 const useStyles = makeStyles({
   selectableCard: {
@@ -52,7 +52,9 @@ export default function Event() {
           confirmHandler={() => {
             selectCard({
               headers: { EventID: eventID },
-              cardID: selectedCard._id
+              variables: {
+                cardID: selectedCard._id
+              }
             });
             setSelectedCard({
               _id: null,
@@ -165,7 +167,7 @@ export default function Event() {
               <AutoScrollMessages
                 messages={eventState.chat_log}
                 submitFunction={(value) =>
-                  createChatMessageEvent({
+                  createEventChatMessage({
                     headers: { EventID: eventID },
                     variables: { body: value }
                   })
@@ -198,11 +200,13 @@ export default function Event() {
                   labelText="Add basic lands to your deck"
                   submitFunction={(cardData) => {
                     addBasics({
-                      component: 'mainboard',
                       headers: { EventID: eventID },
-                      name: cardData.name,
-                      numberOfCopies: 1,
-                      scryfall_id: cardData.scryfall_id
+                      variables: {
+                        component: 'mainboard',
+                        name: cardData.name,
+                        numberOfCopies: 1,
+                        scryfall_id: cardData.scryfall_id
+                      }
                     });
                   }}
                 />
@@ -220,7 +224,7 @@ export default function Event() {
               <AutoScrollMessages
                 messages={eventState.chat_log}
                 submitFunction={(value) =>
-                  createChatMessageEvent({
+                  createEventChatMessage({
                     headers: { EventID: eventID },
                     variables: { body: value }
                   })

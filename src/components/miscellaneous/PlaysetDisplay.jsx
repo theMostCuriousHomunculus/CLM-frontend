@@ -13,9 +13,9 @@ import theme, { backgroundColor } from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
 import { AuthenticationContext } from '../../contexts/Authentication';
-import { addBasics } from '../../graphql/mutations/add-basics';
-import { removeBasics } from '../../graphql/mutations/remove-basics';
-import { toggleMainboardSideboardEvent } from '../../graphql/mutations/toggle-mainboard-sideboard-event';
+import addBasics from '../../graphql/mutations/add-basics';
+import removeBasics from '../../graphql/mutations/remove-basics';
+import toggleMainboardSideboardEvent from '../../graphql/mutations/toggle-mainboard-sideboard-event';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -53,11 +53,13 @@ export default function PlaysetDisplay({
     if (copies.length < updatedCount) {
       if (eventID) {
         addBasics({
-          component,
           headers: { EventID: eventID },
-          name: card.name,
-          numberOfCopies: updatedCount - copies.length,
-          scryfall_id: card.scryfall_id
+          variables: {
+            component,
+            name: card.name,
+            numberOfCopies: updatedCount - copies.length,
+            scryfall_id: card.scryfall_id
+          }
         });
       } else {
         // TODO don't pass add as props for deck
@@ -67,8 +69,10 @@ export default function PlaysetDisplay({
       if (eventID) {
         removeBasics({
           headers: { EventID: eventID },
-          cardIDs: copies.slice(updatedCount),
-          component
+          variables: {
+            cardIDs: copies.slice(updatedCount),
+            component
+          }
         });
       }
       // TODO don't pass remove as props for deck

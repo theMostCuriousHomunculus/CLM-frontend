@@ -1,6 +1,6 @@
-import { fancyFetch, asyncFancyFetch } from '../../functions/fancy-fetch';
+import { syncFancyFetch } from '../../functions/fancy-fetches';
 
-export function sendICECandidate({
+export default function sendICECandidate({
   variables: {
     accountIDs,
     candidate,
@@ -10,7 +10,7 @@ export function sendICECandidate({
     usernameFragment
   }
 }) {
-  fancyFetch({
+  syncFancyFetch({
     body: {
       query: `
         mutation($accountIDs: [ID]!, $candidate: String!, $room: String!, $sdpMLineIndex: Int!, $sdpMid: String!, $usernameFragment: String!) {
@@ -28,5 +28,3 @@ export function sendICECandidate({
     }
   });
 }
-
-export async function asyncSendICECandidate() {}
