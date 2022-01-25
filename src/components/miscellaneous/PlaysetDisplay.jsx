@@ -13,9 +13,9 @@ import theme, { backgroundColor } from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
 import { AuthenticationContext } from '../../contexts/Authentication';
-import addBasics from '../../graphql/mutations/add-basics';
-import removeBasics from '../../graphql/mutations/remove-basics';
-import toggleMainboardSideboardEvent from '../../graphql/mutations/toggle-mainboard-sideboard-event';
+import addBasics from '../../graphql/mutations/event/add-basics';
+import removeBasics from '../../graphql/mutations/event/remove-basics';
+import toggleMainboardSideboardEvent from '../../graphql/mutations/event/toggle-mainboard-sideboard-event';
 
 const useStyles = makeStyles({
   iconButton: {

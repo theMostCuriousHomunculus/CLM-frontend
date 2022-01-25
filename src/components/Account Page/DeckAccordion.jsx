@@ -60,7 +60,7 @@ export default function DeckAccordion({ pageClasses }) {
           aria-controls="deck-content"
           id="deck-header"
         >
-          <MUITypography>Decks ({decks.length})</MUITypography>
+          <MUITypography variant="h3">Decks</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails>
           <MUITableContainer>

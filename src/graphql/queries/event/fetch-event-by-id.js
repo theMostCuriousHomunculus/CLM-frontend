@@ -1,4 +1,4 @@
-import { asyncFancyFetch } from '../../functions/fancy-fetches';
+import { asyncFancyFetch } from '../../../functions/fancy-fetches';
 
 export default async function fetchEventByID({
   headers: { EventID },

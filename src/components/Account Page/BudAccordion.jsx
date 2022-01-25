@@ -130,7 +130,7 @@ export default function BudAccordion() {
           aria-controls="bud-content"
           id="bud-header"
         >
-          <MUITypography>Buds ({buds.length})</MUITypography>
+          <MUITypography variant="h3">Buds</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails style={{ display: 'block' }}>
           {accountID === userID && (

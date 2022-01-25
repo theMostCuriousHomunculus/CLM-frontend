@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import fetchEventByID from '../graphql/queries/fetch-event-by-id';
+import fetchEventByID from '../graphql/queries/event/fetch-event-by-id';
 import sendICECandidate from '../graphql/mutations/send-ICE-candidate';
 import sendRTCSessionDescription from '../graphql/mutations/send-RTC-session-description';
 import usePopulate from '../hooks/populate-hook';

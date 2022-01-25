@@ -60,7 +60,7 @@ export default function CubeAccordion({ pageClasses }) {
           aria-controls="cube-content"
           id="cube-header"
         >
-          <MUITypography>Cubes ({cubes.length})</MUITypography>
+          <MUITypography variant="h3">Cubes</MUITypography>
         </MUIAccordionSummary>
         <MUIAccordionDetails>
           <MUITableContainer>

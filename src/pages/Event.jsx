@@ -14,9 +14,9 @@ import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { EventContext } from '../contexts/event-context';
-import addBasics from '../graphql/mutations/add-basics';
-import createEventChatMessage from '../graphql/mutations/create-event-chat-message';
-import selectCard from '../graphql/mutations/select-card';
+import addBasics from '../graphql/mutations/event/add-basics';
+import createEventChatMessage from '../graphql/mutations/event/create-event-chat-message';
+import selectCard from '../graphql/mutations/event/select-card';
 
 const useStyles = makeStyles({
   selectableCard: {

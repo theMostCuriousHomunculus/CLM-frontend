@@ -8,7 +8,24 @@ import { CardCacheContext } from './CardCache';
 
 export const AccountContext = createContext({
   loading: false,
-  accountState: null,
+  accountState: {
+    _id: '',
+    avatar: '',
+    buds: [],
+    cubes: [],
+    decks: [],
+    email: '',
+    events: [],
+    location: {
+      coordinates: []
+    },
+    matches: [],
+    name: '...',
+    nearby_users: null,
+    received_bud_requests: [],
+    sent_bud_requests: [],
+    total_events: 0
+  },
   setAccountState: () => null,
   createCube: () => null,
   createDeck: () => null,
@@ -36,12 +53,15 @@ export default function ContextualizedAccountPage() {
     decks: [],
     email: '',
     events: [],
-    location: false,
+    location: {
+      coordinates: []
+    },
     matches: [],
     name: '...',
     nearby_users: null,
     received_bud_requests: [],
-    sent_bud_requests: []
+    sent_bud_requests: [],
+    total_events: 0
   });
   const accountQuery = `
     _id
@@ -99,6 +119,11 @@ export default function ContextualizedAccountPage() {
     events {
       _id
       createdAt
+      cube {
+        _id
+        image
+        name
+      }
       host {
         _id
         avatar
@@ -160,19 +185,24 @@ export default function ContextualizedAccountPage() {
       measurement_system
       radius
     }
+    total_events
   `;
   const { loading, sendRequest } = useRequest();
 
   const updateAccountState = useCallback(
     async function (data) {
       const cardSet = new Set();
-
+      console.log(data);
       for (const cube of data.cubes) {
         if (cube.image) cardSet.add(cube.image);
       }
 
       for (const deck of data.decks) {
         if (deck.image) cardSet.add(deck.image);
+      }
+
+      for (const event of data.events) {
+        if (event.cube.image) cardSet.add(event.cube.image);
       }
 
       await addCardsToCache([...cardSet]);
@@ -197,7 +227,18 @@ export default function ContextualizedAccountPage() {
         }
       }
 
+      for (const event of data.events) {
+        if (event.cube.image) {
+          event.cube.image = {
+            alt: scryfallCardDataCache.current[event.cube.image].name,
+            scryfall_id: event.cube.image,
+            src: scryfallCardDataCache.current[event.cube.image].art_crop
+          };
+        }
+      }
+
       setAccountState(data);
+      console.log(accountState);
     },
     [addCardsToCache]
   );

@@ -1,4 +1,7 @@
-import { asyncFancyFetch, syncFancyFetch } from '../../functions/fancy-fetches';
+import {
+  asyncFancyFetch,
+  syncFancyFetch
+} from '../../../functions/fancy-fetches';
 
 export async function asyncAddBasics({
   headers: { EventID },

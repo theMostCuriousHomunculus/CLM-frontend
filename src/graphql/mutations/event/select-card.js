@@ -1,6 +1,9 @@
-import { asyncFancyFetch, syncFancyFetch } from '../../functions/fancy-fetches';
+import {
+  asyncFancyFetch,
+  syncFancyFetch
+} from '../../../functions/fancy-fetches';
 
-export async function asyncToggleMainboardSideboardEvent({
+export async function asyncSelectCard({
   headers: { EventID },
   queryString,
   signal,
@@ -10,7 +13,7 @@ export async function asyncToggleMainboardSideboardEvent({
     body: {
       query: `
         mutation($cardID: ID!) {
-          toggleMainboardSideboardEvent (cardID: $cardID) ${queryString}
+          selectCard (cardID: $cardID) ${queryString}
         }
       `,
       variables: { cardID }
@@ -20,7 +23,7 @@ export async function asyncToggleMainboardSideboardEvent({
   });
 }
 
-export function syncToggleMainboardSideboardEvent({
+export function syncSelectCard({
   headers: { EventID },
   variables: { cardID }
 }) {
@@ -28,7 +31,7 @@ export function syncToggleMainboardSideboardEvent({
     body: {
       query: `
         mutation($cardID: ID!) {
-          toggleMainboardSideboardEvent (cardID: $cardID) {
+          selectCard (cardID: $cardID) {
             _id
           }
         }
@@ -39,7 +42,7 @@ export function syncToggleMainboardSideboardEvent({
   });
 }
 
-export default function toggleMainboardSideboardEvent({
+export default function selectCard({
   headers: { EventID },
   queryString,
   signal,
@@ -47,7 +50,7 @@ export default function toggleMainboardSideboardEvent({
 }) {
   if (queryString) {
     return (async function () {
-      return await asyncToggleMainboardSideboardEvent({
+      asyncSelectCard({
         headers: { EventID },
         queryString,
         signal,
@@ -55,7 +58,7 @@ export default function toggleMainboardSideboardEvent({
       });
     })();
   } else {
-    syncToggleMainboardSideboardEvent({
+    syncSelectCard({
       headers: { EventID },
       variables: { cardID }
     });
