@@ -4,13 +4,13 @@ import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionDetails from '@mui/material/AccordionDetails';
 import MUIAccordionSummary from '@mui/material/AccordionSummary';
 import MUIBadge from '@mui/material/Badge';
-import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import MUIExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MUIList from '@mui/material/List';
 import MUIListItem from '@mui/material/ListItem';
 import MUIListSubheader from '@mui/material/ListSubheader';
 import MUINotInterestedIcon from '@mui/icons-material/NotInterested';
 import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
+import MUIPersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
@@ -320,7 +320,7 @@ export default function BudAccordion() {
                   <MUIBadge
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     badgeContent={
-                      <MUIDeleteForeverIcon className={classes.badgeIcon} />
+                      <MUIPersonRemoveIcon className={classes.badgeIcon} />
                     }
                     className={classes.badge}
                     color="secondary"

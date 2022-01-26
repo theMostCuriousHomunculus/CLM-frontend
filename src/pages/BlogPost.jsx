@@ -21,13 +21,13 @@ import { makeStyles } from '@mui/styles';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
-import Avatar from '../components/miscellaneous/Avatar';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import editBlogPost from '../graphql/mutations/edit-blog-post';
+import editBlogPost from '../graphql/mutations/blog/edit-blog-post';
 import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { BlogPostContext } from '../contexts/blog-post-context';
 import { ErrorContext } from '../contexts/Error';
+import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 
 const useStyles = makeStyles({
   article: {
@@ -241,9 +241,37 @@ export default function BlogPost() {
                     image: event.target.value
                   }));
                 }}
-                style={{ marginTop: 16 }}
+                style={{ marginBottom: 16, marginTop: 16 }}
                 type="text"
                 value={image}
+              />
+
+              <ScryfallRequest
+                buttonText="Include"
+                labelText="Discuss a card"
+                onSubmit={(cardData) => {
+                  setBlogPostState((prevState) => ({
+                    ...prevState,
+                    body: prevState.body.concat(
+                      `\n## ${cardData.name.replace(
+                        '//',
+                        '/'
+                      )}\n\n<figure class="left-float">\n<image alt="${
+                        cardData.name.replace('//', '/').split('/')[0]
+                      }" class="magic-card" src="${
+                        cardData.image
+                      }">\n<figcaption>***Insert amazing commentary here***</figcaption>\n</figure>\n\n${
+                        cardData.back_image
+                          ? `<figure class="right-float">\n<image alt="${
+                              cardData.name.replace('//', '/').split('/')[1]
+                            }" class="magic-card" src="${
+                              cardData.back_image
+                            }">\n<figcaption>***Insert amazing commentary here***</figcaption>\n</figure>\n`
+                          : ''
+                      }\n\n<br style="clear: both;">\n\n`
+                    )
+                  }));
+                }}
               />
 
               <MUITextField

@@ -1,5 +1,7 @@
 import React from 'react';
 import MUIButton from '@mui/material/Button';
+import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import MUICheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
@@ -11,7 +13,6 @@ import MUIRadio from '@mui/material/Radio';
 import MUIRadioGroup from '@mui/material/RadioGroup';
 import MUITextField from '@mui/material/TextField';
 
-import WarningButton from '../miscellaneous/WarningButton';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function CreateComponentForm({ open, toggleOpen }) {
@@ -73,8 +74,19 @@ export default function CreateComponentForm({ open, toggleOpen }) {
       </MUIDialogContent>
 
       <MUIDialogActions>
-        <MUIButton onClick={addComponent}>Create!</MUIButton>
-        <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
+        <MUIButton
+          onClick={addComponent}
+          startIcon={<MUICheckCircleOutlinedIcon />}
+        >
+          Create!
+        </MUIButton>
+        <MUIButton
+          color="warning"
+          onClick={toggleOpen}
+          startIcon={<MUICancelOutlinedIcon />}
+        >
+          Cancel
+        </MUIButton>
       </MUIDialogActions>
     </MUIDialog>
   );

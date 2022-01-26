@@ -1,5 +1,6 @@
 import React from 'react';
 import MUIButton from '@mui/material/Button';
+import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
@@ -19,7 +20,6 @@ import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import WarningButton from '../miscellaneous/WarningButton';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
@@ -274,7 +274,13 @@ export default function CreateMatchForm({ open, toggleOpen }) {
           </MUIDialogContent>
           <MUIDialogActions>
             <MUIButton type="submit">Whoop that Ass!</MUIButton>
-            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
+            <MUIButton
+              color="warning"
+              onClick={toggleOpen}
+              startIcon={<MUICancelOutlinedIcon />}
+            >
+              Cancel
+            </MUIButton>
           </MUIDialogActions>
         </form>
       )}

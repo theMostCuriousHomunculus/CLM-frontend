@@ -4,8 +4,9 @@ import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionActions from '@mui/material/AccordionActions';
 import MUIAccordionDetails from '@mui/material/AccordionDetails';
 import MUIAccordionSummary from '@mui/material/AccordionSummary';
+import MUIAddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import MUIButton from '@mui/material/Button';
-import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import MUIDeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import MUIExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MUIIconButton from '@mui/material/IconButton';
 import MUITable from '@mui/material/Table';
@@ -67,39 +68,46 @@ export default function CubeAccordion({ pageClasses }) {
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
-                  <MUITableCell>Image</MUITableCell>
-                  <MUITableCell>Name</MUITableCell>
+                  <MUITableCell>Cube</MUITableCell>
                   <MUITableCell>Description</MUITableCell>
-                  {_id === userID && <MUITableCell>Delete</MUITableCell>}
+                  {_id === userID && <MUITableCell />}
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
                 {cubes.map((cube) => (
                   <MUITableRow key={cube._id}>
                     <MUITableCell>
-                      {cube.image && (
-                        <img
-                          alt={cube.image.alt}
-                          src={cube.image.src}
-                          style={{ borderRadius: 4 }}
-                          width={75}
-                        />
-                      )}
+                      <span
+                        style={{
+                          alignItems: 'center',
+                          columnGap: 8,
+                          display: 'flex'
+                        }}
+                      >
+                        {cube.image && (
+                          <img
+                            alt={cube.image.alt}
+                            height={50}
+                            src={cube.image.src}
+                            style={{ borderRadius: 4 }}
+                          />
+                        )}
+                        <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
+                      </span>
                     </MUITableCell>
-                    <MUITableCell>
-                      <Link to={`/cube/${cube._id}`}>{cube.name}</Link>
-                    </MUITableCell>
+
                     <MUITableCell>{cube.description}</MUITableCell>
+
                     {_id === userID && (
-                      <MUITableCell>
+                      <MUITableCell style={{ textAlign: 'right' }}>
                         <MUIIconButton
-                          className={pageClasses.iconButton}
+                          color="secondary"
                           onClick={() =>
                             setCubeToDelete({ _id: cube._id, name: cube.name })
                           }
                           size="small"
                         >
-                          <MUIDeleteForeverIcon />
+                          <MUIDeleteForeverOutlinedIcon fontSize="large" />
                         </MUIIconButton>
                       </MUITableCell>
                     )}
@@ -112,8 +120,11 @@ export default function CubeAccordion({ pageClasses }) {
 
         {_id === userID && (
           <MUIAccordionActions>
-            <MUIButton onClick={() => setShowCubeForm(true)}>
-              Create a Cube
+            <MUIButton
+              onClick={() => setShowCubeForm(true)}
+              startIcon={<MUIAddCircleOutlineOutlinedIcon />}
+            >
+              Build
             </MUIButton>
           </MUIAccordionActions>
         )}

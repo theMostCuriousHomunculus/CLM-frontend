@@ -31,7 +31,6 @@ import randomSampleWOReplacement from '../../functions/random-sample-wo-replacem
 import theme from '../../theme';
 import CreateComponentForm from './CreateComponentForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
-import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { CubeContext } from '../../contexts/cube-context';
 
@@ -408,7 +407,8 @@ export default function Dashboard() {
         >
           {userID === creator._id &&
             !['mainboard', 'sideboard'].includes(activeComponentState._id) && (
-              <WarningButton
+              <MUIButton
+                color="warning"
                 onClick={
                   Number.isInteger(activeComponentState.size)
                     ? deleteRotation
@@ -420,7 +420,7 @@ export default function Dashboard() {
                 {Number.isInteger(activeComponentState.size)
                   ? 'Rotation'
                   : 'Module'}
-              </WarningButton>
+              </MUIButton>
             )}
 
           {isLoggedIn && <MUIButton onClick={cloneCube}>Clone Cube</MUIButton>}

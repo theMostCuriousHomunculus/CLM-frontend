@@ -1,6 +1,8 @@
 import React from 'react';
 import MUIButton from '@mui/material/Button';
+import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MUICheckbox from '@mui/material/Checkbox';
+import MUICheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
@@ -17,14 +19,11 @@ import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
 import MUIRadio from '@mui/material/Radio';
 import MUIRadioGroup from '@mui/material/RadioGroup';
-import MUISwitch from '@mui/material/Switch';
 import MUITextField from '@mui/material/TextField';
-import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import WarningButton from '../miscellaneous/WarningButton';
 import { AccountContext } from '../../contexts/account-context';
 
 const useStyles = makeStyles({
@@ -300,8 +299,16 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
           </MUIDialogContent>
 
           <MUIDialogActions>
-            <MUIButton type="submit">Create!</MUIButton>
-            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
+            <MUIButton type="submit" startIcon={<MUICheckCircleOutlinedIcon />}>
+              Create!
+            </MUIButton>
+            <MUIButton
+              color="warning"
+              onClick={toggleOpen}
+              startIcon={<MUICancelOutlinedIcon />}
+            >
+              Cancel
+            </MUIButton>
           </MUIDialogActions>
         </form>
       )}

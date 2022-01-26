@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionActions from '@mui/material/AccordionActions';
 import MUIAccordionDetails from '@mui/material/AccordionDetails';
@@ -22,13 +22,14 @@ import CreateEventForm from './CreateEventForm';
 import TablePaginationActions from '../miscellaneous/TablePaginationActions';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { ErrorContext } from '../../contexts/Error';
 
-export default function EventAccordion({ pageClasses }) {
+export default function EventAccordion() {
   const {
     accountState: { buds, cubes, events, total_events }
   } = useContext(AccountContext);
   const { userID } = useContext(AuthenticationContext);
-  const navigate = useNavigate();
+  const { setErrorMessages } = useContext(ErrorContext);
   const { accountID } = useParams();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -55,14 +56,23 @@ export default function EventAccordion({ pageClasses }) {
         >
           <MUITypography variant="h3">Events</MUITypography>
         </MUIAccordionSummary>
-        <MUIAccordionDetails>
-          <MUITableContainer>
-            <MUITable stickyHeader className={pageClasses.table}>
+        <MUIAccordionDetails style={{ display: 'flex', overflowX: 'auto' }}>
+          <MUITableContainer
+            style={{
+              flexShrink: 0,
+              minWidth: `${
+                400 +
+                Math.max(...events.map((event) => event.players.length)) * 50
+              }px`
+            }}
+          >
+            <MUITable stickyHeader>
               <MUITableHead>
                 <MUITableRow>
+                  <MUITableCell>Event</MUITableCell>
                   <MUITableCell>Cube</MUITableCell>
                   <MUITableCell>Host</MUITableCell>
-                  <MUITableCell>Other Players</MUITableCell>
+                  <MUITableCell>Others</MUITableCell>
                   <MUITableCell>Date</MUITableCell>
                 </MUITableRow>
               </MUITableHead>
@@ -75,19 +85,24 @@ export default function EventAccordion({ pageClasses }) {
                   : events
                 ).map(function (event) {
                   return (
-                    <MUITableRow
-                      key={event._id}
-                      onClick={() => navigate(`/event/${event._id}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <MUITableRow key={event._id}>
                       <MUITableCell>
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                        <Link to={`/event/${event._id}`}>{event.name}</Link>
+                      </MUITableCell>
+                      <MUITableCell>
+                        <span
+                          style={{
+                            alignItems: 'center',
+                            columnGap: 8,
+                            display: 'flex'
+                          }}
+                        >
                           {event.cube.image && (
                             <img
                               alt={event.cube.image.alt}
                               height={50}
                               src={event.cube.image.src}
-                              style={{ borderRadius: 4, marginRight: 8 }}
+                              style={{ borderRadius: 4 }}
                             />
                           )}
                           {event.cube.name}
@@ -101,10 +116,12 @@ export default function EventAccordion({ pageClasses }) {
                         />
                       </MUITableCell>
                       <MUITableCell>
-                        <span style={{ display: 'flex' }}>
+                        <span style={{ display: 'flex', columnGap: 4 }}>
                           {event.players
                             .filter(
-                              (player) => player.account._id !== event.host._id
+                              (player) =>
+                                player.account._id !== event.host._id &&
+                                player.account._id !== accountID
                             )
                             .map((player) => (
                               <Avatar
@@ -125,7 +142,7 @@ export default function EventAccordion({ pageClasses }) {
 
                 {emptyRows > 0 && (
                   <MUITableRow style={{ height: 59 * emptyRows }}>
-                    <MUITableCell colSpan={4} />
+                    <MUITableCell colSpan={5} />
                   </MUITableRow>
                 )}
               </MUITableBody>
@@ -138,7 +155,7 @@ export default function EventAccordion({ pageClasses }) {
                       25,
                       { label: 'All', value: -1 }
                     ]}
-                    colSpan={4}
+                    colSpan={5}
                     count={total_events}
                     rowsPerPage={rowsPerPage}
                     page={page}
@@ -168,11 +185,19 @@ export default function EventAccordion({ pageClasses }) {
         {accountID === userID && (
           <MUIAccordionActions>
             <MUIButton
-              disabled={cubes.length === 0}
-              onClick={() => setShowEventForm(true)}
+              onClick={() => {
+                if (cubes.length === 0) {
+                  setErrorMessages((prevState) => [
+                    ...prevState,
+                    "You don't have any cubes yet, you silly goose!"
+                  ]);
+                } else {
+                  setShowEventForm(true);
+                }
+              }}
               startIcon={<MUIAddCircleOutlineOutlinedIcon />}
             >
-              {cubes.length === 0 ? 'You have no Cubes!' : 'Host an Event'}
+              Host
             </MUIButton>
           </MUIAccordionActions>
         )}

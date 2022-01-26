@@ -1,16 +1,17 @@
 import React from 'react';
 import MUIButton from '@mui/material/Button';
+import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIGrid from '@mui/material/Grid';
+import MUIPublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import MUITextField from '@mui/material/TextField';
 
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import MoveDeleteMenu from './MoveDeleteMenu';
-import WarningButton from '../miscellaneous/WarningButton';
 import { CubeContext } from '../../contexts/cube-context';
 
 export default function EditCardModal({ card, clear, editable }) {
@@ -137,16 +138,24 @@ export default function EditCardModal({ card, clear, editable }) {
                   notes: event.target.value
                 }))
               }
-              style={{ marginTop: 16 }}
               value={mutableCardDetails.notes}
             />
           </MUIDialogContent>
           {editable && (
             <MUIDialogActions>
-              <MUIButton type="submit">Submit Changes</MUIButton>
-              <WarningButton onClick={clear} type="button">
+              <MUIButton
+                type="submit"
+                startIcon={<MUIPublishedWithChangesOutlinedIcon />}
+              >
+                Submit Changes
+              </MUIButton>
+              <MUIButton
+                color="warning"
+                onClick={clear}
+                startIcon={<MUICancelOutlinedIcon />}
+              >
                 Discard Changes
-              </WarningButton>
+              </MUIButton>
             </MUIDialogActions>
           )}
         </form>

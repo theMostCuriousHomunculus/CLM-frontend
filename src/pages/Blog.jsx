@@ -14,7 +14,6 @@ import useRequest from '../hooks/request-hook';
 import Avatar from '../components/miscellaneous/Avatar';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import WarningButton from '../components/miscellaneous/WarningButton';
 import { AuthenticationContext } from '../contexts/Authentication';
 
 export default function Blog() {
@@ -104,12 +103,19 @@ export default function Blog() {
 
       <MUIGrid container spacing={0}>
         {authentication.admin && (
-          <MUIGrid item xs={12} sm={6} md={4} lg={3} xl={2}>
-            <MUICard>
+          <MUIGrid container item xs={12} sm={6} md={4} lg={3} xl={2}>
+            <MUICard
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1
+              }}
+            >
               <MUICardHeader
                 title={
                   <MUITypography variant="subtitle1">New Article</MUITypography>
                 }
+                style={{ flexGrow: 1 }}
                 subheader={
                   <MUITypography color="textSecondary" variant="subtitle2">
                     The world eagerly awaits your opinions on shit
@@ -129,8 +135,23 @@ export default function Blog() {
           </MUIGrid>
         )}
         {blogPosts.map((blogPost) => (
-          <MUIGrid item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
-            <MUICard>
+          <MUIGrid
+            container
+            item
+            key={blogPost._id}
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}
+            xl={2}
+          >
+            <MUICard
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1
+              }}
+            >
               <MUICardHeader
                 avatar={
                   <Avatar
@@ -144,6 +165,7 @@ export default function Blog() {
                     {blogPost.subtitle}
                   </MUITypography>
                 }
+                style={{ flexGrow: 1 }}
                 title={
                   <MUITypography variant="subtitle1">
                     {blogPost.title}
@@ -156,7 +178,8 @@ export default function Blog() {
                   Read
                 </MUIButton>
                 {blogPost.author._id === authentication.userID && (
-                  <WarningButton
+                  <MUIButton
+                    color="warning"
                     onClick={() =>
                       setBlogPostToDelete({
                         _id: blogPost._id,
@@ -164,10 +187,9 @@ export default function Blog() {
                       })
                     }
                     startIcon={<MUIDeleteForeverIcon />}
-                    style={{ marginLeft: 0 }}
                   >
                     Delete
-                  </WarningButton>
+                  </MUIButton>
                 )}
               </MUICardActions>
             </MUICard>

@@ -1,15 +1,15 @@
 import React from 'react';
 import MUIButton from '@mui/material/Button';
+import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import MUICheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUITextField from '@mui/material/TextField';
-import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import WarningButton from '../miscellaneous/WarningButton';
 import { AccountContext } from '../../contexts/account-context';
 
 const useStyles = makeStyles({
@@ -30,7 +30,6 @@ export default function CreateCubeForm({ open, toggleOpen }) {
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
-      <MUIDialogTitle>Create A New Cube</MUIDialogTitle>
       {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
@@ -39,18 +38,21 @@ export default function CreateCubeForm({ open, toggleOpen }) {
         <form
           onSubmit={(event) => createCube(event, cobraID, description, name)}
         >
-          <MUIDialogContent style={{ height: 'max-content' }}>
+          <MUIDialogTitle>
             <MUITextField
               autoComplete="off"
               autoFocus
               fullWidth
               label="Cube Name"
+              margin="none"
               onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
               value={name}
             />
+          </MUIDialogTitle>
 
+          <MUIDialogContent>
             <MUITextField
               autoComplete="off"
               fullWidth
@@ -59,29 +61,32 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               onChange={(event) => setDescription(event.target.value)}
               required={false}
               rows={2}
-              style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
               value={description}
             />
 
-            <MUITypography variant="body1">
-              Have an existing cube on CubeCobra?
-            </MUITypography>
-
             <MUITextField
               autoComplete="off"
               fullWidth
-              label="24 character ID from cubecobra URL"
+              helperText="https://cubecobra.com/cube/overview/this-is-your-full-cube-id-paste-it-here"
+              label="Have a cube on CubeCobra.com?"
               onChange={(event) => setCobraID(event.target.value)}
               required={false}
-              style={{ marginTop: '8px' }}
               type="text"
               value={cobraID}
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton type="submit">Create!</MUIButton>
-            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
+            <MUIButton type="submit" startIcon={<MUICheckCircleOutlinedIcon />}>
+              Create!
+            </MUIButton>
+            <MUIButton
+              color="warning"
+              onClick={toggleOpen}
+              startIcon={<MUICancelOutlinedIcon />}
+            >
+              Cancel
+            </MUIButton>
           </MUIDialogActions>
         </form>
       )}

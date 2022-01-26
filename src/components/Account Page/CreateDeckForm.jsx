@@ -1,5 +1,7 @@
 import React from 'react';
 import MUIButton from '@mui/material/Button';
+import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import MUICheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
@@ -8,11 +10,9 @@ import MUIFormControl from '@mui/material/FormControl';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
 import MUITextField from '@mui/material/TextField';
-import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import WarningButton from '../miscellaneous/WarningButton';
 import { AccountContext } from '../../contexts/account-context';
 
 const useStyles = makeStyles({
@@ -34,7 +34,6 @@ export default function CreateCubeForm({ open, toggleOpen }) {
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
-      <MUIDialogTitle>Create A New Deck</MUIDialogTitle>
       {loading ? (
         <MUIDialogContent className={classes.loadingSpinnerContainer}>
           <LoadingSpinner />
@@ -45,18 +44,21 @@ export default function CreateCubeForm({ open, toggleOpen }) {
             createDeck(event, description, deckID, format, name)
           }
         >
-          <MUIDialogContent style={{ height: 'max-content' }}>
+          <MUIDialogTitle>
             <MUITextField
               autoComplete="off"
               autoFocus
               fullWidth
               label="Deck Name"
+              margin="none"
               onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
               value={name}
             />
+          </MUIDialogTitle>
 
+          <MUIDialogContent>
             <MUITextField
               autoComplete="off"
               fullWidth
@@ -65,7 +67,6 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               onChange={(event) => setDescription(event.target.value)}
               required={false}
               rows={2}
-              style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
               value={description}
             />
@@ -93,26 +94,28 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               </MUISelect>
             </MUIFormControl>
 
-            <MUITypography
-              variant="subtitle1"
-              style={{ margin: '16px 0 8px 0' }}
-            >
-              Already have a deck list on Scryfall.com?
-            </MUITypography>
             <MUITextField
               autoComplete="off"
               fullWidth
-              label="Scyfall Deck ID"
+              helperText="https://scryfall.com/@yourName/decks/this-is-your-deck-id-paste-it-here"
+              label="Already have a deck on Scryfall.com?"
               onChange={(event) => setDeckID(event.target.value)}
               required={false}
-              style={{ marginBottom: '12px', marginTop: '16px' }}
               type="text"
               value={deckID}
             />
           </MUIDialogContent>
           <MUIDialogActions>
-            <MUIButton type="submit">Create!</MUIButton>
-            <WarningButton onClick={toggleOpen}>Cancel</WarningButton>
+            <MUIButton type="submit" startIcon={<MUICheckCircleOutlinedIcon />}>
+              Create!
+            </MUIButton>
+            <MUIButton
+              color="warning"
+              onClick={toggleOpen}
+              startIcon={<MUICancelOutlinedIcon />}
+            >
+              Cancel
+            </MUIButton>
           </MUIDialogActions>
         </form>
       )}

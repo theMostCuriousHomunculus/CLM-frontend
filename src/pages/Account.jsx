@@ -6,10 +6,12 @@ import MUICardActions from '@mui/material/CardActions';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
+import MUIIconButton from '@mui/material/IconButton';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUILocationOnIcon from '@mui/icons-material/LocationOn';
 import MUINotificationsIcon from '@mui/icons-material/Notifications';
 import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
+import MUIPersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import MUISelect from '@mui/material/Select';
 import MUISwitch from '@mui/material/Switch';
 import MUITextField from '@mui/material/TextField';
@@ -93,122 +95,151 @@ export default function Account() {
       <MUICard>
         <MUICardHeader
           action={
-            accountID === userID && (
-              <React.Fragment>
-                {notificationsSupported && (
-                  <MUIFormControlLabel
-                    control={
-                      <MUISwitch
-                        checked={notificationsEnabled}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            turnOnNotificationsAndSubscribeToPushMessaging();
-                          } else {
-                            unsubscribeFromPushSubscription();
-                          }
-                        }}
-                      />
-                    }
-                    label={
-                      <MUITooltip title="Notifications">
-                        <MUINotificationsIcon
-                          color={notificationsEnabled ? 'primary' : 'secondary'}
-                        />
-                      </MUITooltip>
-                    }
-                    labelPlacement="start"
-                  />
-                )}
-                {geolocationSupported && (
-                  <React.Fragment>
+            <React.Fragment>
+              {accountID === userID && (
+                <React.Fragment>
+                  {notificationsSupported && (
                     <MUIFormControlLabel
                       control={
                         <MUISwitch
-                          checked={geolocationEnabled}
+                          checked={notificationsEnabled}
                           inputProps={{ 'aria-label': 'controlled' }}
                           onChange={(event) => {
                             if (event.target.checked) {
-                              watchAndPostLocation();
+                              turnOnNotificationsAndSubscribeToPushMessaging();
                             } else {
-                              clearAndDeleteLocation();
+                              unsubscribeFromPushSubscription();
                             }
                           }}
                         />
                       }
                       label={
-                        <MUITooltip title="Location Services">
-                          <MUILocationOnIcon
-                            color={geolocationEnabled ? 'primary' : 'secondary'}
+                        <MUITooltip title="Notifications">
+                          <MUINotificationsIcon
+                            color={
+                              notificationsEnabled ? 'primary' : 'secondary'
+                            }
                           />
                         </MUITooltip>
                       }
                       labelPlacement="start"
                     />
-                    {geolocationEnabled && (
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <MUIFormControl variant="outlined">
-                          <MUIInputLabel htmlFor="measurement-system-selector">
-                            Units
-                          </MUIInputLabel>
-                          <MUISelect
-                            fullWidth
-                            label="Units"
-                            native
-                            onChange={(event) =>
-                              editAccount(
-                                `settings: {
+                  )}
+                  {geolocationSupported && (
+                    <React.Fragment>
+                      <MUIFormControlLabel
+                        control={
+                          <MUISwitch
+                            checked={geolocationEnabled}
+                            inputProps={{ 'aria-label': 'controlled' }}
+                            onChange={(event) => {
+                              if (event.target.checked) {
+                                watchAndPostLocation();
+                              } else {
+                                clearAndDeleteLocation();
+                              }
+                            }}
+                          />
+                        }
+                        label={
+                          <MUITooltip title="Location Services">
+                            <MUILocationOnIcon
+                              color={
+                                geolocationEnabled ? 'primary' : 'secondary'
+                              }
+                            />
+                          </MUITooltip>
+                        }
+                        labelPlacement="start"
+                      />
+                      {geolocationEnabled && (
+                        <div
+                          style={{ display: 'flex', flexDirection: 'column' }}
+                        >
+                          <MUIFormControl variant="outlined">
+                            <MUIInputLabel htmlFor="measurement-system-selector">
+                              Units
+                            </MUIInputLabel>
+                            <MUISelect
+                              fullWidth
+                              label="Units"
+                              native
+                              onChange={(event) =>
+                                editAccount(
+                                  `settings: {
                               measurement_system: ${event.target.value},
                               radius: ${radius}
                             }`
-                              )
-                            }
-                            value={measurement_system}
-                            inputProps={{
-                              id: 'measurement-system-selector'
-                            }}
+                                )
+                              }
+                              value={measurement_system}
+                              inputProps={{
+                                id: 'measurement-system-selector'
+                              }}
+                            >
+                              <option value="imperial">Miles</option>
+                              <option value="metric">Kilometers</option>
+                            </MUISelect>
+                          </MUIFormControl>
+                          <MUIFormControl
+                            style={{ marginTop: 8 }}
+                            variant="outlined"
                           >
-                            <option value="imperial">Miles</option>
-                            <option value="metric">Kilometers</option>
-                          </MUISelect>
-                        </MUIFormControl>
-                        <MUIFormControl
-                          style={{ marginTop: 8 }}
-                          variant="outlined"
-                        >
-                          <MUIInputLabel htmlFor="radius-selector">
-                            Distance
-                          </MUIInputLabel>
-                          <MUISelect
-                            fullWidth
-                            label="Distance"
-                            native
-                            onChange={(event) =>
-                              editAccount(
-                                `settings: {
+                            <MUIInputLabel htmlFor="radius-selector">
+                              Distance
+                            </MUIInputLabel>
+                            <MUISelect
+                              fullWidth
+                              label="Distance"
+                              native
+                              onChange={(event) =>
+                                editAccount(
+                                  `settings: {
                               measurement_system: ${measurement_system},
                               radius: ${event.target.value}
                             }`
-                              )
-                            }
-                            value={radius}
-                            inputProps={{
-                              id: 'radius-selector'
-                            }}
-                          >
-                            <option value={5}>5</option>
-                            <option value={10}>10</option>
-                            <option value={25}>25</option>
-                            <option value={100}>100</option>
-                            <option value={1000}>1,000</option>
-                          </MUISelect>
-                        </MUIFormControl>
-                      </div>
-                    )}
-                  </React.Fragment>
+                                )
+                              }
+                              value={radius}
+                              inputProps={{
+                                id: 'radius-selector'
+                              }}
+                            >
+                              <option value={5}>5</option>
+                              <option value={10}>10</option>
+                              <option value={25}>25</option>
+                              <option value={100}>100</option>
+                              <option value={1000}>1,000</option>
+                            </MUISelect>
+                          </MUIFormControl>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  )}
+                </React.Fragment>
+              )}
+              {isLoggedIn &&
+                accountID !== userID &&
+                !buds.find((bud) => bud._id === userID) &&
+                !received_bud_requests.find(
+                  (request) => request._id === userID
+                ) &&
+                !sent_bud_requests.find(
+                  (request) => request._id === userID
+                ) && (
+                  // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
+                  <MUIIconButton
+                    color="primary"
+                    onClick={() =>
+                      editAccount(
+                        `action: "send",\nother_user_id: "${accountID}",\nreturn_other: true`
+                      )
+                    }
+                  >
+                    <MUIPersonAddOutlinedIcon fontSize="large" />
+                  </MUIIconButton>
                 )}
-              </React.Fragment>
-            )
+            </React.Fragment>
           }
           avatar={<Avatar alt={name} size="medium" src={avatar} />}
           className={classes.cardHeader}
@@ -250,26 +281,6 @@ export default function Account() {
             />
           </MUICardActions>
         )}
-        {isLoggedIn &&
-          accountID !== userID &&
-          buds.filter((bud) => bud._id === userID).length === 0 &&
-          received_bud_requests.filter((request) => request._id === userID)
-            .length === 0 &&
-          sent_bud_requests.filter((request) => request._id === userID)
-            .length === 0 && (
-            // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
-            <MUICardActions>
-              <MUIButton
-                onClick={() =>
-                  editAccount(
-                    `action: "send",\nother_user_id: "${accountID}",\nreturn_other: true`
-                  )
-                }
-              >
-                <MUIPersonAddIcon />
-              </MUIButton>
-            </MUICardActions>
-          )}
       </MUICard>
 
       <BudAccordion />

@@ -1,9 +1,9 @@
 import React from 'react';
+import MUIButton from '@mui/material/Button';
 import MUITypography from '@mui/material/Typography';
 
 import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../miscellaneous/DeckDisplay';
-import WarningButton from '../miscellaneous/WarningButton';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { MatchContext } from '../../contexts/match-context';
 
@@ -32,13 +32,14 @@ export default function Intermission() {
         </MUITypography>
       </ConfirmationDialog>
 
-      <WarningButton
+      <MUIButton
+        color="warning"
         fullWidth
         onClick={() => setConfirmationDialogVisible(true)}
         style={{ margin: 4 }}
       >
         Ready!
-      </WarningButton>
+      </MUIButton>
 
       <DeckDisplay
         authorizedID={userID}

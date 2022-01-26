@@ -4,8 +4,9 @@ import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionActions from '@mui/material/AccordionActions';
 import MUIAccordionDetails from '@mui/material/AccordionDetails';
 import MUIAccordionSummary from '@mui/material/AccordionSummary';
+import MUIAddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import MUIButton from '@mui/material/Button';
-import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import MUIDeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import MUIExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MUIIconButton from '@mui/material/IconButton';
 import MUITable from '@mui/material/Table';
@@ -67,39 +68,44 @@ export default function DeckAccordion({ pageClasses }) {
             <MUITable stickyHeader className={pageClasses.table}>
               <MUITableHead>
                 <MUITableRow>
-                  <MUITableCell>Image</MUITableCell>
-                  <MUITableCell>Name</MUITableCell>
+                  <MUITableCell>Deck</MUITableCell>
                   <MUITableCell>Format</MUITableCell>
-                  {_id === userID && <MUITableCell>Delete</MUITableCell>}
+                  {_id === userID && <MUITableCell />}
                 </MUITableRow>
               </MUITableHead>
               <MUITableBody>
                 {decks.map((deck) => (
                   <MUITableRow key={deck._id}>
                     <MUITableCell>
-                      {deck.image && (
-                        <img
-                          alt={deck.image.alt}
-                          src={deck.image.src}
-                          style={{ borderRadius: 4 }}
-                          width={75}
-                        />
-                      )}
-                    </MUITableCell>
-                    <MUITableCell>
-                      <Link to={`/deck/${deck._id}`}>{deck.name}</Link>
+                      <span
+                        style={{
+                          alignItems: 'center',
+                          columnGap: 8,
+                          display: 'flex'
+                        }}
+                      >
+                        {deck.image && (
+                          <img
+                            alt={deck.image.alt}
+                            height={50}
+                            src={deck.image.src}
+                            style={{ borderRadius: 4 }}
+                          />
+                        )}
+                        <Link to={`/deck/${deck._id}`}>{deck.name}</Link>
+                      </span>
                     </MUITableCell>
                     <MUITableCell>{deck.format}</MUITableCell>
                     {_id === userID && (
-                      <MUITableCell>
+                      <MUITableCell style={{ textAlign: 'right' }}>
                         <MUIIconButton
-                          className={pageClasses.iconButton}
+                          color="secondary"
                           onClick={() =>
                             setDeckToDelete({ _id: deck._id, name: deck.name })
                           }
                           size="small"
                         >
-                          <MUIDeleteForeverIcon />
+                          <MUIDeleteForeverOutlinedIcon fontSize="large" />
                         </MUIIconButton>
                       </MUITableCell>
                     )}
@@ -112,8 +118,11 @@ export default function DeckAccordion({ pageClasses }) {
 
         {_id === userID && (
           <MUIAccordionActions>
-            <MUIButton onClick={() => setShowDeckForm(true)}>
-              Create a Deck
+            <MUIButton
+              onClick={() => setShowDeckForm(true)}
+              startIcon={<MUIAddCircleOutlineOutlinedIcon />}
+            >
+              Brew
             </MUIButton>
           </MUIAccordionActions>
         )}

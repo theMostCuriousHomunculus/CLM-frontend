@@ -1,5 +1,5 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
-import { deepPurple, deepOrange, yellow } from '@mui/material/colors';
+import { deepPurple, deepOrange, green, yellow } from '@mui/material/colors';
 
 const backgroundColor = '#efefef';
 const primaryColor = deepPurple;
@@ -66,9 +66,18 @@ let theme = createTheme({
     MuiCardActions: {
       styleOverrides: {
         root: {
+          columnGap: 8,
           flexDirection: 'row-reverse',
           justifyContent: 'space-between',
           padding: 8
+        }
+      },
+      spacing: {
+        // '& > :not(:first-of-type)': {
+        // marginLeft: 0
+        // }
+        '& > *': {
+          marginLeft: 0
         }
       }
     },
@@ -124,6 +133,25 @@ let theme = createTheme({
         }
       }
     },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          padding: '8px !important'
+        }
+      }
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          padding: 8
+        }
+      }
+    },
+    MuiFormControl: {
+      defaultProps: {
+        margin: 'normal'
+      }
+    },
     MuiGrid: {
       styleOverrides: {
         container: {
@@ -170,6 +198,18 @@ let theme = createTheme({
         }
       }
     },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          '&:nth-child(even)': {
+            backgroundColor: '#fff'
+          }
+          // '&:hover': {
+          //   backgroundColor: primaryColor['A100']
+          // }
+        }
+      }
+    },
     MuiTabs: {
       styleOverrides: {
         root: {
@@ -179,6 +219,7 @@ let theme = createTheme({
     },
     MuiTextField: {
       defaultProps: {
+        margin: 'normal',
         size: 'small'
       }
     }
@@ -188,8 +229,11 @@ let theme = createTheme({
       main: primaryColor['A700']
     },
     secondary: secondaryColor,
+    success: {
+      main: green['600']
+    },
     warning: {
-      main: yellow['A700']
+      main: yellow['600']
     }
   },
   typography: {
