@@ -5,6 +5,7 @@ import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIGrid from '@mui/material/Grid';
+import MUILinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
@@ -104,10 +105,11 @@ export default function Resources() {
                 {resource.description}
               </MUITypography>
             </MUICardContent>
-            <MUICardActions>
+            <MUICardActions style={{ justifyContent: 'flex-end' }}>
               <MUIButton
                 className={classes.resourceHyperlink}
                 href={resource.link}
+                startIcon={<MUILinkOutlinedIcon />}
               >
                 Learn More
               </MUIButton>

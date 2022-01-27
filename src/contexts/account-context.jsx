@@ -192,7 +192,7 @@ export default function ContextualizedAccountPage() {
   const updateAccountState = useCallback(
     async function (data) {
       const cardSet = new Set();
-      console.log(data);
+
       for (const cube of data.cubes) {
         if (cube.image) cardSet.add(cube.image);
       }
@@ -238,7 +238,6 @@ export default function ContextualizedAccountPage() {
       }
 
       setAccountState(data);
-      console.log(accountState);
     },
     [addCardsToCache]
   );

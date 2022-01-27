@@ -6,11 +6,14 @@ import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUICardActions from '@mui/material/CardActions';
 import MUICheckbox from '@mui/material/Checkbox';
+import MUICircularProgress from '@mui/material/CircularProgress';
 import MUIEditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import MUIIcon from '@mui/material/Icon';
 import MUIPostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import MUIPublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
+// import MUISaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
@@ -22,6 +25,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import createBlogPost from '../graphql/mutations/blog/create-blog-post';
 import editBlogPost from '../graphql/mutations/blog/edit-blog-post';
 import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/Authentication';
@@ -107,7 +111,6 @@ export default function BlogPost() {
       title,
       updatedAt
     },
-    createBlogPost,
     createComment,
     setBlogPostState
   } = useContext(BlogPostContext);
@@ -118,6 +121,7 @@ export default function BlogPost() {
   const navigate = useNavigate();
   const { blogPostID } = useParams();
   const [editing, setEditing] = useState(blogPostID === 'new-post');
+  const [posting, setPosting] = useState(false);
   const { article } = useStyles();
 
   return loading ? (
@@ -303,23 +307,27 @@ export default function BlogPost() {
           )}
         </MUICardContent>
         {author._id === userID && (
-          <MUICardActions>
+          <MUICardActions style={{ justifyContent: 'flex-end' }}>
             {blogPostID === 'new-post' ? (
               <MUIButton
-                onClick={createBlogPost}
-                startIcon={<MUIPostAddOutlinedIcon />}
-              >
-                Create
-              </MUIButton>
-            ) : (
-              <MUIButton
+                disabled={posting}
+                endIcon={
+                  posting && (
+                    <MUIIcon>
+                      <MUICircularProgress
+                        size={12}
+                        style={{ color: '#fff' }}
+                      />
+                    </MUIIcon>
+                  )
+                }
                 onClick={async () => {
                   try {
-                    await editBlogPost({
-                      headers: { BlogPostID: blogPostID },
+                    setPosting(true);
+                    await createBlogPost({
                       queryString: `{
-                          _id
-                        }`,
+                        _id
+                      }`,
                       variables: { body, image, published, subtitle, title }
                     });
                     navigate('/blog');
@@ -328,6 +336,55 @@ export default function BlogPost() {
                       ...prevState,
                       error.message
                     ]);
+                  } finally {
+                    setPosting(false);
+                  }
+                }}
+                startIcon={<MUIPostAddOutlinedIcon />}
+              >
+                Create
+              </MUIButton>
+            ) : (
+              <MUIButton
+                disabled={posting}
+                endIcon={
+                  posting && (
+                    <MUIIcon>
+                      <MUICircularProgress
+                        size={12}
+                        style={{ color: '#fff' }}
+                      />
+                    </MUIIcon>
+                  )
+                }
+                onClick={async () => {
+                  try {
+                    setPosting(true);
+                    setTimeout(async () => {
+                      await editBlogPost({
+                        headers: { BlogPostID: blogPostID },
+                        queryString: `{
+                            _id
+                          }`,
+                        variables: { body, image, published, subtitle, title }
+                      });
+                      navigate('/blog');
+                    }, 5000);
+                    // await editBlogPost({
+                    //   headers: { BlogPostID: blogPostID },
+                    //   queryString: `{
+                    //       _id
+                    //     }`,
+                    //   variables: { body, image, published, subtitle, title }
+                    // });
+                    // navigate('/blog');
+                  } catch (error) {
+                    setErrorMessages((prevState) => [
+                      ...prevState,
+                      error.message
+                    ]);
+                  } finally {
+                    setPosting(false);
                   }
                 }}
                 startIcon={<MUIPublishedWithChangesOutlinedIcon />}

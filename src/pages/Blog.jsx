@@ -8,6 +8,7 @@ import MUICardActions from '@mui/material/CardActions';
 import MUICreateIcon from '@mui/icons-material/Create';
 import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import MUIGrid from '@mui/material/Grid';
+import MUIMenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import MUITypography from '@mui/material/Typography';
 
 import useRequest from '../hooks/request-hook';
@@ -123,7 +124,7 @@ export default function Blog() {
                 }
               />
               <MUICardMedia image="https://c1.scryfall.com/file/scryfall-cards/art_crop/front/c/b/cb3b35b8-f321-46d8-a441-6b9a6efa9021.jpg?1562304347" />
-              <MUICardActions>
+              <MUICardActions style={{ justifyContent: 'flex-end' }}>
                 <MUIButton
                   onClick={() => navigate('/blog/new-post')}
                   startIcon={<MUICreateIcon />}
@@ -173,10 +174,14 @@ export default function Blog() {
                 }
               />
               <MUICardMedia image={blogPost.image} />
-              <MUICardActions>
-                <MUIButton onClick={() => navigate(`/blog/${blogPost._id}`)}>
-                  Read
-                </MUIButton>
+              <MUICardActions
+                style={{
+                  justifyContent:
+                    blogPost.author._id === authentication.userID
+                      ? 'space-between'
+                      : 'flex-end'
+                }}
+              >
                 {blogPost.author._id === authentication.userID && (
                   <MUIButton
                     color="warning"
@@ -191,6 +196,12 @@ export default function Blog() {
                     Delete
                   </MUIButton>
                 )}
+                <MUIButton
+                  onClick={() => navigate(`/blog/${blogPost._id}`)}
+                  startIcon={<MUIMenuBookOutlinedIcon />}
+                >
+                  Read
+                </MUIButton>
               </MUICardActions>
             </MUICard>
           </MUIGrid>

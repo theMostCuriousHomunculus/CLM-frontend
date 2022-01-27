@@ -160,9 +160,9 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
               </MUIGrid>
             </MUIGrid>
 
-            <hr style={{ margin: 8 }} />
+            <hr />
 
-            <MUIFormControl component="fieldset">
+            <MUIFormControl component="fieldset" margin="normal">
               <MUIFormLabel component="legend" style={{ paddingLeft: 8 }}>
                 Buds
               </MUIFormLabel>
@@ -211,9 +211,9 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
               </MUIFormGroup>
             </MUIFormControl>
 
-            <hr style={{ margin: 8 }} />
+            <hr />
 
-            <MUIFormControl component="fieldset">
+            <MUIFormControl component="fieldset" margin="normal">
               <MUIFormLabel component="legend" style={{ paddingLeft: 8 }}>
                 Modules
               </MUIFormLabel>
@@ -257,7 +257,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
               </MUIFormGroup>
             </MUIFormControl>
 
-            <hr style={{ margin: 8 }} />
+            <hr />
 
             <MUIGrid container spacing={1}>
               <MUIGrid item xs={12} sm={6}>
@@ -266,6 +266,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                   fullWidth
                   InputProps={{ inputProps: { min: 1 } }}
                   label="Cards per Pack"
+                  margin="normal"
                   onBlur={() => {
                     if (cardsPerPack === '') {
                       setCardsPerPack(1);
@@ -284,6 +285,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                   fullWidth
                   InputProps={{ inputProps: { min: 1 } }}
                   label="Packs per Player"
+                  margin="normal"
                   onBlur={() => {
                     if (packsPerPlayer === '') {
                       setPacksPerPlayer(1);

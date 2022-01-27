@@ -50,7 +50,6 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               autoFocus
               fullWidth
               label="Deck Name"
-              margin="none"
               onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
@@ -63,6 +62,7 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               autoComplete="off"
               fullWidth
               label="Deck Description"
+              margin="normal"
               multiline
               onChange={(event) => setDescription(event.target.value)}
               required={false}
@@ -71,7 +71,7 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               value={description}
             />
 
-            <MUIFormControl variant="outlined">
+            <MUIFormControl margin="normal" variant="outlined">
               <MUIInputLabel htmlFor="format-selector">Format</MUIInputLabel>
               <MUISelect
                 fullWidth
@@ -99,6 +99,7 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               fullWidth
               helperText="https://scryfall.com/@yourName/decks/this-is-your-deck-id-paste-it-here"
               label="Already have a deck on Scryfall.com?"
+              margin="normal"
               onChange={(event) => setDeckID(event.target.value)}
               required={false}
               type="text"

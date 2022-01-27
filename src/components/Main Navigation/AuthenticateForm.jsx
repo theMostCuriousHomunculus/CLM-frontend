@@ -4,9 +4,13 @@ import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIIconButton from '@mui/material/IconButton';
+import MUIInputAdornment from '@mui/material/InputAdornment';
 import MUITab from '@mui/material/Tab';
 import MUITabs from '@mui/material/Tabs';
 import MUITextField from '@mui/material/TextField';
+import MUIVisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import MUIVisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
@@ -35,6 +39,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
   const [emailInput, setEmailInput] = useState('');
   const [nameInput, setNameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   function submitForm(event) {
     event.preventDefault();
@@ -100,9 +105,9 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 autoFocus={selectedTab === 0}
                 fullWidth
                 label="Email Address"
+                margin="normal"
                 onChange={(event) => setEmailInput(event.target.value)}
                 required={selectedTab === 0}
-                style={{ marginTop: 16 }}
                 type="email"
                 value={emailInput}
               />
@@ -110,11 +115,28 @@ export default function AuthenticateForm({ open, toggleOpen }) {
               <MUITextField
                 autoComplete="off"
                 fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <MUIIconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={() =>
+                        setPasswordVisible((prevState) => !prevState)
+                      }
+                    >
+                      {passwordVisible ? (
+                        <MUIVisibilityOffOutlinedIcon />
+                      ) : (
+                        <MUIVisibilityOutlinedIcon />
+                      )}
+                    </MUIIconButton>
+                  )
+                }}
                 label="Password"
+                margin="normal"
                 onChange={(event) => setPasswordInput(event.target.value)}
                 required={selectedTab === 0}
-                style={{ marginTop: 16 }}
-                type="password"
+                type={passwordVisible ? 'text' : 'password'}
                 value={passwordInput}
               />
             </div>
@@ -131,9 +153,9 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 autoFocus={selectedTab === 1}
                 fullWidth
                 label="Email Address"
+                margin="normal"
                 onChange={(event) => setEmailInput(event.target.value)}
                 required={selectedTab === 1}
-                style={{ marginTop: 16 }}
                 type="email"
                 value={emailInput}
               />
@@ -151,9 +173,9 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 autoFocus={selectedTab === 2}
                 fullWidth
                 label="Email Address"
+                margin="normal"
                 onChange={(event) => setEmailInput(event.target.value)}
                 required={selectedTab === 2}
-                style={{ marginTop: 16 }}
                 type="email"
                 value={emailInput}
               />
@@ -162,9 +184,9 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 autoComplete="off"
                 fullWidth
                 label="Account Name"
+                margin="normal"
                 onChange={(event) => setNameInput(event.target.value)}
                 required={selectedTab === 2}
-                style={{ marginTop: 16 }}
                 type="text"
                 value={nameInput}
               />
@@ -172,11 +194,28 @@ export default function AuthenticateForm({ open, toggleOpen }) {
               <MUITextField
                 autoComplete="off"
                 fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <MUIIconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={() =>
+                        setPasswordVisible((prevState) => !prevState)
+                      }
+                    >
+                      {passwordVisible ? (
+                        <MUIVisibilityOffOutlinedIcon />
+                      ) : (
+                        <MUIVisibilityOutlinedIcon />
+                      )}
+                    </MUIIconButton>
+                  )
+                }}
                 label="Password"
+                margin="normal"
                 onChange={(event) => setPasswordInput(event.target.value)}
                 required={selectedTab === 2}
-                style={{ marginTop: 16 }}
-                type="password"
+                type={passwordVisible ? 'text' : 'password'}
                 value={passwordInput}
               />
             </div>

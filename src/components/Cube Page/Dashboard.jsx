@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
+import MUIAddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
@@ -11,14 +12,17 @@ import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIEditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import MUIFileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MUIIconButton from '@mui/material/IconButton';
 import MUIImageList from '@mui/material/ImageList';
 import MUIImageListItem from '@mui/material/ImageListItem';
+import MUIInputAdornment from '@mui/material/InputAdornment';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
+import MUIShuffleOutlinedIcon from '@mui/icons-material/ShuffleOutlined';
 import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
@@ -373,20 +377,23 @@ export default function Dashboard() {
             />
           )}
 
-          <MUITypography
-            style={{
-              lineHeight: 2,
-              textAlign: 'right'
-            }}
-            variant="subtitle1"
-          >
-            Matches:{' '}
-            <strong>{activeComponentState.displayedCards.length}</strong>
-          </MUITypography>
           <MUITextField
             autoComplete="off"
             fullWidth
+            InputProps={{
+              endAdornment: (
+                <MUIInputAdornment position="end">
+                  <span>
+                    Matches:{' '}
+                    <strong>
+                      {activeComponentState.displayedCards.length}
+                    </strong>
+                  </span>
+                </MUIInputAdornment>
+              )
+            }}
             label="Filter by keywords, name or type"
+            margin="normal"
             onChange={(event) => {
               event.persist();
               setDisplayState((prevState) => ({
@@ -423,10 +430,20 @@ export default function Dashboard() {
               </MUIButton>
             )}
 
-          {isLoggedIn && <MUIButton onClick={cloneCube}>Clone Cube</MUIButton>}
+          {isLoggedIn && (
+            <MUIButton
+              onClick={cloneCube}
+              startIcon={<MUIFileCopyOutlinedIcon />}
+            >
+              Clone Cube
+            </MUIButton>
+          )}
 
           {userID === creator._id && (
-            <MUIButton onClick={() => setCreateComponentDialogIsOpen(true)}>
+            <MUIButton
+              onClick={() => setCreateComponentDialogIsOpen(true)}
+              startIcon={<MUIAddCircleOutlineOutlinedIcon />}
+            >
               New Component
             </MUIButton>
           )}
@@ -435,6 +452,7 @@ export default function Dashboard() {
             onClick={() =>
               setSamplePack(randomSampleWOReplacement(mainboard, 15))
             }
+            startIcon={<MUIShuffleOutlinedIcon />}
           >
             Sample Pack
           </MUIButton>

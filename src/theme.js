@@ -67,19 +67,16 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           columnGap: 8,
-          flexDirection: 'row-reverse',
           justifyContent: 'space-between',
-          padding: 8
-        }
-      },
-      spacing: {
-        // '& > :not(:first-of-type)': {
-        // marginLeft: 0
-        // }
-        '& > *': {
-          marginLeft: 0
+          padding: 8,
+          '& >:not(:first-of-type)': {
+            marginLeft: 0
+          }
         }
       }
+      // spacing: {
+
+      // }
     },
     MuiCardContent: {
       styleOverrides: {
@@ -147,11 +144,11 @@ let theme = createTheme({
         }
       }
     },
-    MuiFormControl: {
-      defaultProps: {
-        margin: 'normal'
-      }
-    },
+    // MuiFormControl: {
+    //   defaultProps: {
+    //     margin: 'normal'
+    //   }
+    // },
     MuiGrid: {
       styleOverrides: {
         container: {
@@ -219,7 +216,7 @@ let theme = createTheme({
     },
     MuiTextField: {
       defaultProps: {
-        margin: 'normal',
+        // margin: 'normal',
         size: 'small'
       }
     }

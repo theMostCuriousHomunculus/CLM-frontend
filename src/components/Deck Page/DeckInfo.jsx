@@ -9,6 +9,7 @@ import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIFileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -16,6 +17,7 @@ import MUIImageList from '@mui/material/ImageList';
 import MUIImageListItem from '@mui/material/ImageListItem';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
+import MUIShuffleOutlinedIcon from '@mui/icons-material/ShuffleOutlined';
 import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
@@ -255,12 +257,20 @@ export default function DeckInfo() {
             justifyContent: 'flex-end'
           }}
         >
-          {isLoggedIn && <MUIButton onClick={cloneDeck}>Clone Deck</MUIButton>}
+          {isLoggedIn && (
+            <MUIButton
+              onClick={cloneDeck}
+              startIcon={<MUIFileCopyOutlinedIcon />}
+            >
+              Clone Deck
+            </MUIButton>
+          )}
 
           <MUIButton
             onClick={() =>
               setSampleHand(randomSampleWOReplacement(mainboard, 7))
             }
+            startIcon={<MUIShuffleOutlinedIcon />}
           >
             Sample Hand
           </MUIButton>

@@ -44,7 +44,6 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               autoFocus
               fullWidth
               label="Cube Name"
-              margin="none"
               onChange={(event) => setName(event.target.value)}
               required={true}
               type="text"
@@ -57,6 +56,7 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               autoComplete="off"
               fullWidth
               label="Cube Description"
+              margin="normal"
               multiline
               onChange={(event) => setDescription(event.target.value)}
               required={false}
@@ -70,6 +70,7 @@ export default function CreateCubeForm({ open, toggleOpen }) {
               fullWidth
               helperText="https://cubecobra.com/cube/overview/this-is-your-full-cube-id-paste-it-here"
               label="Have a cube on CubeCobra.com?"
+              margin="normal"
               onChange={(event) => setCobraID(event.target.value)}
               required={false}
               type="text"

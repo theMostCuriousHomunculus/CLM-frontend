@@ -30,14 +30,14 @@ export const BlogPostContext = createContext({
     createdAt: 0,
     updatedAt: 0
   },
-  createBlogPost: () => null,
+  // createBlogPost: () => null,
   createComment: () => null,
   // editBlogPost: () => null,
   setBlogPostState: () => null
 });
 
 export default function ContextualizedBlogPostPage() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { blogPostID } = useParams();
   const { avatar, userID, userName } = useContext(AuthenticationContext);
   const [blogPostState, setBlogPostState] = useState({
@@ -84,40 +84,40 @@ export default function ContextualizedBlogPostPage() {
   `;
   const { loading, sendRequest } = useRequest();
 
-  const createBlogPost = useCallback(
-    async function () {
-      await sendRequest({
-        callback: () => {
-          setTimeout(() => navigate('/blog'), 0);
-        },
-        operation: 'createBlogPost',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                body: """${blogPostState.body}""",
-                image: "${blogPostState.image}",
-                subtitle: "${blogPostState.subtitle}",
-                title: "${blogPostState.title}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [
-      blogPostState.body,
-      blogPostState.image,
-      blogPostState.subtitle,
-      blogPostState.title,
-      navigate,
-      sendRequest
-    ]
-  );
+  // const createBlogPost = useCallback(
+  //   async function () {
+  //     await sendRequest({
+  //       callback: () => {
+  //         setTimeout(() => navigate('/blog'), 0);
+  //       },
+  //       operation: 'createBlogPost',
+  //       get body() {
+  //         return {
+  //           query: `
+  //           mutation {
+  //             ${this.operation}(
+  //               body: """${blogPostState.body}""",
+  //               image: "${blogPostState.image}",
+  //               subtitle: "${blogPostState.subtitle}",
+  //               title: "${blogPostState.title}"
+  //             ) {
+  //               _id
+  //             }
+  //           }
+  //         `
+  //         };
+  //       }
+  //     });
+  //   },
+  //   [
+  //     blogPostState.body,
+  //     blogPostState.image,
+  //     blogPostState.subtitle,
+  //     blogPostState.title,
+  //     navigate,
+  //     sendRequest
+  //   ]
+  // );
 
   const createComment = useCallback(
     async function (newComment) {
@@ -194,7 +194,7 @@ export default function ContextualizedBlogPostPage() {
       value={{
         loading,
         blogPostState,
-        createBlogPost,
+        // createBlogPost,
         createComment,
         // editBlogPost,
         setBlogPostState
