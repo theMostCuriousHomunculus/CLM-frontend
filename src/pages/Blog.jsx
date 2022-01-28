@@ -5,9 +5,9 @@ import MUICard from '@mui/material/Card';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUICardMedia from '@mui/material/CardMedia';
 import MUICardActions from '@mui/material/CardActions';
-import MUICreateIcon from '@mui/icons-material/Create';
 import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import MUIGrid from '@mui/material/Grid';
+import MUIHistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
 import MUIMenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import MUITypography from '@mui/material/Typography';
 
@@ -127,7 +127,7 @@ export default function Blog() {
               <MUICardActions style={{ justifyContent: 'flex-end' }}>
                 <MUIButton
                   onClick={() => navigate('/blog/new-post')}
-                  startIcon={<MUICreateIcon />}
+                  startIcon={<MUIHistoryEduOutlinedIcon />}
                 >
                   Write
                 </MUIButton>

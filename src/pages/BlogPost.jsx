@@ -10,10 +10,9 @@ import MUICircularProgress from '@mui/material/CircularProgress';
 import MUIEditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import MUIIcon from '@mui/material/Icon';
 import MUIPostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import MUIPublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
-// import MUISaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import MUISaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import MUITextField from '@mui/material/TextField';
 import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
@@ -122,6 +121,7 @@ export default function BlogPost() {
   const { blogPostID } = useParams();
   const [editing, setEditing] = useState(blogPostID === 'new-post');
   const [posting, setPosting] = useState(false);
+  const [success, setSuccess] = useState(false);
   const { article } = useStyles();
 
   return loading ? (
@@ -310,17 +310,8 @@ export default function BlogPost() {
           <MUICardActions style={{ justifyContent: 'flex-end' }}>
             {blogPostID === 'new-post' ? (
               <MUIButton
+                color={success ? 'success' : 'primary'}
                 disabled={posting}
-                endIcon={
-                  posting && (
-                    <MUIIcon>
-                      <MUICircularProgress
-                        size={12}
-                        style={{ color: '#fff' }}
-                      />
-                    </MUIIcon>
-                  )
-                }
                 onClick={async () => {
                   try {
                     setPosting(true);
@@ -330,7 +321,10 @@ export default function BlogPost() {
                       }`,
                       variables: { body, image, published, subtitle, title }
                     });
-                    navigate('/blog');
+                    setSuccess(true);
+                    setTimeout(() => {
+                      navigate('/blog');
+                    }, 1000);
                   } catch (error) {
                     setErrorMessages((prevState) => [
                       ...prevState,
@@ -340,44 +334,41 @@ export default function BlogPost() {
                     setPosting(false);
                   }
                 }}
-                startIcon={<MUIPostAddOutlinedIcon />}
+                startIcon={(() => {
+                  if (posting) {
+                    return (
+                      <MUICircularProgress
+                        size={13}
+                        style={{ color: 'inherit' }}
+                      />
+                    );
+                  }
+                  if (success) {
+                    return <MUIPublishedWithChangesOutlinedIcon />;
+                  }
+                  return <MUIPostAddOutlinedIcon />;
+                })()}
               >
                 Create
               </MUIButton>
             ) : (
               <MUIButton
+                color={success ? 'success' : 'primary'}
                 disabled={posting}
-                endIcon={
-                  posting && (
-                    <MUIIcon>
-                      <MUICircularProgress
-                        size={12}
-                        style={{ color: '#fff' }}
-                      />
-                    </MUIIcon>
-                  )
-                }
                 onClick={async () => {
+                  setPosting(true);
                   try {
-                    setPosting(true);
-                    setTimeout(async () => {
-                      await editBlogPost({
-                        headers: { BlogPostID: blogPostID },
-                        queryString: `{
-                            _id
-                          }`,
-                        variables: { body, image, published, subtitle, title }
-                      });
+                    await editBlogPost({
+                      headers: { BlogPostID: blogPostID },
+                      queryString: `{
+                          _id
+                        }`,
+                      variables: { body, image, published, subtitle, title }
+                    });
+                    setSuccess(true);
+                    setTimeout(() => {
                       navigate('/blog');
-                    }, 5000);
-                    // await editBlogPost({
-                    //   headers: { BlogPostID: blogPostID },
-                    //   queryString: `{
-                    //       _id
-                    //     }`,
-                    //   variables: { body, image, published, subtitle, title }
-                    // });
-                    // navigate('/blog');
+                    }, 1000);
                   } catch (error) {
                     setErrorMessages((prevState) => [
                       ...prevState,
@@ -387,7 +378,20 @@ export default function BlogPost() {
                     setPosting(false);
                   }
                 }}
-                startIcon={<MUIPublishedWithChangesOutlinedIcon />}
+                startIcon={(() => {
+                  if (posting) {
+                    return (
+                      <MUICircularProgress
+                        size={13}
+                        style={{ color: 'inherit' }}
+                      />
+                    );
+                  }
+                  if (success) {
+                    return <MUIPublishedWithChangesOutlinedIcon />;
+                  }
+                  return <MUISaveOutlinedIcon />;
+                })()}
               >
                 Update
               </MUIButton>

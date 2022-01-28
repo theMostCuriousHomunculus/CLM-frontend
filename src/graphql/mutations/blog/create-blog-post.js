@@ -11,7 +11,7 @@ export async function asyncCreateBlogPost({
   return await asyncFancyFetch({
     body: {
       query: `
-        mutation($body: String!, $image: String!, $published: Boolean, $subtitle: String, $title: String!) {
+        mutation($body: String!, $image: String!, $published: Boolean!, $subtitle: String, $title: String!) {
           createBlogPost (body: $body, image: $image, published: $published, subtitle: $subtitle, title: $title) ${queryString}
         }
       `,
@@ -33,7 +33,7 @@ export function syncCreateBlogPost({
   syncFancyFetch({
     body: {
       query: `
-        mutation($body: String!, $image: String!, $published: Boolean, $subtitle: String, $title: String!) {
+        mutation($body: String!, $image: String!, $published: Boolean!, $subtitle: String, $title: String!) {
           createBlogPost (body: $body, image: $image, published: $published, subtitle: $subtitle, title: $title) {
             _id
           }

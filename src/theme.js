@@ -198,7 +198,7 @@ let theme = createTheme({
     MuiTableRow: {
       styleOverrides: {
         root: {
-          '&:nth-child(even)': {
+          '&:nth-of-type(even)': {
             backgroundColor: '#fff'
           }
           // '&:hover': {

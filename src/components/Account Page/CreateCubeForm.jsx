@@ -1,96 +1,124 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import MUICheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import MUICircularProgress from '@mui/material/CircularProgress';
+import MUICloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
+import MUIPostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import MUITextField from '@mui/material/TextField';
-import { makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router-dom';
 
-import LoadingSpinner from '../miscellaneous/LoadingSpinner';
-import { AccountContext } from '../../contexts/account-context';
-
-const useStyles = makeStyles({
-  loadingSpinnerContainer: {
-    alignContent: 'center',
-    display: 'flex',
-    height: 300,
-    width: 300
-  }
-});
+import createCube from '../../graphql/mutations/cube/create-cube';
+import { ErrorContext } from '../../contexts/Error';
 
 export default function CreateCubeForm({ open, toggleOpen }) {
-  const classes = useStyles();
-  const { loading, createCube } = React.useContext(AccountContext);
-  const [cobraID, setCobraID] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [name, setName] = React.useState('');
+  const { setErrorMessages } = useContext(ErrorContext);
+  const navigate = useNavigate();
+  const [cobraID, setCobraID] = useState('');
+  const [description, setDescription] = useState('');
+  const [name, setName] = useState('');
+  const [posting, setPosting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   return (
     <MUIDialog open={open} onClose={toggleOpen}>
-      {loading ? (
-        <MUIDialogContent className={classes.loadingSpinnerContainer}>
-          <LoadingSpinner />
+      <form
+        name="create-cube-form"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          try {
+            setPosting(true);
+            const data = await createCube({
+              queryString: `{
+                _id
+              }`,
+              variables: { cobraID, description, name }
+            });
+            setSuccess(true);
+            setTimeout(() => {
+              navigate(`/cube/${data.data.createCube._id}`);
+            }, 1000);
+          } catch (error) {
+            setErrorMessages((prevState) => [...prevState, error.message]);
+          } finally {
+            setPosting(false);
+          }
+        }}
+      >
+        <MUIDialogTitle>
+          <MUITextField
+            autoComplete="off"
+            autoFocus
+            disabled={posting || success}
+            fullWidth
+            label="Cube Name"
+            onChange={(event) => setName(event.target.value)}
+            required={true}
+            type="text"
+            value={name}
+          />
+        </MUIDialogTitle>
+
+        <MUIDialogContent>
+          <MUITextField
+            autoComplete="off"
+            disabled={posting || success}
+            fullWidth
+            label="Cube Description"
+            margin="normal"
+            multiline
+            onChange={(event) => setDescription(event.target.value)}
+            required={false}
+            rows={2}
+            type="text"
+            value={description}
+          />
+
+          <MUITextField
+            autoComplete="off"
+            disabled={posting || success}
+            fullWidth
+            helperText="https://cubecobra.com/cube/overview/this-is-your-full-cube-id-paste-it-here"
+            label="Have a cube on CubeCobra.com?"
+            margin="normal"
+            onChange={(event) => setCobraID(event.target.value)}
+            required={false}
+            type="text"
+            value={cobraID}
+          />
         </MUIDialogContent>
-      ) : (
-        <form
-          onSubmit={(event) => createCube(event, cobraID, description, name)}
-        >
-          <MUIDialogTitle>
-            <MUITextField
-              autoComplete="off"
-              autoFocus
-              fullWidth
-              label="Cube Name"
-              onChange={(event) => setName(event.target.value)}
-              required={true}
-              type="text"
-              value={name}
-            />
-          </MUIDialogTitle>
-
-          <MUIDialogContent>
-            <MUITextField
-              autoComplete="off"
-              fullWidth
-              label="Cube Description"
-              margin="normal"
-              multiline
-              onChange={(event) => setDescription(event.target.value)}
-              required={false}
-              rows={2}
-              type="text"
-              value={description}
-            />
-
-            <MUITextField
-              autoComplete="off"
-              fullWidth
-              helperText="https://cubecobra.com/cube/overview/this-is-your-full-cube-id-paste-it-here"
-              label="Have a cube on CubeCobra.com?"
-              margin="normal"
-              onChange={(event) => setCobraID(event.target.value)}
-              required={false}
-              type="text"
-              value={cobraID}
-            />
-          </MUIDialogContent>
-          <MUIDialogActions>
-            <MUIButton type="submit" startIcon={<MUICheckCircleOutlinedIcon />}>
-              Create!
-            </MUIButton>
-            <MUIButton
-              color="warning"
-              onClick={toggleOpen}
-              startIcon={<MUICancelOutlinedIcon />}
-            >
-              Cancel
-            </MUIButton>
-          </MUIDialogActions>
-        </form>
-      )}
+        <MUIDialogActions>
+          <MUIButton
+            color={success ? 'success' : 'primary'}
+            disabled={posting}
+            startIcon={(() => {
+              if (posting) {
+                return (
+                  <MUICircularProgress size={13} style={{ color: 'inherit' }} />
+                );
+              }
+              if (success) {
+                return <MUICloudDoneOutlinedIcon />;
+              }
+              return <MUIPostAddOutlinedIcon />;
+            })()}
+            type="submit"
+          >
+            Create
+          </MUIButton>
+          <MUIButton
+            color="warning"
+            disabled={posting || success}
+            onClick={toggleOpen}
+            startIcon={<MUICancelOutlinedIcon />}
+          >
+            Cancel
+          </MUIButton>
+        </MUIDialogActions>
+      </form>
     </MUIDialog>
   );
 }

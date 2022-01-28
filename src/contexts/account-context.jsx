@@ -27,9 +27,6 @@ export const AccountContext = createContext({
     total_events: 0
   },
   setAccountState: () => null,
-  createCube: () => null,
-  createDeck: () => null,
-  createEvent: () => null,
   createMatch: () => null,
   deleteCube: () => null,
   deleteDeck: () => null,
@@ -242,114 +239,6 @@ export default function ContextualizedAccountPage() {
     [addCardsToCache]
   );
 
-  const createCube = useCallback(
-    async function (event, cobraID, description, name) {
-      event.preventDefault();
-
-      await sendRequest({
-        callback: (data) => {
-          navigate(`/cube/${data._id}`);
-        },
-        load: true,
-        operation: 'createCube',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                ${cobraID ? 'cobraID: "' + cobraID + '",\n' : ''}
-                description: "${description}",
-                name: "${name}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [navigate, sendRequest]
-  );
-
-  const createDeck = useCallback(
-    async function (event, description, existingListID, format, name) {
-      event.preventDefault();
-
-      await sendRequest({
-        callback: (data) => {
-          navigate(`/deck/${data._id}`);
-        },
-        load: true,
-        operation: 'createDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                description: "${description}",
-                ${
-                  existingListID
-                    ? 'existingListID: "' + existingListID + '",\n'
-                    : ''
-                }
-                ${format ? 'format: ' + format + ',\n' : ''}
-                name: "${name}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [navigate, sendRequest]
-  );
-
-  const createEvent = useCallback(
-    async function (
-      event,
-      cubeID,
-      cardsPerPack,
-      eventType,
-      modules,
-      name,
-      otherPlayers,
-      packsPerPlayer
-    ) {
-      event.preventDefault();
-
-      await sendRequest({
-        callback: (data) => {
-          navigate(`/event/${data._id}`);
-        },
-        headers: { CubeID: cubeID },
-        load: true,
-        operation: 'createEvent',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                cards_per_pack: ${cardsPerPack},
-                event_type: ${eventType},
-                modules: [${modules.map((mdl) => '"' + mdl + '"')}],
-                name: "${name}",
-                other_players: [${otherPlayers.map((plr) => '"' + plr + '"')}],
-                packs_per_player: ${packsPerPlayer}
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [navigate, sendRequest]
-  );
-
   const createMatch = useCallback(
     async function (event, deckIDs, eventID, playerIDs) {
       event.preventDefault();
@@ -479,9 +368,6 @@ export default function ContextualizedAccountPage() {
         loading,
         accountState,
         setAccountState,
-        createCube,
-        createDeck,
-        createEvent,
         createMatch,
         deleteCube,
         deleteDeck,
