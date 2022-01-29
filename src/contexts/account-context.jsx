@@ -28,8 +28,6 @@ export const AccountContext = createContext({
   },
   setAccountState: () => null,
   createMatch: () => null,
-  deleteCube: () => null,
-  deleteDeck: () => null,
   // deleteEvent: () => null,
   // deleteMatch: () => null,
   editAccount: () => null,
@@ -269,44 +267,6 @@ export default function ContextualizedAccountPage() {
     [navigate, sendRequest]
   );
 
-  const deleteCube = useCallback(
-    async function (cubeID) {
-      await sendRequest({
-        headers: { CubeID: cubeID },
-        operation: 'deleteCube',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}
-            }
-          `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
-  const deleteDeck = useCallback(
-    async function (deckID) {
-      await sendRequest({
-        headers: { DeckID: deckID },
-        operation: 'deleteDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}
-            }
-          `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
   const editAccount = useCallback(
     async function (changes) {
       await sendRequest({
@@ -369,8 +329,6 @@ export default function ContextualizedAccountPage() {
         accountState,
         setAccountState,
         createMatch,
-        deleteCube,
-        deleteDeck,
         editAccount,
         fetchAccountByID
       }}

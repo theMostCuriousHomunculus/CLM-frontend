@@ -17,42 +17,33 @@ import MUITableHead from '@mui/material/TableHead';
 import MUITableRow from '@mui/material/TableRow';
 import MUITypography from '@mui/material/Typography';
 
-import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
-import CreateCubeForm from './CreateCubeForm';
+// import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
+import CreateCubeForm from '../../forms/CreateCubeForm';
+import DeleteCubeForm from '../../forms/DeleteCubeForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 export default function CubeAccordion({ pageClasses }) {
   const {
-    accountState: { _id, cubes },
-    deleteCube
+    accountState: { _id, cubes }
   } = useContext(AccountContext);
   const { userID } = useContext(AuthenticationContext);
   const [cubeToDelete, setCubeToDelete] = useState({
     _id: null,
     name: null
   });
-  const [showCubeForm, setShowCubeForm] = useState(false);
+  const [showCreateCubeForm, setShowCreateCubeForm] = useState(false);
 
   return (
     <React.Fragment>
-      <ConfirmationDialog
-        confirmHandler={() => {
-          deleteCube(cubeToDelete._id);
-          setCubeToDelete({ _id: null, name: null });
-        }}
-        open={!!cubeToDelete._id}
-        title={`Are you sure you want to delete "${cubeToDelete.name}"?`}
-        toggleOpen={() => setCubeToDelete({ _id: null, name: null })}
-      >
-        <MUITypography variant="body1">
-          This action cannot be undone. You may want to export your list first.
-        </MUITypography>
-      </ConfirmationDialog>
+      <DeleteCubeForm
+        cubeToDelete={cubeToDelete}
+        setCubeToDelete={setCubeToDelete}
+      />
 
       <CreateCubeForm
-        open={showCubeForm}
-        toggleOpen={() => setShowCubeForm((prevState) => !prevState)}
+        open={showCreateCubeForm}
+        toggleOpen={() => setShowCreateCubeForm((prevState) => !prevState)}
       />
 
       <MUIAccordion>
@@ -121,7 +112,7 @@ export default function CubeAccordion({ pageClasses }) {
         {_id === userID && (
           <MUIAccordionActions>
             <MUIButton
-              onClick={() => setShowCubeForm(true)}
+              onClick={() => setShowCreateCubeForm(true)}
               startIcon={<MUIAddCircleOutlineOutlinedIcon />}
             >
               Build

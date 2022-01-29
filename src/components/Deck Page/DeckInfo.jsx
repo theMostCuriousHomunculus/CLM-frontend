@@ -5,6 +5,7 @@ import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUICheckbox from '@mui/material/Checkbox';
+import MUIDeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
@@ -25,10 +26,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
+import DeleteDeckForm from '../../forms/DeleteDeckForm';
+import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
-import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { DeckContext } from '../../contexts/deck-context';
 
@@ -36,6 +38,7 @@ export default function DeckInfo() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const {
     deckState: {
+      _id: deckID,
       creator,
       description,
       format,
@@ -51,6 +54,7 @@ export default function DeckInfo() {
   const [descriptionInput, setDescriptionInput] = useState(description);
   const [isPublished, setIsPublished] = useState(published);
   const [deckNameInput, setDeckNameInput] = useState(deckName);
+  const [deckToDelete, setDeckToDelete] = useState({ _id: null, name: null });
   const [sampleHand, setSampleHand] = useState([]);
   const deckImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
 
@@ -68,6 +72,11 @@ export default function DeckInfo() {
 
   return (
     <React.Fragment>
+      <DeleteDeckForm
+        deckToDelete={deckToDelete}
+        setDeckToDelete={setDeckToDelete}
+      />
+
       <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
         <MUIDialogTitle>Sample Hand from {name}</MUIDialogTitle>
         <MUIDialogContent>
@@ -257,6 +266,19 @@ export default function DeckInfo() {
             justifyContent: 'flex-end'
           }}
         >
+          {creator._id === userID && (
+            <span style={{ flexGrow: 1 }}>
+              <MUIButton
+                color="warning"
+                onClick={() => {
+                  setDeckToDelete({ _id: deckID, name: deckName });
+                }}
+                startIcon={<MUIDeleteForeverOutlinedIcon />}
+              >
+                Delete Deck
+              </MUIButton>
+            </span>
+          )}
           {isLoggedIn && (
             <MUIButton
               onClick={cloneDeck}

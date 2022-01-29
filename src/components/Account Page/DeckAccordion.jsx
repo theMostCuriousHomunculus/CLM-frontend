@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MUIAccordion from '@mui/material/Accordion';
 import MUIAccordionActions from '@mui/material/AccordionActions';
@@ -17,42 +17,32 @@ import MUITableHead from '@mui/material/TableHead';
 import MUITableRow from '@mui/material/TableRow';
 import MUITypography from '@mui/material/Typography';
 
-import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
-import CreateDeckForm from './CreateDeckForm';
+import CreateDeckForm from '../../forms/CreateDeckForm';
+import DeleteDeckForm from '../../forms/DeleteDeckForm';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 export default function DeckAccordion({ pageClasses }) {
   const {
-    accountState: { _id, decks },
-    deleteDeck
-  } = React.useContext(AccountContext);
-  const { userID } = React.useContext(AuthenticationContext);
-  const [deckToDelete, setDeckToDelete] = React.useState({
+    accountState: { _id, decks }
+  } = useContext(AccountContext);
+  const { userID } = useContext(AuthenticationContext);
+  const [deckToDelete, setDeckToDelete] = useState({
     _id: null,
     name: null
   });
-  const [showDeckForm, setShowDeckForm] = React.useState(false);
+  const [showCreateDeckForm, setShowCreateDeckForm] = useState(false);
 
   return (
     <React.Fragment>
-      <ConfirmationDialog
-        confirmHandler={() => {
-          deleteDeck(deckToDelete._id);
-          setDeckToDelete({ _id: null, name: null });
-        }}
-        open={!!deckToDelete._id}
-        title={`Are you sure you want to delete "${deckToDelete.name}?`}
-        toggleOpen={() => setDeckToDelete({ _id: null, name: null })}
-      >
-        <MUITypography variant="body1">
-          This action cannot be undone. You may want to export your list first.
-        </MUITypography>
-      </ConfirmationDialog>
-
       <CreateDeckForm
-        open={showDeckForm}
-        toggleOpen={() => setShowDeckForm((prevState) => !prevState)}
+        open={showCreateDeckForm}
+        toggleOpen={() => setShowCreateDeckForm((prevState) => !prevState)}
+      />
+
+      <DeleteDeckForm
+        deckToDelete={deckToDelete}
+        setDeckToDelete={setDeckToDelete}
       />
 
       <MUIAccordion>
@@ -119,7 +109,7 @@ export default function DeckAccordion({ pageClasses }) {
         {_id === userID && (
           <MUIAccordionActions>
             <MUIButton
-              onClick={() => setShowDeckForm(true)}
+              onClick={() => setShowCreateDeckForm(true)}
               startIcon={<MUIAddCircleOutlineOutlinedIcon />}
             >
               Brew

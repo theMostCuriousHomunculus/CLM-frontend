@@ -18,7 +18,7 @@ import MUITableRow from '@mui/material/TableRow';
 import MUITypography from '@mui/material/Typography';
 
 import Avatar from '../miscellaneous/Avatar';
-import CreateEventForm from './CreateEventForm';
+import CreateEventForm from '../../forms/CreateEventForm';
 import TablePaginationActions from '../miscellaneous/TablePaginationActions';
 import { AccountContext } from '../../contexts/account-context';
 import { AuthenticationContext } from '../../contexts/Authentication';

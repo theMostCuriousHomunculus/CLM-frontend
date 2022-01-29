@@ -6,7 +6,7 @@ import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUICheckbox from '@mui/material/Checkbox';
-import MUIDeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import MUIDeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
@@ -30,11 +30,12 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
+import CreateComponentForm from './CreateComponentForm';
+import DeleteCubeForm from '../../forms/DeleteCubeForm';
+import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
-import CreateComponentForm from './CreateComponentForm';
-import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { CubeContext } from '../../contexts/cube-context';
 
@@ -43,6 +44,7 @@ export default function Dashboard() {
   const {
     activeComponentState,
     cubeState: {
+      _id: cubeID,
       creator,
       description,
       image,
@@ -65,6 +67,7 @@ export default function Dashboard() {
   const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] =
     useState(false);
   const [cubeNameInput, setCubeNameInput] = useState(cubeName);
+  const [cubeToDelete, setCubeToDelete] = useState({ _id: null, name: null });
   const [descriptionInput, setDescriptionInput] = useState(description);
   const [editingComponentName, setEditingComponentName] = useState(false);
   const [isPublished, setIsPublished] = useState(published);
@@ -122,6 +125,11 @@ export default function Dashboard() {
         toggleOpen={() =>
           setCreateComponentDialogIsOpen((prevState) => !prevState)
         }
+      />
+
+      <DeleteCubeForm
+        setCubeToDelete={setCubeToDelete}
+        cubeToDelete={cubeToDelete}
       />
 
       <MUICard>
@@ -412,23 +420,40 @@ export default function Dashboard() {
             justifyContent: 'flex-end'
           }}
         >
-          {userID === creator._id &&
-            !['mainboard', 'sideboard'].includes(activeComponentState._id) && (
-              <MUIButton
-                color="warning"
-                onClick={
-                  Number.isInteger(activeComponentState.size)
-                    ? deleteRotation
-                    : deleteModule
-                }
-                startIcon={<MUIDeleteForeverIcon />}
-              >
-                Delete this{' '}
-                {Number.isInteger(activeComponentState.size)
-                  ? 'Rotation'
-                  : 'Module'}
-              </MUIButton>
-            )}
+          {userID === creator._id && (
+            <React.Fragment>
+              <span style={{ flexGrow: 1 }}>
+                <MUIButton
+                  color="warning"
+                  onClick={() => {
+                    setCubeToDelete({ _id: cubeID, name: cubeName });
+                  }}
+                  startIcon={<MUIDeleteForeverOutlinedIcon />}
+                >
+                  Delete Cube
+                </MUIButton>
+              </span>
+
+              {!['mainboard', 'sideboard'].includes(
+                activeComponentState._id
+              ) && (
+                <MUIButton
+                  color="warning"
+                  onClick={
+                    Number.isInteger(activeComponentState.size)
+                      ? deleteRotation
+                      : deleteModule
+                  }
+                  startIcon={<MUIDeleteForeverOutlinedIcon />}
+                >
+                  Delete this{' '}
+                  {Number.isInteger(activeComponentState.size)
+                    ? 'Rotation'
+                    : 'Module'}
+                </MUIButton>
+              )}
+            </React.Fragment>
+          )}
 
           {isLoggedIn && (
             <MUIButton

@@ -11,8 +11,8 @@ import MUIPostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import MUITextField from '@mui/material/TextField';
 import { useNavigate } from 'react-router-dom';
 
-import createCube from '../../graphql/mutations/cube/create-cube';
-import { ErrorContext } from '../../contexts/Error';
+import createCube from '../graphql/mutations/cube/create-cube';
+import { ErrorContext } from '../contexts/Error';
 
 export default function CreateCubeForm({ open, toggleOpen }) {
   const { setErrorMessages } = useContext(ErrorContext);

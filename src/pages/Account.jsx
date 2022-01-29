@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
 import MUICardHeader from '@mui/material/CardHeader';
@@ -10,7 +9,6 @@ import MUIIconButton from '@mui/material/IconButton';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUILocationOnIcon from '@mui/icons-material/LocationOn';
 import MUINotificationsIcon from '@mui/icons-material/Notifications';
-import MUIPersonAddIcon from '@mui/icons-material/PersonAdd';
 import MUIPersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import MUISelect from '@mui/material/Select';
 import MUISwitch from '@mui/material/Switch';
@@ -289,7 +287,7 @@ export default function Account() {
 
       <DeckAccordion pageClasses={classes} />
 
-      <EventAccordion pageClasses={classes} />
+      <EventAccordion />
 
       {/* <MatchAccordion pageClasses={classes} /> */}
     </React.Fragment>

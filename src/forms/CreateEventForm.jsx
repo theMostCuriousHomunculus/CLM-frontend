@@ -24,9 +24,9 @@ import MUIRadioGroup from '@mui/material/RadioGroup';
 import MUITextField from '@mui/material/TextField';
 import { useNavigate } from 'react-router-dom';
 
-import Avatar from '../miscellaneous/Avatar';
-import createEvent from '../../graphql/mutations/event/create-event';
-import { ErrorContext } from '../../contexts/Error';
+import Avatar from '../components/miscellaneous/Avatar';
+import createEvent from '../graphql/mutations/event/create-event';
+import { ErrorContext } from '../contexts/Error';
 
 export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
   const { setErrorMessages } = useContext(ErrorContext);

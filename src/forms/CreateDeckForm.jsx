@@ -14,8 +14,8 @@ import MUISelect from '@mui/material/Select';
 import MUITextField from '@mui/material/TextField';
 import { useNavigate } from 'react-router-dom';
 
-import createDeck from '../../graphql/mutations/deck/create-deck';
-import { ErrorContext } from '../../contexts/Error';
+import createDeck from '../graphql/mutations/deck/create-deck';
+import { ErrorContext } from '../contexts/Error';
 
 export default function CreateCubeForm({ open, toggleOpen }) {
   const { setErrorMessages } = useContext(ErrorContext);
