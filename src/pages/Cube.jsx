@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MUIPaper from '@mui/material/Paper';
 
+import CubeDashboard from '../components/Cube Page/CubeDashboard';
 import CubeDisplay from '../components/Cube Page/CubeDisplay';
-import Dashboard from '../components/Cube Page/Dashboard';
 import EditCardModal from '../components/Cube Page/EditCardModal';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
@@ -32,7 +32,7 @@ export default function Cube() {
         />
       )}
 
-      <Dashboard />
+      <CubeDashboard />
 
       {editable && (
         <MUIPaper

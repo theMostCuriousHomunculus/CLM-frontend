@@ -12,7 +12,6 @@ import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLink
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
 import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
-import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { EventContext } from '../contexts/event-context';
 import addBasics from '../graphql/mutations/event/add-basics';
 import createEventChatMessage from '../graphql/mutations/event/create-event-chat-message';
@@ -30,7 +29,7 @@ const useStyles = makeStyles({
 
 export default function Event() {
   const { eventID } = useParams();
-  const { eventState, loading, me } = useContext(EventContext);
+  const { eventState, me } = useContext(EventContext);
   const [selectedCard, setSelectedCard] = useState({
     _id: null,
     image: null,
@@ -40,10 +39,6 @@ export default function Event() {
   const [finishedTabNumber, setFinishedTabNumber] = useState(0);
   const [ongoingTabNumber, setOngoingTabNumber] = useState(0);
   const classes = useStyles();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   if (me) {
     return (

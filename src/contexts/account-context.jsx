@@ -1,10 +1,19 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import fetchAccountByID from '../graphql/queries/account/fetch-account-by-ID';
 import useRequest from '../hooks/request-hook';
 import Account from '../pages/Account';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from './Authentication';
 import { CardCacheContext } from './CardCache';
+import { ErrorContext } from './Error';
 
 export const AccountContext = createContext({
   loading: false,
@@ -30,16 +39,16 @@ export const AccountContext = createContext({
   createMatch: () => null,
   // deleteEvent: () => null,
   // deleteMatch: () => null,
-  editAccount: () => null,
-  fetchAccountByID: () => null
+  editAccount: () => null
 });
 
 export default function ContextualizedAccountPage() {
-  const { accountID } = useParams();
+  const { setUserInfo, userID } = useContext(AuthenticationContext);
   const { addCardsToCache, scryfallCardDataCache } =
     useContext(CardCacheContext);
-  const { setUserInfo } = useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const navigate = useNavigate();
+  const { accountID } = useParams();
   const [accountState, setAccountState] = useState({
     _id: accountID,
     avatar: '',
@@ -58,6 +67,7 @@ export default function ContextualizedAccountPage() {
     sent_bud_requests: [],
     total_events: 0
   });
+  const [loading, setLoading] = useState(false);
   const accountQuery = `
     _id
     avatar
@@ -182,7 +192,7 @@ export default function ContextualizedAccountPage() {
     }
     total_events
   `;
-  const { loading, sendRequest } = useRequest();
+  const { sendRequest } = useRequest();
 
   const updateAccountState = useCallback(
     async function (data) {
@@ -300,40 +310,33 @@ export default function ContextualizedAccountPage() {
     [accountQuery, sendRequest]
   );
 
-  const fetchAccountByID = useCallback(
-    async function () {
-      await sendRequest({
-        callback: updateAccountState,
-        load: true,
-        operation: 'fetchAccountByID',
-        get body() {
-          return {
-            query: `
-            query {
-              ${this.operation}(_id: "${accountID}") {
-                ${accountQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [accountQuery, accountID, sendRequest]
-  );
+  useEffect(() => {
+    (async function () {
+      try {
+        setLoading(true);
+        const data = await fetchAccountByID({
+          headers: { AccountID: accountID },
+          queryString: `{\n${accountQuery}\n}`
+        });
+        await updateAccountState(data.data.fetchAccountByID);
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [accountID, userID]);
 
   return (
     <AccountContext.Provider
       value={{
-        loading,
         accountState,
         setAccountState,
         createMatch,
-        editAccount,
-        fetchAccountByID
+        editAccount
       }}
     >
-      <Account />
+      {loading ? <LoadingSpinner /> : <Account />}
     </AccountContext.Provider>
   );
 }

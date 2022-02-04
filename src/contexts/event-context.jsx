@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import fetchEventByID from '../graphql/queries/event/fetch-event-by-id';
+import fetchEventByID from '../graphql/queries/event/fetch-event-by-ID';
 import sendICECandidate from '../graphql/mutations/send-ICE-candidate';
 import sendRTCSessionDescription from '../graphql/mutations/send-RTC-session-description';
 import usePopulate from '../hooks/populate-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Event from '../pages/Event';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import RTCPeerConnectionConfig from '../constants/rtc-peer-connection-config';
 import { AuthenticationContext } from './Authentication';
 import { CardCacheContext } from './CardCache';
@@ -357,12 +358,11 @@ export default function ContextualizedEventPage() {
       value={{
         abortControllerRef,
         eventState,
-        loading,
         me: eventState.players.find((player) => player.account._id === userID),
         peerConnectionsRef
       }}
     >
-      <Event />
+      {loading ? <LoadingSpinner /> : <Event />}
     </EventContext.Provider>
   );
 }

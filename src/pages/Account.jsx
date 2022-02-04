@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
@@ -23,7 +23,6 @@ import BudAccordion from '../components/Account Page/BudAccordion';
 import CubeAccordion from '../components/Account Page/CubeAccordion';
 import DeckAccordion from '../components/Account Page/DeckAccordion';
 import EventAccordion from '../components/Account Page/EventAccordion';
-import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 // import MatchAccordion from '../components/Account Page/MatchAccordion';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AccountContext } from '../contexts/account-context';
@@ -55,7 +54,6 @@ export default function Account() {
     userID
   } = useContext(AuthenticationContext);
   const {
-    loading,
     accountState: {
       avatar,
       buds,
@@ -65,7 +63,6 @@ export default function Account() {
       sent_bud_requests
     },
     editAccount,
-    fetchAccountByID,
     setAccountState
   } = useContext(AccountContext);
   const {
@@ -80,15 +77,7 @@ export default function Account() {
   } = useContext(PermissionsContext);
   const classes = useStyles();
 
-  useEffect(() => {
-    (async function () {
-      await fetchAccountByID();
-    })();
-  }, [fetchAccountByID]);
-
-  return loading ? (
-    <LoadingSpinner />
-  ) : (
+  return (
     <React.Fragment>
       <MUICard>
         <MUICardHeader

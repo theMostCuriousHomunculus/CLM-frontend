@@ -117,19 +117,21 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 fullWidth
                 InputProps={{
                   endAdornment: (
-                    <MUIIconButton
-                      aria-label="toggle password visibility"
-                      edge="end"
-                      onClick={() =>
-                        setPasswordVisible((prevState) => !prevState)
-                      }
-                    >
-                      {passwordVisible ? (
-                        <MUIVisibilityOffOutlinedIcon />
-                      ) : (
-                        <MUIVisibilityOutlinedIcon />
-                      )}
-                    </MUIIconButton>
+                    <MUIInputAdornment position="end">
+                      <MUIIconButton
+                        aria-label="toggle password visibility"
+                        edge="end"
+                        onClick={() =>
+                          setPasswordVisible((prevState) => !prevState)
+                        }
+                      >
+                        {passwordVisible ? (
+                          <MUIVisibilityOffOutlinedIcon />
+                        ) : (
+                          <MUIVisibilityOutlinedIcon />
+                        )}
+                      </MUIIconButton>
+                    </MUIInputAdornment>
                   )
                 }}
                 label="Password"
@@ -196,19 +198,21 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                 fullWidth
                 InputProps={{
                   endAdornment: (
-                    <MUIIconButton
-                      aria-label="toggle password visibility"
-                      edge="end"
-                      onClick={() =>
-                        setPasswordVisible((prevState) => !prevState)
-                      }
-                    >
-                      {passwordVisible ? (
-                        <MUIVisibilityOffOutlinedIcon />
-                      ) : (
-                        <MUIVisibilityOutlinedIcon />
-                      )}
-                    </MUIIconButton>
+                    <MUIInputAdornment position="end">
+                      <MUIIconButton
+                        aria-label="toggle password visibility"
+                        edge="end"
+                        onClick={() =>
+                          setPasswordVisible((prevState) => !prevState)
+                        }
+                      >
+                        {passwordVisible ? (
+                          <MUIVisibilityOffOutlinedIcon />
+                        ) : (
+                          <MUIVisibilityOutlinedIcon />
+                        )}
+                      </MUIIconButton>
+                    </MUIInputAdornment>
                   )
                 }}
                 label="Password"

@@ -39,7 +39,7 @@ import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { CubeContext } from '../../contexts/cube-context';
 
-export default function Dashboard() {
+export default function CubeDashboard() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const {
     activeComponentState,
