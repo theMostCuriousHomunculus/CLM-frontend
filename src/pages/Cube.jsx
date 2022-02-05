@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MUIPaper from '@mui/material/Paper';
+import { useParams } from 'react-router-dom';
 
+import addCardToCube from '../graphql/mutations/cube/add-card-to-cube';
 import CubeDashboard from '../components/Cube Page/CubeDashboard';
 import CubeDisplay from '../components/Cube Page/CubeDisplay';
 import EditCardModal from '../components/Cube Page/EditCardModal';
-import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { CubeContext } from '../contexts/cube-context';
 
 export default function Cube() {
   const { userID } = useContext(AuthenticationContext);
-  const { loading, activeComponentState, cubeState, addCardToCube } =
-    useContext(CubeContext);
+  const { activeComponentState, cubeState } = useContext(CubeContext);
+  const { cubeID } = useParams();
   const [editable, setEditable] = useState(cubeState.creator._id === userID);
   const [selectedCard, setSelectedCard] = useState();
 
@@ -20,9 +21,7 @@ export default function Cube() {
     setEditable(cubeState.creator._id === userID);
   }, [cubeState.creator._id, userID]);
 
-  return loading ? (
-    <LoadingSpinner />
-  ) : (
+  return (
     <React.Fragment>
       {selectedCard && (
         <EditCardModal
@@ -44,7 +43,15 @@ export default function Cube() {
           <ScryfallRequest
             buttonText="Add to Cube"
             labelText={`Add a card to ${activeComponentState.name}`}
-            onSubmit={addCardToCube}
+            onSubmit={(cardData) =>
+              addCardToCube({
+                headers: { CubeID: cubeID },
+                variables: {
+                  componentID: activeComponentState._id,
+                  scryfall_id: cardData.scryfall_id
+                }
+              })
+            }
           />
         </MUIPaper>
       )}

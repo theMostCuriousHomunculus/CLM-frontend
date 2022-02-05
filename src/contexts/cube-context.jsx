@@ -11,10 +11,10 @@ import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Cube from '../pages/Cube';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { CardCacheContext } from './CardCache';
 
 export const CubeContext = createContext({
-  loading: false,
   activeComponentState: {
     _id: 'mainbaord',
     displayedCards: [],
@@ -47,7 +47,7 @@ export const CubeContext = createContext({
     filter: ''
   },
   setDisplayState: () => null,
-  addCardToCube: () => null,
+  // addCardToCube: () => null,
   cloneCube: () => null,
   createModule: () => null,
   createRotation: () => null,
@@ -243,30 +243,30 @@ export default function ContextualizedCubePage() {
     [addCardsToCache, populateCachedScryfallData]
   );
 
-  const addCardToCube = useCallback(
-    async function ({ name, scryfall_id }) {
-      await sendRequest({
-        headers: { CubeID: cubeState._id },
-        operation: 'addCardToCube',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                componentID: "${activeComponentState._id}",
-                name: "${name}",
-                scryfall_id: "${scryfall_id}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [activeComponentState._id, cubeState._id, sendRequest]
-  );
+  // const addCardToCube = useCallback(
+  //   async function ({ name, scryfall_id }) {
+  //     await sendRequest({
+  //       headers: { CubeID: cubeState._id },
+  //       operation: 'addCardToCube',
+  //       get body() {
+  //         return {
+  //           query: `
+  //           mutation {
+  //             ${this.operation}(
+  //               componentID: "${activeComponentState._id}",
+  //               name: "${name}",
+  //               scryfall_id: "${scryfall_id}"
+  //             ) {
+  //               _id
+  //             }
+  //           }
+  //         `
+  //         };
+  //       }
+  //     });
+  //   },
+  //   [activeComponentState._id, cubeState._id, sendRequest]
+  // );
 
   const cloneCube = useCallback(
     async function () {
@@ -564,12 +564,11 @@ export default function ContextualizedCubePage() {
   return (
     <CubeContext.Provider
       value={{
-        loading,
         activeComponentState,
         cubeState,
         displayState,
         setDisplayState,
-        addCardToCube,
+        // addCardToCube,
         cloneCube,
         createModule,
         createRotation,
@@ -582,7 +581,7 @@ export default function ContextualizedCubePage() {
         editRotation
       }}
     >
-      <Cube />
+      {loading ? <LoadingSpinner /> : <Cube />}
     </CubeContext.Provider>
   );
 }
