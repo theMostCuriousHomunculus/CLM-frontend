@@ -1,8 +1,6 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
 
@@ -25,6 +23,5 @@ jobs:
 
       - name: npm install and lint
         run: |
-          npm install
           npm ci
           npm run lint
