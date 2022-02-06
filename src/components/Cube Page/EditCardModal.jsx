@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import MUIButton from '@mui/material/Button';
 import MUICancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MUIDialog from '@mui/material/Dialog';
@@ -8,7 +8,9 @@ import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIGrid from '@mui/material/Grid';
 import MUIPublishedWithChangesOutlinedIcon from '@mui/icons-material/PublishedWithChangesOutlined';
 import MUITextField from '@mui/material/TextField';
+import { useParams } from 'react-router-dom';
 
+import editCard from '../../graphql/mutations/cube/edit-card';
 import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import MoveDeleteMenu from './MoveDeleteMenu';
@@ -17,11 +19,11 @@ import { CubeContext } from '../../contexts/cube-context';
 export default function EditCardModal({ card, clear, editable }) {
   const {
     activeComponentState: { _id: activeComponentID },
-    deleteCard,
-    editCard
-  } = React.useContext(CubeContext);
-  const [destination, setDestination] = React.useState(activeComponentID);
-  const [mutableCardDetails, setMutableCardDetails] = React.useState({
+    deleteCard
+  } = useContext(CubeContext);
+  const { cubeID } = useParams();
+  const [destination, setDestination] = useState(activeComponentID);
+  const [mutableCardDetails, setMutableCardDetails] = useState({
     cmc: card.cmc,
     color_identity: card.color_identity,
     notes: card.notes,
@@ -29,47 +31,35 @@ export default function EditCardModal({ card, clear, editable }) {
     type_line: card.type_line
   });
 
-  const submitForm = React.useCallback(
-    async (event) => {
-      event.preventDefault();
+  async function submitForm(event) {
+    event.preventDefault();
 
-      if (
-        JSON.stringify(mutableCardDetails) !==
-        JSON.stringify({
-          cmc: card.cmc,
-          color_identity: card.color_identity,
-          notes: card.notes,
-          scryfall_id: card.scryfall_id,
-          type_line: card.type_line
-        })
-      ) {
-        await editCard(
-          `cardID: "${card._id}",\ncmc: ${
-            mutableCardDetails.cmc
-          },\ncolor_identity: [${mutableCardDetails.color_identity.map(
-            (ci) => '"' + ci + '"'
-          )}],\nnotes: "${mutableCardDetails.notes}",\nscryfall_id: "${
-            mutableCardDetails.scryfall_id
-          }",\ntype_line: "${mutableCardDetails.type_line}"`
-        );
-      }
+    if (
+      JSON.stringify(mutableCardDetails) !==
+      JSON.stringify({
+        cmc: card.cmc,
+        color_identity: card.color_identity,
+        notes: card.notes,
+        scryfall_id: card.scryfall_id,
+        type_line: card.type_line
+      })
+    ) {
+      editCard({
+        headers: { CubeID: cubeID },
+        variables: {
+          cardID: card._id,
+          componentID: activeComponentID,
+          ...mutableCardDetails
+        }
+      });
+    }
 
-      if (activeComponentID !== destination) {
-        deleteCard(card._id, destination);
-      }
+    if (activeComponentID !== destination) {
+      deleteCard(card._id, destination);
+    }
 
-      clear();
-    },
-    [
-      activeComponentID,
-      card,
-      clear,
-      deleteCard,
-      destination,
-      editCard,
-      mutableCardDetails
-    ]
-  );
+    clear();
+  }
 
   return (
     <MUIDialog onClose={clear} open={Object.keys(card).length > 0}>

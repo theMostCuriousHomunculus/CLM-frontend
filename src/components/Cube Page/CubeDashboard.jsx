@@ -12,7 +12,6 @@ import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIEditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import MUIFileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -30,14 +29,17 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
+import CloneCubeButton from './CloneCubeButton';
 import CreateComponentForm from './CreateComponentForm';
 import DeleteCubeForm from '../../forms/DeleteCubeForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
+import editCube from '../../graphql/mutations/cube/edit-cube';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { CubeContext } from '../../contexts/cube-context';
+import { ErrorContext } from '../../contexts/Error';
 
 export default function CubeDashboard() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
@@ -55,15 +57,16 @@ export default function CubeDashboard() {
       rotations,
       sideboard
     },
-    cloneCube,
     deleteModule,
     deleteRotation,
     displayState,
-    editCube,
     editModule,
     editRotation,
     setDisplayState
   } = useContext(CubeContext);
+  const { setErrorMessages } = useContext(ErrorContext);
+  const cubeImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
+  const componentNameInputRef = useRef();
   const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] =
     useState(false);
   const [cubeNameInput, setCubeNameInput] = useState(cubeName);
@@ -73,8 +76,6 @@ export default function CubeDashboard() {
   const [isPublished, setIsPublished] = useState(published);
   const [samplePack, setSamplePack] = useState([]);
   const [sizeInput, setSizeInput] = useState(activeComponentState.size);
-  const componentNameInputRef = useRef();
-  const cubeImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
 
   useEffect(() => {
     setCubeNameInput(cubeName);
@@ -274,13 +275,21 @@ export default function CubeDashboard() {
               <MUITextField
                 disabled={userID !== creator._id}
                 inputProps={{
-                  onBlur: () => {
-                    editCube(
-                      descriptionInput,
-                      image.scryfall_id,
-                      cubeNameInput,
-                      isPublished
-                    );
+                  onBlur: async () => {
+                    try {
+                      const data = await editCube({
+                        headers: { CubeID: cubeID },
+                        queryString: `{\n_id\nname\n}`,
+                        variables: { name: cubeNameInput }
+                      });
+                      setCubeNameInput(data.data.editCube.name);
+                    } catch (error) {
+                      setErrorMessages((prevState) => [
+                        ...prevState,
+                        error.message
+                      ]);
+                      setCubeNameInput(cubeName);
+                    }
                   }
                 }}
                 label="Cube Name"
@@ -299,14 +308,22 @@ export default function CubeDashboard() {
                     control={
                       <MUICheckbox
                         checked={isPublished}
-                        onChange={() => {
-                          editCube(
-                            descriptionInput,
-                            image.scryfall_id,
-                            cubeNameInput,
-                            !isPublished
-                          );
+                        onChange={async () => {
                           setIsPublished((prevState) => !prevState);
+                          try {
+                            const data = await editCube({
+                              headers: { CubeID: cubeID },
+                              queryString: `{\n_id\npublished\n}`,
+                              variables: { published: isPublished }
+                            });
+                            setIsPublished(data.data.editCube.published);
+                          } catch (error) {
+                            setErrorMessages((prevState) => [
+                              ...prevState,
+                              error.message
+                            ]);
+                            setIsPublished(published);
+                          }
                         }}
                       />
                     }
@@ -353,13 +370,20 @@ export default function CubeDashboard() {
             disabled={userID !== creator._id}
             fullWidth={true}
             inputProps={{
-              onBlur: () => {
-                editCube(
-                  descriptionInput,
-                  image.scryfall_id,
-                  cubeNameInput,
-                  isPublished
-                );
+              onBlur: async () => {
+                try {
+                  const data = await editCube({
+                    headers: { CubeID: cubeID },
+                    queryString: `{\n_id\ndescription\n}`,
+                    variables: { description: descriptionInput }
+                  });
+                  setDescriptionInput(data.data.editCube.description);
+                } catch (error) {
+                  setErrorMessages((prevState) => [
+                    ...prevState,
+                    error.message
+                  ]);
+                }
               }
             }}
             label="Cube Description"
@@ -374,13 +398,19 @@ export default function CubeDashboard() {
             <ScryfallRequest
               buttonText="Change Image"
               labelText="Cube Image"
-              onSubmit={(chosenCard) => {
-                editCube(
-                  descriptionInput,
-                  chosenCard.scryfall_id,
-                  cubeNameInput,
-                  isPublished
-                );
+              onSubmit={async (chosenCard) => {
+                try {
+                  await editCube({
+                    headers: { CubeID: cubeID },
+                    queryString: `{\n_id\nimage\n}`,
+                    variables: { image: chosenCard.scryfall_id }
+                  });
+                } catch (error) {
+                  setErrorMessages((prevState) => [
+                    ...prevState,
+                    error.message
+                  ]);
+                }
               }}
             />
           )}
@@ -455,14 +485,7 @@ export default function CubeDashboard() {
             </React.Fragment>
           )}
 
-          {isLoggedIn && (
-            <MUIButton
-              onClick={cloneCube}
-              startIcon={<MUIFileCopyOutlinedIcon />}
-            >
-              Clone Cube
-            </MUIButton>
-          )}
+          {isLoggedIn && <CloneCubeButton CubeID={cubeID} />}
 
           {userID === creator._id && (
             <MUIButton
