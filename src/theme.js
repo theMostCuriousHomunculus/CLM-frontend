@@ -91,19 +91,18 @@ let theme = createTheme({
           display: 'flex',
           flex: '0 1 auto',
           flexDirection: 'column',
-          marginLeft: 8,
-          marginRight: 0,
-          marginTop: 0
+          margin: 0
         },
         avatar: {
           alignItems: 'flex-start',
           alignSelf: 'stretch',
-          marginRight: 8
+          margin: 0
         },
         content: {
           wordBreak: 'break-word'
         },
         root: {
+          columnGap: 8,
           padding: 8
         }
       }

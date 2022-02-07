@@ -5,7 +5,6 @@ import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
-import MUICheckbox from '@mui/material/Checkbox';
 import MUIDeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
@@ -13,27 +12,28 @@ import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIEditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MUIFormControl from '@mui/material/FormControl';
-import MUIFormControlLabel from '@mui/material/FormControlLabel';
-import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MUIIconButton from '@mui/material/IconButton';
 import MUIImageList from '@mui/material/ImageList';
 import MUIImageListItem from '@mui/material/ImageListItem';
-import MUIInputAdornment from '@mui/material/InputAdornment';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
 import MUIShuffleOutlinedIcon from '@mui/icons-material/ShuffleOutlined';
 import MUITextField from '@mui/material/TextField';
-import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
 import CloneCubeButton from './CloneCubeButton';
+import CubeDescriptionInput from './CubeDescriptionInput';
+import CubeFilterInput from './CubeFilterInput';
+import CubeNameInput from './CubeNameInput';
+import CubePublishedCheckbox from './CubePublishedCheckbox';
 import CreateComponentForm from './CreateComponentForm';
 import DeleteCubeForm from '../../forms/DeleteCubeForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
 import editCube from '../../graphql/mutations/cube/edit-cube';
+import editModule from '../../graphql/mutations/cube/edit-module';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
@@ -53,41 +53,30 @@ export default function CubeDashboard() {
       mainboard,
       modules,
       name: cubeName,
-      published,
       rotations,
       sideboard
     },
     deleteModule,
     deleteRotation,
-    displayState,
-    editModule,
     editRotation,
     setDisplayState
   } = useContext(CubeContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const cubeImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
   const componentNameInputRef = useRef();
+  const [componentNameInput, setComponentNameInput] = useState(
+    activeComponentState.name
+  );
   const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] =
     useState(false);
-  const [cubeNameInput, setCubeNameInput] = useState(cubeName);
   const [cubeToDelete, setCubeToDelete] = useState({ _id: null, name: null });
-  const [descriptionInput, setDescriptionInput] = useState(description);
   const [editingComponentName, setEditingComponentName] = useState(false);
-  const [isPublished, setIsPublished] = useState(published);
   const [samplePack, setSamplePack] = useState([]);
   const [sizeInput, setSizeInput] = useState(activeComponentState.size);
 
   useEffect(() => {
-    setCubeNameInput(cubeName);
-  }, [cubeName]);
-
-  useEffect(() => {
-    setDescriptionInput(description);
-  }, [description]);
-
-  useEffect(() => {
-    setIsPublished(published);
-  }, [published]);
+    setComponentNameInput(activeComponentState.name);
+  }, [activeComponentState.name]);
 
   useEffect(() => {
     setSizeInput(activeComponentState.size);
@@ -210,7 +199,8 @@ export default function CubeDashboard() {
                       : 'Module'
                   } Name`}
                   inputProps={{
-                    onBlur: () => {
+                    onBlur: async () => {
+                      setEditingComponentName(false);
                       if (
                         activeComponentState.name !==
                         componentNameInputRef.current.value
@@ -221,10 +211,24 @@ export default function CubeDashboard() {
                             sizeInput
                           );
                         } else {
-                          editModule(componentNameInputRef.current.value);
+                          try {
+                            await editModule({
+                              headers: { CubeID: cubeID },
+                              queryString: `{\n_id\n}`,
+                              variables: {
+                                moduleID: activeComponentState._id,
+                                name: componentNameInput
+                              }
+                            });
+                          } catch (error) {
+                            setErrorMessages((prevState) => [
+                              ...prevState,
+                              error.message
+                            ]);
+                            setComponentNameInput(activeComponentState.name);
+                          }
                         }
                       }
-                      setEditingComponentName(false);
                     }
                   }}
                   inputRef={componentNameInputRef}
@@ -271,71 +275,14 @@ export default function CubeDashboard() {
             )
           }
           title={
-            <React.Fragment>
-              <MUITextField
-                disabled={userID !== creator._id}
-                inputProps={{
-                  onBlur: async () => {
-                    try {
-                      const data = await editCube({
-                        headers: { CubeID: cubeID },
-                        queryString: `{\n_id\nname\n}`,
-                        variables: { name: cubeNameInput }
-                      });
-                      setCubeNameInput(data.data.editCube.name);
-                    } catch (error) {
-                      setErrorMessages((prevState) => [
-                        ...prevState,
-                        error.message
-                      ]);
-                      setCubeNameInput(cubeName);
-                    }
-                  }
-                }}
-                label="Cube Name"
-                onChange={(event) => setCubeNameInput(event.target.value)}
-                type="text"
-                value={cubeNameInput}
-              />
-              {creator._id === userID && (
-                <div
-                  style={{
-                    alignItems: 'center',
-                    display: 'flex'
-                  }}
-                >
-                  <MUIFormControlLabel
-                    control={
-                      <MUICheckbox
-                        checked={isPublished}
-                        onChange={async () => {
-                          setIsPublished((prevState) => !prevState);
-                          try {
-                            const data = await editCube({
-                              headers: { CubeID: cubeID },
-                              queryString: `{\n_id\npublished\n}`,
-                              variables: { published: isPublished }
-                            });
-                            setIsPublished(data.data.editCube.published);
-                          } catch (error) {
-                            setErrorMessages((prevState) => [
-                              ...prevState,
-                              error.message
-                            ]);
-                            setIsPublished(published);
-                          }
-                        }}
-                      />
-                    }
-                    label="Published"
-                    style={{ marginRight: 8 }}
-                  />
-                  <MUITooltip title="A published cube is visible to other users.">
-                    <MUIHelpOutlineIcon color="primary" />
-                  </MUITooltip>
-                </div>
-              )}
-            </React.Fragment>
+            creator._id === userID ? (
+              <React.Fragment>
+                <CubeNameInput />
+                <CubePublishedCheckbox />
+              </React.Fragment>
+            ) : (
+              <MUITypography variant="h2">{cubeName}</MUITypography>
+            )
           }
           subheader={
             <React.Fragment>
@@ -366,33 +313,11 @@ export default function CubeDashboard() {
         />
 
         <MUICardContent>
-          <MUITextField
-            disabled={userID !== creator._id}
-            fullWidth={true}
-            inputProps={{
-              onBlur: async () => {
-                try {
-                  const data = await editCube({
-                    headers: { CubeID: cubeID },
-                    queryString: `{\n_id\ndescription\n}`,
-                    variables: { description: descriptionInput }
-                  });
-                  setDescriptionInput(data.data.editCube.description);
-                } catch (error) {
-                  setErrorMessages((prevState) => [
-                    ...prevState,
-                    error.message
-                  ]);
-                }
-              }
-            }}
-            label="Cube Description"
-            multiline
-            onChange={(event) => setDescriptionInput(event.target.value)}
-            rows={2}
-            style={{ marginBottom: 8 }}
-            value={descriptionInput}
-          />
+          {creator._id === userID ? (
+            <CubeDescriptionInput />
+          ) : (
+            <MUITypography variant="subtitle1">{description}</MUITypography>
+          )}
 
           {userID === creator._id && (
             <ScryfallRequest
@@ -415,33 +340,7 @@ export default function CubeDashboard() {
             />
           )}
 
-          <MUITextField
-            autoComplete="off"
-            fullWidth
-            InputProps={{
-              endAdornment: (
-                <MUIInputAdornment position="end">
-                  <span>
-                    Matches:{' '}
-                    <strong>
-                      {activeComponentState.displayedCards.length}
-                    </strong>
-                  </span>
-                </MUIInputAdornment>
-              )
-            }}
-            label="Filter by keywords, name or type"
-            margin="normal"
-            onChange={(event) => {
-              event.persist();
-              setDisplayState((prevState) => ({
-                ...prevState,
-                filter: event.target.value
-              }));
-            }}
-            type="text"
-            value={displayState.filter}
-          />
+          <CubeFilterInput />
         </MUICardContent>
 
         <MUICardActions

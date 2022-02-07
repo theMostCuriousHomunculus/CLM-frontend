@@ -57,7 +57,6 @@ export const CubeContext = createContext({
   deleteCard: () => null,
   deleteModule: () => null,
   deleteRotation: () => null,
-  editModule: () => null,
   editRotation: () => null
 });
 
@@ -345,30 +344,6 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const editModule = useCallback(
-    async function (name) {
-      await sendRequest({
-        headers: { CubeID: cubeState._id },
-        operation: 'editModule',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                moduleID: "${activeComponentState._id}",
-                name: "${name}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [activeComponentState._id, cubeState._id, sendRequest]
-  );
-
   const editRotation = useCallback(
     async function (name, size) {
       await sendRequest({
@@ -437,7 +412,6 @@ export default function ContextualizedCubePage() {
         deleteCard,
         deleteModule,
         deleteRotation,
-        editModule,
         editRotation
       }}
     >
