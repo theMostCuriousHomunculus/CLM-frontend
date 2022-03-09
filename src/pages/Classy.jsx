@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import MUIArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MUICard from '@mui/material/Card';
@@ -11,7 +11,9 @@ import MUIListItemText from '@mui/material/ListItemText';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
+import classyBannedList from '../constants/classy-banned-list';
 import theme from '../theme';
+import ScryfallCardLink from '../components/miscellaneous/ScryfallCardLink';
 
 const useStyles = makeStyles({
   multiColumnList: {
@@ -34,171 +36,9 @@ const useStyles = makeStyles({
 });
 
 export default function Classy() {
-  const bannedCards = [
-    "Accorder's Shield",
-    'Allosaurus Rider',
-    'Alpine Meadow',
-    'Ancestral Vision',
-    'Arctic Flats',
-    'Arctic Treeline',
-    'Asmoranomardicadaistinaculdacar',
-    'Birthing Pod',
-    'Blood Moon',
-    'Boil',
-    'Boiling Seas',
-    'Bone Saw',
-    'Boreal Shelf',
-    'Bridge From Below',
-    "Cathar's Shield",
-    'Choke',
-    'Chrome Mox',
-    'Claws of Gix',
-    'Cloudpost',
-    'Commandeer',
-    'Crashing Footfalls',
-    'Dakmor Salvage',
-    'Dark Depths',
-    'Darkblast ',
-    'Darksteel Relic',
-    'Dig Through Time',
-    'Disrupting Shoal',
-    "Dragon's Rage Channeler",
-    'Endurance',
-    'Ensnaring Bridge',
-    'Evermind',
-    'Eye of Ugin',
-    'Faceless Haven',
-    'Faithless Looting',
-    'Field of the Dead',
-    'Flashfires',
-    'Force of Despair',
-    'Force of Negation',
-    'Force of Rage',
-    'Force of Vigor',
-    'Force of Virtue',
-    'Fountain of Youth',
-    'Frost Marsh',
-    'Frostwalk Bastion',
-    'Fury',
-    'Fury of the Horde',
-    "Gaea's Will",
-    'Gitaxian Probe',
-    'Glacial Floodplain',
-    'Glimpse of Nature',
-    'Glimpse of Tomorrow',
-    'Golgari Brownscale',
-    'Golgari Grave Troll',
-    'Golgari Thug',
-    'Grave-Shell Scarab',
-    'Greater Mossdog',
-    'Grief',
-    'Gyruda, Doom of Depths',
-    'Hangarback Walker',
-    'Herbal Poultice',
-    'Highland Forest',
-    'Highland Weald',
-    'Hogaak, Arisen Necropolis',
-    'Hypergenesis',
-    'Ice Tunnel',
-    'Inevitable Betrayal',
-    'Intervention Pact',
-    'Jegantha, the Wellspring',
-    'Kaheera, the Orphanguard',
-    'Keruga, the Macrosage',
-    'Kite Shield',
-    'Krark-Clan Ironworks',
-    'Leyline of Abundance',
-    'Leyline of Anticipation',
-    'Leyline of Combustion',
-    'Leyline of Lifeforce',
-    'Leyline of Lightning',
-    'Leyline of Punishment',
-    'Leyline of Sanctity',
-    'Leyline of Singularity',
-    'Leyline of the Meek',
-    'Leyline of the Void',
-    'Leyline of Vitality',
-    'Life from the Loam',
-    'Living End',
-    'Lotus Bloom',
-    'Lurrus of the Dream-Den',
-    'Lutri, the Spellchaser',
-    'Marrow Shards',
-    'Memnite',
-    'Mental Misstep',
-    'Mine Collapse',
-    "Mishra's Bauble",
-    'Moldervine Cloak',
-    'Mouth of Ronom',
-    'Mox Amber',
-    'Mox Opal',
-    'Mox Tantalite',
-    'Mutagenic Growth',
-    'Mycosynth Lattice',
-    'Necroplasm',
-    'Nightmare Void',
-    'Nourishing Shoal',
-    'Noxious Revival',
-    'Obosh, the Preypiercer',
-    'Oko, Thief of Crowns',
-    'Once Upon a Time',
-    'Ornithopter',
-    'Pact of Negation',
-    'Pact of the Titan',
-    'Paradise Mantle',
-    'Profane Tutor',
-    'Ragavan, Nimble Pilferer',
-    'Restore Balance',
-    'Resurgent Belief',
-    'Rimewood Falls',
-    'Rite of Flame',
-    'Scrying Sheets',
-    "Sensei's Divining Top",
-    'Shambling Shell',
-    'Shenanigans',
-    'Shimmerdrift Vale',
-    'Shining Shoal',
-    'Sickening Shoal',
-    'Simian Spirit Guide',
-    'Skullclamp',
-    'Slaughter Pact',
-    'Snapback',
-    'Snow-Covered Forest',
-    'Snow-Covered Island',
-    'Snow-Covered Mountain',
-    'Snow-Covered Plains',
-    'Snow-Covered Swamp',
-    'Snowfield Sinkhole',
-    'Sol Talisman',
-    'Solitude',
-    'Soul Spike',
-    'Spellbook',
-    'Spidersilk Net',
-    'Stinkweed Imp',
-    'Subtlety',
-    'Sulfurous Mire',
-    'Summer Bloom',
-    "Summoner's Pact",
-    'Sunscour',
-    'Surgical Extraction',
-    "Tibalt's Trickery",
-    "Tormod's Crypt",
-    'Tresserhorn Sinks',
-    "Umezawa's Jitte",
-    'Umori, the Collector',
-    "Uro, Titan of Nature's Wrath",
-    "Urza's Saga",
-    'Veil of Summer',
-    'Volatile Fjord',
-    'Walking Ballista',
-    'Welding Jar',
-    'Wheel of Fate',
-    'Woodland Chasm',
-    'Worship',
-    'Yorion, Sky Nomad',
-    'Zirda, the Dawnwaker',
-    'Zuran Orb'
-  ];
+  const { hash } = useLocation();
+  const [classyBannedListState, setClassyBannedListState] =
+    useState(classyBannedList);
   const classes = useStyles();
   const sections = [
     {
@@ -218,13 +58,9 @@ export default function Classy() {
             can't afford to mainbaord), or effectively win the game by radically
             shifting Magic's goal posts at a mana cost that is far too cheap and
             only ask the player to satisfy a very easy condition.{' '}
-            <a
-              href="https://scryfall.com/card/2xm/253/ensnaring-bridge"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Ensnaring Bridge
-            </a>{' '}
+            <ScryfallCardLink
+              card={classyBannedListState['Ensnaring Bridge']}
+            />{' '}
             is the quintessential example. Such cards are NOT classy.
           </MUITypography>
           <MUITypography
@@ -257,46 +93,16 @@ export default function Classy() {
             brewer's paradise, free spells (non-land cards that do not require a
             mana investment in order to cast) are not allowed. This includes 0
             mana cost artifacts like{' '}
-            <a
-              href="https://scryfall.com/card/2xm/274/mishras-bauble"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Mishra's Bauble
-            </a>{' '}
-            and{' '}
-            <a
-              href="https://scryfall.com/card/som/174/memnite"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Memnite
-            </a>
-            , cards which can be cast for only Phyrexian mana such as{' '}
-            <a
-              href="https://scryfall.com/card/mm2/117/gut-shot"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Gut Shot
-            </a>{' '}
-            and{' '}
-            <a
-              href="https://scryfall.com/card/mm2/99/surgical-extraction"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Surgical Extraction
-            </a>{' '}
+            <ScryfallCardLink card={classyBannedListState["Mishra's Bauble"]} />{' '}
+            and <ScryfallCardLink card={classyBannedListState.Memnite} />, cards
+            which can be cast for only Phyrexian mana such as{' '}
+            <ScryfallCardLink card={classyBannedListState['Gut Shot']} /> and{' '}
+            <ScryfallCardLink
+              card={classyBannedListState['Surgical Extraction']}
+            />{' '}
             as well as the free spell{' '}
-            <a
-              href="https://scryfall.com/card/2xm/208/manamorphose"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Manamorphose
-            </a>
-            . These spells are NOT classy.
+            <ScryfallCardLink card={classyBannedListState.Manamorphose} />.
+            These spells are NOT classy.
           </MUITypography>
           <MUITypography
             className={classes.paragraph}
@@ -376,13 +182,9 @@ export default function Classy() {
             . When graveyard enablers have been too good, modern has been
             dominated by fast, unfair graveyard decks such as dredge and Izzet
             phoenix. Since the banning of{' '}
-            <a
-              href="https://scryfall.com/card/uma/128/faithless-looting"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Faithless Looting
-            </a>
+            <ScryfallCardLink
+              card={classyBannedListState['Faithless Looting']}
+            />
             , these decks have completely fallen out of favor. That suggests
             recursive creatures are often not the problem, but rather cards
             which too easily enable players to abuse their graveyards.
@@ -493,13 +295,9 @@ export default function Classy() {
             run Opt, which, when that is happening, is another indication of a
             tier 0 card (such as when all sorts of decks were splashing green in
             order to play{' '}
-            <a
-              href="https://scryfall.com/card/eld/197/oko-thief-of-crowns"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Oko, Thief of Crowns
-            </a>{' '}
+            <ScryfallCardLink
+              card={classyBannedListState['Oko, Thief of Crowns']}
+            />{' '}
             before it was finally banned).
           </MUITypography>
           <MUITypography
@@ -508,13 +306,9 @@ export default function Classy() {
             variant="body2"
           >
             Next let's consider{' '}
-            <a
-              href="https://scryfall.com/card/mh2/121/dragons-rage-channeler"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Dragon's Rage Channeler
-            </a>{' '}
+            <ScryfallCardLink
+              card={classyBannedListState["Dragon's Rage Channeler"]}
+            />{' '}
             (DRC), a new card from Modern Horizons 2. For a single red mana, you
             get a 1/1 body which lets you surveil any time you cast a
             non-creature spell. And if you have 4 or more card types in your
@@ -567,26 +361,18 @@ export default function Classy() {
             abuse the graveyard by freely putting cards there from your library.
             The card does so much more than just about every other red one drop,
             with the exception of another card introduced in Modern Horizons 2 (
-            <a
-              href="https://scryfall.com/card/mh2/138/ragavan-nimble-pilferer"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Ragavan, Nimble Pilferer
-            </a>
+            <ScryfallCardLink
+              card={classyBannedListState['Ragavan, Nimble Pilferer']}
+            />
             ). Yes, it does die to removal but so do all other red one drops.
             And it is hard to make the argument that a one drop which must be
-            answered quickly or else it will provide loads of value is a
+            answered almost immediately or it will provide loads of value is a
             reasonable and fair Magic card. DRC simply does too much, which
             makes deck building and brewing less interesting. It is to
             aggressive decks what{' '}
-            <a
-              href="https://scryfall.com/card/thb/229/uro-titan-of-natures-wrath"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Uro, Titan of Nature's Wrath
-            </a>{' '}
+            <ScryfallCardLink
+              card={classyBannedListState["Uro, Titan of Nature's Wrath"]}
+            />{' '}
             was to control decks before it was finally banned. Cards like this
             homogenize decks and are NOT classy.
           </MUITypography>
@@ -710,21 +496,18 @@ export default function Classy() {
             . Keep in mind that many of these cards are on the list not for
             power level concerns, but for violating one of the hard rules of the
             format, such as{' '}
-            <a
-              href="https://scryfall.com/card/khm/284/snow-covered-forest"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Snow-Covered Forest
-            </a>
+            <ScryfallCardLink
+              card={classyBannedListState['Snow-Covered Forest']}
+            />
             . The following cards are NOT classy:
           </MUITypography>
           <MUIList className={classes.multiColumnList}>
-            {bannedCards.map((card, index) => (
-              <MUIListItem key={card}>
+            {Object.entries(classyBannedList).map(([key, value], index) => (
+              <MUIListItem key={value.oracle_id}>
                 <MUIListItemText disableTypography={true}>
                   <MUITypography variant="body2">
-                    {index + 1}) {card}
+                    {index + 1}){' '}
+                    <ScryfallCardLink card={classyBannedListState[key]} />
                   </MUITypography>
                 </MUIListItemText>
               </MUIListItem>
@@ -803,9 +586,78 @@ export default function Classy() {
     }
   ];
 
-  const { hash } = useLocation();
+  useEffect(() => {
+    (async () => {
+      const bannedCardsIdentifierArray = Object.values(classyBannedList).map(
+        ({ name }) => ({ name })
+      );
+      const numberOfScryfallRequests = Math.ceil(
+        bannedCardsIdentifierArray.length / 75
+      );
+      const scryfallRequestArrays = [];
 
-  React.useEffect(() => {
+      for (
+        let requestNumber = 0;
+        requestNumber < numberOfScryfallRequests;
+        requestNumber++
+      ) {
+        scryfallRequestArrays.push(bannedCardsIdentifierArray.splice(0, 75));
+      }
+
+      const populatedObject = {};
+
+      for (const request of scryfallRequestArrays) {
+        const rawScryfallResponse = await fetch(
+          'https://api.scryfall.com/cards/collection',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ identifiers: request })
+          }
+        );
+        const parsedScryfallResponse = await rawScryfallResponse.json();
+
+        for (const card of parsedScryfallResponse.data) {
+          const { layout, name, oracle_id, scryfall_uri } = card;
+          let back_image, image;
+          switch (layout) {
+            case 'meld':
+              const meldResult = await fetch(
+                card.all_parts.find((part) => part.component === 'meld_result')
+                  .uri
+              ).json();
+              back_image = meldResult.image_uris.large;
+              image = card.image_uris.large;
+              break;
+            case 'modal_dfc':
+              back_image = card.card_faces[1].image_uris.large;
+              image = card.card_faces[0].image_uris.large;
+              break;
+            case 'transform':
+              back_image = card.card_faces[1].image_uris.large;
+              image = card.card_faces[0].image_uris.large;
+              break;
+            default:
+              back_image = null;
+              image = card.image_uris.large;
+          }
+          populatedObject[name] = {
+            back_image,
+            image,
+            name,
+            oracle_id,
+            scryfall_uri
+          };
+        }
+      }
+
+      setClassyBannedListState(populatedObject);
+    })();
+  });
+
+  useEffect(() => {
     if (hash === '') {
       window.scrollTo(0, 0);
     } else {
@@ -820,44 +672,50 @@ export default function Classy() {
   }, [hash]);
 
   return (
-    <React.Fragment>
-      <MUICard>
-        <MUICardHeader
-          title={<MUITypography variant="h2">Classy</MUITypography>}
-          subheader="The hot new MTG format the cool kids can't get enough of"
-        />
-        <MUICardContent>
-          <MUITypography
-            className={classes.paragraph}
-            paragraph={true}
-            variant="body2"
-          >
-            I'm a big fan of the Modern format, but there are aspects of it that
-            I have always hated. Since I've got my own website, I invented
-            Classy.
-          </MUITypography>
-          <MUIList>
-            {sections.map((section) => (
-              <MUIListItem key={section.id}>
-                <MUIListItemIcon>
-                  <MUIArrowRightIcon />
-                </MUIListItemIcon>
-                <MUIListItemText>
-                  <Link to={`#${section.id}`}>{section.title}</Link>
-                </MUIListItemText>
-              </MUIListItem>
-            ))}
-          </MUIList>
-        </MUICardContent>
-      </MUICard>
-      {sections.map((section) => (
-        <MUICard id={section.id} key={section.id}>
+    Object.values(classyBannedListState).some(
+      ({ scryfall_uri }) => !!scryfall_uri
+    ) && (
+      <React.Fragment>
+        <MUICard>
           <MUICardHeader
-            title={<MUITypography variant="h2">{section.title}</MUITypography>}
+            title={<MUITypography variant="h2">Classy</MUITypography>}
+            subheader="The hot new MTG format the cool kids can't get enough of"
           />
-          <MUICardContent>{section.info}</MUICardContent>
+          <MUICardContent>
+            <MUITypography
+              className={classes.paragraph}
+              paragraph={true}
+              variant="body2"
+            >
+              I'm a big fan of the Modern format, but there are aspects of it
+              that I have always hated. Since I've got my own website, I
+              invented Classy.
+            </MUITypography>
+            <MUIList>
+              {sections.map((section) => (
+                <MUIListItem key={section.id}>
+                  <MUIListItemIcon>
+                    <MUIArrowRightIcon />
+                  </MUIListItemIcon>
+                  <MUIListItemText>
+                    <Link to={`#${section.id}`}>{section.title}</Link>
+                  </MUIListItemText>
+                </MUIListItem>
+              ))}
+            </MUIList>
+          </MUICardContent>
         </MUICard>
-      ))}
-    </React.Fragment>
+        {sections.map((section) => (
+          <MUICard id={section.id} key={section.id}>
+            <MUICardHeader
+              title={
+                <MUITypography variant="h2">{section.title}</MUITypography>
+              }
+            />
+            <MUICardContent>{section.info}</MUICardContent>
+          </MUICard>
+        ))}
+      </React.Fragment>
+    )
   );
 }

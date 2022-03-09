@@ -28,6 +28,7 @@ import { Link } from 'react-router-dom';
 
 import DeleteDeckForm from '../../forms/DeleteDeckForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
+import formats from '../../constants/formats';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
@@ -127,14 +128,11 @@ export default function DeckInfo() {
                   id: 'format-selector'
                 }}
               >
-                <option value="Freeform">Freeform</option>
-                <option value="Classy">Classy</option>
-                <option value="Legacy">Legacy</option>
-                <option value="Modern">Modern</option>
-                <option value="Pauper">Pauper</option>
-                <option value="Pioneer">Pioneer</option>
-                <option value="Standard">Standard</option>
-                <option value="Vintage">Vintage</option>
+                {formats.map((frmt) => (
+                  <option key={frmt} value={frmt}>
+                    {frmt}
+                  </option>
+                ))}
               </MUISelect>
             </MUIFormControl>
           }
