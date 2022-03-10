@@ -50,7 +50,8 @@ export default function DeckInfo() {
       sideboard
     },
     cloneDeck,
-    editDeck
+    editDeck,
+    warnings
   } = useContext(DeckContext);
   const [descriptionInput, setDescriptionInput] = useState(description);
   const [isPublished, setIsPublished] = useState(published);
@@ -73,10 +74,7 @@ export default function DeckInfo() {
 
   return (
     <React.Fragment>
-      <DeleteDeckForm
-        deckToDelete={deckToDelete}
-        setDeckToDelete={setDeckToDelete}
-      />
+      <DeleteDeckForm deckToDelete={deckToDelete} setDeckToDelete={setDeckToDelete} />
 
       <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
         <MUIDialogTitle>Sample Hand from {name}</MUIDialogTitle>
@@ -84,21 +82,13 @@ export default function DeckInfo() {
           <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
             {sampleHand.map((card) => (
               <MUIImageListItem key={card._id}>
-                <img
-                  alt={card.name}
-                  src={card.image}
-                  style={{ height: 264, width: 189 }}
-                />
+                <img alt={card.name} src={card.image} style={{ height: 264, width: 189 }} />
               </MUIImageListItem>
             ))}
           </MUIImageList>
         </MUIDialogContent>
         <MUIDialogActions>
-          <MUIButton
-            onClick={() =>
-              setSampleHand(randomSampleWOReplacement(mainboard, 7))
-            }
-          >
+          <MUIButton onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}>
             New Sample Hand
           </MUIButton>
         </MUIDialogActions>
@@ -202,8 +192,7 @@ export default function DeckInfo() {
           subheader={
             <React.Fragment>
               <MUITypography color="textSecondary" variant="subtitle1">
-                Designed by:{' '}
-                <Link to={`/account/${creator._id}`}>{creator.name}</Link>
+                Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
               </MUITypography>
               <MUITypography variant="subtitle1">
                 <CSVLink
@@ -256,6 +245,22 @@ export default function DeckInfo() {
               }}
             />
           )}
+
+          <div
+            style={{
+              backgroundColor: theme.palette.secondary.main,
+              // borderRadius: 4,
+              color: 'white',
+              margin: '8px -8px',
+              padding: '0 8px'
+            }}
+          >
+            {warnings.map((warning) => (
+              <MUITypography key={warning} variant="body1">
+                {warning}
+              </MUITypography>
+            ))}
+          </div>
         </MUICardContent>
 
         <MUICardActions
@@ -278,18 +283,13 @@ export default function DeckInfo() {
             </span>
           )}
           {isLoggedIn && (
-            <MUIButton
-              onClick={cloneDeck}
-              startIcon={<MUIFileCopyOutlinedIcon />}
-            >
+            <MUIButton onClick={cloneDeck} startIcon={<MUIFileCopyOutlinedIcon />}>
               Clone Deck
             </MUIButton>
           )}
 
           <MUIButton
-            onClick={() =>
-              setSampleHand(randomSampleWOReplacement(mainboard, 7))
-            }
+            onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}
             startIcon={<MUIShuffleOutlinedIcon />}
           >
             Sample Hand

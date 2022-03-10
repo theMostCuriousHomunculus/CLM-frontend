@@ -1,9 +1,10 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
+import validateDeck from '../functions/validate-deck';
 import Deck from '../pages/Deck';
 import { CardCacheContext } from './CardCache';
 
@@ -32,14 +33,14 @@ export const DeckContext = createContext({
   cloneDeck: () => null,
   editDeck: () => null,
   removeCardsFromDeck: () => null,
-  toggleMainboardSideboardDeck: () => null
+  toggleMainboardSideboardDeck: () => null,
+  warnings: []
 });
 
 export default function ContextualizedDeckPage() {
   const navigate = useNavigate();
   const { deckID } = useParams();
-  const { addCardsToCache, scryfallCardDataCache } =
-    useContext(CardCacheContext);
+  const { addCardsToCache, scryfallCardDataCache } = useContext(CardCacheContext);
   const [deckState, setDeckState] = useState({
     _id: deckID,
     creator: {
@@ -59,6 +60,8 @@ export default function ContextualizedDeckPage() {
     published: false,
     sideboard: []
   });
+  const [warnings, setWarnings] = useState([]);
+
   const cardQuery = `
     _id
     scryfall_id
@@ -272,6 +275,11 @@ export default function ContextualizedDeckPage() {
     update: updateDeckState
   });
 
+  useEffect(() => {
+    const { format, mainboard, sideboard } = deckState;
+    validateDeck({ format, mainboard, sideboard }, setWarnings);
+  }, [deckState.format, deckState.mainboard.length, deckState.sideboard.length]);
+
   return (
     <DeckContext.Provider
       value={{
@@ -281,7 +289,8 @@ export default function ContextualizedDeckPage() {
         cloneDeck,
         editDeck,
         removeCardsFromDeck,
-        toggleMainboardSideboardDeck
+        toggleMainboardSideboardDeck,
+        warnings
       }}
     >
       <Deck />
