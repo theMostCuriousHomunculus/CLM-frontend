@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import usePopulate from '../hooks/populate-hook';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import validateDeck from '../functions/validate-deck';
@@ -64,7 +63,34 @@ export default function ContextualizedDeckPage() {
 
   const cardQuery = `
     _id
-    scryfall_id
+    scryfall_card {
+      _id
+      card_faces {
+        image_uris {
+          large
+        }
+        mana_cost
+        name
+        oracle_text
+      }
+      cmc
+      collector_number
+      image_uris {
+        large
+      }
+      legalities {
+        banned
+        legal
+        not_legal
+        restricted
+      }
+      mana_cost
+      mtgo_id
+      name
+      oracle_text
+      _set
+      type_line
+    }
   `;
   const deckQuery = `
     _id
@@ -86,21 +112,12 @@ export default function ContextualizedDeckPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
-  const { populateCachedScryfallData } = usePopulate();
 
   const updateDeckState = useCallback(
     async function (data) {
       const cardSet = new Set();
 
       if (data.image) cardSet.add(data.image);
-
-      for (const card of data.mainboard) {
-        cardSet.add(card.scryfall_id);
-      }
-
-      for (const card of data.sideboard) {
-        cardSet.add(card.scryfall_id);
-      }
 
       await addCardsToCache([...cardSet]);
 
@@ -112,13 +129,9 @@ export default function ContextualizedDeckPage() {
         };
       }
 
-      data.mainboard.forEach(populateCachedScryfallData);
-
-      data.sideboard.forEach(populateCachedScryfallData);
-
       setDeckState(data);
     },
-    [addCardsToCache, populateCachedScryfallData]
+    [addCardsToCache]
   );
 
   const addCardsToDeck = useCallback(

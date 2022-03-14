@@ -58,7 +58,7 @@ export default function PlaysetDisplay({
             component,
             name: card.name,
             numberOfCopies: updatedCount - copies.length,
-            scryfall_id: card.scryfall_id
+            scryfall_id: card._id
           }
         });
       } else {
@@ -87,9 +87,7 @@ export default function PlaysetDisplay({
       <MUITextField
         autoComplete="off"
         disabled={
-          isMatch ||
-          (isEvent && !card.type_line.includes('Basic')) ||
-          authorizedID !== userID
+          isMatch || (isEvent && !card.type_line.includes('Basic')) || authorizedID !== userID
         }
         inputProps={{
           min: 0,
@@ -110,11 +108,7 @@ export default function PlaysetDisplay({
         value={updatedCount}
       />
       <div style={{ display: 'flex', flexGrow: 1 }}>
-        <MUITooltip
-          title={`Move One to ${
-            component === 'mainboard' ? 'Sideboard' : 'Mainboard'
-          }`}
-        >
+        <MUITooltip title={`Move One to ${component === 'mainboard' ? 'Sideboard' : 'Mainboard'}`}>
           <MUIIconButton
             className={classes.iconButton}
             onClick={() => {
@@ -131,11 +125,7 @@ export default function PlaysetDisplay({
             size="small"
             style={{ alignSelf: 'center' }}
           >
-            {useMediaQuery(theme.breakpoints.up('md')) ? (
-              <MUISwapHorizIcon />
-            ) : (
-              <MUISwapVertIcon />
-            )}
+            {useMediaQuery(theme.breakpoints.up('md')) ? <MUISwapHorizIcon /> : <MUISwapVertIcon />}
           </MUIIconButton>
         </MUITooltip>
         <MUITypography
@@ -146,11 +136,14 @@ export default function PlaysetDisplay({
             justifyContent: 'space-between'
           }}
         >
-          <HoverPreview back_image={card.back_image} image={card.image}>
+          <HoverPreview
+            back_image={card.image_uris ? undefined : card.card_faces[1].image_uris.large}
+            image={card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large}
+          >
             <span>{card.name}</span>
           </HoverPreview>
           <span>
-            {card.set.toUpperCase()}
+            {card._set.toUpperCase()}
             <ManaCostSVGs manaCostString={card.mana_cost} size={20} />
           </span>
         </MUITypography>

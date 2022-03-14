@@ -23,18 +23,18 @@ export default function validateDeck({ format, mainboard, sideboard }, setWarnin
       const cardCountObject = {};
 
       for (const card of mainboard.concat(sideboard)) {
-        if (card.name in cardCountObject) {
-          cardCountObject[card.name].count++;
+        if (card.scryfall_card.name in cardCountObject) {
+          cardCountObject[card.scryfall_card.name].count++;
         } else {
-          cardCountObject[card.name] = {
-            ...card,
+          cardCountObject[card.scryfall_card.name] = {
+            ...card.scryfall_card,
             count: 1
           };
         }
       }
 
       for (const [name, cardObject] of Object.entries(cardCountObject)) {
-        if (cardObject.legalities.modern === 'not_legal') {
+        if (cardObject.legalities.not_legal.includes('modern')) {
           validationIssues.push(
             `Deck contains ${cardObject.count} cop${
               cardObject.count === 1 ? 'y' : 'ies'
@@ -61,7 +61,7 @@ export default function validateDeck({ format, mainboard, sideboard }, setWarnin
           } else if (
             cardObject.count > 3 &&
             !cardObject.type_line.includes('Basic') &&
-            !cardObject.oracle_text.includes(`A deck can have any number of cards named ${name}`)
+            !cardObject.oracle_text?.includes(`A deck can have any number of cards named ${name}`)
           ) {
             validationIssues.push(
               `Deck contains ${cardObject.count} copies of "${name}"!  A maximum of 3 copies are allowed.`

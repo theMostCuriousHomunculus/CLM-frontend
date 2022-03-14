@@ -45,38 +45,22 @@ export default function DeckDisplay({
                 'Sorcery'
               ].map(function (type) {
                 const group = customSort(deck[component.toLocaleLowerCase()], [
-                  'cmc',
-                  'name',
-                  'set'
-                ]).filter((card) => specificCardType(card.type_line) === type);
+                  'scryfall_card.cmc',
+                  'scryfall_card.name',
+                  'scryfall_card._set',
+                  'scryfall_card.collector_number'
+                ]).filter((card) => specificCardType(card.scryfall_card.type_line) === type);
                 const condensedGroup = [];
 
                 for (const card of group) {
                   const existingCopies = condensedGroup.find(
-                    (abstraction) =>
-                      abstraction.card.scryfall_id === card.scryfall_id
+                    (abstraction) => abstraction.card._id === card.scryfall_card._id
                   );
                   if (existingCopies) {
                     existingCopies.copies.push(card._id);
                   } else {
                     condensedGroup.push({
-                      card: {
-                        back_image: card.back_image,
-                        cmc: card.cmc,
-                        collector_number: card.collector_number,
-                        color_identity: card.color_identity,
-                        image: card.image,
-                        keywords: card.keywords,
-                        mana_cost: card.mana_cost,
-                        mtgo_id: card.mtgo_id,
-                        name: card.name,
-                        oracle_id: card.oracle_id,
-                        scryfall_id: card.scryfall_id,
-                        set: card.set,
-                        set_name: card.set_name,
-                        tcgplayer_id: card.tcgplayer_id,
-                        type_line: card.type_line
-                      },
+                      card: { ...card.scryfall_card },
                       copies: [card._id]
                     });
                   }
@@ -91,7 +75,7 @@ export default function DeckDisplay({
                           add={add}
                           authorizedID={authorizedID}
                           component={component.toLowerCase()}
-                          key={playset.card.scryfall_id}
+                          key={playset.card._id}
                           playset={playset}
                           remove={remove}
                           toggle={toggle}
