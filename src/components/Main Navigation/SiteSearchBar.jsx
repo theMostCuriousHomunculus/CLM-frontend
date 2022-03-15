@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUICircularProgress from '@mui/material/CircularProgress';
 import MUISearchIcon from '@mui/icons-material/Search';
@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router';
 import theme from '../../theme';
 import useRequest from '../../hooks/request-hook';
 import Avatar from '../miscellaneous/Avatar';
-import { CardCacheContext } from '../../contexts/CardCache';
 
 const useStyles = makeStyles({
   input: {
@@ -43,48 +42,11 @@ const useStyles = makeStyles({
 
 export default function SiteSearchBar({ color, setDrawerOpen }) {
   const searchInput = useRef();
-  const { addCardsToCache, scryfallCardDataCache } =
-    useContext(CardCacheContext);
   const { loading, sendRequest } = useRequest();
   const [searchResults, setSearchResults] = useState([]);
   const [timer, setTimer] = useState();
   const classes = useStyles();
   const navigate = useNavigate();
-
-  const updateSearchResults = useCallback(
-    async function (data) {
-      const cardSet = new Set();
-
-      for (const result of data) {
-        if (
-          (result.__typename === 'CubeType' ||
-            result.__typename === 'DeckType') &&
-          result.image
-        ) {
-          cardSet.add(result.image);
-        }
-      }
-
-      await addCardsToCache([...cardSet]);
-
-      for (const result of data) {
-        if (
-          (result.__typename === 'CubeType' ||
-            result.__typename === 'DeckType') &&
-          result.image
-        ) {
-          result.image = {
-            alt: scryfallCardDataCache.current[result.image].name,
-            scryfall_id: result.image,
-            src: scryfallCardDataCache.current[result.image].art_crop
-          };
-        }
-      }
-
-      setSearchResults(data);
-    },
-    [addCardsToCache]
-  );
 
   const searchSite = useCallback(
     (event) => {
@@ -95,10 +57,11 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
             setSearchResults([]);
           } else {
             await sendRequest({
-              callback: updateSearchResults,
+              callback: setSearchResults,
               load: true,
               operation: 'searchSite',
               get body() {
+                // https://www.rakeshjesadiya.com/graphql-fields-conflict-return-conflicting-types-use-different-aliases-on-the-fields/
                 return {
                   query: `
                     query {
@@ -112,7 +75,7 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                           name
                         }
                         ... on BlogPostType {
-                          image
+                          stringImage: image
                           title
                           subtitle
                         }
@@ -122,7 +85,19 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                             avatar
                             name
                           }
-                          image
+                          cardImage: image {
+                            _id
+                            image_uris {
+                              art_crop
+                            }
+                            name
+                            card_faces {
+                              image_uris {
+                                art_crop
+                              }
+                              name
+                            }
+                          }
                           name
                         }
                         ... on DeckType {
@@ -131,7 +106,19 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                             avatar
                             name
                           }
-                          image
+                          cardImage: image {
+                            _id
+                            image_uris {
+                              art_crop
+                            }
+                            name
+                            card_faces {
+                              image_uris {
+                                art_crop
+                              }
+                              name
+                            }
+                          }
                           name
                         }
                         ... on EventType {
@@ -240,7 +227,8 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                 <span className={classes.option}>
                   <img
                     alt={option.subtitle}
-                    src={option.image}
+                    // src={option.image}
+                    src={option.stringImage}
                     style={{ borderRadius: 4 }}
                     width={75}
                   />
@@ -248,9 +236,7 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Blog Post
                     </MUITypography>
-                    <MUITypography variant="body1">
-                      {option.title}
-                    </MUITypography>
+                    <MUITypography variant="body1">{option.title}</MUITypography>
                   </span>
                 </span>
               </li>
@@ -259,14 +245,34 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
             {option.__typename === 'CubeType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  {option.image && (
-                    <img
-                      alt={option.image.alt}
-                      src={option.image.src}
-                      style={{ borderRadius: 4 }}
-                      width={75}
-                    />
-                  )}
+                  {
+                    /* option.image */ option.cardImage && (
+                      <img
+                        // alt={
+                        //   option.image.image_uris
+                        //     ? option.image.name
+                        //     : option.image.card_faces[0].name
+                        // }
+                        // src={
+                        //   option.image.image_uris
+                        //     ? option.image.image_uris.art_crop
+                        //     : option.image.card_faces[0].image_uris.art_crop
+                        // }
+                        alt={
+                          option.cardImage.image_uris
+                            ? option.cardImage.name
+                            : option.cardImage.card_faces[0].name
+                        }
+                        src={
+                          option.cardImage.image_uris
+                            ? option.cardImage.image_uris.art_crop
+                            : option.cardImage.card_faces[0].image_uris.art_crop
+                        }
+                        style={{ borderRadius: 4 }}
+                        width={75}
+                      />
+                    )
+                  }
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Cube
@@ -280,14 +286,34 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
             {option.__typename === 'DeckType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  {option.image && (
-                    <img
-                      alt={option.image.alt}
-                      src={option.image.src}
-                      style={{ borderRadius: 4 }}
-                      width={75}
-                    />
-                  )}
+                  {
+                    /* option.image */ option.cardImage && (
+                      <img
+                        // alt={
+                        //   option.image.image_uris
+                        //     ? option.image.name
+                        //     : option.image.card_faces[0].name
+                        // }
+                        // src={
+                        //   option.image.image_uris
+                        //     ? option.image.image_uris.art_crop
+                        //     : option.image.card_faces[0].image_uris.art_crop
+                        // }
+                        alt={
+                          option.cardImage.image_uris
+                            ? option.cardImage.name
+                            : option.cardImage.card_faces[0].name
+                        }
+                        src={
+                          option.cardImage.image_uris
+                            ? option.cardImage.image_uris.art_crop
+                            : option.cardImage.card_faces[0].image_uris.art_crop
+                        }
+                        style={{ borderRadius: 4 }}
+                        width={75}
+                      />
+                    )
+                  }
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Deck

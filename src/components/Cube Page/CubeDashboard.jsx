@@ -64,11 +64,8 @@ export default function CubeDashboard() {
   const { setErrorMessages } = useContext(ErrorContext);
   const cubeImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
   const componentNameInputRef = useRef();
-  const [componentNameInput, setComponentNameInput] = useState(
-    activeComponentState.name
-  );
-  const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] =
-    useState(false);
+  const [componentNameInput, setComponentNameInput] = useState(activeComponentState.name);
+  const [createComponentDialogIsOpen, setCreateComponentDialogIsOpen] = useState(false);
   const [cubeToDelete, setCubeToDelete] = useState({ _id: null, name: null });
   const [editingComponentName, setEditingComponentName] = useState(false);
   const [samplePack, setSamplePack] = useState([]);
@@ -90,21 +87,13 @@ export default function CubeDashboard() {
           <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
             {samplePack.map((card) => (
               <MUIImageListItem key={card._id}>
-                <img
-                  alt={card.name}
-                  src={card.image}
-                  style={{ height: 264, width: 189 }}
-                />
+                <img alt={card.name} src={card.image} style={{ height: 264, width: 189 }} />
               </MUIImageListItem>
             ))}
           </MUIImageList>
         </MUIDialogContent>
         <MUIDialogActions>
-          <MUIButton
-            onClick={() =>
-              setSamplePack(randomSampleWOReplacement(mainboard, 15))
-            }
-          >
+          <MUIButton onClick={() => setSamplePack(randomSampleWOReplacement(mainboard, 15))}>
             New Sample Pack
           </MUIButton>
         </MUIDialogActions>
@@ -112,15 +101,10 @@ export default function CubeDashboard() {
 
       <CreateComponentForm
         open={createComponentDialogIsOpen}
-        toggleOpen={() =>
-          setCreateComponentDialogIsOpen((prevState) => !prevState)
-        }
+        toggleOpen={() => setCreateComponentDialogIsOpen((prevState) => !prevState)}
       />
 
-      <DeleteCubeForm
-        setCubeToDelete={setCubeToDelete}
-        cubeToDelete={cubeToDelete}
-      />
+      <DeleteCubeForm setCubeToDelete={setCubeToDelete} cubeToDelete={cubeToDelete} />
 
       <MUICard>
         <MUICardHeader
@@ -128,19 +112,14 @@ export default function CubeDashboard() {
             <React.Fragment>
               {!editingComponentName && (
                 <div style={{ display: 'flex' }}>
-                  {!['mainboard', 'sideboard'].includes(
-                    activeComponentState._id
-                  ) &&
+                  {!['mainboard', 'sideboard'].includes(activeComponentState._id) &&
                     userID === creator._id && (
                       <MUIIconButton
                         aria-label="edit component name"
                         color="primary"
                         onClick={() => {
                           setEditingComponentName(true);
-                          setTimeout(
-                            () => componentNameInputRef.current.focus(),
-                            0
-                          );
+                          setTimeout(() => componentNameInputRef.current.focus(), 0);
                         }}
                       >
                         <MUIEditOutlinedIcon />
@@ -148,9 +127,7 @@ export default function CubeDashboard() {
                     )}
 
                   <MUIFormControl variant="outlined">
-                    <MUIInputLabel htmlFor="component-selector">
-                      Viewing
-                    </MUIInputLabel>
+                    <MUIInputLabel htmlFor="component-selector">Viewing</MUIInputLabel>
                     <MUISelect
                       inputProps={{ id: 'component-selector' }}
                       label="Viewing"
@@ -194,22 +171,14 @@ export default function CubeDashboard() {
                 <MUITextField
                   defaultValue={activeComponentState.name}
                   label={`${
-                    Number.isInteger(activeComponentState.size)
-                      ? 'Rotation'
-                      : 'Module'
+                    Number.isInteger(activeComponentState.size) ? 'Rotation' : 'Module'
                   } Name`}
                   inputProps={{
                     onBlur: async () => {
                       setEditingComponentName(false);
-                      if (
-                        activeComponentState.name !==
-                        componentNameInputRef.current.value
-                      ) {
+                      if (activeComponentState.name !== componentNameInputRef.current.value) {
                         if (Number.isInteger(activeComponentState.size)) {
-                          editRotation(
-                            componentNameInputRef.current.value,
-                            sizeInput
-                          );
+                          editRotation(componentNameInputRef.current.value, sizeInput);
                         } else {
                           try {
                             await editModule({
@@ -221,10 +190,7 @@ export default function CubeDashboard() {
                               }
                             });
                           } catch (error) {
-                            setErrorMessages((prevState) => [
-                              ...prevState,
-                              error.message
-                            ]);
+                            setErrorMessages((prevState) => [...prevState, error.message]);
                             setComponentNameInput(activeComponentState.name);
                           }
                         }
@@ -242,8 +208,7 @@ export default function CubeDashboard() {
                   inputProps={{
                     max: activeComponentState.maxSize,
                     min: 0,
-                    onBlur: () =>
-                      editRotation(activeComponentState.name, sizeInput),
+                    onBlur: () => editRotation(activeComponentState.name, sizeInput),
                     step: 1
                   }}
                   onChange={(event) => setSizeInput(event.target.value)}
@@ -251,9 +216,7 @@ export default function CubeDashboard() {
                     marginLeft:
                       !editingComponentName &&
                       userID === creator._id &&
-                      !['mainboard', 'sideboard'].includes(
-                        activeComponentState._id
-                      )
+                      !['mainboard', 'sideboard'].includes(activeComponentState._id)
                         ? 40
                         : 0,
                     marginTop: 8
@@ -267,8 +230,12 @@ export default function CubeDashboard() {
           avatar={
             image && (
               <img
-                alt={image.alt}
-                src={image.src}
+                alt={image.image_uris ? image.name : image.card_faces[0].name}
+                src={
+                  image.image_uris
+                    ? image.image_uris.art_crop
+                    : image.card_faces[0].image_uris.art_crop
+                }
                 style={{ borderRadius: 4 }}
                 width={cubeImageWidth}
               />
@@ -287,8 +254,7 @@ export default function CubeDashboard() {
           subheader={
             <React.Fragment>
               <MUITypography color="textSecondary" variant="subtitle1">
-                Designed by:{' '}
-                <Link to={`/account/${creator._id}`}>{creator.name}</Link>
+                Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
               </MUITypography>
               <MUITypography variant="subtitle1">
                 <CSVLink
@@ -297,9 +263,7 @@ export default function CubeDashboard() {
                     modules
                       .map((module) => module.cards)
                       .flat()
-                      .concat(
-                        rotations.map((rotation) => rotation.cards).flat()
-                      )
+                      .concat(rotations.map((rotation) => rotation.cards).flat())
                       .concat(sideboard)
                   )}
                   filename={`${cubeName}.csv`}
@@ -331,10 +295,7 @@ export default function CubeDashboard() {
                     variables: { image: chosenCard.scryfall_id }
                   });
                 } catch (error) {
-                  setErrorMessages((prevState) => [
-                    ...prevState,
-                    error.message
-                  ]);
+                  setErrorMessages((prevState) => [...prevState, error.message]);
                 }
               }}
             />
@@ -363,22 +324,15 @@ export default function CubeDashboard() {
                 </MUIButton>
               </span>
 
-              {!['mainboard', 'sideboard'].includes(
-                activeComponentState._id
-              ) && (
+              {!['mainboard', 'sideboard'].includes(activeComponentState._id) && (
                 <MUIButton
                   color="warning"
                   onClick={
-                    Number.isInteger(activeComponentState.size)
-                      ? deleteRotation
-                      : deleteModule
+                    Number.isInteger(activeComponentState.size) ? deleteRotation : deleteModule
                   }
                   startIcon={<MUIDeleteForeverOutlinedIcon />}
                 >
-                  Delete this{' '}
-                  {Number.isInteger(activeComponentState.size)
-                    ? 'Rotation'
-                    : 'Module'}
+                  Delete this {Number.isInteger(activeComponentState.size) ? 'Rotation' : 'Module'}
                 </MUIButton>
               )}
             </React.Fragment>
@@ -396,9 +350,7 @@ export default function CubeDashboard() {
           )}
 
           <MUIButton
-            onClick={() =>
-              setSamplePack(randomSampleWOReplacement(mainboard, 15))
-            }
+            onClick={() => setSamplePack(randomSampleWOReplacement(mainboard, 15))}
             startIcon={<MUIShuffleOutlinedIcon />}
           >
             Sample Pack

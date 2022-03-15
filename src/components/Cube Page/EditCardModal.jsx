@@ -11,7 +11,7 @@ import MUITextField from '@mui/material/TextField';
 import { useParams } from 'react-router-dom';
 
 import editCard from '../../graphql/mutations/cube/edit-card';
-import ChangePrintMenu from './ChangePrintMenu';
+// import ChangePrintMenu from './ChangePrintMenu';
 import ColorCheckboxes from './ColorCheckboxes';
 import MoveDeleteMenu from './MoveDeleteMenu';
 import { CubeContext } from '../../contexts/cube-context';
@@ -24,11 +24,11 @@ export default function EditCardModal({ card, clear, editable }) {
   const { cubeID } = useParams();
   const [destination, setDestination] = useState(activeComponentID);
   const [mutableCardDetails, setMutableCardDetails] = useState({
-    cmc: card.cmc,
-    color_identity: card.color_identity,
+    cmc: Number.isInteger(card.cmc) ? card.cmc : card.scryfall_card.cmc,
+    color_identity: card.color_identity ? card.color_identity : card.scryfall_card.color_identity,
     notes: card.notes,
-    scryfall_id: card.scryfall_id,
-    type_line: card.type_line
+    scryfall_id: card.scryfall_card._id,
+    type_line: card.type_line ? card.type_line : card.scryfall_card.type_line
   });
 
   async function submitForm(event) {
@@ -37,11 +37,13 @@ export default function EditCardModal({ card, clear, editable }) {
     if (
       JSON.stringify(mutableCardDetails) !==
       JSON.stringify({
-        cmc: card.cmc,
-        color_identity: card.color_identity,
+        cmc: Number.isInteger(card.cmc) ? card.cmc : card.scryfall_card.cmc,
+        color_identity: card.color_identity
+          ? card.color_identity
+          : card.scryfall_card.color_identity,
         notes: card.notes,
-        scryfall_id: card.scryfall_id,
-        type_line: card.type_line
+        scryfall_id: card.scryfall_card._id,
+        type_line: card.type_line ? card.type_line : card.scryfall_card.type_line
       })
     ) {
       editCard({
@@ -65,11 +67,13 @@ export default function EditCardModal({ card, clear, editable }) {
     <MUIDialog onClose={clear} open={Object.keys(card).length > 0}>
       {Object.keys(card).length > 0 && (
         <form onSubmit={submitForm}>
-          <MUIDialogTitle>{editable ? 'Edit Card' : card.name}</MUIDialogTitle>
+          <MUIDialogTitle>
+            {editable ? 'Edit Card' : card.name ? card.name : card.scryfall_card.name}
+          </MUIDialogTitle>
           <MUIDialogContent>
             <MUIGrid container={true} spacing={1}>
               <MUIGrid
-                container={!!card.back_image}
+                container={!card.scryfall_card.image_uris}
                 item={true}
                 xs={12}
                 md={6}
@@ -79,9 +83,25 @@ export default function EditCardModal({ card, clear, editable }) {
                   justifyContent: 'center'
                 }}
               >
-                <img alt={card.name} src={card.image} height={264} />
-                {card.back_image && (
-                  <img alt={card.name} src={card.back_image} height={264} />
+                <img
+                  alt={
+                    card.scryfall_card.image_uris
+                      ? card.scryfall_card.name
+                      : card.scryfall_card.card_faces[0].name
+                  }
+                  src={
+                    card.scryfall_card.image_uris
+                      ? card.scryfall_card.image_uris.large
+                      : card.scryfall_card.card_faces[0].image_uris.large
+                  }
+                  height={264}
+                />
+                {!card.scryfall_card.image_uris && (
+                  <img
+                    alt={card.scryfall_card.card_faces[1].name}
+                    src={card.scryfall_card.card_faces[1].image_uris.large}
+                    height={264}
+                  />
                 )}
               </MUIGrid>
               <MUIGrid item={true} xs={12} md={6}>
@@ -104,7 +124,7 @@ export default function EditCardModal({ card, clear, editable }) {
                   }
                 />
 
-                <ChangePrintMenu
+                {/* <ChangePrintMenu
                   card={card}
                   handlePrintingChange={(pd) =>
                     setMutableCardDetails((prevState) => ({
@@ -112,7 +132,7 @@ export default function EditCardModal({ card, clear, editable }) {
                       scryfall_id: pd.scryfall_id
                     }))
                   }
-                />
+                /> */}
               </MUIGrid>
             </MUIGrid>
 
@@ -133,17 +153,10 @@ export default function EditCardModal({ card, clear, editable }) {
           </MUIDialogContent>
           {editable && (
             <MUIDialogActions>
-              <MUIButton
-                type="submit"
-                startIcon={<MUIPublishedWithChangesOutlinedIcon />}
-              >
+              <MUIButton type="submit" startIcon={<MUIPublishedWithChangesOutlinedIcon />}>
                 Submit Changes
               </MUIButton>
-              <MUIButton
-                color="warning"
-                onClick={clear}
-                startIcon={<MUICancelOutlinedIcon />}
-              >
+              <MUIButton color="warning" onClick={clear} startIcon={<MUICancelOutlinedIcon />}>
                 Discard Changes
               </MUIButton>
             </MUIDialogActions>

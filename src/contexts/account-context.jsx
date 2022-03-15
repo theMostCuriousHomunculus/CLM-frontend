@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import fetchAccountByID from '../graphql/queries/account/fetch-account-by-ID';
@@ -12,7 +6,6 @@ import useRequest from '../hooks/request-hook';
 import Account from '../pages/Account';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from './Authentication';
-import { CardCacheContext } from './CardCache';
 import { ErrorContext } from './Error';
 
 export const AccountContext = createContext({
@@ -44,8 +37,6 @@ export const AccountContext = createContext({
 
 export default function ContextualizedAccountPage() {
   const { setUserInfo, userID } = useContext(AuthenticationContext);
-  const { addCardsToCache, scryfallCardDataCache } =
-    useContext(CardCacheContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const navigate = useNavigate();
   const { accountID } = useParams();
@@ -89,7 +80,19 @@ export default function ContextualizedAccountPage() {
     cubes {
       _id
       description
-      image
+      image {
+        _id
+        image_uris {
+          art_crop
+        }
+        name
+        card_faces {
+          image_uris {
+            art_crop
+          }
+          name
+        }
+      }
       mainboard {
         _id
       }
@@ -117,7 +120,19 @@ export default function ContextualizedAccountPage() {
       _id
       description
       format
-      image
+      image {
+        _id
+        image_uris {
+          art_crop
+        }
+        name
+        card_faces {
+          image_uris {
+            art_crop
+          }
+          name
+        }
+      }
       name
     }
     email
@@ -126,7 +141,19 @@ export default function ContextualizedAccountPage() {
       createdAt
       cube {
         _id
-        image
+        image {
+          _id
+          image_uris {
+            art_crop
+          }
+          name
+          card_faces {
+            image_uris {
+              art_crop
+            }
+            name
+          }
+        }
         name
       }
       host {
@@ -193,59 +220,6 @@ export default function ContextualizedAccountPage() {
     total_events
   `;
   const { sendRequest } = useRequest();
-
-  const updateAccountState = useCallback(
-    async function (data) {
-      const cardSet = new Set();
-
-      for (const cube of data.cubes) {
-        if (cube.image) cardSet.add(cube.image);
-      }
-
-      for (const deck of data.decks) {
-        if (deck.image) cardSet.add(deck.image);
-      }
-
-      for (const event of data.events) {
-        if (event.cube.image) cardSet.add(event.cube.image);
-      }
-
-      await addCardsToCache([...cardSet]);
-
-      for (const cube of data.cubes) {
-        if (cube.image) {
-          cube.image = {
-            alt: scryfallCardDataCache.current[cube.image].name,
-            scryfall_id: cube.image,
-            src: scryfallCardDataCache.current[cube.image].art_crop
-          };
-        }
-      }
-
-      for (const deck of data.decks) {
-        if (deck.image) {
-          deck.image = {
-            alt: scryfallCardDataCache.current[deck.image].name,
-            scryfall_id: deck.image,
-            src: scryfallCardDataCache.current[deck.image].art_crop
-          };
-        }
-      }
-
-      for (const event of data.events) {
-        if (event.cube.image) {
-          event.cube.image = {
-            alt: scryfallCardDataCache.current[event.cube.image].name,
-            scryfall_id: event.cube.image,
-            src: scryfallCardDataCache.current[event.cube.image].art_crop
-          };
-        }
-      }
-
-      setAccountState(data);
-    },
-    [addCardsToCache]
-  );
 
   const createMatch = useCallback(
     async function (event, deckIDs, eventID, playerIDs) {
@@ -318,7 +292,7 @@ export default function ContextualizedAccountPage() {
           headers: { AccountID: accountID },
           queryString: `{\n${accountQuery}\n}`
         });
-        await updateAccountState(data.data.fetchAccountByID);
+        setAccountState(data.data.fetchAccountByID);
       } catch (error) {
         setErrorMessages((prevState) => [...prevState, error.message]);
       } finally {

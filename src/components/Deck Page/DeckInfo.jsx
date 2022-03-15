@@ -108,7 +108,7 @@ export default function DeckInfo() {
                   editDeck({
                     description: descriptionInput,
                     format: event.target.value,
-                    image: image.scryfall_id,
+                    image: image._id,
                     name: deckNameInput,
                     published: isPublished
                   });
@@ -127,14 +127,18 @@ export default function DeckInfo() {
             </MUIFormControl>
           }
           avatar={
-            image ? (
+            image && (
               <img
-                alt={image.alt}
-                src={image.src}
+                alt={image.image_uris ? image.name : image.card_faces[0].name}
+                src={
+                  image.image_uris
+                    ? image.image_uris.art_crop
+                    : image.card_faces[0].image_uris.art_crop
+                }
                 style={{ borderRadius: 4 }}
                 width={deckImageWidth}
               />
-            ) : undefined
+            )
           }
           title={
             <React.Fragment>
@@ -145,7 +149,7 @@ export default function DeckInfo() {
                     editDeck({
                       description: descriptionInput,
                       format,
-                      image: image.scryfall_id,
+                      image: image._id,
                       name: deckNameInput,
                       published: isPublished
                     });
@@ -171,7 +175,7 @@ export default function DeckInfo() {
                           editDeck({
                             description: descriptionInput,
                             format,
-                            image: image.scryfall_id,
+                            image: image._id,
                             name: deckNameInput,
                             published: !isPublished
                           });
@@ -216,7 +220,7 @@ export default function DeckInfo() {
                 editDeck({
                   description: descriptionInput,
                   format,
-                  image: image.scryfall_id,
+                  image: image._id,
                   name: deckNameInput,
                   published: isPublished
                 });

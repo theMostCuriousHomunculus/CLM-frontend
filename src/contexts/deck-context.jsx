@@ -5,7 +5,6 @@ import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import validateDeck from '../functions/validate-deck';
 import Deck from '../pages/Deck';
-import { CardCacheContext } from './CardCache';
 
 export const DeckContext = createContext({
   loading: false,
@@ -19,9 +18,19 @@ export const DeckContext = createContext({
     description: '',
     format: '',
     image: {
-      alt: undefined,
-      scryfall_id: undefined,
-      src: undefined
+      _id: '',
+      image_uris: {
+        art_crop: ''
+      },
+      name: '',
+      card_faces: [
+        {
+          image_uris: {
+            art_crop: ''
+          },
+          name: ''
+        }
+      ]
     },
     mainboard: [],
     name: '',
@@ -39,7 +48,6 @@ export const DeckContext = createContext({
 export default function ContextualizedDeckPage() {
   const navigate = useNavigate();
   const { deckID } = useParams();
-  const { addCardsToCache, scryfallCardDataCache } = useContext(CardCacheContext);
   const [deckState, setDeckState] = useState({
     _id: deckID,
     creator: {
@@ -50,9 +58,22 @@ export default function ContextualizedDeckPage() {
     description: '',
     format: '',
     image: {
-      alt: undefined,
-      scryfall_id: undefined,
-      src: undefined
+      _id: '',
+      image_uris: {
+        image_uris: {
+          art_crop: ''
+        },
+        name: ''
+      },
+      name: '',
+      card_faces: [
+        {
+          image_uris: {
+            art_crop: ''
+          },
+          name: ''
+        }
+      ]
     },
     mainboard: [],
     name: '',
@@ -101,7 +122,19 @@ export default function ContextualizedDeckPage() {
     }
     description
     format
-    image
+    image {
+      _id
+      image_uris {
+        art_crop
+      }
+      name
+      card_faces {
+        image_uris {
+          art_crop
+        }
+        name
+      }
+    }
     mainboard {
       ${cardQuery}
     }
@@ -112,27 +145,6 @@ export default function ContextualizedDeckPage() {
     }
   `;
   const { loading, sendRequest } = useRequest();
-
-  const updateDeckState = useCallback(
-    async function (data) {
-      const cardSet = new Set();
-
-      if (data.image) cardSet.add(data.image);
-
-      await addCardsToCache([...cardSet]);
-
-      if (data.image) {
-        data.image = {
-          alt: scryfallCardDataCache.current[data.image].name,
-          scryfall_id: data.image,
-          src: scryfallCardDataCache.current[data.image].art_crop
-        };
-      }
-
-      setDeckState(data);
-    },
-    [addCardsToCache]
-  );
 
   const addCardsToDeck = useCallback(
     async function ({ name, scryfall_id }, component, numberOfCopies) {
@@ -215,7 +227,7 @@ export default function ContextualizedDeckPage() {
   const fetchDeckByID = useCallback(
     async function () {
       await sendRequest({
-        callback: updateDeckState,
+        callback: setDeckState,
         headers: { DeckID: deckState._id },
         load: true,
         operation: 'fetchDeckByID',
@@ -232,7 +244,7 @@ export default function ContextualizedDeckPage() {
         }
       });
     },
-    [deckQuery, deckState._id, sendRequest, updateDeckState]
+    [deckQuery, deckState._id, sendRequest]
   );
 
   const removeCardsFromDeck = useCallback(
@@ -285,7 +297,7 @@ export default function ContextualizedDeckPage() {
     queryString: deckQuery,
     setup: fetchDeckByID,
     subscriptionType: 'subscribeDeck',
-    update: updateDeckState
+    update: setDeckState
   });
 
   useEffect(() => {
