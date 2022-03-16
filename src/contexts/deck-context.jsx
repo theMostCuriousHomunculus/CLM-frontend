@@ -1,15 +1,16 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, /* useContext, useEffect, */ useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
-import validateDeck from '../functions/validate-deck';
+// import validateDeck from '../functions/validate-deck';
 import Deck from '../pages/Deck';
 
 export const DeckContext = createContext({
   loading: false,
   deckState: {
     _id: '',
+    cards: [],
     creator: {
       _id: '',
       avatar: '',
@@ -32,17 +33,12 @@ export const DeckContext = createContext({
         }
       ]
     },
-    mainboard: [],
     name: '',
-    published: false,
-    sideboard: []
+    published: false
   },
-  addCardsToDeck: () => null,
   cloneDeck: () => null,
-  editDeck: () => null,
-  removeCardsFromDeck: () => null,
-  toggleMainboardSideboardDeck: () => null,
-  warnings: []
+  editDeck: () => null
+  // warnings: []
 });
 
 export default function ContextualizedDeckPage() {
@@ -50,6 +46,7 @@ export default function ContextualizedDeckPage() {
   const { deckID } = useParams();
   const [deckState, setDeckState] = useState({
     _id: deckID,
+    cards: [],
     creator: {
       _id: '',
       avatar: '',
@@ -75,15 +72,14 @@ export default function ContextualizedDeckPage() {
         }
       ]
     },
-    mainboard: [],
     name: '',
-    published: false,
-    sideboard: []
+    published: false
   });
-  const [warnings, setWarnings] = useState([]);
+  // const [warnings, setWarnings] = useState([]);
 
   const cardQuery = `
     _id
+    mainboard_count
     scryfall_card {
       _id
       card_faces {
@@ -112,9 +108,13 @@ export default function ContextualizedDeckPage() {
       _set
       type_line
     }
+    sideboard_count
   `;
   const deckQuery = `
     _id
+    cards {
+      ${cardQuery}
+    }
     creator {
       _id
       avatar
@@ -135,42 +135,10 @@ export default function ContextualizedDeckPage() {
         name
       }
     }
-    mainboard {
-      ${cardQuery}
-    }
     name
     published
-    sideboard {
-      ${cardQuery}
-    }
   `;
   const { loading, sendRequest } = useRequest();
-
-  const addCardsToDeck = useCallback(
-    async function ({ name, scryfall_id }, component, numberOfCopies) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'addCardsToDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                component: ${component},
-                name: "${name}",
-                numberOfCopies: ${numberOfCopies},
-                scryfall_id: "${scryfall_id}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
 
   const cloneDeck = useCallback(
     async function () {
@@ -247,51 +215,6 @@ export default function ContextualizedDeckPage() {
     [deckQuery, deckState._id, sendRequest]
   );
 
-  const removeCardsFromDeck = useCallback(
-    async function (cardIDs, component) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'removeCardsFromDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                cardIDs: [${cardIDs.map((cardID) => '"' + cardID + '"')}],
-                component: ${component}
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
-
-  const toggleMainboardSideboardDeck = useCallback(
-    async function (cardID) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'toggleMainboardSideboardDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(cardID: "${cardID}") {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
-
   useSubscribe({
     connectionInfo: { deckID },
     queryString: deckQuery,
@@ -300,22 +223,19 @@ export default function ContextualizedDeckPage() {
     update: setDeckState
   });
 
-  useEffect(() => {
-    const { format, mainboard, sideboard } = deckState;
-    validateDeck({ format, mainboard, sideboard }, setWarnings);
-  }, [deckState.format, deckState.mainboard.length, deckState.sideboard.length]);
+  // useEffect(() => {
+  //   const { format, mainboard, sideboard } = deckState;
+  //   validateDeck({ format, mainboard, sideboard }, setWarnings);
+  // }, [deckState.format, deckState.mainboard.length, deckState.sideboard.length]);
 
   return (
     <DeckContext.Provider
       value={{
         loading,
         deckState,
-        addCardsToDeck,
         cloneDeck,
-        editDeck,
-        removeCardsFromDeck,
-        toggleMainboardSideboardDeck,
-        warnings
+        editDeck
+        // warnings
       }}
     >
       <Deck />

@@ -44,10 +44,10 @@ export default function DeckInfo() {
       description,
       format,
       image,
-      mainboard,
+      // mainboard,
       name: deckName,
-      published,
-      sideboard
+      published
+      // sideboard
     },
     cloneDeck,
     editDeck,
@@ -57,7 +57,7 @@ export default function DeckInfo() {
   const [isPublished, setIsPublished] = useState(published);
   const [deckNameInput, setDeckNameInput] = useState(deckName);
   const [deckToDelete, setDeckToDelete] = useState({ _id: null, name: null });
-  const [sampleHand, setSampleHand] = useState([]);
+  // const [sampleHand, setSampleHand] = useState([]);
   const deckImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function DeckInfo() {
     <React.Fragment>
       <DeleteDeckForm deckToDelete={deckToDelete} setDeckToDelete={setDeckToDelete} />
 
-      <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
+      {/* <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
         <MUIDialogTitle>Sample Hand from {name}</MUIDialogTitle>
         <MUIDialogContent>
           <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
@@ -92,7 +92,7 @@ export default function DeckInfo() {
             New Sample Hand
           </MUIButton>
         </MUIDialogActions>
-      </MUIDialog>
+            </MUIDialog> */}
 
       <MUICard>
         <MUICardHeader
@@ -198,7 +198,7 @@ export default function DeckInfo() {
               <MUITypography color="textSecondary" variant="subtitle1">
                 Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
               </MUITypography>
-              <MUITypography variant="subtitle1">
+              {/* <MUITypography variant="subtitle1">
                 <CSVLink
                   data={generateCSVList(mainboard, sideboard)}
                   filename={`${deckName}.csv`}
@@ -206,7 +206,7 @@ export default function DeckInfo() {
                 >
                   Export to CSV
                 </CSVLink>
-              </MUITypography>
+          </MUITypography> */}
             </React.Fragment>
           }
         />
@@ -250,7 +250,7 @@ export default function DeckInfo() {
             />
           )}
 
-          <div
+          {/* <div
             style={{
               backgroundColor: theme.palette.secondary.main,
               // borderRadius: 4,
@@ -264,7 +264,7 @@ export default function DeckInfo() {
                 {warning}
               </MUITypography>
             ))}
-          </div>
+            </div> */}
         </MUICardContent>
 
         <MUICardActions
@@ -292,12 +292,12 @@ export default function DeckInfo() {
             </MUIButton>
           )}
 
-          <MUIButton
+          {/* <MUIButton
             onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}
             startIcon={<MUIShuffleOutlinedIcon />}
           >
             Sample Hand
-          </MUIButton>
+          </MUIButton> */}
         </MUICardActions>
       </MUICard>
     </React.Fragment>
