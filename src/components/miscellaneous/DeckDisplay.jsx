@@ -37,6 +37,7 @@ const useStyles = makeStyles({
 
 export default function DeckDisplay({ authorizedID, cards }) {
   const { userID } = useContext(AuthenticationContext);
+  const sideBySide = useMediaQuery(theme.breakpoints.up('md'));
   const { eventID, deckID, matchID } = useParams();
   const [cardCountState, setCardCountState] = useState(
     cards.reduce(
@@ -92,9 +93,9 @@ export default function DeckDisplay({ authorizedID, cards }) {
               title={
                 <MUITypography variant="h3">
                   {component} (
-                  {cards.reduce(
+                  {Object.values(cardCountState).reduce(
                     (previousValue, currentValue) =>
-                      previousValue + currentValue[`${component.toLowerCase().concat('_count')}`],
+                      previousValue + currentValue[component.toLowerCase()],
                     0
                   )}
                   )
@@ -119,57 +120,65 @@ export default function DeckDisplay({ authorizedID, cards }) {
                 ]).filter(
                   (card) =>
                     specificCardType(card.scryfall_card.type_line) === type &&
-                    card[`${component.toLowerCase().concat('_count')}`] > 0
+                    card[`${component.toLowerCase()}_count`] > 0
                 );
 
                 return (
                   cards_specific_card_type.length > 0 && (
                     <React.Fragment key={`${component}-${type}`}>
-                      <MUITypography variant="subtitle1">{`${type} (${cards_specific_card_type.reduce(
-                        (previousValue, currentValue) =>
-                          previousValue +
-                          currentValue[`${component.toLowerCase().concat('_count')}`],
-                        0
-                      )})`}</MUITypography>
-                      {cards_specific_card_type.map((card) => (
+                      <MUITypography variant="subtitle1">
+                        {`${type} (${cards_specific_card_type.reduce(
+                          (previousValue, currentValue) =>
+                            previousValue +
+                            (cardCountState[currentValue.scryfall_card._id]
+                              ? cardCountState[currentValue.scryfall_card._id][
+                                  component.toLowerCase()
+                                ]
+                              : 0),
+                          0
+                        )})`}
+                      </MUITypography>
+                      {cards_specific_card_type.map(({ scryfall_card }) => (
                         <div
-                          key={card.scryfall_card._id}
+                          key={scryfall_card._id}
                           style={{ alignItems: 'center', display: 'flex' }}
                         >
                           <MUITextField
                             autoComplete="off"
                             disabled={
                               isMatch ||
-                              (isEvent && !card.scryfall_card.type_line.includes('Basic')) ||
+                              (isEvent && !scryfall_card.type_line.includes('Basic')) ||
                               authorizedID !== userID
                             }
                             inputProps={{
                               min: 0,
-                              onBlur: () => handleChangeNumberOfCopies(card.scryfall_card._id),
+                              onBlur: () => handleChangeNumberOfCopies(scryfall_card._id),
                               step: 1,
                               style: {
                                 paddingBottom: 4,
                                 paddingTop: 4
                               }
                             }}
-                            onChange={(event) => {
-                              event.persist();
+                            onChange={(event) =>
                               setCardCountState((prevState) => ({
                                 ...prevState,
-                                [card.scryfall_card._id]: {
-                                  ...prevState[card.scryfall_card._id],
+                                [scryfall_card._id]: {
+                                  ...prevState[scryfall_card._id],
                                   [component.toLowerCase()]: parseInt(event.target.value)
                                 }
-                              }));
-                              console.log(cardCountState);
-                            }}
+                              }))
+                            }
                             style={{
                               marginLeft: 16,
                               marginTop: 4,
                               width: 64
                             }}
                             type="number"
-                            value={cardCountState[card.scryfall_card._id][component.toLowerCase()]}
+                            value={
+                              cardCountState[scryfall_card._id]
+                                ? cardCountState[scryfall_card._id][component.toLowerCase()]
+                                : 0
+                            }
                           />
                           <div style={{ display: 'flex', flexGrow: 1 }}>
                             <MUITooltip
@@ -183,9 +192,9 @@ export default function DeckDisplay({ authorizedID, cards }) {
                                   if (component === 'Mainboard') {
                                     setCardCountState((prevState) => ({
                                       ...prevState,
-                                      [card.scryfall_card._id]: {
-                                        mainboard: prevState[card.scryfall_card._id].mainboard--,
-                                        sideboard: prevState[card.scryfall_card._id].sideboard++
+                                      [scryfall_card._id]: {
+                                        mainboard: prevState[scryfall_card._id].mainboard--,
+                                        sideboard: prevState[scryfall_card._id].sideboard++
                                       }
                                     }));
                                   }
@@ -193,23 +202,19 @@ export default function DeckDisplay({ authorizedID, cards }) {
                                   if (component === 'Sideboard') {
                                     setCardCountState((prevState) => ({
                                       ...prevState,
-                                      [card.scryfall_card._id]: {
-                                        mainboard: prevState[card.scryfall_card._id].mainboard++,
-                                        sideboard: prevState[card.scryfall_card._id].sideboard--
+                                      [scryfall_card._id]: {
+                                        mainboard: prevState[scryfall_card._id].mainboard++,
+                                        sideboard: prevState[scryfall_card._id].sideboard--
                                       }
                                     }));
                                   }
 
-                                  handleChangeNumberOfCopies(card.scryfall_card._id);
+                                  handleChangeNumberOfCopies(scryfall_card._id);
                                 }}
                                 size="small"
                                 style={{ alignSelf: 'center' }}
                               >
-                                {useMediaQuery(theme.breakpoints.up('md')) ? (
-                                  <MUISwapHorizIcon />
-                                ) : (
-                                  <MUISwapVertIcon />
-                                )}
+                                {sideBySide ? <MUISwapHorizIcon /> : <MUISwapVertIcon />}
                               </MUIIconButton>
                             </MUITooltip>
                             <MUITypography
@@ -222,24 +227,21 @@ export default function DeckDisplay({ authorizedID, cards }) {
                             >
                               <HoverPreview
                                 back_image={
-                                  card.scryfall_card.image_uris
+                                  scryfall_card.image_uris
                                     ? undefined
-                                    : card.scryfall_card.card_faces[1].image_uris.large
+                                    : scryfall_card.card_faces[1].image_uris.large
                                 }
                                 image={
-                                  card.scryfall_card.image_uris
-                                    ? card.scryfall_card.image_uris.large
-                                    : card.scryfall_card.card_faces[0].image_uris.large
+                                  scryfall_card.image_uris
+                                    ? scryfall_card.image_uris.large
+                                    : scryfall_card.card_faces[0].image_uris.large
                                 }
                               >
-                                <span>{card.scryfall_card.name}</span>
+                                <span>{scryfall_card.name}</span>
                               </HoverPreview>
                               <span>
-                                {card.scryfall_card._set.toUpperCase()}
-                                <ManaCostSVGs
-                                  manaCostString={card.scryfall_card.mana_cost}
-                                  size={20}
-                                />
+                                {scryfall_card._set.toUpperCase()}
+                                <ManaCostSVGs manaCostString={scryfall_card.mana_cost} size={20} />
                               </span>
                             </MUITypography>
                           </div>

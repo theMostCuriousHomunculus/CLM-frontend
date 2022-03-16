@@ -19,6 +19,29 @@ export default function Deck() {
   } = useContext(DeckContext);
   const { deckID } = useParams();
 
+  function submit(cardData) {
+    const existingCard = cards.find((card) => card.scryfall_card._id === cardData.scryfall_id);
+    if (existingCard) {
+      setNumberOfDeckCardCopies({
+        headers: { DeckID: deckID },
+        variables: {
+          mainboard_count: existingCard.mainboard_count + 1,
+          scryfall_id: cardData.scryfall_id,
+          sideboard_count: existingCard.sideboard_count
+        }
+      });
+    } else {
+      setNumberOfDeckCardCopies({
+        headers: { DeckID: deckID },
+        variables: {
+          mainboard_count: 1,
+          scryfall_id: cardData.scryfall_id,
+          sideboard_count: 0
+        }
+      });
+    }
+  }
+
   return loading ? (
     <LoadingSpinner />
   ) : (
@@ -27,33 +50,12 @@ export default function Deck() {
 
       {creator._id === userID && (
         <React.Fragment>
-          <BasicLandAdder
-            labelText={`Add basic lands to ${name}`}
-            submitFunction={(cardData) =>
-              setNumberOfDeckCardCopies({
-                headers: { DeckID: deckID },
-                variables: {
-                  mainboard_count: 1,
-                  scryfall_id: cardData.scryfall_id,
-                  sideboard_count: 0
-                }
-              })
-            }
-          />
+          <BasicLandAdder labelText={`Add basic lands to ${name}`} submitFunction={submit} />
           <MUIPaper>
             <ScryfallRequest
               buttonText="Add to Deck"
               labelText={`Add a card to ${name}`}
-              onSubmit={(cardData) =>
-                setNumberOfDeckCardCopies({
-                  headers: { DeckID: deckID },
-                  variables: {
-                    mainboard_count: 1,
-                    scryfall_id: cardData.scryfall_id,
-                    sideboard_count: 0
-                  }
-                })
-              }
+              onSubmit={submit}
             />
           </MUIPaper>
         </React.Fragment>
