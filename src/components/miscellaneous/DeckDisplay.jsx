@@ -3,7 +3,6 @@ import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIGrid from '@mui/material/Grid';
-import MUIIconButton from '@mui/material/IconButton';
 import MUISwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import MUISwapVertIcon from '@mui/icons-material/SwapVert';
 import MUITextField from '@mui/material/TextField';
@@ -13,14 +12,13 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
 
-import HoverPreview from '../miscellaneous/HoverPreview';
-import ManaCostSVGs from '../miscellaneous/ManaCostSVGs';
-import addBasics from '../../graphql/mutations/event/add-basics';
+import HoverPreview from './HoverPreview';
+import ManaCostSVGs from './ManaCostSVGs';
+import MoveCardMenu from './MoveCardMenu';
 import setNumberOfDeckCardCopies from '../../graphql/mutations/deck/set-number-of-deck-card-copies';
 import customSort from '../../functions/custom-sort';
 import specificCardType from '../../functions/specific-card-type';
 import theme, { backgroundColor } from '../../theme';
-// import PlaysetDisplay from './PlaysetDisplay';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
@@ -37,7 +35,7 @@ const useStyles = makeStyles({
 
 export default function DeckDisplay({ authorizedID, cards }) {
   const { userID } = useContext(AuthenticationContext);
-  const sideBySide = useMediaQuery(theme.breakpoints.up('md'));
+  const sideBySide = useMediaQuery(theme.breakpoints.up('lg'));
   const { eventID, deckID, matchID } = useParams();
   const [cardCountState, setCardCountState] = useState(
     cards.reduce(
@@ -45,6 +43,7 @@ export default function DeckDisplay({ authorizedID, cards }) {
         ...previousValue,
         [currentValue.scryfall_card._id]: {
           mainboard: currentValue.mainboard_count,
+          maybeboard: currentValue.maybeboard_count,
           sideboard: currentValue.sideboard_count
         }
       }),
@@ -62,6 +61,7 @@ export default function DeckDisplay({ authorizedID, cards }) {
         headers: { DeckID: deckID },
         variables: {
           mainboard_count: cardCountState[scryfall_id].mainboard,
+          maybeboard_count: cardCountState[scryfall_id].maybeboard,
           scryfall_id,
           sideboard_count: cardCountState[scryfall_id].sideboard
         }
@@ -76,6 +76,7 @@ export default function DeckDisplay({ authorizedID, cards }) {
           ...previousValue,
           [currentValue.scryfall_card._id]: {
             mainboard: currentValue.mainboard_count,
+            maybeboard: currentValue.maybeboard_count,
             sideboard: currentValue.sideboard_count
           }
         }),
@@ -86,8 +87,8 @@ export default function DeckDisplay({ authorizedID, cards }) {
 
   return (
     <MUIGrid container spacing={0}>
-      {['Mainboard', 'Sideboard'].map((component) => (
-        <MUIGrid item key={component} xs={12} md={6}>
+      {['Mainboard', 'Sideboard', 'Maybeboard'].map((component, componentIndex, componentArray) => (
+        <MUIGrid item key={component} xs={12} md={6} lg={4}>
           <MUICard>
             <MUICardHeader
               title={
@@ -141,8 +142,30 @@ export default function DeckDisplay({ authorizedID, cards }) {
                       {cards_specific_card_type.map(({ scryfall_card }) => (
                         <div
                           key={scryfall_card._id}
-                          style={{ alignItems: 'center', display: 'flex' }}
+                          style={{ alignItems: 'center', columnGap: 8, display: 'flex' }}
                         >
+                          <MoveCardMenu
+                            moveIDPrefix={`${scryfall_card._id}-${component.toLowerCase()}-`}
+                            options={componentArray
+                              .filter((value) => component !== value)
+                              .map((otherComponent) => ({
+                                action() {
+                                  setCardCountState((prevState) => ({
+                                    ...prevState,
+                                    [scryfall_card._id]: {
+                                      ...prevState[scryfall_card._id],
+                                      [component.toLowerCase()]:
+                                        prevState[scryfall_card._id][component.toLowerCase()] - 1,
+                                      [otherComponent.toLowerCase()]:
+                                        prevState[scryfall_card._id][otherComponent.toLowerCase()] +
+                                        1
+                                    }
+                                  }));
+                                  handleChangeNumberOfCopies(scryfall_card._id);
+                                },
+                                text: `Move to ${otherComponent}`
+                              }))}
+                          />
                           <MUITextField
                             autoComplete="off"
                             disabled={
@@ -168,11 +191,7 @@ export default function DeckDisplay({ authorizedID, cards }) {
                                 }
                               }))
                             }
-                            style={{
-                              marginLeft: 16,
-                              marginTop: 4,
-                              width: 64
-                            }}
+                            style={{ width: 64 }}
                             type="number"
                             value={
                               cardCountState[scryfall_card._id]
@@ -181,7 +200,7 @@ export default function DeckDisplay({ authorizedID, cards }) {
                             }
                           />
                           <div style={{ display: 'flex', flexGrow: 1 }}>
-                            <MUITooltip
+                            {/* <MUITooltip
                               title={`Move One to ${
                                 component === 'Mainboard' ? 'Sideboard' : 'Mainboard'
                               }`}
@@ -216,10 +235,11 @@ export default function DeckDisplay({ authorizedID, cards }) {
                               >
                                 {sideBySide ? <MUISwapHorizIcon /> : <MUISwapVertIcon />}
                               </MUIIconButton>
-                            </MUITooltip>
+                            </MUITooltip> */}
                             <MUITypography
                               variant="body1"
                               style={{
+                                columnGap: 8,
                                 display: 'inline-flex',
                                 flexGrow: 1,
                                 justifyContent: 'space-between'

@@ -80,6 +80,7 @@ export default function ContextualizedDeckPage() {
   const cardQuery = `
     _id
     mainboard_count
+    maybeboard_count
     scryfall_card {
       _id
       card_faces {
@@ -105,6 +106,7 @@ export default function ContextualizedDeckPage() {
       mtgo_id
       name
       oracle_text
+      rarity
       _set
       type_line
     }

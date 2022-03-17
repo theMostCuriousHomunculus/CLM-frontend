@@ -40,14 +40,13 @@ export default function DeckInfo() {
   const {
     deckState: {
       _id: deckID,
+      cards,
       creator,
       description,
       format,
       image,
-      // mainboard,
       name: deckName,
       published
-      // sideboard
     },
     cloneDeck,
     editDeck,
@@ -57,8 +56,21 @@ export default function DeckInfo() {
   const [isPublished, setIsPublished] = useState(published);
   const [deckNameInput, setDeckNameInput] = useState(deckName);
   const [deckToDelete, setDeckToDelete] = useState({ _id: null, name: null });
-  // const [sampleHand, setSampleHand] = useState([]);
+  const [sampleHand, setSampleHand] = useState([]);
   const deckImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
+
+  function generateSampleHand() {
+    setSampleHand(
+      randomSampleWOReplacement(
+        cards.reduce((previousValue, currentValue) => {
+          for (let index = 0; index < currentValue.mainboard_count; index++) {
+            previousValue.push({ ...currentValue.scryfall_card });
+          }
+        }, []),
+        7
+      )
+    );
+  }
 
   useEffect(() => {
     setDeckNameInput(deckName);
@@ -76,23 +88,31 @@ export default function DeckInfo() {
     <React.Fragment>
       <DeleteDeckForm deckToDelete={deckToDelete} setDeckToDelete={setDeckToDelete} />
 
-      {/* <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
-        <MUIDialogTitle>Sample Hand from {name}</MUIDialogTitle>
-        <MUIDialogContent>
-          <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
-            {sampleHand.map((card) => (
-              <MUIImageListItem key={card._id}>
-                <img alt={card.name} src={card.image} style={{ height: 264, width: 189 }} />
-              </MUIImageListItem>
-            ))}
-          </MUIImageList>
-        </MUIDialogContent>
-        <MUIDialogActions>
-          <MUIButton onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}>
-            New Sample Hand
-          </MUIButton>
-        </MUIDialogActions>
-            </MUIDialog> */}
+      {
+        <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
+          <MUIDialogTitle>Sample Hand from {deckName}</MUIDialogTitle>
+          <MUIDialogContent>
+            <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
+              {sampleHand.map((card) => (
+                <MUIImageListItem key={card._id}>
+                  <img
+                    alt={card.name}
+                    src={
+                      scryfall_card.image_uris
+                        ? scryfall_card.image_uris.large
+                        : scryfall_card.card_faces[0].image_uris.large
+                    }
+                    style={{ height: 264, width: 189 }}
+                  />
+                </MUIImageListItem>
+              ))}
+            </MUIImageList>
+          </MUIDialogContent>
+          <MUIDialogActions>
+            <MUIButton onClick={generateSampleHand}>New Sample Hand</MUIButton>
+          </MUIDialogActions>
+        </MUIDialog>
+      }
 
       <MUICard>
         <MUICardHeader
@@ -198,15 +218,11 @@ export default function DeckInfo() {
               <MUITypography color="textSecondary" variant="subtitle1">
                 Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
               </MUITypography>
-              {/* <MUITypography variant="subtitle1">
-                <CSVLink
-                  data={generateCSVList(mainboard, sideboard)}
-                  filename={`${deckName}.csv`}
-                  target="_blank"
-                >
+              <MUITypography variant="subtitle1">
+                <CSVLink data={generateCSVList(cards)} filename={`${deckName}.csv`} target="_blank">
                   Export to CSV
                 </CSVLink>
-          </MUITypography> */}
+              </MUITypography>
             </React.Fragment>
           }
         />
@@ -292,12 +308,9 @@ export default function DeckInfo() {
             </MUIButton>
           )}
 
-          {/* <MUIButton
-            onClick={() => setSampleHand(randomSampleWOReplacement(mainboard, 7))}
-            startIcon={<MUIShuffleOutlinedIcon />}
-          >
+          <MUIButton onClick={generateSampleHand} startIcon={<MUIShuffleOutlinedIcon />}>
             Sample Hand
-          </MUIButton> */}
+          </MUIButton>
         </MUICardActions>
       </MUICard>
     </React.Fragment>

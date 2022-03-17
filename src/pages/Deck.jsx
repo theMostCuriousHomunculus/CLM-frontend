@@ -26,6 +26,7 @@ export default function Deck() {
         headers: { DeckID: deckID },
         variables: {
           mainboard_count: existingCard.mainboard_count + 1,
+          maybeboard_count: existingCard.maybeboard_count,
           scryfall_id: cardData.scryfall_id,
           sideboard_count: existingCard.sideboard_count
         }
@@ -35,6 +36,7 @@ export default function Deck() {
         headers: { DeckID: deckID },
         variables: {
           mainboard_count: 1,
+          maybeboard_count: 0,
           scryfall_id: cardData.scryfall_id,
           sideboard_count: 0
         }
