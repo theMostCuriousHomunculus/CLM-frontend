@@ -320,7 +320,7 @@ export default function ContextualizedCubePage() {
     queryString: cubeQuery,
     setup: async () => {
       if (cubeData) {
-        updateCubeState(cubeData);
+        setCubeState(cubeData);
       } else {
         try {
           setLoading(true);
