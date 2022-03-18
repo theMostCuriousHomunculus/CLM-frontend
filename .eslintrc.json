@@ -50,6 +50,7 @@
         "tabWidth": 2
       }
     ],
+    "no-undef": "error",
     "radix": ["error", "as-needed"],
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",

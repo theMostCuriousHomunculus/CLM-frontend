@@ -98,9 +98,7 @@ export default function DeckInfo() {
                   <img
                     alt={card.name}
                     src={
-                      scryfall_card.image_uris
-                        ? scryfall_card.image_uris.large
-                        : scryfall_card.card_faces[0].image_uris.large
+                      card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large
                     }
                     style={{ height: 264, width: 189 }}
                   />

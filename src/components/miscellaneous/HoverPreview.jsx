@@ -10,7 +10,7 @@ const useStyles = makeStyles({
   hoverPreviewImage: {
     borderRadius: 8,
     display: 'inline',
-    height: 264
+    height: 350
   }
 });
 
@@ -47,12 +47,7 @@ export default function HoverPreview({ back_image, children, image }) {
       right = undefined;
     } else {
       left = undefined;
-      right = `${
-        windowWidth -
-        event.pageX -
-        hpcWidth +
-        (hpcWidth * event.pageX) / windowWidth
-      }px`;
+      right = `${windowWidth - event.pageX - hpcWidth + (hpcWidth * event.pageX) / windowWidth}px`;
     }
 
     if (event.screenY < windowHeight / 2) {
@@ -103,17 +98,9 @@ export default function HoverPreview({ back_image, children, image }) {
               top: preview.top
             }}
           >
-            <img
-              alt="front of card"
-              className={classes.hoverPreviewImage}
-              src={image}
-            />
+            <img alt="front of card" className={classes.hoverPreviewImage} src={image} />
             {back_image && (
-              <img
-                alt="back of card"
-                className={classes.hoverPreviewImage}
-                src={back_image}
-              />
+              <img alt="back of card" className={classes.hoverPreviewImage} src={back_image} />
             )}
           </div>,
           document.getElementById('hover-preview')
