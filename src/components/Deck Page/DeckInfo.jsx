@@ -256,7 +256,7 @@ export default function DeckInfo() {
                 editDeck({
                   description: descriptionInput,
                   format,
-                  image: chosenCard.scryfall_id,
+                  image: chosenCard._id,
                   name: deckNameInput,
                   published: isPublished
                 });

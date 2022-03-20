@@ -193,10 +193,8 @@ export default function CubeDisplay({ setSelectedCard }) {
                                                       .large
                                               }
                                               image={
-                                                card.scryfall_card.image_uris
-                                                  ? card.scryfall_card.image_uris.large
-                                                  : card.scryfall_card.card_faces[0].image_uris
-                                                      .large
+                                                card.scryfall_card.image_uris?.large ??
+                                                card.scryfall_card.card_faces[0].image_uris.large
                                               }
                                             >
                                               <MUITypography
@@ -209,9 +207,7 @@ export default function CubeDisplay({ setSelectedCard }) {
                                                 {!card.scryfall_card.mtgo_id && (
                                                   <MUITooltip
                                                     title={`This version of ${
-                                                      card.name
-                                                        ? card.name
-                                                        : card.scryfall_card.name
+                                                      card.name ?? card.scryfall_card.name
                                                     } is not available on MTGO.`}
                                                   >
                                                     <MUIWarningRoundedIcon
@@ -252,9 +248,7 @@ export default function CubeDisplay({ setSelectedCard }) {
               (
               {
                 displayedCards.filter(
-                  (card) =>
-                    (card.color_identity ? card.color_identity : card.scryfall_card.color_identity)
-                      .length > 1
+                  (card) => (card.color_identity ?? card.scryfall_card.color_identity).length > 1
                 ).length
               }
               )
@@ -265,10 +259,8 @@ export default function CubeDisplay({ setSelectedCard }) {
           {multiColors.map(function (color) {
             const cards_color = displayedCards.filter(
               (card) =>
-                (card.color_identity
-                  ? card.color_identity
-                  : card.scryfall_card.color_identity
-                ).toString() === color.color_identity
+                (card.color_identity ?? card.scryfall_card.color_identity).toString() ===
+                color.color_identity
             );
             return (
               <React.Fragment key={color.name}>
@@ -286,9 +278,8 @@ export default function CubeDisplay({ setSelectedCard }) {
                     {generalCardTypes.map(function (type) {
                       const cards_color_type = cards_color.filter(
                         (card) =>
-                          generalCardType(
-                            card.type_line ? card.type_line : card.scryfall_card.type_line
-                          ) === type.name
+                          generalCardType(card.type_line ?? card.scryfall_card.type_line) ===
+                          type.name
                       );
                       return (
                         cards_color_type.length > 0 && (
@@ -318,9 +309,8 @@ export default function CubeDisplay({ setSelectedCard }) {
                                         : card.scryfall_card.card_faces[1].image_uris.large
                                     }
                                     image={
-                                      card.scryfall_card.image_uris
-                                        ? card.scryfall_card.image_uris.large
-                                        : card.scryfall_card.card_faces[0].image_uris.large
+                                      card.scryfall_card.image_uris?.large ??
+                                      card.scryfall_card.card_faces[0].image_uris.large
                                     }
                                   >
                                     <MUITypography
@@ -331,7 +321,7 @@ export default function CubeDisplay({ setSelectedCard }) {
                                       }}
                                       variant="body1"
                                     >
-                                      {index + 1}) {card.name ? card.name : card.scryfall_card.name}
+                                      {index + 1}) {card.name ?? card.scryfall_card.name}
                                       {!card.scryfall_card.mtgo_id && (
                                         <MUITooltip
                                           title={`This version of ${

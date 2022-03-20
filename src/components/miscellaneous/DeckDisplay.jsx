@@ -198,11 +198,7 @@ function TypeCardDisplay({
             back_image={
               scryfall_card.image_uris ? undefined : scryfall_card.card_faces[1].image_uris.large
             }
-            image={
-              scryfall_card.image_uris
-                ? scryfall_card.image_uris.large
-                : scryfall_card.card_faces[0].image_uris.large
-            }
+            image={scryfall_card.image_uris?.large ?? scryfall_card.card_faces[0].image_uris.large}
           >
             <span>{scryfall_card.name}</span>
           </HoverPreview>

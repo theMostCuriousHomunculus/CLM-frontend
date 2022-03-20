@@ -20,14 +20,14 @@ export default function Deck() {
   const { deckID } = useParams();
 
   function submit(cardData) {
-    const existingCard = cards.find((card) => card.scryfall_card._id === cardData.scryfall_id);
+    const existingCard = cards.find((card) => card.scryfall_card._id === cardData._id);
     if (existingCard) {
       setNumberOfDeckCardCopies({
         headers: { DeckID: deckID },
         variables: {
           mainboard_count: existingCard.mainboard_count + 1,
           maybeboard_count: existingCard.maybeboard_count,
-          scryfall_id: cardData.scryfall_id,
+          scryfall_id: cardData._id,
           sideboard_count: existingCard.sideboard_count
         }
       });
@@ -37,7 +37,7 @@ export default function Deck() {
         variables: {
           mainboard_count: 1,
           maybeboard_count: 0,
-          scryfall_id: cardData.scryfall_id,
+          scryfall_id: cardData._id,
           sideboard_count: 0
         }
       });

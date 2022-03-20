@@ -54,14 +54,7 @@ export default function Account() {
     userID
   } = useContext(AuthenticationContext);
   const {
-    accountState: {
-      avatar,
-      buds,
-      email,
-      name,
-      received_bud_requests,
-      sent_bud_requests
-    },
+    accountState: { avatar, buds, email, name, received_bud_requests, sent_bud_requests },
     editAccount,
     setAccountState
   } = useContext(AccountContext);
@@ -103,9 +96,7 @@ export default function Account() {
                       label={
                         <MUITooltip title="Notifications">
                           <MUINotificationsIcon
-                            color={
-                              notificationsEnabled ? 'primary' : 'secondary'
-                            }
+                            color={notificationsEnabled ? 'primary' : 'secondary'}
                           />
                         </MUITooltip>
                       }
@@ -131,18 +122,14 @@ export default function Account() {
                         label={
                           <MUITooltip title="Location Services">
                             <MUILocationOnIcon
-                              color={
-                                geolocationEnabled ? 'primary' : 'secondary'
-                              }
+                              color={geolocationEnabled ? 'primary' : 'secondary'}
                             />
                           </MUITooltip>
                         }
                         labelPlacement="start"
                       />
                       {geolocationEnabled && (
-                        <div
-                          style={{ display: 'flex', flexDirection: 'column' }}
-                        >
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <MUIFormControl variant="outlined">
                             <MUIInputLabel htmlFor="measurement-system-selector">
                               Units
@@ -168,13 +155,8 @@ export default function Account() {
                               <option value="metric">Kilometers</option>
                             </MUISelect>
                           </MUIFormControl>
-                          <MUIFormControl
-                            style={{ marginTop: 8 }}
-                            variant="outlined"
-                          >
-                            <MUIInputLabel htmlFor="radius-selector">
-                              Distance
-                            </MUIInputLabel>
+                          <MUIFormControl style={{ marginTop: 8 }} variant="outlined">
+                            <MUIInputLabel htmlFor="radius-selector">Distance</MUIInputLabel>
                             <MUISelect
                               fullWidth
                               label="Distance"
@@ -208,12 +190,8 @@ export default function Account() {
               {isLoggedIn &&
                 accountID !== userID &&
                 !buds.find((bud) => bud._id === userID) &&
-                !received_bud_requests.find(
-                  (request) => request._id === userID
-                ) &&
-                !sent_bud_requests.find(
-                  (request) => request._id === userID
-                ) && (
+                !received_bud_requests.find((request) => request._id === userID) &&
+                !sent_bud_requests.find((request) => request._id === userID) && (
                   // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
                   <MUIIconButton
                     color="primary"
@@ -263,7 +241,13 @@ export default function Account() {
               buttonText="Change Avatar"
               labelText="Avatar"
               onSubmit={(chosenCard) => {
-                editAccount(`avatar: "${chosenCard.art_crop}"`);
+                editAccount(
+                  `avatar: "${
+                    chosenCard.image_uris
+                      ? chosenCard.image_uris.art_crop
+                      : chosenCard.card_faces[0].image_uris.art_crop
+                  }"`
+                );
               }}
             />
           </MUICardActions>

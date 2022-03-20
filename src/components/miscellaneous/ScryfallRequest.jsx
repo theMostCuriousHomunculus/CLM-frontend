@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MUIAutocomplete from '@mui/material/Autocomplete';
 import MUIButton from '@mui/material/Button';
 import MUICircularProgress from '@mui/material/CircularProgress';
@@ -9,141 +9,108 @@ import MUIMenu from '@mui/material/Menu';
 import MUIMenuItem from '@mui/material/MenuItem';
 import MUITextField from '@mui/material/TextField';
 
-import useRequest from '../../hooks/request-hook';
+import searchCard from '../../graphql/queries/card/search-card';
+import searchPrintings from '../../graphql/queries/card/search-printings';
 import HoverPreview from './HoverPreview';
 
 export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
+  const abortControllerRef = useRef(new AbortController());
   const cardSearchInput = useRef();
-  const { loading, sendRequest } = useRequest();
+  const timer = useRef();
   const [anchorEl, setAnchorEl] = useState(null);
   const [availablePrintings, setAvailablePrintings] = useState([]);
-  const [timer, setTimer] = useState();
   const [cardSearchResults, setCardSearchResults] = useState([]);
-  const [chosenCard, setChosenCard] = useState(null);
+  const [chosenCardOracleID, setChosenCardOracleID] = useState(null);
+  const [chosenPrinting, setChosenPrinting] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const scryfallCardSearch = useCallback(
-    (event) => {
-      event.persist();
-      setTimer(
-        setTimeout(async function () {
-          if (event.target.value.length < 2) {
-            setCardSearchResults([]);
-            setChosenCard(null);
+  const scryfallCardSearch = (event) => {
+    event.persist();
+    if ('current' in timer) {
+      clearTimeout(timer.current);
+    }
+    timer.current = setTimeout(async function () {
+      try {
+        if (event.target.value.length < 2) {
+          setCardSearchResults([]);
+          setChosenCardOracleID(null);
+          setChosenPrinting(null);
+        } else {
+          setLoading(true);
+          const cards = await searchCard({
+            queryString: `{
+              name
+              oracle_id
+            }`,
+            signal: abortControllerRef.current.signal,
+            variables: { search: event.target.value }
+          });
+          if (cards && cards.data && cards.data.searchCard) {
+            setCardSearchResults(cards.data.searchCard);
           } else {
-            await sendRequest({
-              callback: (data) => {
-                if (data.data) {
-                  setCardSearchResults(
-                    data.data.map((match) => ({
-                      name: match.name,
-                      oracle_id: match.oracle_id
-                    }))
-                  );
-                } else {
-                  setCardSearchResults([]);
-                }
-              },
-              method: 'GET',
-              url: `https://api.scryfall.com/cards/search?q=${event.target.value}`
-            });
+            setCardSearchResults([]);
           }
-        }, 250)
-      );
-    },
-    [sendRequest]
-  );
+        }
+      } catch (error) {
+        setCardSearchResults([]);
+        setChosenCardOracleID(null);
+        setChosenPrinting(null);
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+  };
 
-  const scryfallPrintSearch = useCallback(
-    async function (oracleID) {
-      await sendRequest({
-        callback: async (data) => {
-          const printings = await Promise.all(
-            data.data.map(async function (print) {
-              let art_crop, back_image, image;
-              switch (print.layout) {
-                case 'adventure':
-                  // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
-                  art_crop = print.image_uris.art_crop;
-                  image = print.image_uris.large;
-                  break;
-                case 'flip':
-                  // flip was only in Kamigawa block (plus an "Un" card and a couple of reprints), which was before planeswalkers existed.  unlikely they ever bring this layout back, and if they do, no idea how they would fit a planeswalker onto one side.  all flip cards are creatures on one end and either a creature or an enchantment on the other
-                  art_crop = print.image_uris.art_crop;
-                  image = print.image_uris.large;
-                  break;
-                case 'leveler':
-                  // all level up cards have been creatures.  this is a mechanic that has so far only appeared in Rise of the Eldrazi and a single card in Modern Horizons.  i don't expect the mechanic to return, but the printing of Hexdrinker in MH1 suggests it may
-                  art_crop = print.image_uris.art_crop;
-                  image = print.image_uris.large;
-                  break;
-                case 'meld':
-                  // meld only appeared in Eldritch Moon and probably won't ever come back.  no planeswalkers; only creatures and a single land
-                  art_crop = print.image_uris.art_crop;
-                  const meldResultPart = print.all_parts.find(
-                    (part) => part.component === 'meld_result'
-                  );
-                  await sendRequest({
-                    callback: (data) => {
-                      back_image = data.image_uris.large;
-                      image = print.image_uris.large;
-                    },
-                    method: 'GET',
-                    url: meldResultPart.uri
-                  });
-                  break;
-                case 'modal_dfc':
-                  art_crop = print.card_faces[0].image_uris.art_crop;
-                  back_image = print.card_faces[1].image_uris.large;
-                  image = print.card_faces[0].image_uris.large;
-                  break;
-                case 'saga':
-                  // saga's have no other faces; they simply have their own layout type becuase of the fact that the art is on the right side of the card rather than the top of the card.  all sagas printed so far (through Kaldheim) have only 3 or 4 chapters
-                  art_crop = print.image_uris.art_crop;
-                  image = print.image_uris.large;
-                  break;
-                case 'split':
-                  // split cards are always instants and/or sorceries
-                  art_crop = print.image_uris.art_crop;
-                  image = print.image_uris.large;
-                  break;
-                case 'transform':
-                  art_crop = print.card_faces[0].image_uris.art_crop;
-                  back_image = print.card_faces[1].image_uris.large;
-                  image = print.card_faces[0].image_uris.large;
-                  break;
-                default:
-                  art_crop = print.image_uris.art_crop;
-                  image = print.image_uris.large;
+  useEffect(() => {
+    (async function () {
+      try {
+        if (chosenCardOracleID) {
+          const printings = await searchPrintings({
+            queryString: `{
+              _id
+              card_faces {
+                image_uris {
+                  art_crop
+                  large
+                }
               }
-              return {
-                art_crop,
-                back_image,
-                collector_number: print.collector_number,
-                image,
-                name: print.name,
-                oracle_id: print.oracle_id,
-                scryfall_id: print.id,
-                set_name: print.set_name
-              };
-            })
-          );
+              collector_number
+              image_uris {
+                art_crop
+                large
+              }
+              name
+              oracle_id
+              set_name
+            }`,
+            signal: abortControllerRef.current.signal,
+            variables: { oracle_id: chosenCardOracleID }
+          });
+          if (printings && printings.data && printings.data.searchPrintings) {
+            setAvailablePrintings(printings.data.searchPrintings);
+            if (printings.data.searchPrintings.length > 0) {
+              setChosenPrinting(printings[0]);
+            }
+          }
+        }
+      } catch (error) {
+        setChosenPrinting(null);
+      } finally {
+      }
+    })();
+  }, [chosenCardOracleID]);
 
-          setChosenCard(printings[0]);
-          setAvailablePrintings(printings);
-        },
-        method: 'GET',
-        url: `https://api.scryfall.com/cards/search?order=released&q=oracleid%3A${oracleID}&unique=prints`
-      });
-    },
-    [sendRequest]
-  );
+  useEffect(() => {
+    return () => abortControllerRef.current.abort();
+  }, []);
 
   function submitForm() {
     setAnchorEl(null);
     setAvailablePrintings([]);
     setCardSearchResults([]);
-    onSubmit(chosenCard);
-    setChosenCard(null);
+    onSubmit(chosenPrinting);
+    setChosenCardOracleID(null);
+    setChosenPrinting(null);
     cardSearchInput.current.parentElement
       .getElementsByClassName('MuiAutocomplete-clearIndicator')[0]
       .click();
@@ -172,7 +139,7 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
           loading={loading}
           onChange={function (event, value, reason) {
             if (reason === 'selectOption') {
-              scryfallPrintSearch(value.oracle_id);
+              setChosenCardOracleID(value.oracle_id);
             }
           }}
           options={cardSearchResults}
@@ -181,22 +148,22 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
               {...params}
               inputRef={cardSearchInput}
               label={labelText}
-              onKeyUp={(event) => {
-                clearTimeout(timer);
-                scryfallCardSearch(event);
-              }}
+              onChange={scryfallCardSearch}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
                   <React.Fragment>
-                    {loading && (
-                      <MUICircularProgress color="inherit" size={20} />
-                    )}
+                    {loading && <MUICircularProgress color="inherit" size={20} />}
                     {params.InputProps.endAdornment}
                   </React.Fragment>
                 )
               }}
             />
+          )}
+          renderOption={(props, option) => (
+            <li key={option.oracle_id} {...props}>
+              {option.name}
+            </li>
           )}
           style={{
             marginBottom: 8
@@ -221,8 +188,7 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
             <MUIListItemText
               primary="Selected Printing"
               secondary={
-                chosenCard &&
-                `${chosenCard.set_name} - ${chosenCard.collector_number}`
+                chosenPrinting && `${chosenPrinting.set_name} - ${chosenPrinting.collector_number}`
               }
             />
           </MUIListItem>
@@ -237,18 +203,18 @@ export default function ScryfallRequest({ buttonText, labelText, onSubmit }) {
             role: 'listbox'
           }}
         >
-          {availablePrintings.map((option, index) => (
+          {availablePrintings.map((option) => (
             <HoverPreview
-              back_image={option.back_image}
-              image={option.image}
-              key={option.scryfall_id}
+              back_image={option.image_uris ? undefined : option.card_faces[1].image_uris.large}
+              image={option.image_uris?.large ?? option.card_faces[0].image_uris.large}
+              key={option._id}
             >
               <MUIMenuItem
                 onClick={() => {
-                  setChosenCard({ ...availablePrintings[index] });
+                  setChosenPrinting(option);
                   setAnchorEl(null);
                 }}
-                selected={option.scryfall_id === chosenCard.scryfall_id}
+                selected={option._id === chosenPrinting?._id}
               >
                 {`${option.set_name} - ${option.collector_number}`}
               </MUIMenuItem>

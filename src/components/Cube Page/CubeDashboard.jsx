@@ -292,7 +292,7 @@ export default function CubeDashboard() {
                   await editCube({
                     headers: { CubeID: cubeID },
                     queryString: `{\n_id\nimage\n}`,
-                    variables: { image: chosenCard.scryfall_id }
+                    variables: { image: chosenCard._id }
                   });
                 } catch (error) {
                   setErrorMessages((prevState) => [...prevState, error.message]);

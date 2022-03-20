@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MUIArrowRightIcon from '@mui/icons-material/ArrowRight';
-// import MUIButton from '@mui/material/Button';
+import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
-// import MUICardActions from '@mui/material/CardActions';
+import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIList from '@mui/material/List';
@@ -11,6 +11,7 @@ import MUIListItem from '@mui/material/ListItem';
 import MUIListItemIcon from '@mui/material/ListItemIcon';
 import MUIListItemText from '@mui/material/ListItemText';
 import MUITypography from '@mui/material/Typography';
+import searchPrintings from '../graphql/queries/card/search-printings';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -25,6 +26,32 @@ export default function Home() {
     'Check out "Classy", an independently managed, constructed format and brewer\'s paradise',
     'Dive into topical and set review articles from our brialliant contributors'
   ];
+
+  useEffect(() => {
+    (async function () {
+      const printings = await searchPrintings({
+        queryString: `{
+          _id
+          card_faces {
+            image_uris {
+              art_crop
+              large
+            }
+          }
+          collector_number
+          image_uris {
+            art_crop
+            large
+          }
+          name
+          oracle_id
+          set_name
+        }`,
+        variables: { oracle_id: '2b93787d-47ea-4b8b-912d-ffc5d5440171' }
+      });
+      console.table(printings.data.searchPrintings);
+    })();
+  });
 
   return (
     <MUICard>
