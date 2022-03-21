@@ -100,10 +100,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                   onClick={(event) => setCubeAnchorEl(event.currentTarget)}
                   style={{ padding: 0 }}
                 >
-                  <MUIListItemText
-                    primary="Cube"
-                    secondary={selectedCube.name}
-                  />
+                  <MUIListItemText primary="Cube" secondary={selectedCube.name} />
                 </MUIListItem>
               </MUIList>
               <MUIMenu
@@ -135,19 +132,13 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                         width={75}
                       />
                     )}
-                    <span style={{ flexGrow: 1, textAlign: 'right' }}>
-                      {cube.name}
-                    </span>
+                    <span style={{ flexGrow: 1, textAlign: 'right' }}>{cube.name}</span>
                   </MUIMenuItem>
                 ))}
               </MUIMenu>
             </MUIGrid>
             <MUIGrid item xs={12} sm={6}>
-              <MUIFormControl
-                component="fieldset"
-                disabled={posting || success}
-                required={true}
-              >
+              <MUIFormControl component="fieldset" disabled={posting || success} required={true}>
                 <MUIFormLabel component="legend">Event Type</MUIFormLabel>
 
                 <MUIRadioGroup
@@ -156,17 +147,9 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                   row
                   value={eventType}
                 >
-                  <MUIFormControlLabel
-                    value="draft"
-                    control={<MUIRadio />}
-                    label="Draft"
-                  />
+                  <MUIFormControlLabel value="draft" control={<MUIRadio />} label="Draft" />
 
-                  <MUIFormControlLabel
-                    value="sealed"
-                    control={<MUIRadio />}
-                    label="Sealed"
-                  />
+                  <MUIFormControlLabel value="sealed" control={<MUIRadio />} label="Sealed" />
                 </MUIRadioGroup>
               </MUIFormControl>
             </MUIGrid>
@@ -174,11 +157,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
 
           <hr />
 
-          <MUIFormControl
-            component="fieldset"
-            disabled={posting || success}
-            margin="normal"
-          >
+          <MUIFormControl component="fieldset" disabled={posting || success} margin="normal">
             <MUIFormLabel component="legend" style={{ paddingLeft: 8 }}>
               Buds
             </MUIFormLabel>
@@ -204,17 +183,21 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                                 prevState.filter((plr) => plr !== bud._id)
                               );
                             } else {
-                              setOtherPlayers((prevState) => [
-                                ...prevState,
-                                bud._id
-                              ]);
+                              setOtherPlayers((prevState) => [...prevState, bud._id]);
                             }
                           }}
                           value={bud._id}
                         />
                       }
                       label={
-                        <Avatar alt={bud.name} size="small" src={bud.avatar} />
+                        <Avatar
+                          alt={bud.name}
+                          size="small"
+                          src={
+                            bud.avatar.image_uris?.art_crop ??
+                            bud.avatar.card_faces[0].image_uris.art_crop
+                          }
+                        />
                       }
                     />
                   </MUIGrid>
@@ -225,11 +208,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
 
           <hr />
 
-          <MUIFormControl
-            component="fieldset"
-            disabled={posting || success}
-            margin="normal"
-          >
+          <MUIFormControl component="fieldset" disabled={posting || success} margin="normal">
             <MUIFormLabel component="legend" style={{ paddingLeft: 8 }}>
               Modules
             </MUIFormLabel>
@@ -247,10 +226,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                                   prevState.filter((mdl) => mdl !== module._id)
                                 );
                               } else {
-                                setIncludedModules((prevState) => [
-                                  ...prevState,
-                                  module._id
-                                ]);
+                                setIncludedModules((prevState) => [...prevState, module._id]);
                               }
                             }}
                             value={module._id}
@@ -315,9 +291,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
             disabled={posting}
             startIcon={(() => {
               if (posting) {
-                return (
-                  <MUICircularProgress size={13} style={{ color: 'inherit' }} />
-                );
+                return <MUICircularProgress size={13} style={{ color: 'inherit' }} />;
               }
               if (success) {
                 return <MUICloudDoneOutlinedIcon />;
@@ -328,11 +302,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
           >
             Create
           </MUIButton>
-          <MUIButton
-            color="warning"
-            onClick={toggleOpen}
-            startIcon={<MUICancelOutlinedIcon />}
-          >
+          <MUIButton color="warning" onClick={toggleOpen} startIcon={<MUICancelOutlinedIcon />}>
             Cancel
           </MUIButton>
         </MUIDialogActions>

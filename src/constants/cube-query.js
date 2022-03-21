@@ -34,7 +34,16 @@ export default `
 _id
 creator {
   _id
-  avatar
+  avatar {
+    card_faces {
+      image_uris {
+        art_crop
+      }
+    }
+    image_uris {
+      art_crop
+    }
+  }
   name
 }
 description

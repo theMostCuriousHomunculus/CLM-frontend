@@ -21,7 +21,10 @@ export const EventContext = createContext({
     finished: false,
     host: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     name: null,
@@ -29,7 +32,10 @@ export const EventContext = createContext({
       {
         account: {
           _id: null,
-          avatar: null,
+          avatar: {
+            card_faces: [],
+            image_uris: null
+          },
           name: '...'
         },
         answers: [],
@@ -45,7 +51,10 @@ export const EventContext = createContext({
   me: {
     account: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     answers: [],
@@ -72,7 +81,10 @@ export default function ContextualizedEventPage() {
     finished: false,
     host: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     name: null,
@@ -90,7 +102,16 @@ export default function ContextualizedEventPage() {
     _id
     author {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     body
@@ -104,7 +125,16 @@ export default function ContextualizedEventPage() {
   players {
     account {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     current_pack {

@@ -13,7 +13,10 @@ export const DeckContext = createContext({
     cards: [],
     creator: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: ''
     },
     description: '',
@@ -49,7 +52,10 @@ export default function ContextualizedDeckPage() {
     cards: [],
     creator: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     description: '',
@@ -119,7 +125,16 @@ export default function ContextualizedDeckPage() {
     }
     creator {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     description

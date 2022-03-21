@@ -148,11 +148,7 @@ export default function DeckInfo() {
             image && (
               <img
                 alt={image.image_uris ? image.name : image.card_faces[0].name}
-                src={
-                  image.image_uris
-                    ? image.image_uris.art_crop
-                    : image.card_faces[0].image_uris.art_crop
-                }
+                src={image.image_uris?.art_crop ?? image.card_faces[0].image_uris.art_crop}
                 style={{ borderRadius: 4 }}
                 width={deckImageWidth}
               />

@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 
 import useRequest from '../hooks/request-hook';
@@ -13,7 +6,10 @@ import { ErrorContext } from './Error';
 
 const unauthenticatedUserInfo = {
   admin: false,
-  avatar: null,
+  avatar: {
+    card_faces: [],
+    image_uris: null
+  },
   settings: {
     measurement_system: 'imperial',
     radius: 10
@@ -72,7 +68,16 @@ export function AuthenticationProvider({ children }) {
   const authenticationQuery = `
     _id
     admin
-    avatar
+    avatar {
+      card_faces {
+        image_uris {
+          art_crop
+        }
+      }
+      image_uris {
+        art_crop
+      }
+    }
     name
     settings {
       measurement_system
@@ -81,14 +86,7 @@ export function AuthenticationProvider({ children }) {
     token
   `;
 
-  const storeUserInfo = useCallback(function ({
-    _id,
-    admin,
-    avatar,
-    name,
-    settings,
-    token
-  }) {
+  const storeUserInfo = useCallback(function ({ _id, admin, avatar, name, settings, token }) {
     // store in running application
     setUserInfo({
       admin,
@@ -100,8 +98,7 @@ export function AuthenticationProvider({ children }) {
 
     // store in browser
     Cookies.set('authentication_token', token);
-  },
-  []);
+  }, []);
 
   const authenticate = useCallback(
     async function () {
@@ -198,31 +195,6 @@ export function AuthenticationProvider({ children }) {
 
   const register = useCallback(
     async function (email, name, password) {
-      const avatar = {
-        prints_search_uri: null,
-        printings: []
-      };
-
-      await sendRequest({
-        callback: (data) => {
-          avatar.prints_search_uri = data.prints_search_uri;
-        },
-        load: true,
-        method: 'GET',
-        url: 'https://api.scryfall.com/cards/random'
-      });
-
-      await sendRequest({
-        callback: (data) => {
-          avatar.printings = data.data;
-        },
-        load: true,
-        method: 'GET',
-        url: avatar.prints_search_uri
-      });
-
-      const randomIndex = Math.floor(Math.random() * avatar.printings.length);
-
       await sendRequest({
         callback: storeUserInfo,
         load: true,
@@ -232,7 +204,6 @@ export function AuthenticationProvider({ children }) {
             query: `
               mutation {
                 ${this.operation}(
-                  avatar: "${avatar.printings[randomIndex].image_uris.art_crop}",
                   email: "${email}",
                   name: "${name}",
                   password: "${password}"

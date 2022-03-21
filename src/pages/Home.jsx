@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MUIArrowRightIcon from '@mui/icons-material/ArrowRight';
 import MUIButton from '@mui/material/Button';
@@ -26,32 +26,6 @@ export default function Home() {
     'Check out "Classy", an independently managed, constructed format and brewer\'s paradise',
     'Dive into topical and set review articles from our brialliant contributors'
   ];
-
-  useEffect(() => {
-    (async function () {
-      const printings = await searchPrintings({
-        queryString: `{
-          _id
-          card_faces {
-            image_uris {
-              art_crop
-              large
-            }
-          }
-          collector_number
-          image_uris {
-            art_crop
-            large
-          }
-          name
-          oracle_id
-          set_name
-        }`,
-        variables: { oracle_id: '2b93787d-47ea-4b8b-912d-ffc5d5440171' }
-      });
-      console.table(printings.data.searchPrintings);
-    })();
-  });
 
   return (
     <MUICard>

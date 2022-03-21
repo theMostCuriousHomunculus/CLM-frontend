@@ -75,9 +75,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
             ])
           }
         >
-          <MUIDialogContent
-            style={{ display: 'flex', flexDirection: 'column' }}
-          >
+          <MUIDialogContent style={{ display: 'flex', flexDirection: 'column' }}>
             <MUIFormControl
               className={classes.formControlWithMargin}
               component="fieldset"
@@ -97,16 +95,8 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                 }}
                 value={fromEvent}
               >
-                <MUIFormControlLabel
-                  control={<MUIRadio />}
-                  label="Decks"
-                  value={false}
-                />
-                <MUIFormControlLabel
-                  control={<MUIRadio />}
-                  label="Event"
-                  value={true}
-                />
+                <MUIFormControlLabel control={<MUIRadio />} label="Decks" value={false} />
+                <MUIFormControlLabel control={<MUIRadio />} label="Event" value={true} />
               </MUIRadioGroup>
             </MUIFormControl>
 
@@ -119,10 +109,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                     button
                     onClick={(event) => setAnchorEl(event.currentTarget)}
                   >
-                    <MUIListItemText
-                      primary="Use Decks From"
-                      secondary={selectedEvent.name}
-                    />
+                    <MUIListItemText primary="Use Decks From" secondary={selectedEvent.name} />
                   </MUIListItem>
                 </MUIList>
                 <MUIMenu
@@ -162,12 +149,8 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                       key={dck._id}
                       label={
                         <React.Fragment>
-                          <MUITypography variant="subtitle1">
-                            {dck.name}
-                          </MUITypography>
-                          <MUITypography variant="subtitle2">
-                            {dck.format}
-                          </MUITypography>
+                          <MUITypography variant="subtitle1">{dck.name}</MUITypography>
+                          <MUITypography variant="subtitle2">{dck.format}</MUITypography>
                         </React.Fragment>
                       }
                       value={dck._id}
@@ -199,11 +182,12 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                             <Avatar
                               alt={plr.account.name}
                               size="small"
-                              src={plr.account.avatar}
+                              src={
+                                plr.account.avatar.image_uris?.art_crop ??
+                                plr.account.avatar.card_faces[0].image_uris.art_crop
+                              }
                             />
-                            <MUITypography variant="subtitle1">
-                              {plr.account.name}
-                            </MUITypography>
+                            <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
                           </span>
                         }
                         value={plr.account._id}
@@ -220,11 +204,12 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                             <Avatar
                               alt={bud.name}
                               size="small"
-                              src={bud.avatar}
+                              src={
+                                bud.avatar.image_uris?.art_crop ??
+                                bud.avatar.card_faces[0].image_uris.art_crop
+                              }
                             />
-                            <MUITypography variant="subtitle1">
-                              {bud.name}
-                            </MUITypography>
+                            <MUITypography variant="subtitle1">{bud.name}</MUITypography>
                           </span>
                         }
                         value={bud._id}
@@ -241,9 +226,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                 component="fieldset"
                 required={true}
               >
-                <MUIFormLabel component="legend">
-                  Your Opponent's Deck
-                </MUIFormLabel>
+                <MUIFormLabel component="legend">Your Opponent's Deck</MUIFormLabel>
                 <MUIRadioGroup
                   onChange={(event) => setOpponentDeckID(event.target.value)}
                   value={opponentDeckID}
@@ -257,12 +240,8 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                           key={dck._id}
                           label={
                             <React.Fragment>
-                              <MUITypography variant="subtitle1">
-                                {dck.name}
-                              </MUITypography>
-                              <MUITypography variant="subtitle2">
-                                {dck.format}
-                              </MUITypography>
+                              <MUITypography variant="subtitle1">{dck.name}</MUITypography>
+                              <MUITypography variant="subtitle2">{dck.format}</MUITypography>
                             </React.Fragment>
                           }
                           value={dck._id}
@@ -274,11 +253,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
           </MUIDialogContent>
           <MUIDialogActions>
             <MUIButton type="submit">Whoop that Ass!</MUIButton>
-            <MUIButton
-              color="warning"
-              onClick={toggleOpen}
-              startIcon={<MUICancelOutlinedIcon />}
-            >
+            <MUIButton color="warning" onClick={toggleOpen} startIcon={<MUICancelOutlinedIcon />}>
               Cancel
             </MUIButton>
           </MUIDialogActions>

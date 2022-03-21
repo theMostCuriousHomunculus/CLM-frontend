@@ -22,7 +22,10 @@ export const CubeContext = createContext({
     _id: null,
     creator: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: null
     },
     description: null,
@@ -78,7 +81,10 @@ export default function ContextualizedCubePage() {
     _id: cubeID,
     creator: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     description: '',

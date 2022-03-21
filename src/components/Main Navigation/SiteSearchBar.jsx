@@ -71,7 +71,16 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                           __typename
                         }
                         ... on AccountType {
-                          avatar
+                          avatar {
+                            card_faces {
+                              image_uris {
+                                art_crop
+                              }
+                            }
+                            image_uris {
+                              art_crop
+                            }
+                          }
                           name
                         }
                         ... on BlogPostType {
@@ -82,7 +91,16 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                         ... on CubeType {
                           creator {
                             _id
-                            avatar
+                            avatar {
+                              card_faces {
+                                image_uris {
+                                  art_crop
+                                }
+                              }
+                              image_uris {
+                                art_crop
+                              }
+                            }
                             name
                           }
                           cardImage: image {
@@ -103,7 +121,16 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                         ... on DeckType {
                           creator {
                             _id
-                            avatar
+                            avatar {
+                              card_faces {
+                                image_uris {
+                                  art_crop
+                                }
+                              }
+                              image_uris {
+                                art_crop
+                              }
+                            }
                             name
                           }
                           cardImage: image {
@@ -125,7 +152,16 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                           createdAt
                           host {
                             _id
-                            avatar
+                            avatar {
+                              card_faces {
+                                image_uris {
+                                  art_crop
+                                }
+                              }
+                              image_uris {
+                                art_crop
+                              }
+                            }
                             name
                           }
                           name
@@ -264,9 +300,8 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
                             : option.cardImage.card_faces[0].name
                         }
                         src={
-                          option.cardImage.image_uris
-                            ? option.cardImage.image_uris.art_crop
-                            : option.cardImage.card_faces[0].image_uris.art_crop
+                          option.cardImage.image_uris?.art_crop ??
+                          option.cardImage.card_faces[0].image_uris.art_crop
                         }
                         style={{ borderRadius: 4 }}
                         width={75}
@@ -286,34 +321,21 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
             {option.__typename === 'DeckType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  {
-                    /* option.image */ option.cardImage && (
-                      <img
-                        // alt={
-                        //   option.image.image_uris
-                        //     ? option.image.name
-                        //     : option.image.card_faces[0].name
-                        // }
-                        // src={
-                        //   option.image.image_uris
-                        //     ? option.image.image_uris.art_crop
-                        //     : option.image.card_faces[0].image_uris.art_crop
-                        // }
-                        alt={
-                          option.cardImage.image_uris
-                            ? option.cardImage.name
-                            : option.cardImage.card_faces[0].name
-                        }
-                        src={
-                          option.cardImage.image_uris
-                            ? option.cardImage.image_uris.art_crop
-                            : option.cardImage.card_faces[0].image_uris.art_crop
-                        }
-                        style={{ borderRadius: 4 }}
-                        width={75}
-                      />
-                    )
-                  }
+                  {option.cardImage && (
+                    <img
+                      alt={
+                        option.cardImage.image_uris
+                          ? option.cardImage.name
+                          : option.cardImage.card_faces[0].name
+                      }
+                      src={
+                        option.cardImage.image_uris?.art_crop ??
+                        option.cardImage.card_faces[0].image_uris.art_crop
+                      }
+                      style={{ borderRadius: 4 }}
+                      width={75}
+                    />
+                  )}
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       Deck

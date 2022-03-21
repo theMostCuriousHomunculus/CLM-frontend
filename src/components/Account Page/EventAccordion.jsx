@@ -110,7 +110,14 @@ export default function EventAccordion() {
                         </span>
                       </MUITableCell>
                       <MUITableCell>
-                        <Avatar alt={event.host.name} size="small" src={event.host.avatar} />
+                        <Avatar
+                          alt={event.host.name}
+                          size="small"
+                          src={
+                            event.host.avatar.image_uris?.art_crop ??
+                            event.host.avatar.card_faces[0].image_uris.art_crop
+                          }
+                        />
                       </MUITableCell>
                       <MUITableCell>
                         <span style={{ display: 'flex', columnGap: 4 }}>
@@ -125,7 +132,10 @@ export default function EventAccordion() {
                                 alt={player.account.name}
                                 key={player.account._id}
                                 size="small"
-                                src={player.account.avatar}
+                                src={
+                                  player.account.avatar.image_uris?.art_crop ??
+                                  player.account.avatar.card_faces[0].image_uris.art_crop
+                                }
                               />
                             ))}
                         </span>

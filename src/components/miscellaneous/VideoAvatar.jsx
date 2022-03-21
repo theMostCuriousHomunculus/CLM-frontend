@@ -30,12 +30,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function VideoAvatar({
-  account,
-  context,
-  rtcConnectionIndex,
-  size
-}) {
+export default function VideoAvatar({ account, context, rtcConnectionIndex, size }) {
   const { userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const { peerConnectionsRef } = useContext(context);
@@ -49,12 +44,8 @@ export default function VideoAvatar({
   const audioBadge = useRef();
   const videoBadge = useRef();
   const classes = useStyles();
-  const audioTracks = !!mediaStreamRef.current
-    ? mediaStreamRef.current.getAudioTracks()
-    : [];
-  const videoTracks = !!mediaStreamRef.current
-    ? mediaStreamRef.current.getVideoTracks()
-    : [];
+  const audioTracks = !!mediaStreamRef.current ? mediaStreamRef.current.getAudioTracks() : [];
+  const videoTracks = !!mediaStreamRef.current ? mediaStreamRef.current.getVideoTracks() : [];
   const pc = peerConnectionsRef.current[rtcConnectionIndex];
 
   async function toggleAudio() {
@@ -65,15 +56,9 @@ export default function VideoAvatar({
             const microphoneStream = await navigator.mediaDevices.getUserMedia({
               audio: true
             });
-            for (
-              let index = 0;
-              index < peerConnectionsRef.current.length;
-              index++
-            ) {
+            for (let index = 0; index < peerConnectionsRef.current.length; index++) {
               if (peerConnectionsRef.current[index]) {
-                audioSendersRef.current[index] = peerConnectionsRef.current[
-                  index
-                ].addTrack(
+                audioSendersRef.current[index] = peerConnectionsRef.current[index].addTrack(
                   microphoneStream.getAudioTracks()[0]
                   // mediaStreamRef.current
                 );
@@ -84,15 +69,9 @@ export default function VideoAvatar({
               audioTracks[index].stop();
               mediaStreamRef.current.removeTrack(audioTracks[index]);
             }
-            for (
-              let index = 0;
-              index < peerConnectionsRef.current.length;
-              index++
-            ) {
+            for (let index = 0; index < peerConnectionsRef.current.length; index++) {
               if (peerConnectionsRef.current[index]) {
-                peerConnectionsRef.current[index].removeTrack(
-                  audioSendersRef.current[index]
-                );
+                peerConnectionsRef.current[index].removeTrack(audioSendersRef.current[index]);
                 audioSendersRef.current[index] = null;
               }
             }
@@ -105,15 +84,9 @@ export default function VideoAvatar({
             audio: true
           });
           // mediaStreamRef.current = microphoneStream;
-          for (
-            let index = 0;
-            index < peerConnectionsRef.current.length;
-            index++
-          ) {
+          for (let index = 0; index < peerConnectionsRef.current.length; index++) {
             if (peerConnectionsRef.current[index]) {
-              audioSendersRef.current[index] = peerConnectionsRef.current[
-                index
-              ].addTrack(
+              audioSendersRef.current[index] = peerConnectionsRef.current[index].addTrack(
                 microphoneStream.getAudioTracks()[0]
                 // mediaStreamRef.current
               );
@@ -137,15 +110,9 @@ export default function VideoAvatar({
             const cameraStream = await navigator.mediaDevices.getUserMedia({
               video: true
             });
-            for (
-              let index = 0;
-              index < peerConnectionsRef.current.length;
-              index++
-            ) {
+            for (let index = 0; index < peerConnectionsRef.current.length; index++) {
               if (peerConnectionsRef.current[index]) {
-                videoSendersRef.current[index] = peerConnectionsRef.current[
-                  index
-                ].addTrack(
+                videoSendersRef.current[index] = peerConnectionsRef.current[index].addTrack(
                   cameraStream.getVideoTracks()[0],
                   mediaStreamRef.current
                 );
@@ -156,15 +123,9 @@ export default function VideoAvatar({
               videoTracks[index].stop();
               mediaStreamRef.current.removeTrack(videoTracks[index]);
             }
-            for (
-              let index = 0;
-              index < peerConnectionsRef.current.length;
-              index++
-            ) {
+            for (let index = 0; index < peerConnectionsRef.current.length; index++) {
               if (peerConnectionsRef.current[index]) {
-                peerConnectionsRef.current[index].removeTrack(
-                  videoSendersRef.current[index]
-                );
+                peerConnectionsRef.current[index].removeTrack(videoSendersRef.current[index]);
                 videoSendersRef.current[index] = null;
               }
             }
@@ -177,15 +138,9 @@ export default function VideoAvatar({
             video: true
           });
           mediaStreamRef.current = cameraStream;
-          for (
-            let index = 0;
-            index < peerConnectionsRef.current.length;
-            index++
-          ) {
+          for (let index = 0; index < peerConnectionsRef.current.length; index++) {
             if (peerConnectionsRef.current[index]) {
-              videoSendersRef.current[index] = peerConnectionsRef.current[
-                index
-              ].addTrack(
+              videoSendersRef.current[index] = peerConnectionsRef.current[index].addTrack(
                 mediaStreamRef.current.getVideoTracks()[0],
                 mediaStreamRef.current
               );
@@ -236,7 +191,9 @@ export default function VideoAvatar({
       <Link to={`/account/${account._id}`}>
         <Avatar
           alt={account.name}
-          src={account.avatar}
+          src={
+            account.avatar.image_uris?.art_crop ?? account.avatar.card_faces[0].image_uris.art_crop
+          }
           style={{
             height: size,
             width: size
@@ -266,7 +223,9 @@ export default function VideoAvatar({
       >
         <Avatar
           alt={account.name}
-          src={account.avatar}
+          src={
+            account.avatar.image_uris?.art_crop ?? account.avatar.card_faces[0].image_uris.art_crop
+          }
           style={{
             height: size,
             width: size
@@ -317,7 +276,10 @@ export default function VideoAvatar({
         ) : (
           <Avatar
             alt={account.name}
-            src={account.avatar}
+            src={
+              account.avatar.image_uris?.art_crop ??
+              account.avatar.card_faces[0].image_uris.art_crop
+            }
             style={{
               height: size,
               width: size
@@ -343,11 +305,7 @@ export default function VideoAvatar({
         className={classes.badge}
         color="primary"
         onClick={(event) => {
-          if (
-            event.target
-              .closest('span')
-              .classList.contains('MuiBadge-colorPrimary')
-          ) {
+          if (event.target.closest('span').classList.contains('MuiBadge-colorPrimary')) {
             toggleVideo();
           }
         }}
@@ -370,11 +328,7 @@ export default function VideoAvatar({
           color="secondary"
           onClick={async (event) => {
             event.persist();
-            if (
-              event.target
-                .closest('span')
-                .classList.contains('MuiBadge-colorSecondary')
-            ) {
+            if (event.target.closest('span').classList.contains('MuiBadge-colorSecondary')) {
               toggleAudio();
             }
           }}
@@ -399,7 +353,10 @@ export default function VideoAvatar({
             <React.Fragment>
               <Avatar
                 alt={account.name}
-                src={account.avatar}
+                src={
+                  account.avatar.image_uris?.art_crop ??
+                  account.avatar.card_faces[0].image_uris.art_crop
+                }
                 style={{
                   height: size,
                   width: size

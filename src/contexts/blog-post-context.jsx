@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import useRequest from '../hooks/request-hook';
@@ -18,7 +12,10 @@ export const BlogPostContext = createContext({
     _id: '',
     author: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: ''
     },
     body: '',
@@ -41,7 +38,10 @@ export default function ContextualizedBlogPostPage() {
     _id: null,
     author: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     body: '',
@@ -57,7 +57,16 @@ export default function ContextualizedBlogPostPage() {
     _id
     author {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     body
@@ -65,7 +74,16 @@ export default function ContextualizedBlogPostPage() {
       _id
       author {
         _id
-        avatar
+        avatar {
+          card_faces {
+            image_uris {
+              art_crop
+            }
+          }
+          image_uris {
+            art_crop
+          }
+        }
         name
       }
       body

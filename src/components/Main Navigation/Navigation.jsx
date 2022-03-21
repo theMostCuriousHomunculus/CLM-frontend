@@ -58,23 +58,15 @@ const useStyles = makeStyles({
 });
 
 export default function Navigation() {
-  const { isLoggedIn, avatar, userID, userName } = useContext(
-    AuthenticationContext
-  );
+  const { isLoggedIn, avatar, userID, userName } = useContext(AuthenticationContext);
   const { deferredPrompt, setDeferredPrompt } = useContext(PermissionsContext);
-  const searchBarLocation = useMediaQuery(theme.breakpoints.up('md'))
-    ? 'top'
-    : 'side';
-  const [authenticateFormDisplayed, setAuthenticateFormDisplayed] =
-    useState(false);
+  const searchBarLocation = useMediaQuery(theme.breakpoints.up('md')) ? 'top' : 'side';
+  const [authenticateFormDisplayed, setAuthenticateFormDisplayed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const classes = useStyles();
 
   function toggleDrawer(event) {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
     setDrawerOpen((prevState) => !prevState);
@@ -104,7 +96,11 @@ export default function Navigation() {
             )}
             {isLoggedIn ? (
               <Link to={`/account/${userID}`} style={{ marginLeft: 8 }}>
-                <Avatar alt={userName} size="small" src={avatar} />
+                <Avatar
+                  alt={userName}
+                  size="small"
+                  src={avatar.image_uris?.art_crop ?? avatar.card_faces[0].image_uris.art_crop}
+                />
               </Link>
             ) : (
               <MUITooltip title="Login / Register">

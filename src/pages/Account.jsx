@@ -206,7 +206,13 @@ export default function Account() {
                 )}
             </React.Fragment>
           }
-          avatar={<Avatar alt={name} size="medium" src={avatar} />}
+          avatar={
+            <Avatar
+              alt={name}
+              size="medium"
+              src={avatar.image_uris?.art_crop ?? avatar.card_faces[0].image_uris.art_crop}
+            />
+          }
           className={classes.cardHeader}
           title={
             <MUITextField
@@ -241,13 +247,7 @@ export default function Account() {
               buttonText="Change Avatar"
               labelText="Avatar"
               onSubmit={(chosenCard) => {
-                editAccount(
-                  `avatar: "${
-                    chosenCard.image_uris
-                      ? chosenCard.image_uris.art_crop
-                      : chosenCard.card_faces[0].image_uris.art_crop
-                  }"`
-                );
+                editAccount(`avatar: "${chosenCard._id}"`);
               }}
             />
           </MUICardActions>

@@ -12,7 +12,12 @@ export const AccountContext = createContext({
   loading: false,
   accountState: {
     _id: '',
-    avatar: '',
+    avatar: {
+      card_faces: null,
+      image_uris: {
+        art_crop: '...'
+      }
+    },
     buds: [],
     cubes: [],
     decks: [],
@@ -42,7 +47,12 @@ export default function ContextualizedAccountPage() {
   const { accountID } = useParams();
   const [accountState, setAccountState] = useState({
     _id: accountID,
-    avatar: '',
+    avatar: {
+      card_faces: null,
+      image_uris: {
+        art_crop: '...'
+      }
+    },
     buds: [],
     cubes: [],
     decks: [],
@@ -61,13 +71,40 @@ export default function ContextualizedAccountPage() {
   const [loading, setLoading] = useState(false);
   const accountQuery = `
     _id
-    avatar
+    avatar {
+      card_faces {
+        image_uris {
+          art_crop
+        }
+      }
+      image_uris {
+        art_crop
+      }
+    }
     buds {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       buds {
         _id
-        avatar
+        avatar {
+          card_faces {
+            image_uris {
+              art_crop
+            }
+          }
+          image_uris {
+            art_crop
+          }
+        }
         name
       }
       decks {
@@ -158,14 +195,32 @@ export default function ContextualizedAccountPage() {
       }
       host {
         _id
-        avatar
+        avatar {
+          card_faces {
+            image_uris {
+              art_crop
+            }
+          }
+          image_uris {
+            art_crop
+          }
+        }
         name
       }
       name
       players {
         account {
           _id
-          avatar
+          avatar {
+            card_faces {
+              image_uris {
+                art_crop
+              }
+            }
+            image_uris {
+              art_crop
+            }
+          }
           name
         }
       }
@@ -192,7 +247,16 @@ export default function ContextualizedAccountPage() {
       players {
         account {
           _id
-          avatar
+          avatar {
+            card_faces {
+              image_uris {
+                art_crop
+              }
+            }
+            image_uris {
+              art_crop
+            }
+          }
           name
         }
       }
@@ -200,17 +264,44 @@ export default function ContextualizedAccountPage() {
     name
     nearby_users {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     received_bud_requests {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     sent_bud_requests {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     settings {
