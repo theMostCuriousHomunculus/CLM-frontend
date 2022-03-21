@@ -332,7 +332,7 @@ export default function ContextualizedCubePage() {
           setLoading(true);
           const data = await fetchCubeByID({
             headers: { CubeID: cubeID },
-            queryString: `{${cubeQuery}}`,
+            queryString: cubeQuery,
             signal: abortControllerRef.current.signal
           });
           setCubeState(data.data.fetchCubeByID);

@@ -24,13 +24,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import createBlogPost from '../graphql/mutations/blog/create-blog-post';
+import createComment from '../graphql/mutations/blog/create-comment';
 import editBlogPost from '../graphql/mutations/blog/edit-blog-post';
 import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { BlogPostContext } from '../contexts/blog-post-context';
 import { ErrorContext } from '../contexts/Error';
-import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 
 const useStyles = makeStyles({
   article: {
@@ -99,9 +100,7 @@ const useStyles = makeStyles({
 export default function BlogPost() {
   const { userID } = useContext(AuthenticationContext);
   const {
-    loading,
     blogPostState: { author, body, comments, image, published, subtitle, title, updatedAt },
-    createComment,
     setBlogPostState
   } = useContext(BlogPostContext);
   const { setErrorMessages } = useContext(ErrorContext);
@@ -113,9 +112,7 @@ export default function BlogPost() {
   const [success, setSuccess] = useState(false);
   const { article } = useStyles();
 
-  return loading ? (
-    <LoadingSpinner />
-  ) : (
+  return (
     <React.Fragment>
       <MUICard>
         <MUICardHeader
@@ -367,7 +364,9 @@ export default function BlogPost() {
       {blogPostID !== 'new-post' && (
         <AutoScrollMessages
           messages={comments}
-          submitFunction={(value) => createComment(value)}
+          submitFunction={(value) =>
+            createComment({ headers: { BlogPostID: blogPostID }, variables: { body: value } })
+          }
           title="Community Reaction"
         />
       )}
