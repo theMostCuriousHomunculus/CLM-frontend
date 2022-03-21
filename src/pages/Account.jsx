@@ -206,13 +206,7 @@ export default function Account() {
                 )}
             </React.Fragment>
           }
-          avatar={
-            <Avatar
-              alt={name}
-              size="medium"
-              src={avatar.image_uris?.art_crop ?? avatar.card_faces[0].image_uris.art_crop}
-            />
-          }
+          avatar={<Avatar profile={{ avatar, name }} size="medium" />}
           className={classes.cardHeader}
           title={
             <MUITextField

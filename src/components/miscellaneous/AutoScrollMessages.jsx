@@ -70,14 +70,7 @@ export default function AutoScrollMessages({ messages, submitFunction, title }) 
                   flexDirection: message.author._id === userID ? 'row-reverse' : 'row'
                 }}
               >
-                <Avatar
-                  alt={message.author.name}
-                  size="small"
-                  src={
-                    message.author.avatar.image_uris?.art_crop ??
-                    message.author.avatar.card_faces[0].image_uris.art_crop
-                  }
-                />
+                <Avatar profile={message.author} size="small" />
                 <MUIPaper
                   style={{
                     backgroundColor:

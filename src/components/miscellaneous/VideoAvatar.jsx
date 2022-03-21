@@ -190,10 +190,7 @@ export default function VideoAvatar({ account, context, rtcConnectionIndex, size
     return (
       <Link to={`/account/${account._id}`}>
         <Avatar
-          alt={account.name}
-          src={
-            account.avatar.image_uris?.art_crop ?? account.avatar.card_faces[0].image_uris.art_crop
-          }
+          profile={account}
           style={{
             height: size,
             width: size
@@ -222,10 +219,7 @@ export default function VideoAvatar({ account, context, rtcConnectionIndex, size
         ref={audioBadge}
       >
         <Avatar
-          alt={account.name}
-          src={
-            account.avatar.image_uris?.art_crop ?? account.avatar.card_faces[0].image_uris.art_crop
-          }
+          profile={account}
           style={{
             height: size,
             width: size
@@ -275,11 +269,7 @@ export default function VideoAvatar({ account, context, rtcConnectionIndex, size
           />
         ) : (
           <Avatar
-            alt={account.name}
-            src={
-              account.avatar.image_uris?.art_crop ??
-              account.avatar.card_faces[0].image_uris.art_crop
-            }
+            profile={account}
             style={{
               height: size,
               width: size
@@ -352,11 +342,7 @@ export default function VideoAvatar({ account, context, rtcConnectionIndex, size
           ) : (
             <React.Fragment>
               <Avatar
-                alt={account.name}
-                src={
-                  account.avatar.image_uris?.art_crop ??
-                  account.avatar.card_faces[0].image_uris.art_crop
-                }
+                profile={account}
                 style={{
                   height: size,
                   width: size

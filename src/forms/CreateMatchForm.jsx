@@ -179,14 +179,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                         key={plr.account._id}
                         label={
                           <span className={classes.flex}>
-                            <Avatar
-                              alt={plr.account.name}
-                              size="small"
-                              src={
-                                plr.account.avatar.image_uris?.art_crop ??
-                                plr.account.avatar.card_faces[0].image_uris.art_crop
-                              }
-                            />
+                            <Avatar profile={plr.account} size="small" />
                             <MUITypography variant="subtitle1">{plr.account.name}</MUITypography>
                           </span>
                         }
@@ -201,14 +194,7 @@ export default function CreateMatchForm({ open, toggleOpen }) {
                         key={bud._id}
                         label={
                           <span className={classes.flex}>
-                            <Avatar
-                              alt={bud.name}
-                              size="small"
-                              src={
-                                bud.avatar.image_uris?.art_crop ??
-                                bud.avatar.card_faces[0].image_uris.art_crop
-                              }
-                            />
+                            <Avatar profile={bud} size="small" />
                             <MUITypography variant="subtitle1">{bud.name}</MUITypography>
                           </span>
                         }

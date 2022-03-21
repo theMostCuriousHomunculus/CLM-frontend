@@ -96,11 +96,7 @@ export default function Navigation() {
             )}
             {isLoggedIn ? (
               <Link to={`/account/${userID}`} style={{ marginLeft: 8 }}>
-                <Avatar
-                  alt={userName}
-                  size="small"
-                  src={avatar.image_uris?.art_crop ?? avatar.card_faces[0].image_uris.art_crop}
-                />
+                <Avatar profile={{ avatar, name: userName }} size="small" />
               </Link>
             ) : (
               <MUITooltip title="Login / Register">

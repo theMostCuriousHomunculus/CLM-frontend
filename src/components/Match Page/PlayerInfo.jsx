@@ -192,13 +192,9 @@ export default function PlayerInfo({ player, position, setClickedPlayer }) {
               showZero
             >
               <Avatar
-                alt={player.account.name}
                 id={`${position}-avatar`}
+                profile={player.account}
                 size="large"
-                src={
-                  player.account.avatar.image_uris?.art_crop ??
-                  player.account.avatar.card_faces[0].image_uris.art_crop
-                }
                 style={{ cursor: 'move' }}
               />
             </MUIBadge>

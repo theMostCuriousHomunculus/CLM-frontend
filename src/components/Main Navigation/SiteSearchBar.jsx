@@ -247,7 +247,7 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
             {option.__typename === 'AccountType' && (
               <li {...props}>
                 <span className={classes.option}>
-                  <Avatar alt={option.name} size="small" src={option.avatar} />
+                  <Avatar size="small" profile={option} />
                   <span style={{ textAlign: 'right' }}>
                     <MUITypography variant="body1" style={{ fontWeight: 700 }}>
                       User

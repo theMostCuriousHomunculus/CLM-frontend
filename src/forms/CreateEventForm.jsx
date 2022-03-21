@@ -189,16 +189,7 @@ export default function CreateEventForm({ buds, cubes, open, toggleOpen }) {
                           value={bud._id}
                         />
                       }
-                      label={
-                        <Avatar
-                          alt={bud.name}
-                          size="small"
-                          src={
-                            bud.avatar.image_uris?.art_crop ??
-                            bud.avatar.card_faces[0].image_uris.art_crop
-                          }
-                        />
-                      }
+                      label={<Avatar profile={bud} size="small" />}
                     />
                   </MUIGrid>
                 ))}

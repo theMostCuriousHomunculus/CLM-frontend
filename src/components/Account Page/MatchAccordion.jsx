@@ -64,12 +64,8 @@ export default function MatchAccordion({ pageClasses }) {
                       <MUITableCell>
                         <Link to={`/match/${match._id}`}>
                           <Avatar
-                            alt={opponent.account.name}
+                            profile={opponent.account}
                             size="small"
-                            src={
-                              opponent.account.avatar.image_uris?.art_crop ??
-                              opponent.account.avatar.card_faces[0].image_uris.art_crop
-                            }
                             style={{ marginRight: 16 }}
                           />
                         </Link>

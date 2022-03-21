@@ -100,15 +100,7 @@ export default function BudAccordion() {
         toggleOpen={() => setBudToDelete(null)}
       >
         <div style={{ display: 'flex' }}>
-          <Avatar
-            alt={budToDelete?.name}
-            size="medium"
-            src={
-              budToDelete?.avatar.image_uris?.art_crop ??
-              budToDelete?.avatar.card_faces[0].image_uris.art_crop
-            }
-            style={{ marginRight: 16 }}
-          />
+          <Avatar profile={budToDelete} size="medium" style={{ marginRight: 16 }} />
           <MUITypography variant="body1">
             Think of all the good times you've had. And how lonely they'll be without you.
           </MUITypography>
@@ -155,14 +147,7 @@ export default function BudAccordion() {
                             overlap="circular"
                           >
                             <Link to={`/account/${nearby_user._id}`}>
-                              <Avatar
-                                alt={nearby_user.name}
-                                size="medium"
-                                src={
-                                  nearby_user.avatar.image_uris?.art_crop ??
-                                  nearby_user.avatar.card_faces[0].image_uris.art_crop
-                                }
-                              />
+                              <Avatar profile={nearby_user} size="medium" />
                             </Link>
                           </MUIBadge>
                         </MUIListItem>
@@ -220,14 +205,7 @@ export default function BudAccordion() {
                           overlap="circular"
                         >
                           <Link to={`/account/${request._id}`}>
-                            <Avatar
-                              alt={request.name}
-                              size="medium"
-                              src={
-                                request.avatar.image_uris?.art_crop ??
-                                request.avatar.card_faces[0].image_uris.art_crop
-                              }
-                            />
+                            <Avatar profile={request} size="medium" />
                           </Link>
                         </MUIBadge>
                       </MUIBadge>
@@ -244,14 +222,7 @@ export default function BudAccordion() {
                   return (
                     <MUIListItem key={request._id}>
                       <Link to={`/account/${request._id}`}>
-                        <Avatar
-                          alt={request.name}
-                          size="medium"
-                          src={
-                            request.avatar.image_uris?.art_crop ??
-                            request.avatar.card_faces[0].image_uris.art_crop
-                          }
-                        />
+                        <Avatar profile={request} size="medium" />
                       </Link>
                     </MUIListItem>
                   );
@@ -280,14 +251,7 @@ export default function BudAccordion() {
                         overlap="circular"
                       >
                         <Link to={`/account/${pb._id}`}>
-                          <Avatar
-                            alt={pb.name}
-                            size="medium"
-                            src={
-                              pb.avatar.image_uris?.art_crop ??
-                              pb.avatar.card_faces[0].image_uris.art_crop
-                            }
-                          />
+                          <Avatar profile={pb} size="medium" />
                         </Link>
                       </MUIBadge>
                     </MUIListItem>
@@ -319,26 +283,12 @@ export default function BudAccordion() {
                     overlap="circular"
                   >
                     <Link to={`/account/${bud._id}`}>
-                      <Avatar
-                        alt={bud.name}
-                        size="medium"
-                        src={
-                          bud.avatar.image_uris?.art_crop ??
-                          bud.avatar.card_faces[0].image_uris.art_crop
-                        }
-                      />
+                      <Avatar profile={bud} size="medium" />
                     </Link>
                   </MUIBadge>
                 ) : (
                   <Link to={`/account/${bud._id}`}>
-                    <Avatar
-                      alt={bud.name}
-                      size="medium"
-                      src={
-                        bud.avatar.image_uris?.art_crop ??
-                        bud.avatar.card_faces[0].image_uris.art_crop
-                      }
-                    />
+                    <Avatar profile={bud} size="medium" />
                   </Link>
                 )}
               </MUIListItem>

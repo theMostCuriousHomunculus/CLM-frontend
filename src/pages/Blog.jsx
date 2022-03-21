@@ -152,16 +152,7 @@ export default function Blog() {
               }}
             >
               <MUICardHeader
-                avatar={
-                  <Avatar
-                    alt={blogPost.author.name}
-                    size="small"
-                    src={
-                      blogPost.author.avatar.image_uris?.art_crop ??
-                      blogPost.author.avatar.card_faces[0].image_uris.art_crop
-                    }
-                  />
-                }
+                avatar={<Avatar profile={blogPost.author} size="small" />}
                 subheader={
                   <MUITypography color="textSecondary" variant="subtitle2">
                     {blogPost.subtitle}
