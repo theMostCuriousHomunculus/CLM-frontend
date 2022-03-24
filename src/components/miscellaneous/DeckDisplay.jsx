@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import MUICard from '@mui/material/Card';
+import MUICardActions from '@mui/material/CardActions';
 import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUIGrid from '@mui/material/Grid';
@@ -13,10 +14,12 @@ import { useParams } from 'react-router';
 
 import HoverPreview from './HoverPreview';
 import ManaCostSVGs from './ManaCostSVGs';
+import ScryfallRequest from './ScryfallRequest';
 import setNumberOfDeckCardCopies from '../../graphql/mutations/deck/set-number-of-deck-card-copies';
 import customSort from '../../functions/custom-sort';
 import specificCardType from '../../functions/specific-card-type';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { DeckContext } from '../../contexts/deck-context';
 
 const deckComponents = ['Mainboard', 'Sideboard', 'Maybeboard'];
 const generalCardTypes = [
@@ -59,14 +62,9 @@ function MoveToOption({
   );
 }
 
-function TypeCardDisplay({
-  authorizedID,
-  cardCountState,
-  componentName,
-  scryfall_card,
-  setCardCountState
-}) {
+function TypeCardDisplay({ cardCountState, componentName, scryfall_card, setCardCountState }) {
   const { userID } = useContext(AuthenticationContext);
+  const { deckState } = useContext(DeckContext);
   const { eventID, deckID, matchID } = useParams();
   const [anchorEl, setAnchorEl] = useState();
 
@@ -119,7 +117,7 @@ function TypeCardDisplay({
         aria-expanded={open ? 'true' : undefined}
         aria-haspopup="true"
         color="primary"
-        disabled={authorizedID !== userID}
+        disabled={deckState.creator._id !== userID}
         id={`${scryfall_card._id}-${componentName.toLowerCase()}-move-button`}
         onClick={(event) => setAnchorEl(event.currentTarget)}
       >
@@ -152,7 +150,7 @@ function TypeCardDisplay({
         disabled={
           isMatch ||
           (isEvent && !scryfall_card.type_line.includes('Basic')) ||
-          authorizedID !== userID
+          deckState.creator._id !== userID
         }
         inputProps={{
           min: 0,
@@ -213,7 +211,6 @@ function TypeCardDisplay({
 }
 
 function ComponentTypeDisplay({
-  authorizedID,
   cardCountState,
   componentCards,
   componentName,
@@ -239,7 +236,6 @@ function ComponentTypeDisplay({
         </MUITypography>
         {cardsOfType.map(({ scryfall_card }) => (
           <TypeCardDisplay
-            authorizedID={authorizedID}
             cardCountState={cardCountState}
             componentName={componentName}
             key={scryfall_card._id}
@@ -252,7 +248,11 @@ function ComponentTypeDisplay({
   );
 }
 
-function DeckComponentDisplay({ authorizedID, componentCards, componentName }) {
+function DeckComponentDisplay({ componentCards, componentName }) {
+  const { userID } = useContext(AuthenticationContext);
+  const { deckState } = useContext(DeckContext);
+  const { deckID } = useParams();
+
   const [cardCountState, setCardCountState] = useState(
     componentCards.reduce(
       (previousValue, currentValue) => ({
@@ -266,6 +266,44 @@ function DeckComponentDisplay({ authorizedID, componentCards, componentName }) {
       {}
     )
   );
+
+  function addCardToComponent(cardData) {
+    const otherComponents = deckComponents.filter((cmpnnt) => cmpnnt !== componentName);
+    const existingCard = deckState.cards.find((card) => card.scryfall_card._id === cardData._id);
+    if (existingCard) {
+      const variables = otherComponents.reduce(
+        (previousValue, currentValue) => ({
+          ...previousValue,
+          [`${currentValue.toLowerCase()}_count`]:
+            existingCard[`${currentValue.toLowerCase()}_count`]
+        }),
+        {
+          scryfall_id: cardData._id,
+          [`${componentName.toLowerCase()}_count`]:
+            existingCard[`${componentName.toLowerCase()}_count`] + 1
+        }
+      );
+      setNumberOfDeckCardCopies({
+        headers: { DeckID: deckID },
+        variables
+      });
+    } else {
+      const variables = otherComponents.reduce(
+        (previousValue, currentValue) => ({
+          ...previousValue,
+          [`${currentValue.toLowerCase()}_count`]: 0
+        }),
+        {
+          scryfall_id: cardData._id,
+          [`${componentName.toLowerCase()}_count`]: 1
+        }
+      );
+      setNumberOfDeckCardCopies({
+        headers: { DeckID: deckID },
+        variables
+      });
+    }
+  }
 
   useEffect(() => {
     setCardCountState(
@@ -302,7 +340,6 @@ function DeckComponentDisplay({ authorizedID, componentCards, componentName }) {
         <MUICardContent>
           {generalCardTypes.map((generalCardType) => (
             <ComponentTypeDisplay
-              authorizedID={authorizedID}
               cardCountState={cardCountState}
               componentCards={componentCards}
               componentName={componentName}
@@ -312,12 +349,24 @@ function DeckComponentDisplay({ authorizedID, componentCards, componentName }) {
             />
           ))}
         </MUICardContent>
+        {deckState && deckState.creator._id === userID && (
+          <MUICardActions>
+            <ScryfallRequest
+              buttonText="+"
+              labelText={`Add a card to ${componentName}`}
+              onSubmit={addCardToComponent}
+            />
+          </MUICardActions>
+        )}
       </MUICard>
     </MUIGrid>
   );
 }
 
-export default function DeckDisplay({ authorizedID, cards }) {
+export default function DeckDisplay() {
+  const {
+    deckState: { cards }
+  } = useContext(DeckContext);
   const sortedCards = customSort(cards, [
     'scryfall_card.cmc',
     'scryfall_card.name',
@@ -329,7 +378,6 @@ export default function DeckDisplay({ authorizedID, cards }) {
     <MUIGrid container spacing={0}>
       {deckComponents.map((componentName) => (
         <DeckComponentDisplay
-          authorizedID={authorizedID}
           componentCards={sortedCards.filter(
             (card) => card[`${componentName.toLowerCase()}_count`] > 0
           )}

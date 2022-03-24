@@ -7,6 +7,7 @@ import useSubscribe from '../hooks/subscribe-hook';
 import BlogPost from '../pages/BlogPost';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from './Authentication';
+import { ErrorContext } from './Error';
 
 export const BlogPostContext = createContext({
   abortControllerRef: { current: new AbortController() },
@@ -35,6 +36,7 @@ export const BlogPostContext = createContext({
 
 export default function ContextualizedBlogPostPage() {
   const { avatar, userID, userName } = useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const { blogPostID } = useParams();
   const abortControllerRef = useRef(new AbortController());
   const [blogPostState, setBlogPostState] = useState({
@@ -56,7 +58,7 @@ export default function ContextualizedBlogPostPage() {
     createdAt: null,
     updatedAt: null
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   if (blogPostID !== 'new-post') {
     useSubscribe({
@@ -64,9 +66,11 @@ export default function ContextualizedBlogPostPage() {
         abortControllerRef.current.abort();
       },
       connectionInfo: { blogPostID },
+      dependencies: blogPostID,
       queryString: blogPostQuery,
       setup: async () => {
         try {
+          setLoading(true);
           const response = await fetchBlogPostByID({
             headers: { BlogPostID: blogPostID },
             queryString: blogPostQuery,
@@ -74,6 +78,7 @@ export default function ContextualizedBlogPostPage() {
           });
           setBlogPostState(response.data.fetchBlogPostByID);
         } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
         } finally {
           setLoading(false);
         }

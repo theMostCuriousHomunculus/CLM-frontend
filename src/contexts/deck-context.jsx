@@ -5,6 +5,7 @@ import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 // import validateDeck from '../functions/validate-deck';
 import Deck from '../pages/Deck';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 
 export const DeckContext = createContext({
   loading: false,
@@ -248,14 +249,13 @@ export default function ContextualizedDeckPage() {
   return (
     <DeckContext.Provider
       value={{
-        loading,
         deckState,
         cloneDeck,
         editDeck
         // warnings
       }}
     >
-      <Deck />
+      {loading ? <LoadingSpinner /> : <Deck />}
     </DeckContext.Provider>
   );
 }

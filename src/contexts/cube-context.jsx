@@ -330,12 +330,12 @@ export default function ContextualizedCubePage() {
       } else {
         try {
           setLoading(true);
-          const data = await fetchCubeByID({
+          const response = await fetchCubeByID({
             headers: { CubeID: cubeID },
             queryString: cubeQuery,
             signal: abortControllerRef.current.signal
           });
-          setCubeState(data.data.fetchCubeByID);
+          setCubeState(response.data.fetchCubeByID);
         } catch (error) {
           setErrorMessages((prevState) => [...prevState, error.message]);
         } finally {
