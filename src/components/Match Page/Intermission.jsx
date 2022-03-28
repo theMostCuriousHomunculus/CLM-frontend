@@ -3,16 +3,14 @@ import MUIButton from '@mui/material/Button';
 import MUITypography from '@mui/material/Typography';
 
 import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
-import DeckDisplay from '../miscellaneous/DeckDisplay';
+// import DeckDisplay from '../miscellaneous/DeckDisplay';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { MatchContext } from '../../contexts/match-context';
 
 export default function Intermission() {
-  const [confirmationDialogVisible, setConfirmationDialogVisible] =
-    React.useState(false);
+  const [confirmationDialogVisible, setConfirmationDialogVisible] = React.useState(false);
   const { userID } = React.useContext(AuthenticationContext);
-  const { matchState, ready, toggleMainboardSideboardMatch } =
-    React.useContext(MatchContext);
+  const { matchState, ready, toggleMainboardSideboardMatch } = React.useContext(MatchContext);
 
   const player = matchState.players.find((plr) => plr.account._id === userID);
 
@@ -22,13 +20,10 @@ export default function Intermission() {
         confirmHandler={ready}
         open={confirmationDialogVisible}
         title="Are you readier than SpongeBob SquarePants with a belly full of Krabby Patties?"
-        toggleOpen={() =>
-          setConfirmationDialogVisible((prevState) => !prevState)
-        }
+        toggleOpen={() => setConfirmationDialogVisible((prevState) => !prevState)}
       >
         <MUITypography variant="body1">
-          Think of how embarrassing it will be if you get mushroom stamped! Oh,
-          the shame!
+          Think of how embarrassing it will be if you get mushroom stamped! Oh, the shame!
         </MUITypography>
       </ConfirmationDialog>
 
@@ -41,11 +36,11 @@ export default function Intermission() {
         Ready!
       </MUIButton>
 
-      <DeckDisplay
+      {/* <DeckDisplay
         authorizedID={userID}
         deck={{ mainboard: player.mainboard, sideboard: player.sideboard }}
         toggle={toggleMainboardSideboardMatch}
-      />
+      /> */}
     </React.Fragment>
   ) : (
     <div>

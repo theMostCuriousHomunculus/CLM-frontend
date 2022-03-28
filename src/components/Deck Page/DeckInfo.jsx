@@ -10,7 +10,6 @@ import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
-import MUIFileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -26,18 +25,22 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
+import CloneDeckButton from './CloneDeckButton';
 import DeleteDeckForm from '../../forms/DeleteDeckForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
+import editDeck from '../../graphql/mutations/deck/edit-deck';
 import formats from '../../constants/formats';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { DeckContext } from '../../contexts/deck-context';
+import { ErrorContext } from '../../contexts/Error';
 
 export default function DeckInfo() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const {
+    abortControllerRef,
     deckState: {
       _id: deckID,
       cards,
@@ -47,11 +50,10 @@ export default function DeckInfo() {
       image,
       name: deckName,
       published
-    },
-    cloneDeck,
-    editDeck,
-    warnings
+    }
+    // warnings
   } = useContext(DeckContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const [descriptionInput, setDescriptionInput] = useState(description);
   const [isPublished, setIsPublished] = useState(published);
   const [deckNameInput, setDeckNameInput] = useState(deckName);
@@ -122,14 +124,17 @@ export default function DeckInfo() {
                 fullWidth
                 label="Format"
                 native
-                onChange={(event) => {
-                  editDeck({
-                    description: descriptionInput,
-                    format: event.target.value,
-                    image: image._id,
-                    name: deckNameInput,
-                    published: isPublished
-                  });
+                onChange={async (event) => {
+                  try {
+                    await editDeck({
+                      headers: { DeckID: deckID },
+                      queryString: `{\n_id\nformat\n}`,
+                      signal: abortControllerRef.current.signal,
+                      variables: { format: event.target.value }
+                    });
+                  } catch (error) {
+                    setErrorMessages((prevState) => [...prevState, error.message]);
+                  }
                 }}
                 value={format}
                 inputProps={{
@@ -159,14 +164,17 @@ export default function DeckInfo() {
               <MUITextField
                 disabled={creator._id !== userID}
                 inputProps={{
-                  onBlur: () => {
-                    editDeck({
-                      description: descriptionInput,
-                      format,
-                      image: image._id,
-                      name: deckNameInput,
-                      published: isPublished
-                    });
+                  onBlur: async () => {
+                    try {
+                      await editDeck({
+                        headers: { DeckID: deckID },
+                        queryString: `{\n_id\nname\n}`,
+                        signal: abortControllerRef.current.signal,
+                        variables: { name: deckNameInput }
+                      });
+                    } catch (error) {
+                      setErrorMessages((prevState) => [...prevState, error.message]);
+                    }
                   }
                 }}
                 label="Deck Name"
@@ -185,15 +193,18 @@ export default function DeckInfo() {
                     control={
                       <MUICheckbox
                         checked={isPublished}
-                        onChange={() => {
-                          editDeck({
-                            description: descriptionInput,
-                            format,
-                            image: image._id,
-                            name: deckNameInput,
-                            published: !isPublished
-                          });
-                          setIsPublished((prevState) => !prevState);
+                        onChange={async () => {
+                          try {
+                            await editDeck({
+                              headers: { DeckID: deckID },
+                              queryString: `{\n_id\npublished\n}`,
+                              signal: abortControllerRef.current.signal,
+                              variables: { published: !isPublished }
+                            });
+                            setIsPublished((prevState) => !prevState);
+                          } catch (error) {
+                            setErrorMessages((prevState) => [...prevState, error.message]);
+                          }
                         }}
                       />
                     }
@@ -226,14 +237,17 @@ export default function DeckInfo() {
             disabled={creator._id !== userID}
             fullWidth={true}
             inputProps={{
-              onBlur: () => {
-                editDeck({
-                  description: descriptionInput,
-                  format,
-                  image: image._id,
-                  name: deckNameInput,
-                  published: isPublished
-                });
+              onBlur: async () => {
+                try {
+                  await editDeck({
+                    headers: { DeckID: deckID },
+                    queryString: `{\n_id\ndescription\n}`,
+                    signal: abortControllerRef.current.signal,
+                    variables: { description: descriptionInput }
+                  });
+                } catch (error) {
+                  setErrorMessages((prevState) => [...prevState, error.message]);
+                }
               }
             }}
             label="Deck Description"
@@ -248,14 +262,17 @@ export default function DeckInfo() {
             <ScryfallRequest
               buttonText="Change Image"
               labelText="Deck Image"
-              onSubmit={(chosenCard) => {
-                editDeck({
-                  description: descriptionInput,
-                  format,
-                  image: chosenCard._id,
-                  name: deckNameInput,
-                  published: isPublished
-                });
+              onSubmit={async (chosenCard) => {
+                try {
+                  await editDeck({
+                    headers: { DeckID: deckID },
+                    queryString: `{\n_id\nimage\n}`,
+                    signal: abortControllerRef.current.signal,
+                    variables: { image: chosenCard._id }
+                  });
+                } catch (error) {
+                  setErrorMessages((prevState) => [...prevState, error.message]);
+                }
               }}
             />
           )}
@@ -296,12 +313,7 @@ export default function DeckInfo() {
               </MUIButton>
             </span>
           )}
-          {isLoggedIn && (
-            <MUIButton onClick={cloneDeck} startIcon={<MUIFileCopyOutlinedIcon />}>
-              Clone Deck
-            </MUIButton>
-          )}
-
+          {isLoggedIn && <CloneDeckButton DeckID={deckID} />}
           <MUIButton onClick={generateSampleHand} startIcon={<MUIShuffleOutlinedIcon />}>
             Sample Hand
           </MUIButton>

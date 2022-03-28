@@ -26,10 +26,7 @@ export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
   const [success, setSuccess] = useState(false);
 
   return (
-    <MUIDialog
-      open={!!cubeToDelete._id}
-      onClose={() => setCubeToDelete({ _id: null, name: null })}
-    >
+    <MUIDialog open={!!cubeToDelete._id} onClose={() => setCubeToDelete({ _id: null, name: null })}>
       <form
         name="delete-cube-form"
         onSubmit={async (event) => {
@@ -44,9 +41,7 @@ export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
             if (accountID) {
               setAccountState((prevState) => ({
                 ...prevState,
-                cubes: prevState.cubes.filter(
-                  (cube) => cube._id !== data.data.deleteCube._id
-                )
+                cubes: prevState.cubes.filter((cube) => cube._id !== data.data.deleteCube._id)
               }));
             }
             setTimeout(() => {
@@ -54,6 +49,7 @@ export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
               if (cubeID) {
                 navigate(`/account/${userID}`);
               }
+              setSuccess(false);
             }, 1000);
           } catch (error) {
             setErrorMessages((prevState) => [...prevState, error.message]);
@@ -65,9 +61,7 @@ export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
         <MUIDialogTitle>{`Are you sure you want to delete "${cubeToDelete.name}"?`}</MUIDialogTitle>
         <MUIDialogContent>
           <MUITypography variant="body1">
-            {
-              'This action cannot be undone. You may want to export your list first.'
-            }
+            {'This action cannot be undone. You may want to export your list first.'}
           </MUITypography>
         </MUIDialogContent>
         <MUIDialogActions>
@@ -76,9 +70,7 @@ export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
             disabled={deleting}
             startIcon={(() => {
               if (deleting) {
-                return (
-                  <MUICircularProgress size={13} style={{ color: 'inherit' }} />
-                );
+                return <MUICircularProgress size={13} style={{ color: 'inherit' }} />;
               }
               if (success) {
                 return <MUICloudDoneOutlinedIcon />;

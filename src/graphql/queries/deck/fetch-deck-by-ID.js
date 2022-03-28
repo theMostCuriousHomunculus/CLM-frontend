@@ -1,15 +1,15 @@
 import { asyncFancyFetch } from '../../../functions/fancy-fetches';
 
-export default async function fetchCubeByID({ headers: { CubeID }, queryString, signal }) {
+export default async function fetchDeckByID({ headers: { DeckID }, queryString, signal }) {
   return await asyncFancyFetch({
     body: {
       query: `
         query {
-          fetchCubeByID ${queryString}
+          fetchDeckByID ${queryString}
         }
       `
     },
-    headers: { CubeID },
+    headers: { DeckID },
     signal
   });
 }

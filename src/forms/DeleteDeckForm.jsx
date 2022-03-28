@@ -26,10 +26,7 @@ export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
   const [success, setSuccess] = useState(false);
 
   return (
-    <MUIDialog
-      open={!!deckToDelete._id}
-      onClose={() => setDeckToDelete({ _id: null, name: null })}
-    >
+    <MUIDialog open={!!deckToDelete._id} onClose={() => setDeckToDelete({ _id: null, name: null })}>
       <form
         name="delete-deck-form"
         onSubmit={async (event) => {
@@ -44,9 +41,7 @@ export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
             if (accountID) {
               setAccountState((prevState) => ({
                 ...prevState,
-                decks: prevState.decks.filter(
-                  (deck) => deck._id !== data.data.deleteDeck._id
-                )
+                decks: prevState.decks.filter((deck) => deck._id !== data.data.deleteDeck._id)
               }));
             }
             setTimeout(() => {
@@ -54,6 +49,7 @@ export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
               if (deckID) {
                 navigate(`/account/${userID}`);
               }
+              setSuccess(false);
             }, 1000);
           } catch (error) {
             setErrorMessages((prevState) => [...prevState, error.message]);
@@ -65,9 +61,7 @@ export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
         <MUIDialogTitle>{`Are you sure you want to delete "${deckToDelete.name}"?`}</MUIDialogTitle>
         <MUIDialogContent>
           <MUITypography variant="body1">
-            {
-              'This action cannot be undone. You may want to export your list first.'
-            }
+            {'This action cannot be undone. You may want to export your list first.'}
           </MUITypography>
         </MUIDialogContent>
         <MUIDialogActions>
@@ -76,9 +70,7 @@ export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
             disabled={deleting}
             startIcon={(() => {
               if (deleting) {
-                return (
-                  <MUICircularProgress size={13} style={{ color: 'inherit' }} />
-                );
+                return <MUICircularProgress size={13} style={{ color: 'inherit' }} />;
               }
               if (success) {
                 return <MUICloudDoneOutlinedIcon />;
