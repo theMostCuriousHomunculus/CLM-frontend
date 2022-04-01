@@ -15,6 +15,9 @@ import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import customSort from '../../functions/custom-sort';
+import initiateBudRequest from '../../graphql/mutations/account/initiate-bud-request';
+import respondToBudRequest from '../../graphql/mutations/account/respond-to-bud-request';
+import revokeBudship from '../../graphql/mutations/account/revoke-budship';
 import Avatar from '../miscellaneous/Avatar';
 import ConfirmationDialog from '../miscellaneous/ConfirmationDialog';
 import { AccountContext } from '../../contexts/account-context';
@@ -48,8 +51,7 @@ export default function BudAccordion() {
   const { accountID } = useParams();
   const classes = useStyles();
   const {
-    accountState: { buds, nearby_users, received_bud_requests, sent_bud_requests },
-    editAccount
+    accountState: { buds, nearby_users, received_bud_requests, sent_bud_requests }
   } = useContext(AccountContext);
   const { geolocationEnabled, userID } = useContext(AuthenticationContext);
   const [budToDelete, setBudToDelete] = useState();
@@ -92,7 +94,9 @@ export default function BudAccordion() {
     <React.Fragment>
       <ConfirmationDialog
         confirmHandler={() => {
-          editAccount(`action: "remove",\nother_user_id: "${budToDelete?._id}"`);
+          revokeBudship({
+            variables: { other_user_id: budToDelete?._id }
+          });
           setBudToDelete(null);
         }}
         open={!!budToDelete}
@@ -141,7 +145,9 @@ export default function BudAccordion() {
                                   .closest('span')
                                   .classList.contains('MuiBadge-colorPrimary')
                               ) {
-                                editAccount(`action: "send",\nother_user_id: "${nearby_user._id}"`);
+                                initiateBudRequest({
+                                  variables: { other_user_id: nearby_user._id }
+                                });
                               }
                             }}
                             overlap="circular"
@@ -180,7 +186,9 @@ export default function BudAccordion() {
                               .closest('span')
                               .classList.contains('MuiBadge-colorSecondary')
                           ) {
-                            editAccount(`action: "reject",\nother_user_id: "${request._id}"`);
+                            respondToBudRequest({
+                              variables: { other_user_id: request._id, response: 'reject' }
+                            });
                           }
                         }}
                         overlap="circular"
@@ -199,7 +207,9 @@ export default function BudAccordion() {
                                 .closest('span')
                                 .classList.contains('MuiBadge-colorPrimary')
                             ) {
-                              editAccount(`action: "accept",\nother_user_id: "${request._id}"`);
+                              respondToBudRequest({
+                                variables: { other_user_id: request._id, response: 'accept' }
+                              });
                             }
                           }}
                           overlap="circular"
@@ -245,7 +255,9 @@ export default function BudAccordion() {
                           if (
                             event.target.closest('span').classList.contains('MuiBadge-colorPrimary')
                           ) {
-                            editAccount(`action: "send",\nother_user_id: "${pb._id}"`);
+                            initiateBudRequest({
+                              variables: { other_user_id: pb._id }
+                            });
                           }
                         }}
                         overlap="circular"

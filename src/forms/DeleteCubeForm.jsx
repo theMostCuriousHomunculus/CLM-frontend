@@ -12,16 +12,14 @@ import MUITypography from '@mui/material/Typography';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import deleteCube from '../graphql/mutations/cube/delete-cube';
-import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { ErrorContext } from '../contexts/Error';
 
 export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
-  const { setAccountState } = useContext(AccountContext);
   const { userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const navigate = useNavigate();
-  const { accountID, cubeID } = useParams();
+  const { cubeID } = useParams();
   const [deleting, setDeleting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -33,17 +31,11 @@ export default function DeleteCubeForm({ cubeToDelete, setCubeToDelete }) {
           event.preventDefault();
           try {
             setDeleting(true);
-            const data = await deleteCube({
+            await deleteCube({
               headers: { CubeID: cubeToDelete._id },
               queryString: '{\n_id\n}'
             });
             setSuccess(true);
-            if (accountID) {
-              setAccountState((prevState) => ({
-                ...prevState,
-                cubes: prevState.cubes.filter((cube) => cube._id !== data.data.deleteCube._id)
-              }));
-            }
             setTimeout(() => {
               setCubeToDelete({ _id: null, name: null });
               if (cubeID) {

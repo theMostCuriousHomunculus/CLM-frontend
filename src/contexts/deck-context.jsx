@@ -97,7 +97,7 @@ export default function ContextualizedDeckPage() {
 
   useSubscribe({
     connectionInfo: { deckID },
-    dependencies: deckID,
+    dependencies: [deckID],
     queryString: deckQuery,
     setup: async () => {
       if (deckData) {

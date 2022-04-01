@@ -17,6 +17,7 @@ import MUITooltip from '@mui/material/Tooltip';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
+import editAccount from '../graphql/mutations/account/edit-account';
 import theme, { backgroundColor } from '../theme';
 import Avatar from '../components/miscellaneous/Avatar';
 import BudAccordion from '../components/Account Page/BudAccordion';
@@ -28,6 +29,7 @@ import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { PermissionsContext } from '../contexts/Permissions';
+import initiateBudRequest from '../graphql/mutations/account/initiate-bud-request';
 
 const useStyles = makeStyles({
   cardHeader: {
@@ -48,14 +50,9 @@ const useStyles = makeStyles({
 
 export default function Account() {
   const { accountID } = useParams();
-  const {
-    isLoggedIn,
-    settings: { measurement_system, radius },
-    userID
-  } = useContext(AuthenticationContext);
+  const { isLoggedIn, measurement_system, radius, userID } = useContext(AuthenticationContext);
   const {
     accountState: { avatar, buds, email, name, received_bud_requests, sent_bud_requests },
-    editAccount,
     setAccountState
   } = useContext(AccountContext);
   const {
@@ -138,14 +135,11 @@ export default function Account() {
                               fullWidth
                               label="Units"
                               native
-                              onChange={(event) =>
-                                editAccount(
-                                  `settings: {
-                              measurement_system: ${event.target.value},
-                              radius: ${radius}
-                            }`
-                                )
-                              }
+                              onChange={(event) => {
+                                editAccount({
+                                  variables: { measurement_system: event.target.value }
+                                });
+                              }}
                               value={measurement_system}
                               inputProps={{
                                 id: 'measurement-system-selector'
@@ -161,14 +155,11 @@ export default function Account() {
                               fullWidth
                               label="Distance"
                               native
-                              onChange={(event) =>
-                                editAccount(
-                                  `settings: {
-                              measurement_system: ${measurement_system},
-                              radius: ${event.target.value}
-                            }`
-                                )
-                              }
+                              onChange={(event) => {
+                                editAccount({
+                                  variables: { radius: event.target.value }
+                                });
+                              }}
                               value={radius}
                               inputProps={{
                                 id: 'radius-selector'
@@ -195,11 +186,11 @@ export default function Account() {
                   // only showing the add bud button if the user is logged in, they are viewing someone else's profile, and they are not already buds with nor have they already sent or received a bud request to or from the user whose profile they are viewing
                   <MUIIconButton
                     color="primary"
-                    onClick={() =>
-                      editAccount(
-                        `action: "send",\nother_user_id: "${accountID}",\nreturn_other: true`
-                      )
-                    }
+                    onClick={() => {
+                      initiateBudRequest({
+                        variables: { other_user_id: accountID }
+                      });
+                    }}
                   >
                     <MUIPersonAddOutlinedIcon fontSize="large" />
                   </MUIIconButton>
@@ -213,7 +204,11 @@ export default function Account() {
               autoComplete="off"
               disabled={accountID !== userID}
               inputProps={{
-                onBlur: (event) => editAccount(`name: "${event.target.value}"`)
+                onBlur: (event) => {
+                  editAccount({
+                    variables: { name: event.target.value }
+                  });
+                }
               }}
               label="Account Name"
               onChange={(event) => {
@@ -241,7 +236,9 @@ export default function Account() {
               buttonText="Change Avatar"
               labelText="Avatar"
               onSubmit={(chosenCard) => {
-                editAccount(`avatar: "${chosenCard._id}"`);
+                editAccount({
+                  variables: { avatar: chosenCard._id }
+                });
               }}
             />
           </MUICardActions>

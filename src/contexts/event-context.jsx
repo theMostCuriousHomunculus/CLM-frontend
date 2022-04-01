@@ -300,7 +300,7 @@ export default function ContextualizedEventPage() {
   useSubscribe({
     cleanup: () => abortControllerRef.current.abort(),
     connectionInfo: { eventID },
-    dependencies: [eventID, userID],
+    dependencies: [eventID],
     queryString: eventQuery,
     setup: async () => {
       try {

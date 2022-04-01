@@ -12,16 +12,14 @@ import MUITypography from '@mui/material/Typography';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import deleteDeck from '../graphql/mutations/deck/delete-deck';
-import { AccountContext } from '../contexts/account-context';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { ErrorContext } from '../contexts/Error';
 
 export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
-  const { setAccountState } = useContext(AccountContext);
   const { userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const navigate = useNavigate();
-  const { accountID, deckID } = useParams();
+  const { deckID } = useParams();
   const [deleting, setDeleting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -33,17 +31,11 @@ export default function DeleteDeckForm({ deckToDelete, setDeckToDelete }) {
           event.preventDefault();
           try {
             setDeleting(true);
-            const data = await deleteDeck({
+            await deleteDeck({
               headers: { DeckID: deckToDelete._id },
               queryString: '{\n_id\n}'
             });
             setSuccess(true);
-            if (accountID) {
-              setAccountState((prevState) => ({
-                ...prevState,
-                decks: prevState.decks.filter((deck) => deck._id !== data.data.deleteDeck._id)
-              }));
-            }
             setTimeout(() => {
               setDeckToDelete({ _id: null, name: null });
               if (deckID) {

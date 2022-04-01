@@ -66,7 +66,7 @@ export default function ContextualizedBlogPostPage() {
         abortControllerRef.current.abort();
       },
       connectionInfo: { blogPostID },
-      dependencies: blogPostID,
+      dependencies: [blogPostID],
       queryString: blogPostQuery,
       setup: async () => {
         try {

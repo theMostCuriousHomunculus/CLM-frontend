@@ -10,10 +10,8 @@ const unauthenticatedUserInfo = {
     card_faces: [],
     image_uris: null
   },
-  settings: {
-    measurement_system: 'imperial',
-    radius: 10
-  },
+  measurement_system: 'imperial',
+  radius: 10,
   userID: null,
   userName: null
 };
@@ -79,26 +77,34 @@ export function AuthenticationProvider({ children }) {
       }
     }
     name
-    settings {
-      measurement_system
-      radius
-    }
+    measurement_system
+    radius
     token
   `;
 
-  const storeUserInfo = useCallback(function ({ _id, admin, avatar, name, settings, token }) {
+  const storeUserInfo = useCallback(function ({
+    _id,
+    admin,
+    avatar,
+    measurement_system,
+    name,
+    radius,
+    token
+  }) {
     // store in running application
     setUserInfo({
       admin,
       avatar,
-      settings,
+      measurement_system,
+      radius,
       userID: _id,
       userName: name
     });
 
     // store in browser
     Cookies.set('authentication_token', token);
-  }, []);
+  },
+  []);
 
   const authenticate = useCallback(
     async function () {

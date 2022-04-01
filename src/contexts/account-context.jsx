@@ -1,15 +1,17 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import accountQuery from '../constants/account-query';
 import fetchAccountByID from '../graphql/queries/account/fetch-account-by-ID';
 import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import Account from '../pages/Account';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from './Authentication';
 import { ErrorContext } from './Error';
 
 export const AccountContext = createContext({
-  loading: false,
+  abortControllerRef: { current: new AbortController() },
   accountState: {
     _id: '',
     avatar: {
@@ -34,17 +36,18 @@ export const AccountContext = createContext({
     total_events: 0
   },
   setAccountState: () => null,
-  createMatch: () => null,
+  createMatch: () => null
   // deleteEvent: () => null,
-  // deleteMatch: () => null,
-  editAccount: () => null
+  // deleteMatch: () => null
 });
 
 export default function ContextualizedAccountPage() {
-  const { setUserInfo, userID } = useContext(AuthenticationContext);
+  const { userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
+  const location = useLocation();
   const navigate = useNavigate();
   const { accountID } = useParams();
+  const abortControllerRef = useRef(new AbortController());
   const [accountState, setAccountState] = useState({
     _id: accountID,
     avatar: {
@@ -69,247 +72,7 @@ export default function ContextualizedAccountPage() {
     total_events: 0
   });
   const [loading, setLoading] = useState(false);
-  const accountQuery = `
-    _id
-    avatar {
-      card_faces {
-        image_uris {
-          art_crop
-        }
-      }
-      image_uris {
-        art_crop
-      }
-    }
-    buds {
-      _id
-      avatar {
-        card_faces {
-          image_uris {
-            art_crop
-          }
-        }
-        image_uris {
-          art_crop
-        }
-      }
-      buds {
-        _id
-        avatar {
-          card_faces {
-            image_uris {
-              art_crop
-            }
-          }
-          image_uris {
-            art_crop
-          }
-        }
-        name
-      }
-      decks {
-        _id
-        format
-        name
-      }
-      name
-    }
-    cubes {
-      _id
-      description
-      image {
-        _id
-        image_uris {
-          art_crop
-        }
-        name
-        card_faces {
-          image_uris {
-            art_crop
-          }
-          name
-        }
-      }
-      mainboard {
-        _id
-      }
-      modules {
-        _id
-        cards {
-          _id
-        }
-        name
-      }
-      name
-      rotations {
-        _id
-        cards {
-          _id
-        }
-        name
-        size
-      }
-      sideboard {
-        _id
-      }
-    }
-    decks {
-      _id
-      description
-      format
-      image {
-        _id
-        image_uris {
-          art_crop
-        }
-        name
-        card_faces {
-          image_uris {
-            art_crop
-          }
-          name
-        }
-      }
-      name
-    }
-    email
-    events {
-      _id
-      createdAt
-      cube {
-        _id
-        image {
-          _id
-          image_uris {
-            art_crop
-          }
-          name
-          card_faces {
-            image_uris {
-              art_crop
-            }
-            name
-          }
-        }
-        name
-      }
-      host {
-        _id
-        avatar {
-          card_faces {
-            image_uris {
-              art_crop
-            }
-          }
-          image_uris {
-            art_crop
-          }
-        }
-        name
-      }
-      name
-      players {
-        account {
-          _id
-          avatar {
-            card_faces {
-              image_uris {
-                art_crop
-              }
-            }
-            image_uris {
-              art_crop
-            }
-          }
-          name
-        }
-      }
-    }
-    location {
-      coordinates
-    }
-    matches {
-      _id
-      createdAt
-      cube {
-        _id
-        name
-      }
-      decks {
-        _id
-        format
-        name
-      }
-      event {
-        _id
-        name
-      }
-      players {
-        account {
-          _id
-          avatar {
-            card_faces {
-              image_uris {
-                art_crop
-              }
-            }
-            image_uris {
-              art_crop
-            }
-          }
-          name
-        }
-      }
-    }
-    name
-    nearby_users {
-      _id
-      avatar {
-        card_faces {
-          image_uris {
-            art_crop
-          }
-        }
-        image_uris {
-          art_crop
-        }
-      }
-      name
-    }
-    received_bud_requests {
-      _id
-      avatar {
-        card_faces {
-          image_uris {
-            art_crop
-          }
-        }
-        image_uris {
-          art_crop
-        }
-      }
-      name
-    }
-    sent_bud_requests {
-      _id
-      avatar {
-        card_faces {
-          image_uris {
-            art_crop
-          }
-        }
-        image_uris {
-          art_crop
-        }
-      }
-      name
-    }
-    settings {
-      measurement_system
-      radius
-    }
-    total_events
-  `;
+  const { accountData } = location.state || {};
   const { sendRequest } = useRequest();
 
   const createMatch = useCallback(
@@ -342,63 +105,43 @@ export default function ContextualizedAccountPage() {
     [navigate, sendRequest]
   );
 
-  const editAccount = useCallback(
-    async function (changes) {
-      await sendRequest({
-        callback: (data) => {
-          setAccountState(data);
-          if (!changes.toString().includes('return_other')) {
-            setUserInfo((prevState) => ({
-              ...prevState,
-              avatar: data.avatar,
-              settings: data.settings,
-              userName: data.name
-            }));
-          }
-        },
-        operation: 'editAccount',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                ${changes}
-              ) {
-                ${accountQuery}
-              }
-            }
-          `
-          };
-        }
-      });
+  useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
     },
-    [accountQuery, sendRequest]
-  );
-
-  useEffect(() => {
-    (async function () {
-      try {
-        setLoading(true);
-        const data = await fetchAccountByID({
-          headers: { AccountID: accountID },
-          queryString: `{\n${accountQuery}\n}`
-        });
-        setAccountState(data.data.fetchAccountByID);
-      } catch (error) {
-        setErrorMessages((prevState) => [...prevState, error.message]);
-      } finally {
-        setLoading(false);
+    connectionInfo: { accountID },
+    dependencies: [accountID],
+    queryString: accountQuery,
+    setup: async () => {
+      if (accountData) {
+        setAccountState(accountData);
+      } else {
+        try {
+          setLoading(true);
+          const response = await fetchAccountByID({
+            headers: { AccountID: accountID },
+            queryString: accountQuery,
+            signal: abortControllerRef.current.signal
+          });
+          setAccountState(response.data.fetchAccountByID);
+        } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
+        } finally {
+          setLoading(false);
+        }
       }
-    })();
-  }, [accountID, userID]);
+    },
+    subscriptionType: 'subscribeAccount',
+    update: setAccountState
+  });
 
   return (
     <AccountContext.Provider
       value={{
+        abortControllerRef,
         accountState,
         setAccountState,
-        createMatch,
-        editAccount
+        createMatch
       }}
     >
       {loading ? <LoadingSpinner /> : <Account />}

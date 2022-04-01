@@ -34,7 +34,7 @@ export default function useSubscribe({
           {
             query: `
               subscription {
-                ${subscriptionType} {${queryString}}
+                ${subscriptionType} ${queryString}
               }
             `
           },

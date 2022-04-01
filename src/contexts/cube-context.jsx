@@ -322,7 +322,7 @@ export default function ContextualizedCubePage() {
       abortControllerRef.current.abort();
     },
     connectionInfo: { cubeID },
-    dependencies: cubeID,
+    dependencies: [cubeID],
     queryString: cubeQuery,
     setup: async () => {
       if (cubeData) {
