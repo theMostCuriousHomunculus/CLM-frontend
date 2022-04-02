@@ -1,7 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 
+import authenticate from '../graphql/queries/account/authenticate';
+import authenticateQuery from '../constants/authenticate-query';
 import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import { ErrorContext } from './Error';
 
 const unauthenticatedUserInfo = {
@@ -18,21 +21,19 @@ const unauthenticatedUserInfo = {
 
 export const AuthenticationContext = createContext({
   ...unauthenticatedUserInfo,
+  abortControllerRef: { current: new AbortController() },
   // a convenience field; just makes code a bit easier to reason about
   isLoggedIn: false,
   loading: false,
   localStream: null,
-  login: () => {
-    // don't return anything
-  },
   logout: () => {
     // don't return anything
   },
   peerConnection: null,
-  register: () => {
+  requestPasswordReset: () => {
     // don't return anything
   },
-  requestPasswordReset: () => {
+  setLoading: () => {
     // don't return anything
   },
   setLocalStream: () => {
@@ -40,15 +41,14 @@ export const AuthenticationContext = createContext({
   },
   setUserInfo: () => {
     // don't return anything
-  },
-  submitPasswordReset: () => {
-    // don't return anything
   }
 });
 
 export function AuthenticationProvider({ children }) {
   const { setErrorMessages } = useContext(ErrorContext);
-  const { loading, sendRequest } = useRequest();
+  const abortControllerRef = useRef(new AbortController());
+  const { sendRequest } = useRequest();
+  const [loading, setLoading] = useState(false);
   const [localStream, setLocalStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState([]);
   const [userInfo, setUserInfo] = useState({
@@ -63,24 +63,6 @@ export function AuthenticationProvider({ children }) {
     iceCandidatePoolSize: 10
   });
   const peerConnection = useRef(new RTCPeerConnection(servers.current));
-  const authenticationQuery = `
-    _id
-    admin
-    avatar {
-      card_faces {
-        image_uris {
-          art_crop
-        }
-      }
-      image_uris {
-        art_crop
-      }
-    }
-    name
-    measurement_system
-    radius
-    token
-  `;
 
   const storeUserInfo = useCallback(function ({
     _id,
@@ -105,53 +87,6 @@ export function AuthenticationProvider({ children }) {
     Cookies.set('authentication_token', token);
   },
   []);
-
-  const authenticate = useCallback(
-    async function () {
-      await sendRequest({
-        callback: storeUserInfo,
-        load: true,
-        operation: 'authenticate',
-        get body() {
-          return {
-            query: `
-              query {
-                ${this.operation} {
-                  ${authenticationQuery}
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
-  const login = useCallback(
-    async function (email, password) {
-      await sendRequest({
-        callback: storeUserInfo,
-        load: true,
-        operation: 'login',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  email: "${email}",
-                  password: "${password}"
-                ) {
-                  ${authenticationQuery}
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
 
   const logout = useCallback(
     async function () {
@@ -199,32 +134,6 @@ export function AuthenticationProvider({ children }) {
     [sendRequest]
   );
 
-  const register = useCallback(
-    async function (email, name, password) {
-      await sendRequest({
-        callback: storeUserInfo,
-        load: true,
-        operation: 'register',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  email: "${email}",
-                  name: "${name}",
-                  password: "${password}"
-                ) {
-                  ${authenticationQuery}
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
   const requestPasswordReset = useCallback(
     async function (email) {
       await sendRequest({
@@ -252,37 +161,30 @@ export function AuthenticationProvider({ children }) {
     [sendRequest]
   );
 
-  const submitPasswordReset = useCallback(
-    async function (email, password, reset_token) {
-      await sendRequest({
-        callback: storeUserInfo,
-        load: true,
-        operation: 'submitPasswordReset',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  email: "${email}"
-                  password: "${password}"
-                  reset_token: "${reset_token}"
-                ) {
-                  ${authenticationQuery}
-                }
-              }
-            `
-          };
-        }
-      });
+  useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
     },
-    [sendRequest]
-  );
-
-  useEffect(() => {
-    if (Cookies.get('authentication_token')) {
-      authenticate();
-    }
-  }, []);
+    queryString: authenticateQuery,
+    setup: async () => {
+      try {
+        if (Cookies.get('authentication_token')) {
+          setLoading(true);
+          const response = await authenticate({
+            queryString: authenticateQuery,
+            signal: abortControllerRef.current.signal
+          });
+          setUserInfo(response.data.authenticate);
+        }
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    subscriptionType: 'subscribeAccount',
+    update: setUserInfo
+  });
 
   return (
     <AuthenticationContext.Provider
@@ -291,14 +193,12 @@ export function AuthenticationProvider({ children }) {
         isLoggedIn: !!userInfo.userID,
         loading,
         localStream,
-        login,
         logout,
         peerConnection,
-        register,
         requestPasswordReset,
+        setLoading,
         setLocalStream,
-        setUserInfo,
-        submitPasswordReset
+        setUserInfo
       }}
     >
       {children}
