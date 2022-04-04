@@ -16,6 +16,7 @@ import { makeStyles } from '@mui/styles';
 
 import login from '../../graphql/mutations/account/login';
 import register from '../../graphql/mutations/account/register';
+import requestPasswordReset from '../../graphql/mutations/account/request-password-reset';
 import tokenQuery from '../../constants/token-query';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../../contexts/Authentication';
@@ -36,7 +37,7 @@ const useStyles = makeStyles({
 });
 
 export default function AuthenticateForm({ open, toggleOpen }) {
-  const { abortControllerRef, loading, requestPasswordReset, setLoading, setUserInfo } =
+  const { abortControllerRef, loading, setLoading, setUserInfo } =
     useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const classes = useStyles();
@@ -71,7 +72,23 @@ export default function AuthenticateForm({ open, toggleOpen }) {
     }
 
     if (selectedTab === 1) {
-      requestPasswordReset(emailInput);
+      try {
+        setLoading(true);
+        await login({
+          signal: abortControllerRef.current.signal,
+          variables: { email: emailInput }
+        });
+        setErrorMessages((prevState) => {
+          return [
+            ...prevState,
+            'A link to reset your password has been sent to the provided email address.  Please allow a few minutes and check both your inbox and your spam folder.'
+          ];
+        });
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
     }
 
     if (selectedTab === 2) {

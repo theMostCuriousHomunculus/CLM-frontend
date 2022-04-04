@@ -26,13 +26,7 @@ export const AuthenticationContext = createContext({
   isLoggedIn: false,
   loading: false,
   localStream: null,
-  logout: () => {
-    // don't return anything
-  },
   peerConnection: null,
-  requestPasswordReset: () => {
-    // don't return anything
-  },
   setLoading: () => {
     // don't return anything
   },
@@ -64,102 +58,51 @@ export function AuthenticationProvider({ children }) {
   });
   const peerConnection = useRef(new RTCPeerConnection(servers.current));
 
-  const storeUserInfo = useCallback(function ({
-    _id,
-    admin,
-    avatar,
-    measurement_system,
-    name,
-    radius,
-    token
-  }) {
-    // store in running application
-    setUserInfo({
-      admin,
-      avatar,
-      measurement_system,
-      radius,
-      userID: _id,
-      userName: name
-    });
+  // const logout = useCallback(
+  //   async function () {
+  //     // unsubscribe from push notifications if subscribed
+  //     let subscription;
 
-    // store in browser
-    Cookies.set('authentication_token', token);
-  },
-  []);
+  //     if ('Notification' in window && 'serviceWorker' in navigator) {
+  //       const swreg = await navigator.serviceWorker.ready;
+  //       subscription = await swreg.pushManager.getSubscription();
+  //       if (subscription) {
+  //         try {
+  //           await subscription.unsubscribe();
+  //         } catch (error) {
+  //           setErrorMessages((prevState) => [...prevState, error.message]);
+  //         }
+  //       }
+  //     }
 
-  const logout = useCallback(
-    async function () {
-      // unsubscribe from push notifications if subscribed
-      let subscription;
+  //     // if the logged in user had a push subscription, remove it and the token from the server
+  //     await sendRequest({
+  //       operation: 'logoutSingleDevice',
+  //       get body() {
+  //         return {
+  //           query: `
+  //             mutation {
+  //               ${this.operation}${
+  //             subscription
+  //               ? `(
+  //                 endpoint: "${subscription.endpoint}"
+  //               )`
+  //               : ''
+  //           }
+  //             }
+  //           `
+  //         };
+  //       }
+  //     });
 
-      if ('Notification' in window && 'serviceWorker' in navigator) {
-        const swreg = await navigator.serviceWorker.ready;
-        subscription = await swreg.pushManager.getSubscription();
-        if (subscription) {
-          try {
-            await subscription.unsubscribe();
-          } catch (error) {
-            setErrorMessages((prevState) => [...prevState, error.message]);
-          }
-        }
-      }
-
-      // if the logged in user had a push subscription, remove it and the token from the server
-      await sendRequest({
-        operation: 'logoutSingleDevice',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}${
-              subscription
-                ? `(
-                  endpoint: "${subscription.endpoint}"
-                )`
-                : ''
-            }
-              }
-            `
-          };
-        }
-      });
-
-      // clear from browser and running application
-      setUserInfo({
-        ...unauthenticatedUserInfo
-      });
-      Cookies.remove('authentication_token');
-    },
-    [sendRequest]
-  );
-
-  const requestPasswordReset = useCallback(
-    async function (email) {
-      await sendRequest({
-        callback: () => {
-          setErrorMessages((prevState) => {
-            return [
-              ...prevState,
-              'A link to reset your password has been sent.  Please check your email inbox and your spam folder.'
-            ];
-          });
-        },
-        load: true,
-        operation: 'requestPasswordReset',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(email: "${email}")
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
+  //     // clear from browser and running application
+  //     setUserInfo({
+  //       ...unauthenticatedUserInfo
+  //     });
+  //     Cookies.remove('authentication_token');
+  //   },
+  //   [sendRequest]
+  // );
 
   useSubscribe({
     cleanup: () => {
@@ -177,7 +120,7 @@ export function AuthenticationProvider({ children }) {
           setUserInfo(response.data.authenticate);
         }
       } catch (error) {
-        setErrorMessages((prevState) => [...prevState, error.message]);
+        Cookies.remove('authentication_token');
       } finally {
         setLoading(false);
       }
@@ -193,9 +136,7 @@ export function AuthenticationProvider({ children }) {
         isLoggedIn: !!userInfo.userID,
         loading,
         localStream,
-        logout,
         peerConnection,
-        requestPasswordReset,
         setLoading,
         setLocalStream,
         setUserInfo
