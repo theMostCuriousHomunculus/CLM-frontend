@@ -1,31 +1,23 @@
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 
 import authenticate from '../graphql/queries/account/authenticate';
 import authenticateQuery from '../constants/authenticate-query';
-import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import { ErrorContext } from './Error';
 
-const unauthenticatedUserInfo = {
+export const AuthenticationContext = createContext({
+  abortControllerRef: { current: new AbortController() },
   admin: false,
   avatar: {
     card_faces: [],
     image_uris: null
   },
-  measurement_system: 'imperial',
-  radius: 10,
-  userID: null,
-  userName: null
-};
-
-export const AuthenticationContext = createContext({
-  ...unauthenticatedUserInfo,
-  abortControllerRef: { current: new AbortController() },
   // a convenience field; just makes code a bit easier to reason about
   isLoggedIn: false,
   loading: false,
   localStream: null,
+  measurement_system: 'imperial',
   peerConnection: null,
   setLoading: () => {
     // don't return anything
@@ -35,18 +27,28 @@ export const AuthenticationContext = createContext({
   },
   setUserInfo: () => {
     // don't return anything
-  }
+  },
+  radius: 10,
+  userID: null,
+  userName: null
 });
 
 export function AuthenticationProvider({ children }) {
   const { setErrorMessages } = useContext(ErrorContext);
   const abortControllerRef = useRef(new AbortController());
-  const { sendRequest } = useRequest();
   const [loading, setLoading] = useState(false);
   const [localStream, setLocalStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState([]);
   const [userInfo, setUserInfo] = useState({
-    ...unauthenticatedUserInfo
+    admin: false,
+    avatar: {
+      card_faces: [],
+      image_uris: null
+    },
+    measurement_system: 'imperial',
+    radius: 10,
+    userID: null,
+    userName: null
   });
   const servers = useRef({
     iceServers: [
@@ -57,52 +59,6 @@ export function AuthenticationProvider({ children }) {
     iceCandidatePoolSize: 10
   });
   const peerConnection = useRef(new RTCPeerConnection(servers.current));
-
-  // const logout = useCallback(
-  //   async function () {
-  //     // unsubscribe from push notifications if subscribed
-  //     let subscription;
-
-  //     if ('Notification' in window && 'serviceWorker' in navigator) {
-  //       const swreg = await navigator.serviceWorker.ready;
-  //       subscription = await swreg.pushManager.getSubscription();
-  //       if (subscription) {
-  //         try {
-  //           await subscription.unsubscribe();
-  //         } catch (error) {
-  //           setErrorMessages((prevState) => [...prevState, error.message]);
-  //         }
-  //       }
-  //     }
-
-  //     // if the logged in user had a push subscription, remove it and the token from the server
-  //     await sendRequest({
-  //       operation: 'logoutSingleDevice',
-  //       get body() {
-  //         return {
-  //           query: `
-  //             mutation {
-  //               ${this.operation}${
-  //             subscription
-  //               ? `(
-  //                 endpoint: "${subscription.endpoint}"
-  //               )`
-  //               : ''
-  //           }
-  //             }
-  //           `
-  //         };
-  //       }
-  //     });
-
-  //     // clear from browser and running application
-  //     setUserInfo({
-  //       ...unauthenticatedUserInfo
-  //     });
-  //     Cookies.remove('authentication_token');
-  //   },
-  //   [sendRequest]
-  // );
 
   useSubscribe({
     cleanup: () => {
@@ -133,6 +89,7 @@ export function AuthenticationProvider({ children }) {
     <AuthenticationContext.Provider
       value={{
         ...userInfo,
+        abortControllerRef,
         isLoggedIn: !!userInfo.userID,
         loading,
         localStream,

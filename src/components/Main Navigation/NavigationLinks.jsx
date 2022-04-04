@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import Cookies from 'js-cookie';
 import MUIAllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import MUIArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 // import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -12,7 +13,9 @@ import MUILogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 
+import logoutSingleDevice from '../../graphql/mutations/account/logout-single-device';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { ErrorContext } from '../../contexts/Error';
 
 const useStyles = makeStyles({
   item: {
@@ -28,7 +31,9 @@ const useStyles = makeStyles({
 });
 
 export default function NavigationLinks({ toggleDrawer }) {
-  const { isLoggedIn, logout } = useContext(AuthenticationContext);
+  const { abortControllerRef, isLoggedIn, setLoading, setUserInfo } =
+    useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -59,22 +64,37 @@ export default function NavigationLinks({ toggleDrawer }) {
     options.push({
       icon: <MUILogoutOutlinedIcon />,
       name: 'Logout',
-      onClick: logout
+      onClick: async () => {
+        try {
+          setLoading(true);
+          await logoutSingleDevice({ signal: abortControllerRef.current.signal });
+          Cookies.remove('authentication_token');
+          setUserInfo({
+            admin: false,
+            avatar: {
+              card_faces: [],
+              image_uris: null
+            },
+            measurement_system: 'imperial',
+            radius: 10,
+            userID: null,
+            userName: null
+          });
+        } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
+        } finally {
+          setLoading(false);
+        }
+      }
     });
   }
 
   return (
-    <MUIList
-      className={classes.list}
-      onClick={toggleDrawer}
-      onKeyDown={toggleDrawer}
-    >
+    <MUIList className={classes.list} onClick={toggleDrawer} onKeyDown={toggleDrawer}>
       {options.map(function (option) {
         return (
           <MUIListItem button key={option.name} onClick={option.onClick}>
-            <MUIListItemIcon className={classes.item}>
-              {option.icon}
-            </MUIListItemIcon>
+            <MUIListItemIcon className={classes.item}>{option.icon}</MUIListItemIcon>
             <MUIListItemText className={classes.item} primary={option.name} />
           </MUIListItem>
         );
