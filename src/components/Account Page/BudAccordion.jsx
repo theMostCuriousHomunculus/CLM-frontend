@@ -95,12 +95,12 @@ export default function BudAccordion() {
       <ConfirmationDialog
         confirmHandler={() => {
           revokeBudship({
-            variables: { other_user_id: budToDelete?._id }
+            variables: { other_user_id: budToDelete ? budToDelete._id : '' }
           });
           setBudToDelete(null);
         }}
         open={!!budToDelete}
-        title={`Are you sure you want to un-bud ${budToDelete?.name}?`}
+        title={`Are you sure you want to un-bud ${budToDelete ? budToDelete.name : ''}?`}
         toggleOpen={() => setBudToDelete(null)}
       >
         <div style={{ display: 'flex' }}>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 
 import authenticate from '../graphql/queries/account/authenticate';
@@ -13,6 +13,8 @@ export const AuthenticationContext = createContext({
     card_faces: [],
     image_uris: null
   },
+  buds: [],
+  conversations: [],
   // a convenience field; just makes code a bit easier to reason about
   isLoggedIn: false,
   loading: false,
@@ -45,6 +47,8 @@ export function AuthenticationProvider({ children }) {
       card_faces: [],
       image_uris: null
     },
+    buds: [],
+    conversations: [],
     measurement_system: 'imperial',
     radius: 10,
     userID: null,
@@ -60,29 +64,70 @@ export function AuthenticationProvider({ children }) {
   });
   const peerConnection = useRef(new RTCPeerConnection(servers.current));
 
-  useSubscribe({
-    cleanup: () => {
-      abortControllerRef.current.abort();
-    },
-    queryString: authenticateQuery,
-    setup: async () => {
+  useEffect(() => {
+    (async () => {
       try {
         if (Cookies.get('authentication_token')) {
           setLoading(true);
-          const response = await authenticate({
+          const {
+            data: {
+              authenticate: {
+                _id,
+                admin,
+                avatar,
+                buds,
+                conversations,
+                measurement_system,
+                name,
+                radius
+              }
+            }
+          } = await authenticate({
             queryString: authenticateQuery,
             signal: abortControllerRef.current.signal
           });
-          setUserInfo(response.data.authenticate);
+          setUserInfo({
+            admin,
+            avatar,
+            buds,
+            conversations,
+            measurement_system,
+            radius,
+            userID: _id,
+            userName: name
+          });
+          console.log(conversations);
         }
       } catch (error) {
+        console.log(error);
         Cookies.remove('authentication_token');
       } finally {
         setLoading(false);
       }
+    })();
+  }, []);
+
+  useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
     },
+    condition: !!Cookies.get('authentication_token'),
+    queryString: authenticateQuery,
     subscriptionType: 'subscribeAccount',
-    update: setUserInfo
+    update: (data) => {
+      console.log(data);
+      setUserInfo({
+        admin: data.admin,
+        avatar: data.avatar,
+        buds: data.buds,
+        conversations: data.conversations,
+        measurement_system: data.measurement_system,
+        radius: data.radius,
+        userID: data._id,
+        userName: data.name
+      });
+    }
   });
 
   return (

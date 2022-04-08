@@ -23,7 +23,7 @@
     // "ecmaFeatures": {
     //   "jsx": true
     // },
-    "ecmaVersion": 2022,
+    "ecmaVersion": "latest",
     "requireConfigFile": false,
     "sourceType": "module"
   },

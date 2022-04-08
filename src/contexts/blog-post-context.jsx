@@ -64,6 +64,7 @@ export default function ContextualizedBlogPostPage() {
     useSubscribe({
       cleanup: () => {
         abortControllerRef.current.abort();
+        abortControllerRef.current = new AbortController();
       },
       connectionInfo: { blogPostID },
       dependencies: [blogPostID],

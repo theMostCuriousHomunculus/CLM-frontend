@@ -320,6 +320,7 @@ export default function ContextualizedCubePage() {
   useSubscribe({
     cleanup: () => {
       abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
     },
     connectionInfo: { cubeID },
     dependencies: [cubeID],

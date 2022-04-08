@@ -1,5 +1,5 @@
 export default `{
-  _id as userID
+  _id
   admin
   avatar {
     card_faces {
@@ -11,7 +11,7 @@ export default `{
       art_crop
     }
   }
-  name as userName
+  name
   measurement_system
   radius
   token

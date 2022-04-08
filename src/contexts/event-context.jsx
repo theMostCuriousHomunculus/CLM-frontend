@@ -298,7 +298,10 @@ export default function ContextualizedEventPage() {
   }
 
   useSubscribe({
-    cleanup: () => abortControllerRef.current.abort(),
+    cleanup: () => {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
+    },
     connectionInfo: { eventID },
     dependencies: [eventID],
     queryString: eventQuery,

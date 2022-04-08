@@ -318,7 +318,10 @@ export function PermissionsProvider({ children }) {
 
   // when the app closes, the user logs in/out or the geolocationPermission changes, clear the watch
   useEffect(() => {
-    return clearAndDeleteLocation;
+    return () => {
+      // opposite of what you might expect due to a closure i suspect... maybe need to use useCallback?
+      if (!isLoggedIn) clearAndDeleteLocation();
+    };
   }, [isLoggedIn, geolocationPermission]);
 
   useEffect(() => {

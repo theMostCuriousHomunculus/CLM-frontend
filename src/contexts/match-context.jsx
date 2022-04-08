@@ -1052,7 +1052,12 @@ export default function ContextualizedMatchPage() {
   );
 
   useSubscribe({
+    // cleanup: () => {
+    //   abortControllerRef.current.abort();
+    //   abortControllerRef.current = new AbortController();
+    // },
     connectionInfo: { matchID },
+    dependencies: [matchID],
     queryString: matchQuery,
     setup: fetchMatchByID,
     subscriptionType: 'subscribeMatch',

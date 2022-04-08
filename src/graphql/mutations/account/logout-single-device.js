@@ -48,12 +48,16 @@ export default async function logoutSingleDevice({ signal }) {
     return (async function () {
       return await asyncLogoutSingleDevice({
         signal,
-        variables: { endpoint: subscription.endpoint }
+        variables: {
+          endpoint: subscription ? subscription.endpoint : undefined
+        }
       });
     })();
   } else {
     syncLogoutSingleDevice({
-      variables: { endpoint: subscription.endpoint }
+      variables: {
+        endpoint: subscription ? subscription.endpoint : undefined
+      }
     });
   }
 }

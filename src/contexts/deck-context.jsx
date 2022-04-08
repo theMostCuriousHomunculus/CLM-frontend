@@ -96,6 +96,10 @@ export default function ContextualizedDeckPage() {
   const { deckData } = location.state || {};
 
   useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
+    },
     connectionInfo: { deckID },
     dependencies: [deckID],
     queryString: deckQuery,
