@@ -96,10 +96,8 @@ export function AuthenticationProvider({ children }) {
             userID: _id,
             userName: name
           });
-          console.log(conversations);
         }
       } catch (error) {
-        console.log(error);
         Cookies.remove('authentication_token');
       } finally {
         setLoading(false);
@@ -116,7 +114,6 @@ export function AuthenticationProvider({ children }) {
     queryString: authenticateQuery,
     subscriptionType: 'subscribeAccount',
     update: (data) => {
-      console.log(data);
       setUserInfo({
         admin: data.admin,
         avatar: data.avatar,

@@ -55,14 +55,33 @@ export default function AuthenticateForm({ open, toggleOpen }) {
         setLoading(true);
         const {
           data: {
-            login: { _id, admin, avatar, measurement_system, name, radius, token }
+            login: {
+              _id,
+              admin,
+              avatar,
+              buds,
+              conversations,
+              measurement_system,
+              name,
+              radius,
+              token
+            }
           }
         } = await login({
           queryString: tokenQuery,
           signal: abortControllerRef.current.signal,
           variables: { email: emailInput, password: passwordInput }
         });
-        setUserInfo({ admin, avatar, measurement_system, radius, userID: _id, userName: name });
+        setUserInfo({
+          admin,
+          avatar,
+          buds,
+          conversations,
+          measurement_system,
+          radius,
+          userID: _id,
+          userName: name
+        });
         Cookies.set('authentication_token', token);
       } catch (error) {
         setErrorMessages((prevState) => [...prevState, error.message]);
@@ -74,7 +93,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
     if (selectedTab === 1) {
       try {
         setLoading(true);
-        await login({
+        await requestPasswordReset({
           signal: abortControllerRef.current.signal,
           variables: { email: emailInput }
         });
@@ -96,14 +115,33 @@ export default function AuthenticateForm({ open, toggleOpen }) {
         setLoading(true);
         const {
           data: {
-            register: { _id, admin, avatar, measurement_system, name, radius, token }
+            register: {
+              _id,
+              admin,
+              avatar,
+              buds,
+              conversations,
+              measurement_system,
+              name,
+              radius,
+              token
+            }
           }
         } = await register({
           queryString: tokenQuery,
           signal: abortControllerRef.current.signal,
           variables: { email: emailInput, name: nameInput, password: passwordInput }
         });
-        setUserInfo({ admin, avatar, measurement_system, radius, userID: _id, userName: name });
+        setUserInfo({
+          admin,
+          avatar,
+          buds,
+          conversations,
+          measurement_system,
+          radius,
+          userID: _id,
+          userName: name
+        });
         Cookies.set('authentication_token', token);
       } catch (error) {
         setErrorMessages((prevState) => [...prevState, error.message]);

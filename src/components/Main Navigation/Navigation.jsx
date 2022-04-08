@@ -256,17 +256,16 @@ export default function Navigation() {
             {buds.map((bud) => (
               <Avatar
                 key={bud._id}
-                onClick={async () => {
-                  const response = await createConversationMessage({
-                    queryString: `{\n_id\n}`,
-                    signal: abortControllerRef.current.signal,
-                    variables: {
-                      body: `What's up, turd?`,
-                      participants: [userID, bud._id]
-                    }
-                  });
-                  console.log(response);
-                }}
+                // onClick={async () => {
+                //   const response = await createConversationMessage({
+                //     queryString: `{\n_id\n}`,
+                //     signal: abortControllerRef.current.signal,
+                //     variables: {
+                //       body: `What's up, turd?`,
+                //       participants: [userID, bud._id]
+                //     }
+                //   });
+                // }}
                 profile={{ avatar: bud.avatar, name: bud.name }}
                 size="medium"
                 style={{ cursor: 'pointer' }}
