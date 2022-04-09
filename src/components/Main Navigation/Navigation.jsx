@@ -19,9 +19,9 @@ import { makeStyles } from '@mui/styles';
 
 import AuthenticateForm from './AuthenticateForm';
 import Avatar from '../miscellaneous/Avatar';
+import ChatDialog from './ChatDialog';
 import NavigationLinks from './NavigationLinks';
 import SiteSearchBar from './SiteSearchBar';
-import createConversationMessage from '../../graphql/mutations/conversation/create-conversation-message';
 import logoutSingleDevice from '../../graphql/mutations/account/logout-single-device';
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
@@ -97,6 +97,8 @@ export default function Navigation() {
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] = useState(false);
   const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const [menuDrawerOpen, setMenuDrawerOpen] = useState(false);
+  const [newConversationParticipants, setNewConversationParticipants] = useState();
+  const [selectedConversationID, setSelectedConversationID] = useState();
   const classes = useStyles();
 
   function toggleDrawer(event) {
@@ -112,6 +114,22 @@ export default function Navigation() {
         open={authenticateFormDisplayed}
         toggleOpen={() => setAuthenticateFormDisplayed(false)}
       />
+
+      <ChatDialog
+        close={() => {
+          setNewConversationParticipants(null);
+          setSelectedConversationID(null);
+        }}
+        conversation={
+          newConversationParticipants
+            ? { messages: [], participants: newConversationParticipants }
+            : conversations.find((conversation) => conversation._id === selectedConversationID)
+        }
+        open={!!selectedConversationID || !!newConversationParticipants}
+        setNewConversationParticipants={setNewConversationParticipants}
+        setSelectedConversationID={setSelectedConversationID}
+      />
+
       <MUIAppBar className={classes.appBar} id="app-bar" position="static">
         <MUIToolbar className={classes.toolbar}>
           <div className={classes.leftContainer}>
@@ -248,7 +266,6 @@ export default function Navigation() {
               display: 'flex',
               flexWrap: 'wrap',
               gap: 8,
-              // maxHeight: 158,
               maxWidth: 267,
               overflowY: 'auto'
             }}
@@ -256,16 +273,22 @@ export default function Navigation() {
             {buds.map((bud) => (
               <Avatar
                 key={bud._id}
-                // onClick={async () => {
-                //   const response = await createConversationMessage({
-                //     queryString: `{\n_id\n}`,
-                //     signal: abortControllerRef.current.signal,
-                //     variables: {
-                //       body: `What's up, turd?`,
-                //       participants: [userID, bud._id]
-                //     }
-                //   });
-                // }}
+                onClick={() => {
+                  const existingConversation = conversations.find(
+                    (conversation) =>
+                      conversation.participants.length === 2 &&
+                      conversation.participants.some((participant) => participant._id === bud._id)
+                  );
+
+                  if (existingConversation) {
+                    setSelectedConversationID(existingConversation._id);
+                  } else {
+                    setNewConversationParticipants([
+                      { _id: userID, name: userName },
+                      { _id: bud._id, name: bud.name }
+                    ]);
+                  }
+                }}
                 profile={{ avatar: bud.avatar, name: bud.name }}
                 size="medium"
                 style={{ cursor: 'pointer' }}
@@ -275,7 +298,11 @@ export default function Navigation() {
           {conversations.length > 0 ? (
             <React.Fragment>
               {conversations.map((conversation) => (
-                <div key={conversation._id}>
+                <div
+                  key={conversation._id}
+                  onClick={() => setSelectedConversationID(conversation._id)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <MUITypography color="white" variant="h3">
                     {conversation.participants.map((participant) => participant.name).join()}
                   </MUITypography>

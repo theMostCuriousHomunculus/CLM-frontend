@@ -26,6 +26,7 @@ export default `{
     name
   }
   conversations {
+    _id
     messages {
       _id
       author {

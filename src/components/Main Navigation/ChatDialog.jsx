@@ -1,17 +1,19 @@
 import React, { useContext, useRef, useState } from 'react';
+import MUIAddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import MUIButton from '@mui/material/Button';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
 import MUIPaper from '@mui/material/Paper';
+import MUITextField from '@mui/material/TextField';
 import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
-import AutoScrollMessages from '../miscellaneous/AutoScrollMessages';
 import Avatar from '../miscellaneous/Avatar';
 import createConversationMessage from '../../graphql/mutations/conversation/create-conversation-message';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { ErrorContext } from '../../contexts/Error';
 import { primaryColor, secondaryColor } from '../../theme';
 
 const useStyles = makeStyles({
@@ -22,93 +24,81 @@ const useStyles = makeStyles({
   },
   messageDialogActions: {
     alignItems: 'stretch',
+    columnGap: 8,
     flexDirection: 'row'
   },
   messageDialogContent: {
     flexGrow: 1,
     marginRight: 16,
-    overflowY: 'auto'
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column-reverse'
   },
   messageLI: {
     display: 'flex',
     margin: '4px 0'
-  },
-  messagesUL: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  submitButton: {
-    marginLeft: 8
   }
 });
 
-export default function ChatDialog({ conversation: { _id, messages, participants } }) {
+export default function ChatDialog({
+  close,
+  conversation,
+  open,
+  setNewConversationParticipants,
+  setSelectedConversationID
+}) {
+  if (!conversation) return null;
+
   const { abortControllerRef, userID } = useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const newMessageRef = useRef();
   const [newMessageText, setNewMessageText] = useState('');
-  const {
-    messageDialog,
-    messageDialogActions,
-    messageDialogContent,
-    messageLI,
-    messagesUL,
-    submitButton
-  } = useStyles();
+  const { messageDialog, messageDialogActions, messageDialogContent, messageLI } = useStyles();
+
+  const { _id, messages, participants } = conversation;
 
   return (
-    <MUIDialog className={messageDialog}>
-      <MUIDialogTitle></MUIDialogTitle>
+    <MUIDialog className={messageDialog} onClose={close} open={open}>
+      <MUIDialogTitle>
+        {participants.map((participant) => participant.name).join(', ')}
+      </MUIDialogTitle>
       <MUIDialogContent className={messageDialogContent}>
-        {/* <AutoScrollMessages
-          messages={messages}
-          submitFunction={(value) => {
-            createConversationMessage({
-              headers: _id ? { ConversationID: _id } : undefined,
-              variables: {
-                body: value,
-                participants: participants
-              }
-            });
-          }}
-          title={participants.map((participant) => participant.name).join(', ')}
-        /> */}
-        <ul className={messagesUL}>
-          {messages
-            .map((message, index, array) => array[array.length - 1 - index])
-            .map((message) => (
-              <li
-                className={messageLI}
-                key={message._id}
+        <ul>
+          {messages.map((message) => (
+            <li
+              className={messageLI}
+              key={message._id}
+              style={{
+                flexDirection: message.author._id === userID ? 'row-reverse' : 'row'
+              }}
+            >
+              <Avatar profile={message.author} size="small" />
+              <MUIPaper
                 style={{
-                  flexDirection: message.author._id === userID ? 'row-reverse' : 'row'
+                  backgroundColor:
+                    message.author._id === userID ? primaryColor['A100'] : secondaryColor['A100'],
+                  minWidth: '50%',
+                  overflowWrap: 'break-word',
+                  textAlign: message.author._id === userID ? 'right' : 'left'
                 }}
               >
-                <Avatar profile={message.author} size="small" />
-                <MUIPaper
-                  style={{
-                    backgroundColor:
-                      message.author._id === userID ? primaryColor['A100'] : secondaryColor['A100'],
-                    minWidth: '50%',
-                    overflowWrap: 'break-word',
-                    textAlign: message.author._id === userID ? 'right' : 'left'
-                  }}
-                >
-                  {message.body.split('\n').map((subString, index) => (
-                    <MUITypography key={index} variant="body1">
-                      {subString}
-                    </MUITypography>
-                  ))}
-                  <MUITypography variant="caption">
-                    {new Date(parseInt(message.createdAt)).toLocaleString()}
+                {message.body.split('\n').map((subString, index) => (
+                  <MUITypography key={index} variant="body1">
+                    {subString}
                   </MUITypography>
-                </MUIPaper>
-              </li>
-            ))}
+                ))}
+                <MUITypography variant="caption">
+                  {new Date(parseInt(message.createdAt)).toLocaleString()}
+                </MUITypography>
+              </MUIPaper>
+            </li>
+          ))}
         </ul>
       </MUIDialogContent>
       <MUIDialogActions className={messageDialogActions}>
         <MUITextField
           autoComplete="off"
+          autoFocus
           fullWidth
           inputRef={newMessageRef}
           multiline
@@ -117,17 +107,30 @@ export default function ChatDialog({ conversation: { _id, messages, participants
               setNewMessageText(event.target.value);
             }
           }}
-          onKeyDown={(event) => {
-            if (!event.shiftKey && event.key === 'Enter' && newMessageText.length > 0) {
-              createConversationMessage({
-                headers: _id ? { ConversationID: _id } : undefined,
-                variables: {
-                  body: newMessageText,
-                  participants: participants
+          onKeyDown={async (event) => {
+            event.persist();
+            try {
+              if (!event.shiftKey && event.key === 'Enter' && newMessageText.length > 0) {
+                const response = await createConversationMessage({
+                  headers: _id ? { ConversationID: _id } : undefined,
+                  queryString: `{\n_id\n}`,
+                  signal: abortControllerRef.current.signal,
+                  variables: {
+                    body: newMessageText,
+                    participants: participants.map((participant) => participant._id)
+                  }
+                });
+
+                if (_id) {
+                  setNewMessageText('');
+                  newMessageRef.current.focus();
+                } else {
+                  setSelectedConversationID(response.data.createConversationMessage._id);
+                  setNewConversationParticipants(null);
                 }
-              });
-              setNewMessageText('');
-              newMessageRef.current.focus();
+              }
+            } catch (error) {
+              setErrorMessages((prevState) => [...prevState, error.message]);
             }
           }}
           rows={2}
@@ -135,20 +138,31 @@ export default function ChatDialog({ conversation: { _id, messages, participants
           value={newMessageText}
         />
         <MUIButton
-          className={submitButton}
           disabled={newMessageText.length === 0}
-          onClick={() => {
-            if (newMessageText.length > 0) {
-              createConversationMessage({
-                headers: _id ? { ConversationID: _id } : undefined,
-                variables: {
-                  body: newMessageText,
-                  participants: participants
+          onClick={async () => {
+            try {
+              if (newMessageText.length > 0) {
+                const response = await createConversationMessage({
+                  headers: _id ? { ConversationID: _id } : undefined,
+                  queryString: `{\n_id\n}`,
+                  signal: abortControllerRef.current.signal,
+                  variables: {
+                    body: newMessageText,
+                    participants: participants.map((participant) => participant._id)
+                  }
+                });
+
+                if (_id) {
+                  setNewMessageText('');
+                  newMessageRef.current.focus();
+                } else {
+                  setSelectedConversationID(response.data.createConversationMessage._id);
+                  setNewConversationParticipants(null);
                 }
-              });
+              }
+            } catch (error) {
+              setErrorMessages((prevState) => [...prevState, error.message]);
             }
-            setNewMessageText('');
-            newMessageRef.current.focus();
           }}
           startIcon={<MUIAddCommentOutlinedIcon />}
         >
