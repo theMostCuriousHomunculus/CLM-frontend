@@ -58,7 +58,7 @@ export default function ChatDialog({
   const { _id, messages, participants } = conversation;
 
   return (
-    <MUIDialog className={messageDialog} onClose={close} open={open}>
+    <MUIDialog className={messageDialog} fullWidth maxWidth="xl" onClose={close} open={open}>
       <MUIDialogTitle>
         {participants.map((participant) => participant.name).join(', ')}
       </MUIDialogTitle>

@@ -50,6 +50,14 @@ let theme = createTheme({
         }
       }
     },
+    MuiAvatarGroup: {
+      styleOverrides: {
+        avatar: {
+          height: 50,
+          width: 50
+        }
+      }
+    },
     MuiButton: {
       defaultProps: {
         size: 'small',
@@ -140,6 +148,14 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           padding: 8
+        }
+      }
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          background: `linear-gradient(to bottom, ${primaryColor.A700}, calc(2/3 * 100%), ${secondaryColor.A400})`,
+          margin: 0
         }
       }
     },

@@ -25,7 +25,7 @@ export default function CloneCubeButton({ CubeID }) {
             setCloning(true);
             const data = await cloneCube({
               headers: { CubeID },
-              queryString: `{${cubeQuery}}`
+              queryString: cubeQuery
             });
             setSuccess(true);
             setTimeout(() => {

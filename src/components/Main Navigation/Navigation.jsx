@@ -3,10 +3,7 @@ import Cookies from 'js-cookie';
 import MUIAccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MUIAppBar from '@mui/material/AppBar';
 import MUIBadge from '@mui/material/Badge';
-import MUIButton from '@mui/material/Button';
 import MUIChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import MUIDownloadIcon from '@mui/icons-material/Download';
-import MUIDrawer from '@mui/material/Drawer';
 import MUIIconButton from '@mui/material/IconButton';
 import MUIToolbar from '@mui/material/Toolbar';
 import MUITooltip from '@mui/material/Tooltip';
@@ -20,13 +17,13 @@ import { makeStyles } from '@mui/styles';
 import AuthenticateForm from './AuthenticateForm';
 import Avatar from '../miscellaneous/Avatar';
 import ChatDialog from './ChatDialog';
-import NavigationLinks from './NavigationLinks';
+import ChatDrawer from './ChatDrawer';
+import NavigationDrawer from './NavigationDrawer';
 import SiteSearchBar from './SiteSearchBar';
 import logoutSingleDevice from '../../graphql/mutations/account/logout-single-device';
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { ErrorContext } from '../../contexts/Error';
-import { PermissionsContext } from '../../contexts/Permissions';
 
 const useStyles = makeStyles({
   appBar: {
@@ -46,12 +43,6 @@ const useStyles = makeStyles({
   badgeIcon: {
     height: 26,
     width: 26
-  },
-  drawer: {
-    '& .MuiPaper-root': {
-      background: `linear-gradient(to bottom, ${theme.palette.primary.main}, calc(2/3 * 100%), ${theme.palette.secondary.main})`,
-      margin: 0
-    }
   },
   leftContainer: {
     alignItems: 'center',
@@ -83,7 +74,6 @@ export default function Navigation() {
   const {
     abortControllerRef,
     avatar,
-    buds,
     conversations,
     isLoggedIn,
     setLoading,
@@ -92,21 +82,13 @@ export default function Navigation() {
     userName
   } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
-  const { deferredPrompt, setDeferredPrompt } = useContext(PermissionsContext);
   const searchBarLocation = useMediaQuery(theme.breakpoints.up('md')) ? 'top' : 'side';
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] = useState(false);
   const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
-  const [menuDrawerOpen, setMenuDrawerOpen] = useState(false);
+  const [navigationDrawerOpen, setNavigationDrawerOpen] = useState(false);
   const [newConversationParticipants, setNewConversationParticipants] = useState();
   const [selectedConversationID, setSelectedConversationID] = useState();
   const classes = useStyles();
-
-  function toggleDrawer(event) {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-    setMenuDrawerOpen((prevState) => !prevState);
-  }
 
   return (
     <React.Fragment>
@@ -123,7 +105,7 @@ export default function Navigation() {
         conversation={
           newConversationParticipants
             ? { messages: [], participants: newConversationParticipants }
-            : conversations.find((conversation) => conversation._id === selectedConversationID)
+            : conversations?.find((conversation) => conversation._id === selectedConversationID)
         }
         open={!!selectedConversationID || !!newConversationParticipants}
         setNewConversationParticipants={setNewConversationParticipants}
@@ -136,7 +118,7 @@ export default function Navigation() {
             <MUIMenuIcon
               className={classes.menuIcon}
               color="secondary"
-              onClick={() => setMenuDrawerOpen(true)}
+              onClick={() => setNavigationDrawerOpen(true)}
             />
             <MUITypography color="inherit" variant="h1">
               Cube Level Midnight
@@ -144,7 +126,7 @@ export default function Navigation() {
           </div>
           <div className={classes.rightContainer}>
             {searchBarLocation === 'top' && (
-              <SiteSearchBar setMenuDrawerOpen={setMenuDrawerOpen} color="primary" />
+              <SiteSearchBar setNavigationDrawerOpen={setNavigationDrawerOpen} color="primary" />
             )}
             {isLoggedIn ? (
               <div style={{ padding: 8 }}>
@@ -227,97 +209,17 @@ export default function Navigation() {
           </div>
         </MUIToolbar>
 
-        <MUIDrawer
-          anchor="left"
-          className={classes.drawer}
-          id="side-navigation"
-          onClose={() => setMenuDrawerOpen(false)}
-          open={menuDrawerOpen}
-        >
-          {searchBarLocation === 'side' && (
-            <SiteSearchBar setMenuDrawerOpen={setMenuDrawerOpen} color="secondary" />
-          )}
-          <NavigationLinks toggleDrawer={toggleDrawer} />
-          {deferredPrompt && (
-            <MUIButton
-              fullWidth
-              onClick={async () => {
-                deferredPrompt.prompt();
-                await deferredPrompt.userChoice;
-                setDeferredPrompt(null);
-                setMenuDrawerOpen(false);
-              }}
-              startIcon={<MUIDownloadIcon />}
-            >
-              Install the App!
-            </MUIButton>
-          )}
-        </MUIDrawer>
+        <NavigationDrawer
+          navigationDrawerOpen={navigationDrawerOpen}
+          setNavigationDrawerOpen={setNavigationDrawerOpen}
+        />
 
-        <MUIDrawer
-          anchor="right"
-          className={classes.drawer}
-          id="side-navigation"
-          onClose={() => setChatDrawerOpen(false)}
-          open={chatDrawerOpen}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 8,
-              maxWidth: 267,
-              overflowY: 'auto'
-            }}
-          >
-            {buds.map((bud) => (
-              <Avatar
-                key={bud._id}
-                onClick={() => {
-                  const existingConversation = conversations.find(
-                    (conversation) =>
-                      conversation.participants.length === 2 &&
-                      conversation.participants.some((participant) => participant._id === bud._id)
-                  );
-
-                  if (existingConversation) {
-                    setSelectedConversationID(existingConversation._id);
-                  } else {
-                    setNewConversationParticipants([
-                      { _id: userID, name: userName },
-                      { _id: bud._id, name: bud.name }
-                    ]);
-                  }
-                }}
-                profile={{ avatar: bud.avatar, name: bud.name }}
-                size="medium"
-                style={{ cursor: 'pointer' }}
-              />
-            ))}
-          </div>
-          {conversations.length > 0 ? (
-            <React.Fragment>
-              {conversations.map((conversation) => (
-                <div
-                  key={conversation._id}
-                  onClick={() => setSelectedConversationID(conversation._id)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <MUITypography color="white" variant="h3">
-                    {conversation.participants.map((participant) => participant.name).join()}
-                  </MUITypography>
-                  <MUITypography color="white" variant="body1">
-                    {conversation.messages[conversation.messages.length - 1].body}
-                  </MUITypography>
-                </div>
-              ))}
-            </React.Fragment>
-          ) : (
-            <MUITypography color="white" variant="body1">
-              No Conversations Yet...
-            </MUITypography>
-          )}
-        </MUIDrawer>
+        <ChatDrawer
+          chatDrawerOpen={chatDrawerOpen}
+          setChatDrawerOpen={setChatDrawerOpen}
+          setNewConversationParticipants={setNewConversationParticipants}
+          setSelectedConversationID={setSelectedConversationID}
+        />
       </MUIAppBar>
     </React.Fragment>
   );

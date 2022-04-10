@@ -40,7 +40,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function SiteSearchBar({ color, setDrawerOpen }) {
+export default function SiteSearchBar({ color, setNavigationDrawerOpen }) {
   const searchInput = useRef();
   const { loading, sendRequest } = useRequest();
   const [searchResults, setSearchResults] = useState([]);
@@ -214,7 +214,7 @@ export default function SiteSearchBar({ color, setDrawerOpen }) {
               .getElementsByClassName('MuiAutocomplete-clearIndicator')[0]
               .click();
             setSearchResults([]);
-            setDrawerOpen(false);
+            setNavigationDrawerOpen(false);
           }, 0);
         }
       }}
