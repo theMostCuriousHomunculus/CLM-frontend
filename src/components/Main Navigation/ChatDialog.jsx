@@ -50,7 +50,7 @@ export default function ChatDialog({
 }) {
   if (!conversation) return null;
 
-  const { abortControllerRef, avatar, buds, userID, userName } = useContext(AuthenticationContext);
+  const { abortControllerRef, userID } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const newMessageRef = useRef();
   const [newMessageText, setNewMessageText] = useState('');
@@ -67,14 +67,14 @@ export default function ChatDialog({
   return (
     <MUIDialog className={messageDialog} fullWidth maxWidth="xl" onClose={close} open={open}>
       <MUIDialogTitle>
-        {_id ? (
+        {/* _id ? (
           participants.map((participant) => participant.name).join(', ')
-        ) : (
-          <ParticipantsInput
-            participants={participants}
-            setNewConversationParticipants={setNewConversationParticipants}
-          />
-        )}
+        ) : ( */}
+        <ParticipantsInput
+          participants={participants}
+          setNewConversationParticipants={setNewConversationParticipants}
+        />
+        {/* }) */}
       </MUIDialogTitle>
       <MUIDialogContent className={messageDialogContent}>
         <ul>
@@ -140,7 +140,7 @@ export default function ChatDialog({
                   newMessageRef.current.focus();
                 } else {
                   setSelectedConversationID(response.data.createConversationMessage._id);
-                  setNewConversationParticipants(null);
+                  setNewConversationParticipants([]);
                 }
               }
             } catch (error) {
@@ -171,7 +171,7 @@ export default function ChatDialog({
                   newMessageRef.current.focus();
                 } else {
                   setSelectedConversationID(response.data.createConversationMessage._id);
-                  setNewConversationParticipants(null);
+                  setNewConversationParticipants([]);
                 }
               }
             } catch (error) {

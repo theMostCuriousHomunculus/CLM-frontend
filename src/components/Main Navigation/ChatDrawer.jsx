@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MUIAvatarGroup from '@mui/material/AvatarGroup';
 import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
@@ -8,6 +8,7 @@ import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
+import ChatDialog from './ChatDialog';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
@@ -87,91 +88,127 @@ function ConversationMapItem({ conversation, setSelectedConversationID }) {
   );
 }
 
-export default function ChatDrawer({
-  chatDrawerOpen,
-  setChatDrawerOpen,
-  setNewConversationParticipants,
-  setSelectedConversationID
-}) {
+export default function ChatDrawer({ chatDrawerOpen, setChatDrawerOpen }) {
   const { avatar, buds, conversations, userID, userName } = useContext(AuthenticationContext);
+  const [newConversationParticipants, setNewConversationParticipants] = useState([]);
+  const [selectedConversationID, setSelectedConversationID] = useState();
   const { chatDrawerSection, columnFlex, stickyHeading } = useStyles();
 
-  return (
-    <MUIDrawer
-      anchor="right"
-      id="side-navigation"
-      onClose={() => setChatDrawerOpen(false)}
-      open={chatDrawerOpen}
-    >
-      <div className={columnFlex}>
-        <div className={chatDrawerSection}>
-          <MUITypography className={stickyHeading} color="white" variant="h3">
-            Buds
-          </MUITypography>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 8
-            }}
-          >
-            {buds.map((bud) => (
-              <Avatar
-                key={bud._id}
-                onClick={() => {
-                  const existingConversation = conversations.find(
-                    (conversation) =>
-                      conversation.participants.length === 2 &&
-                      conversation.participants.some((participant) => participant._id === bud._id)
-                  );
+  useEffect(() => {
+    const existingConversation = conversations.find(
+      (conversation) =>
+        conversation.participants.length === newConversationParticipants.length &&
+        conversation.participants.every((cp) =>
+          newConversationParticipants.some((ncp) => ncp._id === cp._id)
+        )
+    );
 
-                  if (existingConversation) {
-                    setSelectedConversationID(existingConversation._id);
-                  } else {
-                    setNewConversationParticipants([
-                      { _id: userID, avatar, name: userName },
-                      { _id: bud._id, avatar: bud.avatar, name: bud.name }
-                    ]);
-                  }
-                }}
-                profile={{ avatar: bud.avatar, name: bud.name }}
-                size="medium"
-                style={{ cursor: 'pointer' }}
-              />
-            ))}
+    if (existingConversation) {
+      setSelectedConversationID(existingConversation._id);
+    } else {
+      setSelectedConversationID(null);
+    }
+  }, [newConversationParticipants]);
+
+  return (
+    <React.Fragment>
+      <ChatDialog
+        close={() => {
+          setNewConversationParticipants([]);
+          setSelectedConversationID(null);
+        }}
+        conversation={(() => {
+          if (selectedConversationID) {
+            return conversations.find(
+              (conversation) => conversation._id === selectedConversationID
+            );
+          }
+          if (newConversationParticipants.length > 0) {
+            return { messages: [], participants: newConversationParticipants };
+          }
+          return null;
+        })()}
+        open={!!selectedConversationID || newConversationParticipants.length > 0}
+        setNewConversationParticipants={setNewConversationParticipants}
+        setSelectedConversationID={setSelectedConversationID}
+      />
+
+      <MUIDrawer
+        anchor="right"
+        id="side-navigation"
+        onClose={() => setChatDrawerOpen(false)}
+        open={chatDrawerOpen}
+      >
+        <div className={columnFlex}>
+          <div className={chatDrawerSection}>
+            <MUITypography className={stickyHeading} color="white" variant="h3">
+              Buds
+            </MUITypography>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 8
+              }}
+            >
+              {buds.map((bud) => (
+                <Avatar
+                  key={bud._id}
+                  onClick={() => {
+                    const existingConversation = conversations.find(
+                      (conversation) =>
+                        conversation.participants.length === 2 &&
+                        conversation.participants.some((participant) => participant._id === bud._id)
+                    );
+
+                    if (existingConversation) {
+                      setSelectedConversationID(existingConversation._id);
+                    } else {
+                      setNewConversationParticipants([
+                        { _id: userID, avatar, name: userName },
+                        { _id: bud._id, avatar: bud.avatar, name: bud.name }
+                      ]);
+                    }
+                  }}
+                  profile={{ avatar: bud.avatar, name: bud.name }}
+                  size="medium"
+                  style={{ cursor: 'pointer' }}
+                />
+              ))}
+            </div>
+          </div>
+          <div className={chatDrawerSection}>
+            <MUITypography className={stickyHeading} color="white" variant="h3">
+              Conversations
+            </MUITypography>
+            {conversations.length > 0 ? (
+              <div className={columnFlex}>
+                {conversations
+                  .sort((a, b) => {
+                    if (
+                      parseInt(a.messages[a.messages.length - 1].createdAt) >
+                      parseInt(b.messages[b.messages.length - 1].createdAt)
+                    ) {
+                      return -1;
+                    }
+                    return 1;
+                  })
+                  .map((conversation) => (
+                    <ConversationMapItem
+                      conversation={conversation}
+                      key={conversation._id}
+                      setSelectedConversationID={setSelectedConversationID}
+                    />
+                  ))}
+              </div>
+            ) : (
+              <MUITypography color="white" variant="body1">
+                No Conversations Yet...
+              </MUITypography>
+            )}
           </div>
         </div>
-        <div className={chatDrawerSection}>
-          <MUITypography className={stickyHeading} color="white" variant="h3">
-            Conversations
-          </MUITypography>
-          {conversations.length > 0 ? (
-            <div className={columnFlex}>
-              {conversations
-                .sort((a, b) => {
-                  if (
-                    parseInt(a.messages[a.messages.length - 1].createdAt) >
-                    parseInt(b.messages[b.messages.length - 1].createdAt)
-                  ) {
-                    return -1;
-                  }
-                  return 1;
-                })
-                .map((conversation) => (
-                  <ConversationMapItem
-                    conversation={conversation}
-                    key={conversation._id}
-                    setSelectedConversationID={setSelectedConversationID}
-                  />
-                ))}
-            </div>
-          ) : (
-            <MUITypography color="white" variant="body1">
-              No Conversations Yet...
-            </MUITypography>
-          )}
-        </div>
-      </div>
-    </MUIDrawer>
+      </MUIDrawer>
+    </React.Fragment>
   );
 }

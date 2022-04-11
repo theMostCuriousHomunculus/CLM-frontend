@@ -16,7 +16,6 @@ import { makeStyles } from '@mui/styles';
 
 import AuthenticateForm from './AuthenticateForm';
 import Avatar from '../miscellaneous/Avatar';
-import ChatDialog from './ChatDialog';
 import ChatDrawer from './ChatDrawer';
 import NavigationDrawer from './NavigationDrawer';
 import SiteSearchBar from './SiteSearchBar';
@@ -71,23 +70,13 @@ const useStyles = makeStyles({
 });
 
 export default function Navigation() {
-  const {
-    abortControllerRef,
-    avatar,
-    conversations,
-    isLoggedIn,
-    setLoading,
-    setUserInfo,
-    userID,
-    userName
-  } = useContext(AuthenticationContext);
+  const { abortControllerRef, avatar, isLoggedIn, setLoading, setUserInfo, userID, userName } =
+    useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const searchBarLocation = useMediaQuery(theme.breakpoints.up('md')) ? 'top' : 'side';
   const [authenticateFormDisplayed, setAuthenticateFormDisplayed] = useState(false);
   const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const [navigationDrawerOpen, setNavigationDrawerOpen] = useState(false);
-  const [newConversationParticipants, setNewConversationParticipants] = useState();
-  const [selectedConversationID, setSelectedConversationID] = useState();
   const classes = useStyles();
 
   return (
@@ -95,21 +84,6 @@ export default function Navigation() {
       <AuthenticateForm
         open={authenticateFormDisplayed}
         toggleOpen={() => setAuthenticateFormDisplayed(false)}
-      />
-
-      <ChatDialog
-        close={() => {
-          setNewConversationParticipants(null);
-          setSelectedConversationID(null);
-        }}
-        conversation={
-          newConversationParticipants
-            ? { messages: [], participants: newConversationParticipants }
-            : conversations?.find((conversation) => conversation._id === selectedConversationID)
-        }
-        open={!!selectedConversationID || !!newConversationParticipants}
-        setNewConversationParticipants={setNewConversationParticipants}
-        setSelectedConversationID={setSelectedConversationID}
       />
 
       <MUIAppBar className={classes.appBar} id="app-bar" position="static">
@@ -214,12 +188,7 @@ export default function Navigation() {
           setNavigationDrawerOpen={setNavigationDrawerOpen}
         />
 
-        <ChatDrawer
-          chatDrawerOpen={chatDrawerOpen}
-          setChatDrawerOpen={setChatDrawerOpen}
-          setNewConversationParticipants={setNewConversationParticipants}
-          setSelectedConversationID={setSelectedConversationID}
-        />
+        <ChatDrawer chatDrawerOpen={chatDrawerOpen} setChatDrawerOpen={setChatDrawerOpen} />
       </MUIAppBar>
     </React.Fragment>
   );
