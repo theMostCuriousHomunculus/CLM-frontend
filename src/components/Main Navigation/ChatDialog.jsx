@@ -11,6 +11,7 @@ import MUITypography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
+import ParticipantsInput from './ParticipantsInput';
 import createConversationMessage from '../../graphql/mutations/conversation/create-conversation-message';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { ErrorContext } from '../../contexts/Error';
@@ -49,18 +50,31 @@ export default function ChatDialog({
 }) {
   if (!conversation) return null;
 
-  const { abortControllerRef, userID } = useContext(AuthenticationContext);
+  const { abortControllerRef, avatar, buds, userID, userName } = useContext(AuthenticationContext);
   const { setErrorMessages } = useContext(ErrorContext);
   const newMessageRef = useRef();
   const [newMessageText, setNewMessageText] = useState('');
   const { messageDialog, messageDialogActions, messageDialogContent, messageLI } = useStyles();
 
   const { _id, messages, participants } = conversation;
+  participants.sort((a, b) => {
+    if (a._id === userID) return -1;
+    if (b._id === userID) return 1;
+    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+    return 1;
+  });
 
   return (
     <MUIDialog className={messageDialog} fullWidth maxWidth="xl" onClose={close} open={open}>
       <MUIDialogTitle>
-        {participants.map((participant) => participant.name).join(', ')}
+        {_id ? (
+          participants.map((participant) => participant.name).join(', ')
+        ) : (
+          <ParticipantsInput
+            participants={participants}
+            setNewConversationParticipants={setNewConversationParticipants}
+          />
+        )}
       </MUIDialogTitle>
       <MUIDialogContent className={messageDialogContent}>
         <ul>

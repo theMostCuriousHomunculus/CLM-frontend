@@ -36,6 +36,13 @@ function ConversationMapItem({ conversation, setSelectedConversationID }) {
   const { userID } = useContext(AuthenticationContext);
   const lastMessage = conversation.messages[conversation.messages.length - 1];
 
+  conversation.participants.sort((a, b) => {
+    if (a._id === userID) return -1;
+    if (b._id === userID) return 1;
+    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+    return 1;
+  });
+
   return (
     <MUICard
       onClick={() => setSelectedConversationID(conversation._id)}
@@ -62,7 +69,7 @@ function ConversationMapItem({ conversation, setSelectedConversationID }) {
             {conversation.participants
               .filter((participant) => participant._id !== userID)
               .map((participant) => participant.name)
-              .join()}
+              .join(', ')}
           </MUITypography>
         }
       />
@@ -86,7 +93,7 @@ export default function ChatDrawer({
   setNewConversationParticipants,
   setSelectedConversationID
 }) {
-  const { buds, conversations, userID, userName } = useContext(AuthenticationContext);
+  const { avatar, buds, conversations, userID, userName } = useContext(AuthenticationContext);
   const { chatDrawerSection, columnFlex, stickyHeading } = useStyles();
 
   return (
@@ -122,8 +129,8 @@ export default function ChatDrawer({
                     setSelectedConversationID(existingConversation._id);
                   } else {
                     setNewConversationParticipants([
-                      { _id: userID, name: userName },
-                      { _id: bud._id, name: bud.name }
+                      { _id: userID, avatar, name: userName },
+                      { _id: bud._id, avatar: bud.avatar, name: bud.name }
                     ]);
                   }
                 }}
