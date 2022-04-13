@@ -1,24 +1,25 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import useRequest from '../hooks/request-hook';
+import blogPostQuery from '../constants/blog-post-query';
+import fetchBlogPostByID from '../graphql/queries/blog/fetch-blog-post-by-ID';
 import useSubscribe from '../hooks/subscribe-hook';
 import BlogPost from '../pages/BlogPost';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from './Authentication';
+import { ErrorContext } from './Error';
 
 export const BlogPostContext = createContext({
+  abortControllerRef: { current: new AbortController() },
   loading: false,
   blogPostState: {
     _id: '',
     author: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: ''
     },
     body: '',
@@ -30,18 +31,22 @@ export const BlogPostContext = createContext({
     createdAt: 0,
     updatedAt: 0
   },
-  createComment: () => null,
   setBlogPostState: () => null
 });
 
 export default function ContextualizedBlogPostPage() {
-  const { blogPostID } = useParams();
   const { avatar, userID, userName } = useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
+  const { blogPostID } = useParams();
+  const abortControllerRef = useRef(new AbortController());
   const [blogPostState, setBlogPostState] = useState({
     _id: null,
     author: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     body: '',
@@ -53,83 +58,32 @@ export default function ContextualizedBlogPostPage() {
     createdAt: null,
     updatedAt: null
   });
-  const blogPostQuery = `
-    _id
-    author {
-      _id
-      avatar
-      name
-    }
-    body
-    comments {
-      _id
-      author {
-        _id
-        avatar
-        name
-      }
-      body
-      createdAt
-      updatedAt
-    }
-    image
-    published
-    subtitle
-    title
-    createdAt
-    updatedAt
-  `;
-  const { loading, sendRequest } = useRequest();
-
-  const createComment = useCallback(
-    async function (newComment) {
-      await sendRequest({
-        headers: { BlogPostID: blogPostID },
-        operation: 'createComment',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(body: "${newComment}") {
-                  _id
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [sendRequest]
-  );
-
-  const fetchBlogPostByID = useCallback(
-    async function () {
-      await sendRequest({
-        callback: setBlogPostState,
-        headers: { BlogPostID: blogPostID },
-        load: true,
-        operation: 'fetchBlogPostByID',
-        get body() {
-          return {
-            query: `
-              query {
-                ${this.operation} {
-                  ${blogPostQuery}
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [blogPostQuery, blogPostID, sendRequest]
-  );
+  const [loading, setLoading] = useState(false);
 
   if (blogPostID !== 'new-post') {
     useSubscribe({
+      cleanup: () => {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = new AbortController();
+      },
       connectionInfo: { blogPostID },
+      dependencies: [blogPostID],
       queryString: blogPostQuery,
-      setup: fetchBlogPostByID,
+      setup: async () => {
+        try {
+          setLoading(true);
+          const response = await fetchBlogPostByID({
+            headers: { BlogPostID: blogPostID },
+            queryString: blogPostQuery,
+            signal: abortControllerRef.current.signal
+          });
+          setBlogPostState(response.data.fetchBlogPostByID);
+        } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
+        } finally {
+          setLoading(false);
+        }
+      },
       subscriptionType: 'subscribeBlogPost',
       update: setBlogPostState
     });
@@ -154,13 +108,12 @@ export default function ContextualizedBlogPostPage() {
   return (
     <BlogPostContext.Provider
       value={{
-        loading,
+        abortControllerRef,
         blogPostState,
-        createComment,
         setBlogPostState
       }}
     >
-      <BlogPost />
+      {loading ? <LoadingSpinner /> : <BlogPost />}
     </BlogPostContext.Provider>
   );
 }

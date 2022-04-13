@@ -34,8 +34,7 @@ export default function EventAccordion() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [showEventForm, setShowEventForm] = useState(false);
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - total_events) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - total_events) : 0;
 
   return (
     <React.Fragment>
@@ -60,10 +59,7 @@ export default function EventAccordion() {
           <MUITableContainer
             style={{
               flexShrink: 0,
-              minWidth: `${
-                400 +
-                Math.max(...events.map((event) => event.players.length)) * 50
-              }px`
+              minWidth: `${400 + Math.max(...events.map((event) => event.players.length)) * 50}px`
             }}
           >
             <MUITable stickyHeader>
@@ -78,10 +74,7 @@ export default function EventAccordion() {
               </MUITableHead>
               <MUITableBody>
                 {(rowsPerPage > 0 && total_events > 5
-                  ? events.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
+                  ? events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   : events
                 ).map(function (event) {
                   return (
@@ -99,9 +92,17 @@ export default function EventAccordion() {
                         >
                           {event.cube.image && (
                             <img
-                              alt={event.cube.image.alt}
+                              alt={
+                                event.cube.image.image_uris
+                                  ? event.cube.image.name
+                                  : event.cube.image.card_faces[0].name
+                              }
                               height={50}
-                              src={event.cube.image.src}
+                              src={
+                                event.cube.image.image_uris
+                                  ? event.cube.image.image_uris.art_crop
+                                  : event.cube.image.card_faces[0].image_uris.art_crop
+                              }
                               style={{ borderRadius: 4 }}
                             />
                           )}
@@ -109,11 +110,7 @@ export default function EventAccordion() {
                         </span>
                       </MUITableCell>
                       <MUITableCell>
-                        <Avatar
-                          alt={event.host.name}
-                          size="small"
-                          src={event.host.avatar}
-                        />
+                        <Avatar profile={event.host} size="small" />
                       </MUITableCell>
                       <MUITableCell>
                         <span style={{ display: 'flex', columnGap: 4 }}>
@@ -125,10 +122,9 @@ export default function EventAccordion() {
                             )
                             .map((player) => (
                               <Avatar
-                                alt={player.account.name}
                                 key={player.account._id}
+                                profile={player.account}
                                 size="small"
-                                src={player.account.avatar}
                               />
                             ))}
                         </span>
@@ -149,12 +145,7 @@ export default function EventAccordion() {
               {total_events > 5 && (
                 <MUITableFooter>
                   <MUITablePagination
-                    rowsPerPageOptions={[
-                      5,
-                      10,
-                      25,
-                      { label: 'All', value: -1 }
-                    ]}
+                    rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                     colSpan={5}
                     count={total_events}
                     rowsPerPage={rowsPerPage}

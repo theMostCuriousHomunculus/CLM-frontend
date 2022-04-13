@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 import urlBase64ToUint8Array from '../functions/url-base64-to-uint8-array';
 import useRequest from '../hooks/request-hook';
@@ -71,8 +65,7 @@ export function PermissionsProvider({ children }) {
   const [microphoneSupported, setMicrophoneSupported] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationsPermission, setNotificationsPermission] = useState();
-  const notificationsSupported =
-    'Notification' in window && 'serviceWorker' in navigator;
+  const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator;
 
   async function turnOnNotificationsAndSubscribeToPushMessaging() {
     if (isLoggedIn) {
@@ -84,19 +77,14 @@ export function PermissionsProvider({ children }) {
           setNotificationsEnabled(true);
 
           const swreg = await navigator.serviceWorker.ready;
-          const existingSubscription =
-            await swreg.pushManager.getSubscription();
+          const existingSubscription = await swreg.pushManager.getSubscription();
           if (!existingSubscription) {
             const newSubscription = await swreg.pushManager.subscribe({
               userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(
-                process.env.REACT_APP_VAPID_PUBLIC_KEY
-              ),
+              applicationServerKey: urlBase64ToUint8Array(process.env.REACT_APP_VAPID_PUBLIC_KEY),
               userID
             });
-            const parsedNewSubscription = JSON.parse(
-              JSON.stringify(newSubscription)
-            );
+            const parsedNewSubscription = JSON.parse(JSON.stringify(newSubscription));
             sendRequest({
               operation: 'subscribeToPush',
               get body() {
@@ -330,7 +318,10 @@ export function PermissionsProvider({ children }) {
 
   // when the app closes, the user logs in/out or the geolocationPermission changes, clear the watch
   useEffect(() => {
-    return clearAndDeleteLocation;
+    return () => {
+      // opposite of what you might expect due to a closure i suspect... maybe need to use useCallback?
+      if (!isLoggedIn) clearAndDeleteLocation();
+    };
   }, [isLoggedIn, geolocationPermission]);
 
   useEffect(() => {
@@ -340,17 +331,23 @@ export function PermissionsProvider({ children }) {
       const N = await navigator.permissions.query({ name: 'notifications' });
       setNotificationsPermission(N.state);
 
-      const devices =
-        navigator.mediaDevices &&
-        (await navigator.mediaDevices.enumerateDevices());
+      const devices = navigator.mediaDevices && (await navigator.mediaDevices.enumerateDevices());
 
-      if (devices.some((device) => device.kind === 'videoinput')) {
+      if (
+        devices.some((device) => device.kind === 'videoinput') &&
+        navigator.permissions &&
+        'camera' in navigator.permissions
+      ) {
         setCameraSupported(true);
         const C = await navigator.permissions.query({ name: 'camera' });
         setCameraPermission(C.state);
       }
 
-      if (devices.some((device) => device.kind === 'audioinput')) {
+      if (
+        devices.some((device) => device.kind === 'audioinput') &&
+        navigator.permissions &&
+        'microphone' in navigator.permissions
+      ) {
         setMicrophoneSupported(true);
         const M = await navigator.permissions.query({ name: 'microphone' });
         setMicrophonePermission(M.state);

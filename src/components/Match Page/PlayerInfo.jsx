@@ -47,12 +47,8 @@ export default function PlayerInfo({ player, position, setClickedPlayer }) {
   const classes = useStyles();
   const [dragging, setDragging] = React.useState(false);
   const { userID } = React.useContext(AuthenticationContext);
-  const {
-    adjustEnergyCounters,
-    adjustLifeTotal,
-    adjustPoisonCounters,
-    setNumberInputDialogInfo
-  } = React.useContext(MatchContext);
+  const { adjustEnergyCounters, adjustLifeTotal, adjustPoisonCounters, setNumberInputDialogInfo } =
+    React.useContext(MatchContext);
 
   React.useEffect(() => {
     function energyBadgeClickListner() {
@@ -196,10 +192,9 @@ export default function PlayerInfo({ player, position, setClickedPlayer }) {
               showZero
             >
               <Avatar
-                alt={player.account.name}
                 id={`${position}-avatar`}
+                profile={player.account}
                 size="large"
-                src={player.account.avatar}
                 style={{ cursor: 'move' }}
               />
             </MUIBadge>

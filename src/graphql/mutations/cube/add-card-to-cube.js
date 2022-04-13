@@ -13,7 +13,7 @@ export async function asyncAddCardToCube({
     body: {
       query: `
         mutation($componentID: String!, $scryfall_id: String!) {
-          addCardToCube (componentID: $componentID, name: $name, scryfall_id: $scryfall_id) ${queryString}
+          addCardToCube (componentID: $componentID, scryfall_id: $scryfall_id) ${queryString}
         }
       `,
       variables: { componentID, scryfall_id }

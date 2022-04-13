@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 
 export default function useSubscribe({
   cleanup = () => null,
+  condition = true,
   connectionInfo = {},
   dependencies = [],
   queryString = '',
@@ -12,44 +13,50 @@ export default function useSubscribe({
   update = () => null
 }) {
   useEffect(() => {
-    (async function () {
-      await setup();
-    })();
+    if (condition) {
+      (async function () {
+        await setup();
+      })();
 
-    const client = createClient({
-      connectionParams: {
-        authToken: Cookies.get('authentication_token'),
-        ...connectionInfo
-      },
-      url: process.env.REACT_APP_WS_URL
-    });
-
-    (async function () {
-      function onNext(message) {
-        update(message.data[subscriptionType]);
-      }
-
-      await new Promise((resolve, reject) => {
-        client.subscribe(
-          {
-            query: `
-              subscription {
-                ${subscriptionType} {${queryString}}
-              }
-            `
-          },
-          {
-            complete: resolve,
-            error: reject,
-            next: onNext
-          }
-        );
+      const client = createClient({
+        connectionParams: {
+          authToken: Cookies.get('authentication_token'),
+          ...connectionInfo
+        },
+        url: process.env.REACT_APP_WS_URL
       });
-    })();
 
-    return () => {
-      cleanup();
-      client.dispose();
-    };
+      (async function () {
+        function onNext(message) {
+          if (message.data) {
+            update(message.data[subscriptionType]);
+          } else {
+            console.log(message);
+          }
+        }
+
+        await new Promise((resolve, reject) => {
+          client.subscribe(
+            {
+              query: `
+                subscription {
+                  ${subscriptionType} ${queryString}
+                }
+              `
+            },
+            {
+              complete: resolve,
+              error: reject,
+              next: onNext
+            }
+          );
+        });
+      })();
+
+      return () => {
+        cleanup();
+        client.dispose();
+      };
+    }
   }, [Cookies.get('authentication_token'), ...dependencies]);
 }

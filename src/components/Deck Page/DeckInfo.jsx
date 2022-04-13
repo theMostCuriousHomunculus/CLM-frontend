@@ -10,7 +10,6 @@ import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
 import MUIDialogContent from '@mui/material/DialogContent';
 import MUIDialogTitle from '@mui/material/DialogTitle';
-import MUIFileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIFormControlLabel from '@mui/material/FormControlLabel';
 import MUIHelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -26,37 +25,54 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
+import CloneDeckButton from './CloneDeckButton';
 import DeleteDeckForm from '../../forms/DeleteDeckForm';
 import ScryfallRequest from '../miscellaneous/ScryfallRequest';
+import editDeck from '../../graphql/mutations/deck/edit-deck';
+import formats from '../../constants/formats';
 import generateCSVList from '../../functions/generate-csv-list';
 import randomSampleWOReplacement from '../../functions/random-sample-wo-replacement';
 import theme from '../../theme';
 import { AuthenticationContext } from '../../contexts/Authentication';
 import { DeckContext } from '../../contexts/deck-context';
+import { ErrorContext } from '../../contexts/Error';
 
 export default function DeckInfo() {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const {
+    abortControllerRef,
     deckState: {
       _id: deckID,
+      cards,
       creator,
       description,
       format,
       image,
-      mainboard,
       name: deckName,
-      published,
-      sideboard
-    },
-    cloneDeck,
-    editDeck
+      published
+    }
+    // warnings
   } = useContext(DeckContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const [descriptionInput, setDescriptionInput] = useState(description);
   const [isPublished, setIsPublished] = useState(published);
   const [deckNameInput, setDeckNameInput] = useState(deckName);
   const [deckToDelete, setDeckToDelete] = useState({ _id: null, name: null });
   const [sampleHand, setSampleHand] = useState([]);
   const deckImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
+
+  function generateSampleHand() {
+    setSampleHand(
+      randomSampleWOReplacement(
+        cards.reduce((previousValue, currentValue) => {
+          for (let index = 0; index < currentValue.mainboard_count; index++) {
+            previousValue.push({ ...currentValue.scryfall_card });
+          }
+        }, []),
+        7
+      )
+    );
+  }
 
   useEffect(() => {
     setDeckNameInput(deckName);
@@ -72,36 +88,31 @@ export default function DeckInfo() {
 
   return (
     <React.Fragment>
-      <DeleteDeckForm
-        deckToDelete={deckToDelete}
-        setDeckToDelete={setDeckToDelete}
-      />
+      <DeleteDeckForm deckToDelete={deckToDelete} setDeckToDelete={setDeckToDelete} />
 
-      <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
-        <MUIDialogTitle>Sample Hand from {name}</MUIDialogTitle>
-        <MUIDialogContent>
-          <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
-            {sampleHand.map((card) => (
-              <MUIImageListItem key={card._id}>
-                <img
-                  alt={card.name}
-                  src={card.image}
-                  style={{ height: 264, width: 189 }}
-                />
-              </MUIImageListItem>
-            ))}
-          </MUIImageList>
-        </MUIDialogContent>
-        <MUIDialogActions>
-          <MUIButton
-            onClick={() =>
-              setSampleHand(randomSampleWOReplacement(mainboard, 7))
-            }
-          >
-            New Sample Hand
-          </MUIButton>
-        </MUIDialogActions>
-      </MUIDialog>
+      {
+        <MUIDialog onClose={() => setSampleHand([])} open={sampleHand.length > 0}>
+          <MUIDialogTitle>Sample Hand from {deckName}</MUIDialogTitle>
+          <MUIDialogContent>
+            <MUIImageList cols={2} rowHeight={264} sx={{ width: 382 }}>
+              {sampleHand.map((card) => (
+                <MUIImageListItem key={card._id}>
+                  <img
+                    alt={card.name}
+                    src={
+                      card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large
+                    }
+                    style={{ height: 264, width: 189 }}
+                  />
+                </MUIImageListItem>
+              ))}
+            </MUIImageList>
+          </MUIDialogContent>
+          <MUIDialogActions>
+            <MUIButton onClick={generateSampleHand}>New Sample Hand</MUIButton>
+          </MUIDialogActions>
+        </MUIDialog>
+      }
 
       <MUICard>
         <MUICardHeader
@@ -113,54 +124,57 @@ export default function DeckInfo() {
                 fullWidth
                 label="Format"
                 native
-                onChange={(event) => {
-                  editDeck({
-                    description: descriptionInput,
-                    format: event.target.value,
-                    image: image.scryfall_id,
-                    name: deckNameInput,
-                    published: isPublished
-                  });
+                onChange={async (event) => {
+                  try {
+                    await editDeck({
+                      headers: { DeckID: deckID },
+                      queryString: `{\n_id\nformat\n}`,
+                      signal: abortControllerRef.current.signal,
+                      variables: { format: event.target.value }
+                    });
+                  } catch (error) {
+                    setErrorMessages((prevState) => [...prevState, error.message]);
+                  }
                 }}
                 value={format}
                 inputProps={{
                   id: 'format-selector'
                 }}
               >
-                <option value="Freeform">Freeform</option>
-                <option value="Classy">Classy</option>
-                <option value="Legacy">Legacy</option>
-                <option value="Modern">Modern</option>
-                <option value="Pauper">Pauper</option>
-                <option value="Pioneer">Pioneer</option>
-                <option value="Standard">Standard</option>
-                <option value="Vintage">Vintage</option>
+                {formats.map((frmt) => (
+                  <option key={frmt} value={frmt}>
+                    {frmt}
+                  </option>
+                ))}
               </MUISelect>
             </MUIFormControl>
           }
           avatar={
-            image ? (
+            image && (
               <img
-                alt={image.alt}
-                src={image.src}
+                alt={image.image_uris ? image.name : image.card_faces[0].name}
+                src={image.image_uris?.art_crop ?? image.card_faces[0].image_uris.art_crop}
                 style={{ borderRadius: 4 }}
                 width={deckImageWidth}
               />
-            ) : undefined
+            )
           }
           title={
             <React.Fragment>
               <MUITextField
                 disabled={creator._id !== userID}
                 inputProps={{
-                  onBlur: () => {
-                    editDeck({
-                      description: descriptionInput,
-                      format,
-                      image: image.scryfall_id,
-                      name: deckNameInput,
-                      published: isPublished
-                    });
+                  onBlur: async () => {
+                    try {
+                      await editDeck({
+                        headers: { DeckID: deckID },
+                        queryString: `{\n_id\nname\n}`,
+                        signal: abortControllerRef.current.signal,
+                        variables: { name: deckNameInput }
+                      });
+                    } catch (error) {
+                      setErrorMessages((prevState) => [...prevState, error.message]);
+                    }
                   }
                 }}
                 label="Deck Name"
@@ -179,15 +193,18 @@ export default function DeckInfo() {
                     control={
                       <MUICheckbox
                         checked={isPublished}
-                        onChange={() => {
-                          editDeck({
-                            description: descriptionInput,
-                            format,
-                            image: image.scryfall_id,
-                            name: deckNameInput,
-                            published: !isPublished
-                          });
-                          setIsPublished((prevState) => !prevState);
+                        onChange={async () => {
+                          try {
+                            await editDeck({
+                              headers: { DeckID: deckID },
+                              queryString: `{\n_id\npublished\n}`,
+                              signal: abortControllerRef.current.signal,
+                              variables: { published: !isPublished }
+                            });
+                            setIsPublished((prevState) => !prevState);
+                          } catch (error) {
+                            setErrorMessages((prevState) => [...prevState, error.message]);
+                          }
                         }}
                       />
                     }
@@ -204,15 +221,10 @@ export default function DeckInfo() {
           subheader={
             <React.Fragment>
               <MUITypography color="textSecondary" variant="subtitle1">
-                Designed by:{' '}
-                <Link to={`/account/${creator._id}`}>{creator.name}</Link>
+                Designed by: <Link to={`/account/${creator._id}`}>{creator.name}</Link>
               </MUITypography>
               <MUITypography variant="subtitle1">
-                <CSVLink
-                  data={generateCSVList(mainboard, sideboard)}
-                  filename={`${deckName}.csv`}
-                  target="_blank"
-                >
+                <CSVLink data={generateCSVList(cards)} filename={`${deckName}.csv`} target="_blank">
                   Export to CSV
                 </CSVLink>
               </MUITypography>
@@ -225,14 +237,17 @@ export default function DeckInfo() {
             disabled={creator._id !== userID}
             fullWidth={true}
             inputProps={{
-              onBlur: () => {
-                editDeck({
-                  description: descriptionInput,
-                  format,
-                  image: image.scryfall_id,
-                  name: deckNameInput,
-                  published: isPublished
-                });
+              onBlur: async () => {
+                try {
+                  await editDeck({
+                    headers: { DeckID: deckID },
+                    queryString: `{\n_id\ndescription\n}`,
+                    signal: abortControllerRef.current.signal,
+                    variables: { description: descriptionInput }
+                  });
+                } catch (error) {
+                  setErrorMessages((prevState) => [...prevState, error.message]);
+                }
               }
             }}
             label="Deck Description"
@@ -247,17 +262,36 @@ export default function DeckInfo() {
             <ScryfallRequest
               buttonText="Change Image"
               labelText="Deck Image"
-              onSubmit={(chosenCard) => {
-                editDeck({
-                  description: descriptionInput,
-                  format,
-                  image: chosenCard.scryfall_id,
-                  name: deckNameInput,
-                  published: isPublished
-                });
+              onSubmit={async (chosenCard) => {
+                try {
+                  await editDeck({
+                    headers: { DeckID: deckID },
+                    queryString: `{\n_id\nimage\n}`,
+                    signal: abortControllerRef.current.signal,
+                    variables: { image: chosenCard._id }
+                  });
+                } catch (error) {
+                  setErrorMessages((prevState) => [...prevState, error.message]);
+                }
               }}
             />
           )}
+
+          {/* <div
+            style={{
+              backgroundColor: theme.palette.secondary.main,
+              // borderRadius: 4,
+              color: 'white',
+              margin: '8px -8px',
+              padding: '0 8px'
+            }}
+          >
+            {warnings.map((warning) => (
+              <MUITypography key={warning} variant="body1">
+                {warning}
+              </MUITypography>
+            ))}
+            </div> */}
         </MUICardContent>
 
         <MUICardActions
@@ -279,21 +313,8 @@ export default function DeckInfo() {
               </MUIButton>
             </span>
           )}
-          {isLoggedIn && (
-            <MUIButton
-              onClick={cloneDeck}
-              startIcon={<MUIFileCopyOutlinedIcon />}
-            >
-              Clone Deck
-            </MUIButton>
-          )}
-
-          <MUIButton
-            onClick={() =>
-              setSampleHand(randomSampleWOReplacement(mainboard, 7))
-            }
-            startIcon={<MUIShuffleOutlinedIcon />}
-          >
+          {isLoggedIn && <CloneDeckButton DeckID={deckID} />}
+          <MUIButton onClick={generateSampleHand} startIcon={<MUIShuffleOutlinedIcon />}>
             Sample Hand
           </MUIButton>
         </MUICardActions>

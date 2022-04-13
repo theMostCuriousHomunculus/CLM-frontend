@@ -24,13 +24,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 import createBlogPost from '../graphql/mutations/blog/create-blog-post';
+import createComment from '../graphql/mutations/blog/create-comment';
 import editBlogPost from '../graphql/mutations/blog/edit-blog-post';
 import theme, { backgroundColor } from '../theme';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { BlogPostContext } from '../contexts/blog-post-context';
 import { ErrorContext } from '../contexts/Error';
-import ScryfallRequest from '../components/miscellaneous/ScryfallRequest';
 
 const useStyles = makeStyles({
   article: {
@@ -99,24 +100,11 @@ const useStyles = makeStyles({
 export default function BlogPost() {
   const { userID } = useContext(AuthenticationContext);
   const {
-    loading,
-    blogPostState: {
-      author,
-      body,
-      comments,
-      image,
-      published,
-      subtitle,
-      title,
-      updatedAt
-    },
-    createComment,
+    blogPostState: { author, body, comments, image, published, subtitle, title, updatedAt },
     setBlogPostState
   } = useContext(BlogPostContext);
   const { setErrorMessages } = useContext(ErrorContext);
-  const blogPostImageWidth = useMediaQuery(theme.breakpoints.up('md'))
-    ? 150
-    : 75;
+  const blogPostImageWidth = useMediaQuery(theme.breakpoints.up('md')) ? 150 : 75;
   const navigate = useNavigate();
   const { blogPostID } = useParams();
   const [editing, setEditing] = useState(blogPostID === 'new-post');
@@ -124,9 +112,7 @@ export default function BlogPost() {
   const [success, setSuccess] = useState(false);
   const { article } = useStyles();
 
-  return loading ? (
-    <LoadingSpinner />
-  ) : (
+  return (
     <React.Fragment>
       <MUICard>
         <MUICardHeader
@@ -188,13 +174,10 @@ export default function BlogPost() {
           subheader={
             <React.Fragment>
               <MUITypography color="textSecondary" variant="subtitle1">
-                A work of genius by:{' '}
-                <Link to={`/account/${author._id}`}>{author.name}</Link>
+                A work of genius by: <Link to={`/account/${author._id}`}>{author.name}</Link>
               </MUITypography>
               <MUITypography color="textSecondary" variant="subtitle2">
-                {`Last updated ${new Date(
-                  parseInt(updatedAt)
-                ).toLocaleString()}.`}
+                {`Last updated ${new Date(parseInt(updatedAt)).toLocaleString()}.`}
               </MUITypography>
             </React.Fragment>
           }
@@ -205,13 +188,7 @@ export default function BlogPost() {
                 onClick={() => {
                   setEditing((prevState) => !prevState);
                 }}
-                startIcon={
-                  editing ? (
-                    <MUIVisibilityOutlinedIcon />
-                  ) : (
-                    <MUIEditOutlinedIcon />
-                  )
-                }
+                startIcon={editing ? <MUIVisibilityOutlinedIcon /> : <MUIEditOutlinedIcon />}
               >
                 {editing ? 'Preview' : 'Edit'}
               </MUIButton>
@@ -263,13 +240,15 @@ export default function BlogPost() {
                       )}\n\n<figure class="left-float">\n<image alt="${
                         cardData.name.replace('//', '/').split('/')[0]
                       }" class="magic-card" src="${
-                        cardData.image
+                        cardData.image_uris
+                          ? cardData.image_uris.large
+                          : cardData.card_faces[0].image_uris.large
                       }">\n<figcaption>***Insert amazing commentary here***</figcaption>\n</figure>\n\n${
-                        cardData.back_image
+                        !cardData.image_uris
                           ? `<figure class="right-float">\n<image alt="${
                               cardData.name.replace('//', '/').split('/')[1]
                             }" class="magic-card" src="${
-                              cardData.back_image
+                              cardData.card_faces[1].image_uris.large
                             }">\n<figcaption>***Insert amazing commentary here***</figcaption>\n</figure>\n`
                           : ''
                       }\n\n<br style="clear: both;">\n\n`
@@ -299,9 +278,7 @@ export default function BlogPost() {
             <React.Fragment>
               <MUITypography variant="h3">{subtitle}</MUITypography>
               <article className={article}>
-                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                  {body}
-                </ReactMarkdown>
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{body}</ReactMarkdown>
               </article>
             </React.Fragment>
           )}
@@ -326,22 +303,14 @@ export default function BlogPost() {
                       navigate('/blog');
                     }, 1000);
                   } catch (error) {
-                    setErrorMessages((prevState) => [
-                      ...prevState,
-                      error.message
-                    ]);
+                    setErrorMessages((prevState) => [...prevState, error.message]);
                   } finally {
                     setPosting(false);
                   }
                 }}
                 startIcon={(() => {
                   if (posting) {
-                    return (
-                      <MUICircularProgress
-                        size={13}
-                        style={{ color: 'inherit' }}
-                      />
-                    );
+                    return <MUICircularProgress size={13} style={{ color: 'inherit' }} />;
                   }
                   if (success) {
                     return <MUIPublishedWithChangesOutlinedIcon />;
@@ -370,22 +339,14 @@ export default function BlogPost() {
                       navigate('/blog');
                     }, 1000);
                   } catch (error) {
-                    setErrorMessages((prevState) => [
-                      ...prevState,
-                      error.message
-                    ]);
+                    setErrorMessages((prevState) => [...prevState, error.message]);
                   } finally {
                     setPosting(false);
                   }
                 }}
                 startIcon={(() => {
                   if (posting) {
-                    return (
-                      <MUICircularProgress
-                        size={13}
-                        style={{ color: 'inherit' }}
-                      />
-                    );
+                    return <MUICircularProgress size={13} style={{ color: 'inherit' }} />;
                   }
                   if (success) {
                     return <MUIPublishedWithChangesOutlinedIcon />;
@@ -403,7 +364,9 @@ export default function BlogPost() {
       {blogPostID !== 'new-post' && (
         <AutoScrollMessages
           messages={comments}
-          submitFunction={(value) => createComment(value)}
+          submitFunction={(value) =>
+            createComment({ headers: { BlogPostID: blogPostID }, variables: { body: value } })
+          }
           title="Community Reaction"
         />
       )}

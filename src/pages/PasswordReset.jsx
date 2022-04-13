@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import MUIButton from '@mui/material/Button';
 import MUICard from '@mui/material/Card';
 import MUICardActions from '@mui/material/CardActions';
@@ -7,35 +8,62 @@ import MUICardContent from '@mui/material/CardContent';
 import MUICardHeader from '@mui/material/CardHeader';
 import MUITextField from '@mui/material/TextField';
 
+import submitPasswordReset from '../graphql/mutations/account/submit-password-reset';
+import tokenQuery from '../constants/token-query';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../contexts/Authentication';
 import { ErrorContext } from '../contexts/Error';
 
 export default function PasswordReset() {
-  const { loading, submitPasswordReset } = React.useContext(
-    AuthenticationContext
-  );
-  const { setErrorMessages } = React.useContext(ErrorContext);
-  const confirmPasswordInput = React.useRef();
-  const emailInput = React.useRef();
+  const { abortControllerRef, loading, setLoading, setUserInfo } =
+    useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const navigate = useNavigate();
-  const passwordInput = React.useRef();
   const { resetToken } = useParams();
+  const [emailInputState, setEmailInputState] = useState('');
+  const [passwordInputState, setPasswordInputState] = useState('');
+  const [confirmPasswordInputState, setConfirmPasswordInputState] = useState('');
 
   async function submitForm(event) {
     event.preventDefault();
-    if (passwordInput.current.value !== confirmPasswordInput.current.value) {
+    if (passwordInputState !== confirmPasswordInputState) {
       setErrorMessages((prevState) => [
         ...prevState,
         'The entered passwords do not match.  Please try again.'
       ]);
     } else {
-      submitPasswordReset(
-        emailInput.current.value,
-        passwordInput.current.value,
-        resetToken
-      );
-      navigate('/');
+      try {
+        setLoading(true);
+        const {
+          data: {
+            submitPasswordReset: {
+              admin,
+              avatar,
+              measurement_system,
+              radius,
+              token,
+              userID,
+              userName
+            }
+          }
+        } = await submitPasswordReset({
+          queryString: tokenQuery,
+          signal: abortControllerRef.current.signal,
+          variables: {
+            email: emailInputState,
+            password: passwordInputState,
+            reset_token: resetToken
+          }
+        });
+        setUserInfo({ admin, avatar, measurement_system, radius, userID, userName });
+        Cookies.set('authentication_token', token);
+        setTimeout(() => {
+          navigate('/');
+        }, 0);
+      } catch (error) {
+        setLoading(false);
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      }
     }
   }
 
@@ -50,24 +78,27 @@ export default function PasswordReset() {
             <React.Fragment>
               <MUITextField
                 fullWidth
-                inputRef={emailInput}
                 label="Email Address"
+                onChange={setEmailInputState}
                 required={true}
                 type="email"
+                value={emailInputState}
               />
               <MUITextField
                 fullWidth
-                inputRef={passwordInput}
                 label="New Password"
+                onChange={setPasswordInputState}
                 required={true}
                 type="password"
+                value={passwordInputState}
               />
               <MUITextField
                 fullWidth
-                inputRef={confirmPasswordInput}
                 label="Confirm New Password"
+                onChange={setConfirmPasswordInputState}
                 required={true}
                 type="password"
+                value={confirmPasswordInputState}
               />
             </React.Fragment>
           )}

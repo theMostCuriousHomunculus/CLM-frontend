@@ -36,10 +36,7 @@ export default function CubeAccordion({ pageClasses }) {
 
   return (
     <React.Fragment>
-      <DeleteCubeForm
-        cubeToDelete={cubeToDelete}
-        setCubeToDelete={setCubeToDelete}
-      />
+      <DeleteCubeForm cubeToDelete={cubeToDelete} setCubeToDelete={setCubeToDelete} />
 
       <CreateCubeForm
         open={showCreateCubeForm}
@@ -77,9 +74,17 @@ export default function CubeAccordion({ pageClasses }) {
                       >
                         {cube.image && (
                           <img
-                            alt={cube.image.alt}
+                            alt={
+                              cube.image.image_uris
+                                ? cube.image.name
+                                : cube.image.card_faces[0].name
+                            }
                             height={50}
-                            src={cube.image.src}
+                            src={
+                              cube.image.image_uris
+                                ? cube.image.image_uris.art_crop
+                                : cube.image.card_faces[0].image_uris.art_crop
+                            }
                             style={{ borderRadius: 4 }}
                           />
                         )}
@@ -93,9 +98,7 @@ export default function CubeAccordion({ pageClasses }) {
                       <MUITableCell style={{ textAlign: 'right' }}>
                         <MUIIconButton
                           color="secondary"
-                          onClick={() =>
-                            setCubeToDelete({ _id: cube._id, name: cube.name })
-                          }
+                          onClick={() => setCubeToDelete({ _id: cube._id, name: cube.name })}
                           size="small"
                         >
                           <MUIDeleteForeverOutlinedIcon fontSize="large" />

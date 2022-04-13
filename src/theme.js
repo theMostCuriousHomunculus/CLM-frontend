@@ -50,6 +50,14 @@ let theme = createTheme({
         }
       }
     },
+    MuiAvatarGroup: {
+      styleOverrides: {
+        avatar: {
+          height: 50,
+          width: 50
+        }
+      }
+    },
     MuiButton: {
       defaultProps: {
         size: 'small',
@@ -91,19 +99,18 @@ let theme = createTheme({
           display: 'flex',
           flex: '0 1 auto',
           flexDirection: 'column',
-          marginLeft: 8,
-          marginRight: 0,
-          marginTop: 0
+          margin: 0
         },
         avatar: {
           alignItems: 'flex-start',
           alignSelf: 'stretch',
-          marginRight: 8
+          margin: 0
         },
         content: {
           wordBreak: 'break-word'
         },
         root: {
+          columnGap: 8,
           padding: 8
         }
       }
@@ -141,6 +148,14 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           padding: 8
+        }
+      }
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          background: `linear-gradient(to bottom, ${primaryColor.A700}, calc(2/3 * 100%), ${secondaryColor.A400})`,
+          margin: 0
         }
       }
     },

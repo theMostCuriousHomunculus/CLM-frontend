@@ -10,7 +10,7 @@ import AutoScrollMessages from '../components/miscellaneous/AutoScrollMessages';
 import BasicLandAdder from '../components/miscellaneous/BasicLandAdder';
 import CardPoolDownloadLinks from '../components/Event Page/CardPoolDownloadLinks';
 import ConfirmationDialog from '../components/miscellaneous/ConfirmationDialog';
-import DeckDisplay from '../components/miscellaneous/DeckDisplay';
+// import DeckDisplay from '../components/miscellaneous/DeckDisplay';
 import EventInfo from '../components/Event Page/EventInfo';
 import { EventContext } from '../contexts/event-context';
 import addBasics from '../graphql/mutations/event/add-basics';
@@ -93,9 +93,7 @@ export default function Event() {
           <React.Fragment>
             <MUITabs
               aria-label="ongoing-event-tabs"
-              onChange={(event, newTabNumber) =>
-                setOngoingTabNumber(newTabNumber)
-              }
+              onChange={(event, newTabNumber) => setOngoingTabNumber(newTabNumber)}
               style={{ margin: 4 }}
               value={ongoingTabNumber}
               variant="fullWidth"
@@ -142,13 +140,13 @@ export default function Event() {
                   Other drafters are still making their picks...
                 </MUITypography>
                 <MUITypography variant="body1">
-                  Yell at them to hurry up! Also tell them to turn notifications
-                  on so they will be alerted when they have a selection to make.
+                  Yell at them to hurry up! Also tell them to turn notifications on so they will be
+                  alerted when they have a selection to make.
                 </MUITypography>
               </React.Fragment>
             )}
 
-            {ongoingTabNumber === 1 && (
+            {/* ongoingTabNumber === 1 && (
               <DeckDisplay
                 authorizedID={me.account._id}
                 deck={{
@@ -156,7 +154,7 @@ export default function Event() {
                   sideboard: me.sideboard
                 }}
               />
-            )}
+            ) */}
 
             {ongoingTabNumber === 2 && (
               <AutoScrollMessages
@@ -177,9 +175,7 @@ export default function Event() {
           <React.Fragment>
             <MUITabs
               aria-label="finished-event-tabs"
-              onChange={(event, newTabNumber) =>
-                setFinishedTabNumber(newTabNumber)
-              }
+              onChange={(event, newTabNumber) => setFinishedTabNumber(newTabNumber)}
               style={{ margin: 4 }}
               value={finishedTabNumber}
               variant="fullWidth"
@@ -205,13 +201,13 @@ export default function Event() {
                     });
                   }}
                 />
-                <DeckDisplay
+                {/* <DeckDisplay
                   authorizedID={me.account._id}
                   deck={{
                     mainboard: me.mainboard,
                     sideboard: me.sideboard
                   }}
-                />
+                /> */}
               </React.Fragment>
             )}
 

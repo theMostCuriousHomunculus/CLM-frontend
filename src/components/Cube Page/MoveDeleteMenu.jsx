@@ -2,23 +2,19 @@ import React from 'react';
 import MUIFormControl from '@mui/material/FormControl';
 import MUIInputLabel from '@mui/material/InputLabel';
 import MUISelect from '@mui/material/Select';
+import MUITypography from '@mui/material/Typography';
 
+import theme from '../../theme';
 import { CubeContext } from '../../contexts/cube-context';
 
-export default function MoveDeleteMenu({
-  destination,
-  editable,
-  setDestination
-}) {
+export default function MoveDeleteMenu({ destination, editable, setDestination }) {
   const {
     cubeState: { modules, rotations }
   } = React.useContext(CubeContext);
 
   return (
     <MUIFormControl variant="outlined">
-      <MUIInputLabel htmlFor="move-delete-selector">
-        Cube Component
-      </MUIInputLabel>
+      <MUIInputLabel htmlFor="move-delete-selector">Cube Component</MUIInputLabel>
       <MUISelect
         disabled={!editable}
         inputProps={{ id: 'move-delete-selector' }}
@@ -50,7 +46,9 @@ export default function MoveDeleteMenu({
             ))}
           </optgroup>
         )}
-        <option value="">Delete From Cube</option>
+        <option value="" style={{ color: theme.palette.secondary.main, fontWeight: 'bold' }}>
+          Delete From Cube
+        </option>
       </MUISelect>
     </MUIFormControl>
   );

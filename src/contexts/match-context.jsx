@@ -11,7 +11,10 @@ export const MatchContext = createContext({
   bottomPlayerState: {
     account: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: null
     },
     battlefield: [],
@@ -34,7 +37,10 @@ export const MatchContext = createContext({
       {
         account: {
           _id: null,
-          avatar: null,
+          avatar: {
+            card_faces: [],
+            image_uris: null
+          },
           name: null
         },
         battlefield: [],
@@ -52,7 +58,10 @@ export const MatchContext = createContext({
       {
         account: {
           _id: null,
-          avatar: null,
+          avatar: {
+            card_faces: [],
+            image_uris: null
+          },
           name: null
         },
         battlefield: [],
@@ -80,7 +89,10 @@ export const MatchContext = createContext({
   topPlayerState: {
     account: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: null
     },
     battlefield: [],
@@ -136,7 +148,10 @@ export default function ContextualizedMatchPage() {
       {
         account: {
           _id: 'A',
-          avatar: '',
+          avatar: {
+            card_faces: [],
+            image_uris: null
+          },
           name: '...'
         },
         battlefield: [],
@@ -154,7 +169,10 @@ export default function ContextualizedMatchPage() {
       {
         account: {
           _id: 'B',
-          avatar: '',
+          avatar: {
+            card_faces: [],
+            image_uris: null
+          },
           name: '...'
         },
         battlefield: [],
@@ -179,24 +197,38 @@ export default function ContextualizedMatchPage() {
     title: null,
     updateFunction: null
   });
-  const [bottomPlayerState, setBottomPlayerState] = React.useState(
-    matchState.players[0]
-  );
-  const [topPlayerState, setTopPlayerState] = React.useState(
-    matchState.players[1]
-  );
+  const [bottomPlayerState, setBottomPlayerState] = React.useState(matchState.players[0]);
+  const [topPlayerState, setTopPlayerState] = React.useState(matchState.players[1]);
   const matchQuery = `
     _id
     game_winners {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     log
     players {
       account {
         _id
-        avatar
+        avatar {
+          card_faces {
+            image_uris {
+              art_crop
+            }
+          }
+          image_uris {
+            art_crop
+          }
+        }
         name
       }
       battlefield {
@@ -397,20 +429,14 @@ export default function ContextualizedMatchPage() {
 
   React.useEffect(() => {
     // this allows a more smooth drag and drop experience
-    const me = matchState.players.find(
-      (player) => player.account._id === userID
-    );
+    const me = matchState.players.find((player) => player.account._id === userID);
 
     if (me) {
-      if (JSON.stringify(bottomPlayerState) !== JSON.stringify(me))
-        setBottomPlayerState(me);
+      if (JSON.stringify(bottomPlayerState) !== JSON.stringify(me)) setBottomPlayerState(me);
 
-      const opponent = matchState.players.find(
-        (player) => player.account._id !== userID
-      );
+      const opponent = matchState.players.find((player) => player.account._id !== userID);
 
-      if (JSON.stringify(topPlayerState) !== JSON.stringify(opponent))
-        setTopPlayerState(opponent);
+      if (JSON.stringify(topPlayerState) !== JSON.stringify(opponent)) setTopPlayerState(opponent);
     }
 
     if (!me) {
@@ -924,14 +950,7 @@ export default function ContextualizedMatchPage() {
 
   // TODO: Improve
   const transferCard = React.useCallback(
-    async function (
-      cardID,
-      destinationZone,
-      originZone,
-      reveal,
-      shuffle,
-      index
-    ) {
+    async function (cardID, destinationZone, originZone, reveal, shuffle, index) {
       await sendRequest({
         headers: { MatchID: matchState._id },
         operation: 'transferCard',
@@ -1033,7 +1052,12 @@ export default function ContextualizedMatchPage() {
   );
 
   useSubscribe({
+    // cleanup: () => {
+    //   abortControllerRef.current.abort();
+    //   abortControllerRef.current = new AbortController();
+    // },
     connectionInfo: { matchID },
+    dependencies: [matchID],
     queryString: matchQuery,
     setup: fetchMatchByID,
     subscriptionType: 'subscribeMatch',

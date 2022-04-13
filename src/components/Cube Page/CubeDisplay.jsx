@@ -13,10 +13,7 @@ import specificCardType from '../../functions/specific-card-type';
 import theme from '../../theme';
 import HoverPreview from '../miscellaneous/HoverPreview';
 import { monoColors, multiColors } from '../../constants/color-objects';
-import {
-  generalCardTypes,
-  specificCardTypes
-} from '../../constants/type-objects';
+import { generalCardTypes, specificCardTypes } from '../../constants/type-objects';
 import { CubeContext } from '../../contexts/cube-context';
 import { ReactComponent as MagicSVG } from '../../svgs/magic.svg';
 
@@ -137,13 +134,15 @@ export default function CubeDisplay({ setSelectedCard }) {
     <div className={classes.tableViewMainContainer}>
       {monoColors.map(function (color) {
         const cards_color = displayedCards.filter(
-          (card) => card.color_identity.toString() === color.color_identity
+          (card) =>
+            (card.color_identity
+              ? card.color_identity
+              : card.scryfall_card.color_identity
+            ).toString() === color.color_identity
         );
         return (
           <MUICard
-            className={`${classes[color.name.toLowerCase()]} ${
-              classes.basicCard
-            }`}
+            className={`${classes[color.name.toLowerCase()]} ${classes.basicCard}`}
             key={`table-${color.name}`}
           >
             <MUICardHeader
@@ -151,25 +150,21 @@ export default function CubeDisplay({ setSelectedCard }) {
                 style: { height: 32, width: 32 }
               })}
               className={classes.cardHeader}
-              title={
-                <MUITypography variant="h3">
-                  ({cards_color.length})
-                </MUITypography>
-              }
+              title={<MUITypography variant="h3">({cards_color.length})</MUITypography>}
             />
             <MUICardContent>
               {specificCardTypes.map(function (type) {
                 const cards_color_type = cards_color.filter(
-                  (card) => specificCardType(card.type_line) === type.name
+                  (card) =>
+                    specificCardType(
+                      card.type_line ? card.type_line : card.scryfall_card.type_line
+                    ) === type.name
                 );
                 return (
                   <React.Fragment key={type.name}>
                     {cards_color_type.length > 0 && (
                       <React.Fragment>
-                        <MUITypography
-                          className={classes.typeText}
-                          variant="h4"
-                        >
+                        <MUITypography className={classes.typeText} variant="h4">
                           {React.cloneElement(type.svg, {
                             style: { height: 20, marginRight: 8, width: 20 }
                           })}
@@ -177,50 +172,58 @@ export default function CubeDisplay({ setSelectedCard }) {
                         </MUITypography>
                         <div className={classes.cmcBlock}>
                           {[...Array(16).keys()].map(function (cost) {
-                            const cards_color_type_cost =
-                              cards_color_type.filter(
-                                (card) => card.cmc === cost
-                              );
+                            const cards_color_type_cost = cards_color_type.filter(
+                              (card) =>
+                                (Number.isInteger(card.cmc) ? card.cmc : card.scryfall_card.cmc) ===
+                                cost
+                            );
                             return (
                               <React.Fragment key={cost}>
                                 {cards_color_type_cost.length > 0 && (
                                   <div>
-                                    {customSort(cards_color_type_cost, [
-                                      'name'
-                                    ]).map(function (card, index) {
-                                      return (
-                                        <span key={card._id}>
-                                          <HoverPreview
-                                            back_image={card.back_image}
-                                            image={card.image}
-                                          >
-                                            <MUITypography
-                                              onDoubleClick={() =>
-                                                setSelectedCard(card)
+                                    {customSort(cards_color_type_cost, ['scryfall_card.name']).map(
+                                      function (card, index) {
+                                        return (
+                                          <span key={card._id}>
+                                            <HoverPreview
+                                              back_image={
+                                                card.scryfall_card.image_uris
+                                                  ? undefined
+                                                  : card.scryfall_card.card_faces[1].image_uris
+                                                      .large
                                               }
-                                              style={{ cursor: 'pointer' }}
-                                              variant="body1"
+                                              image={
+                                                card.scryfall_card.image_uris?.large ??
+                                                card.scryfall_card.card_faces[0].image_uris.large
+                                              }
                                             >
-                                              {index + 1}) {card.name}
-                                              {!card.mtgo_id && (
-                                                <MUITooltip
-                                                  title={`This version of ${card.name} is not available on MTGO.`}
-                                                >
-                                                  <MUIWarningRoundedIcon
-                                                    style={{
-                                                      color:
-                                                        theme.palette.warning
-                                                          .main,
-                                                      fontSize: 20
-                                                    }}
-                                                  />
-                                                </MUITooltip>
-                                              )}
-                                            </MUITypography>
-                                          </HoverPreview>
-                                        </span>
-                                      );
-                                    })}
+                                              <MUITypography
+                                                onDoubleClick={() => setSelectedCard(card)}
+                                                style={{ cursor: 'pointer' }}
+                                                variant="body1"
+                                              >
+                                                {index + 1}){' '}
+                                                {card.name ? card.name : card.scryfall_card.name}
+                                                {!card.scryfall_card.mtgo_id && (
+                                                  <MUITooltip
+                                                    title={`This version of ${
+                                                      card.name ?? card.scryfall_card.name
+                                                    } is not available on MTGO.`}
+                                                  >
+                                                    <MUIWarningRoundedIcon
+                                                      style={{
+                                                        color: theme.palette.warning.main,
+                                                        fontSize: 20
+                                                      }}
+                                                    />
+                                                  </MUITooltip>
+                                                )}
+                                              </MUITypography>
+                                            </HoverPreview>
+                                          </span>
+                                        );
+                                      }
+                                    )}
                                   </div>
                                 )}
                               </React.Fragment>
@@ -244,8 +247,9 @@ export default function CubeDisplay({ setSelectedCard }) {
             <MUITypography variant="h3">
               (
               {
-                displayedCards.filter((card) => card.color_identity.length > 1)
-                  .length
+                displayedCards.filter(
+                  (card) => (card.color_identity ?? card.scryfall_card.color_identity).length > 1
+                ).length
               }
               )
             </MUITypography>
@@ -254,20 +258,17 @@ export default function CubeDisplay({ setSelectedCard }) {
         <MUICardContent className={classes.multicolorCardContent}>
           {multiColors.map(function (color) {
             const cards_color = displayedCards.filter(
-              (card) => card.color_identity.toString() === color.color_identity
+              (card) =>
+                (card.color_identity ?? card.scryfall_card.color_identity).toString() ===
+                color.color_identity
             );
             return (
               <React.Fragment key={color.name}>
                 {cards_color.length > 0 && (
                   <div
-                    className={`${classes[color.name.toLowerCase()]} ${
-                      classes.multicolorSection
-                    }`}
+                    className={`${classes[color.name.toLowerCase()]} ${classes.multicolorSection}`}
                   >
-                    <MUITypography
-                      className={classes.colorComboText}
-                      variant="h4"
-                    >
+                    <MUITypography className={classes.colorComboText} variant="h4">
                       {color.svg &&
                         React.cloneElement(color.svg, {
                           style: { height: 24, marginRight: 8, width: 24 }
@@ -276,7 +277,9 @@ export default function CubeDisplay({ setSelectedCard }) {
                     </MUITypography>
                     {generalCardTypes.map(function (type) {
                       const cards_color_type = cards_color.filter(
-                        (card) => type.name === generalCardType(card.type_line)
+                        (card) =>
+                          generalCardType(card.type_line ?? card.scryfall_card.type_line) ===
+                          type.name
                       );
                       return (
                         cards_color_type.length > 0 && (
@@ -293,44 +296,51 @@ export default function CubeDisplay({ setSelectedCard }) {
                               })}
                               {type.name}
                             </MUITypography>
-                            {customSort(cards_color_type, ['cmc']).map(
-                              function (card, index) {
-                                return (
-                                  <span key={card._id}>
-                                    <HoverPreview
-                                      back_image={card.back_image}
-                                      image={card.image}
+                            {customSort(cards_color_type, ['scryfall_card.cmc']).map(function (
+                              card,
+                              index
+                            ) {
+                              return (
+                                <span key={card._id}>
+                                  <HoverPreview
+                                    back_image={
+                                      card.scryfall_card.image_uris
+                                        ? undefined
+                                        : card.scryfall_card.card_faces[1].image_uris.large
+                                    }
+                                    image={
+                                      card.scryfall_card.image_uris?.large ??
+                                      card.scryfall_card.card_faces[0].image_uris.large
+                                    }
+                                  >
+                                    <MUITypography
+                                      onDoubleClick={() => setSelectedCard(card)}
+                                      style={{
+                                        cursor: 'pointer',
+                                        userSelect: 'none'
+                                      }}
+                                      variant="body1"
                                     >
-                                      <MUITypography
-                                        onDoubleClick={() =>
-                                          setSelectedCard(card)
-                                        }
-                                        style={{
-                                          cursor: 'pointer',
-                                          userSelect: 'none'
-                                        }}
-                                        variant="body1"
-                                      >
-                                        {index + 1}) {card.name}
-                                        {!card.mtgo_id && (
-                                          <MUITooltip
-                                            title={`This version of ${card.name} is not available on MTGO.`}
-                                          >
-                                            <MUIWarningRoundedIcon
-                                              style={{
-                                                color:
-                                                  theme.palette.warning.main,
-                                                fontSize: 20
-                                              }}
-                                            />
-                                          </MUITooltip>
-                                        )}
-                                      </MUITypography>
-                                    </HoverPreview>
-                                  </span>
-                                );
-                              }
-                            )}
+                                      {index + 1}) {card.name ?? card.scryfall_card.name}
+                                      {!card.scryfall_card.mtgo_id && (
+                                        <MUITooltip
+                                          title={`This version of ${
+                                            card.name ? card.name : card.scryfall_card.name
+                                          } is not available on MTGO.`}
+                                        >
+                                          <MUIWarningRoundedIcon
+                                            style={{
+                                              color: theme.palette.warning.main,
+                                              fontSize: 20
+                                            }}
+                                          />
+                                        </MUITooltip>
+                                      )}
+                                    </MUITypography>
+                                  </HoverPreview>
+                                </span>
+                              );
+                            })}
                           </div>
                         )
                       );

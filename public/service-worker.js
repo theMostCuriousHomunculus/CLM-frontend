@@ -17,9 +17,7 @@ self.addEventListener('notificationclick', function (event) {
   async function pullUpApp() {
     const allClients = await clients.matchAll();
     const hiddenApp = allClients.find(
-      (client) =>
-        client.url === notification.data.url &&
-        client.visibilityState === 'hidden'
+      (client) => client.url === notification.data.url && client.visibilityState === 'hidden'
     );
 
     if (hiddenApp) {
@@ -64,7 +62,7 @@ self.addEventListener('push', async function (event) {
         data: {
           url: data.url
         },
-        icon: '/images/icon.png'
+        icon: data.icon ?? '/images/icon.png'
       });
     }
   }

@@ -11,6 +11,7 @@ import MUIListItem from '@mui/material/ListItem';
 import MUIListItemIcon from '@mui/material/ListItemIcon';
 import MUIListItemText from '@mui/material/ListItemText';
 import MUITypography from '@mui/material/Typography';
+import searchPrintings from '../graphql/queries/card/search-printings';
 
 export default function Home() {
   const navigate = useNavigate();

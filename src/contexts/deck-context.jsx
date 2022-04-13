@@ -1,290 +1,146 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, {
+  createContext,
+  useContext,
+  /* useEffect, */
+  useRef,
+  useState
+} from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 
-import usePopulate from '../hooks/populate-hook';
-import useRequest from '../hooks/request-hook';
+import deckQuery from '../constants/deck-query';
+import fetchDeckByID from '../graphql/queries/deck/fetch-deck-by-ID';
 import useSubscribe from '../hooks/subscribe-hook';
+// import validateDeck from '../functions/validate-deck';
 import Deck from '../pages/Deck';
-import { CardCacheContext } from './CardCache';
+import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
+import { ErrorContext } from './Error';
 
 export const DeckContext = createContext({
-  loading: false,
+  abortControllerRef: { current: new AbortController() },
   deckState: {
     _id: '',
+    cards: [],
     creator: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: ''
     },
     description: '',
     format: '',
     image: {
-      alt: undefined,
-      scryfall_id: undefined,
-      src: undefined
+      _id: '',
+      image_uris: {
+        art_crop: ''
+      },
+      name: '',
+      card_faces: [
+        {
+          image_uris: {
+            art_crop: ''
+          },
+          name: ''
+        }
+      ]
     },
-    mainboard: [],
     name: '',
-    published: false,
-    sideboard: []
-  },
-  addCardsToDeck: () => null,
-  cloneDeck: () => null,
-  editDeck: () => null,
-  removeCardsFromDeck: () => null,
-  toggleMainboardSideboardDeck: () => null
+    published: false
+  }
+  // warnings: []
 });
 
 export default function ContextualizedDeckPage() {
-  const navigate = useNavigate();
+  const { setErrorMessages } = useContext(ErrorContext);
+  const location = useLocation();
   const { deckID } = useParams();
-  const { addCardsToCache, scryfallCardDataCache } =
-    useContext(CardCacheContext);
+  const abortControllerRef = useRef(new AbortController());
+  const [loading, setLoading] = useState(false);
   const [deckState, setDeckState] = useState({
     _id: deckID,
+    cards: [],
     creator: {
       _id: '',
-      avatar: '',
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     description: '',
     format: '',
     image: {
-      alt: undefined,
-      scryfall_id: undefined,
-      src: undefined
-    },
-    mainboard: [],
-    name: '',
-    published: false,
-    sideboard: []
-  });
-  const cardQuery = `
-    _id
-    scryfall_id
-  `;
-  const deckQuery = `
-    _id
-    creator {
-      _id
-      avatar
-      name
-    }
-    description
-    format
-    image
-    mainboard {
-      ${cardQuery}
-    }
-    name
-    published
-    sideboard {
-      ${cardQuery}
-    }
-  `;
-  const { loading, sendRequest } = useRequest();
-  const { populateCachedScryfallData } = usePopulate();
-
-  const updateDeckState = useCallback(
-    async function (data) {
-      const cardSet = new Set();
-
-      if (data.image) cardSet.add(data.image);
-
-      for (const card of data.mainboard) {
-        cardSet.add(card.scryfall_id);
-      }
-
-      for (const card of data.sideboard) {
-        cardSet.add(card.scryfall_id);
-      }
-
-      await addCardsToCache([...cardSet]);
-
-      if (data.image) {
-        data.image = {
-          alt: scryfallCardDataCache.current[data.image].name,
-          scryfall_id: data.image,
-          src: scryfallCardDataCache.current[data.image].art_crop
-        };
-      }
-
-      data.mainboard.forEach(populateCachedScryfallData);
-
-      data.sideboard.forEach(populateCachedScryfallData);
-
-      setDeckState(data);
-    },
-    [addCardsToCache, populateCachedScryfallData]
-  );
-
-  const addCardsToDeck = useCallback(
-    async function ({ name, scryfall_id }, component, numberOfCopies) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'addCardsToDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                component: ${component},
-                name: "${name}",
-                numberOfCopies: ${numberOfCopies},
-                scryfall_id: "${scryfall_id}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
-
-  const cloneDeck = useCallback(
-    async function () {
-      await sendRequest({
-        callback: (data) => {
-          navigate(`/deck/${data._id}`);
+      _id: '',
+      image_uris: {
+        image_uris: {
+          art_crop: ''
         },
-        headers: { DeckID: deckState._id },
-        load: true,
-        operation: 'cloneDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation} {
-                ${deckQuery}
-              }
-            }
-          `
-          };
+        name: ''
+      },
+      name: '',
+      card_faces: [
+        {
+          image_uris: {
+            art_crop: ''
+          },
+          name: ''
         }
-      });
+      ]
     },
-    [deckQuery, deckState._id, navigate, sendRequest]
-  );
+    name: '',
+    published: false
+  });
+  // const [warnings, setWarnings] = useState([]);
 
-  const editDeck = useCallback(
-    async function ({ description, format, image, name, published }) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'editDeck',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  description: "${description}",
-                  format: ${format},
-                  ${image ? `image: "${image}",` : ''}
-                  published: ${published},
-                  name: "${name}"
-                ) {
-                  _id
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
-
-  const fetchDeckByID = useCallback(
-    async function () {
-      await sendRequest({
-        callback: updateDeckState,
-        headers: { DeckID: deckState._id },
-        load: true,
-        operation: 'fetchDeckByID',
-        get body() {
-          return {
-            query: `
-            query {
-              ${this.operation} {
-                ${deckQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckQuery, deckState._id, sendRequest, updateDeckState]
-  );
-
-  const removeCardsFromDeck = useCallback(
-    async function (cardIDs, component) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'removeCardsFromDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                cardIDs: [${cardIDs.map((cardID) => '"' + cardID + '"')}],
-                component: ${component}
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
-
-  const toggleMainboardSideboardDeck = useCallback(
-    async function (cardID) {
-      await sendRequest({
-        headers: { DeckID: deckState._id },
-        operation: 'toggleMainboardSideboardDeck',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(cardID: "${cardID}") {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [deckState._id, sendRequest]
-  );
+  const { deckData } = location.state || {};
 
   useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
+    },
     connectionInfo: { deckID },
+    dependencies: [deckID],
     queryString: deckQuery,
-    setup: fetchDeckByID,
+    setup: async () => {
+      if (deckData) {
+        setDeckState(deckData);
+      } else {
+        try {
+          setLoading(true);
+          const response = await fetchDeckByID({
+            headers: { DeckID: deckID },
+            queryString: deckQuery,
+            signal: abortControllerRef.current.signal
+          });
+          setDeckState(response.data.fetchDeckByID);
+        } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    },
+    fetchDeckByID,
     subscriptionType: 'subscribeDeck',
-    update: updateDeckState
+    update: setDeckState
   });
+
+  // useEffect(() => {
+  //   const { format, mainboard, sideboard } = deckState;
+  //   validateDeck({ format, mainboard, sideboard }, setWarnings);
+  // }, [deckState.format, deckState.mainboard.length, deckState.sideboard.length]);
 
   return (
     <DeckContext.Provider
       value={{
-        loading,
-        deckState,
-        addCardsToDeck,
-        cloneDeck,
-        editDeck,
-        removeCardsFromDeck,
-        toggleMainboardSideboardDeck
+        abortControllerRef,
+        deckState
+        // warnings
       }}
     >
-      <Deck />
+      {loading ? <LoadingSpinner /> : <Deck />}
     </DeckContext.Provider>
   );
 }

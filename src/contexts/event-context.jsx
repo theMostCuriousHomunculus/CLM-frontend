@@ -21,7 +21,10 @@ export const EventContext = createContext({
     finished: false,
     host: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     name: null,
@@ -29,7 +32,10 @@ export const EventContext = createContext({
       {
         account: {
           _id: null,
-          avatar: null,
+          avatar: {
+            card_faces: [],
+            image_uris: null
+          },
           name: '...'
         },
         answers: [],
@@ -45,7 +51,10 @@ export const EventContext = createContext({
   me: {
     account: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     answers: [],
@@ -72,7 +81,10 @@ export default function ContextualizedEventPage() {
     finished: false,
     host: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     name: null,
@@ -90,7 +102,16 @@ export default function ContextualizedEventPage() {
     _id
     author {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     body
@@ -104,7 +125,16 @@ export default function ContextualizedEventPage() {
   players {
     account {
       _id
-      avatar
+      avatar {
+        card_faces {
+          image_uris {
+            art_crop
+          }
+        }
+        image_uris {
+          art_crop
+        }
+      }
       name
     }
     current_pack {
@@ -165,10 +195,7 @@ export default function ContextualizedEventPage() {
     const playerIndex = eventState.players.findIndex(
       (player) => player.account._id === data.remote_account._id
     );
-    if (
-      Number.isInteger(playerIndex) &&
-      !!peerConnectionsRef.current[playerIndex]
-    ) {
+    if (Number.isInteger(playerIndex) && !!peerConnectionsRef.current[playerIndex]) {
       switch (data.__typename) {
         case 'ICECandidate':
           const { candidate, sdpMLineIndex, sdpMid, usernameFragment } = data;
@@ -183,15 +210,9 @@ export default function ContextualizedEventPage() {
           const { sdp, type } = data;
           switch (type) {
             case 'offer':
-              await peerConnectionsRef.current[
-                playerIndex
-              ].setRemoteDescription({ type, sdp });
-              const answer = await peerConnectionsRef.current[
-                playerIndex
-              ].createAnswer();
-              await peerConnectionsRef.current[playerIndex].setLocalDescription(
-                answer
-              );
+              await peerConnectionsRef.current[playerIndex].setRemoteDescription({ type, sdp });
+              const answer = await peerConnectionsRef.current[playerIndex].createAnswer();
+              await peerConnectionsRef.current[playerIndex].setLocalDescription(answer);
               sendRTCSessionDescription({
                 variables: {
                   accountIDs: [eventState.players[playerIndex].account._id],
@@ -279,9 +300,10 @@ export default function ContextualizedEventPage() {
   useSubscribe({
     cleanup: () => {
       abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
     },
     connectionInfo: { eventID },
-    dependencies: [eventID, userID],
+    dependencies: [eventID],
     queryString: eventQuery,
     setup: async () => {
       try {
@@ -339,9 +361,7 @@ export default function ContextualizedEventPage() {
       peerConnectionsRef.current = [];
       for (let index = 0; index < eventState.players.length; index++) {
         if (eventState.players[index].account._id !== userID) {
-          const newPeerConnection = new RTCPeerConnection(
-            RTCPeerConnectionConfig
-          );
+          const newPeerConnection = new RTCPeerConnection(RTCPeerConnectionConfig);
 
           newPeerConnection.onicecandidate = onIceCandidate;
           newPeerConnection.onnegotiationneeded = onNegotiationNeeded;

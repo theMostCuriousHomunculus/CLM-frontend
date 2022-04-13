@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import Cookies from 'js-cookie';
 import MUIButton from '@mui/material/Button';
 import MUIDialog from '@mui/material/Dialog';
 import MUIDialogActions from '@mui/material/DialogActions';
@@ -13,8 +14,13 @@ import MUIVisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutli
 import MUIVisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { makeStyles } from '@mui/styles';
 
+import login from '../../graphql/mutations/account/login';
+import register from '../../graphql/mutations/account/register';
+import requestPasswordReset from '../../graphql/mutations/account/request-password-reset';
+import tokenQuery from '../../constants/token-query';
 import LoadingSpinner from '../miscellaneous/LoadingSpinner';
 import { AuthenticationContext } from '../../contexts/Authentication';
+import { ErrorContext } from '../../contexts/Error';
 
 const useStyles = makeStyles({
   activeTab: {
@@ -31,9 +37,9 @@ const useStyles = makeStyles({
 });
 
 export default function AuthenticateForm({ open, toggleOpen }) {
-  const { loading, login, register, requestPasswordReset } = useContext(
-    AuthenticationContext
-  );
+  const { abortControllerRef, loading, setLoading, setUserInfo } =
+    useContext(AuthenticationContext);
+  const { setErrorMessages } = useContext(ErrorContext);
   const classes = useStyles();
   const [selectedTab, setSelectedTab] = useState(0);
   const [emailInput, setEmailInput] = useState('');
@@ -41,19 +47,107 @@ export default function AuthenticateForm({ open, toggleOpen }) {
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  function submitForm(event) {
+  async function submitForm(event) {
     event.preventDefault();
 
     if (selectedTab === 0) {
-      login(emailInput, passwordInput);
+      try {
+        setLoading(true);
+        const {
+          data: {
+            login: {
+              _id,
+              admin,
+              avatar,
+              buds,
+              conversations,
+              measurement_system,
+              name,
+              radius,
+              token
+            }
+          }
+        } = await login({
+          queryString: tokenQuery,
+          signal: abortControllerRef.current.signal,
+          variables: { email: emailInput, password: passwordInput }
+        });
+        setUserInfo({
+          admin,
+          avatar,
+          buds,
+          conversations,
+          measurement_system,
+          radius,
+          userID: _id,
+          userName: name
+        });
+        Cookies.set('authentication_token', token);
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
     }
 
     if (selectedTab === 1) {
-      requestPasswordReset(emailInput);
+      try {
+        setLoading(true);
+        await requestPasswordReset({
+          signal: abortControllerRef.current.signal,
+          variables: { email: emailInput }
+        });
+        setErrorMessages((prevState) => {
+          return [
+            ...prevState,
+            'A link to reset your password has been sent to the provided email address.  Please allow a few minutes and check both your inbox and your spam folder.'
+          ];
+        });
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
     }
 
     if (selectedTab === 2) {
-      register(emailInput, nameInput, passwordInput);
+      try {
+        setLoading(true);
+        const {
+          data: {
+            register: {
+              _id,
+              admin,
+              avatar,
+              buds,
+              conversations,
+              measurement_system,
+              name,
+              radius,
+              token
+            }
+          }
+        } = await register({
+          queryString: tokenQuery,
+          signal: abortControllerRef.current.signal,
+          variables: { email: emailInput, name: nameInput, password: passwordInput }
+        });
+        setUserInfo({
+          admin,
+          avatar,
+          buds,
+          conversations,
+          measurement_system,
+          radius,
+          userID: _id,
+          userName: name
+        });
+        Cookies.set('authentication_token', token);
+      } catch (error) {
+        setErrorMessages((prevState) => [...prevState, error.message]);
+      } finally {
+        setLoading(false);
+      }
     }
 
     toggleOpen();
@@ -121,9 +215,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                       <MUIIconButton
                         aria-label="toggle password visibility"
                         edge="end"
-                        onClick={() =>
-                          setPasswordVisible((prevState) => !prevState)
-                        }
+                        onClick={() => setPasswordVisible((prevState) => !prevState)}
                       >
                         {passwordVisible ? (
                           <MUIVisibilityOffOutlinedIcon />
@@ -202,9 +294,7 @@ export default function AuthenticateForm({ open, toggleOpen }) {
                       <MUIIconButton
                         aria-label="toggle password visibility"
                         edge="end"
-                        onClick={() =>
-                          setPasswordVisible((prevState) => !prevState)
-                        }
+                        onClick={() => setPasswordVisible((prevState) => !prevState)}
                       >
                         {passwordVisible ? (
                           <MUIVisibilityOffOutlinedIcon />

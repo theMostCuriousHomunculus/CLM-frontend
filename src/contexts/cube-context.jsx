@@ -1,20 +1,16 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 
-import usePopulate from '../hooks/populate-hook';
+import cubeQuery from '../constants/cube-query';
+import fetchCubeByID from '../graphql/queries/cube/fetch-cube-by-ID';
 import useRequest from '../hooks/request-hook';
 import useSubscribe from '../hooks/subscribe-hook';
 import Cube from '../pages/Cube';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import { CardCacheContext } from './CardCache';
+import { ErrorContext } from './Error';
 
 export const CubeContext = createContext({
+  abortControllerRef: { current: new AbortController() },
   activeComponentState: {
     _id: 'mainbaord',
     displayedCards: [],
@@ -26,14 +22,27 @@ export const CubeContext = createContext({
     _id: null,
     creator: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: null
     },
     description: null,
     image: {
-      alt: undefined,
-      scryfall_id: undefined,
-      src: undefined
+      _id: '',
+      image_uris: {
+        art_crop: ''
+      },
+      name: '',
+      card_faces: [
+        {
+          image_uris: {
+            art_crop: ''
+          },
+          name: ''
+        }
+      ]
     },
     mainboard: [],
     modules: [],
@@ -47,21 +56,20 @@ export const CubeContext = createContext({
     filter: ''
   },
   setDisplayState: () => null,
-  // addCardToCube: () => null,
-  cloneCube: () => null,
   createModule: () => null,
   createRotation: () => null,
   deleteCard: () => null,
   deleteModule: () => null,
   deleteRotation: () => null,
-  editCard: () => null,
-  editCube: () => null,
-  editModule: () => null,
   editRotation: () => null
 });
 
 export default function ContextualizedCubePage() {
-  const navigate = useNavigate();
+  const { setErrorMessages } = useContext(ErrorContext);
+  const location = useLocation();
+  const { cubeID } = useParams();
+  const abortControllerRef = useRef(new AbortController());
+  const { sendRequest } = useRequest();
   const [activeComponentState, setActiveComponentState] = useState({
     _id: 'mainboard',
     displayedCards: [],
@@ -69,21 +77,31 @@ export default function ContextualizedCubePage() {
     name: 'Mainboard',
     size: null
   });
-  const { cubeID } = useParams();
-  const { addCardsToCache, scryfallCardDataCache } =
-    useContext(CardCacheContext);
   const [cubeState, setCubeState] = useState({
     _id: cubeID,
     creator: {
       _id: null,
-      avatar: null,
+      avatar: {
+        card_faces: [],
+        image_uris: null
+      },
       name: '...'
     },
     description: '',
     image: {
-      alt: undefined,
-      scryfall_id: undefined,
-      src: undefined
+      _id: '',
+      image_uris: {
+        art_crop: ''
+      },
+      name: '',
+      card_faces: [
+        {
+          image_uris: {
+            art_crop: ''
+          },
+          name: ''
+        }
+      ]
     },
     mainboard: [],
     modules: [],
@@ -96,49 +114,8 @@ export default function ContextualizedCubePage() {
     activeComponentID: 'mainboard',
     filter: ''
   });
-  const cardQuery = `
-    _id
-    cmc
-    color_identity
-    notes
-    scryfall_id
-    type_line
-  `;
-  const cubeQuery = `
-    _id
-    creator {
-      _id
-      avatar
-      name
-    }
-    description
-    image
-    mainboard {
-      ${cardQuery}
-    }
-    modules {
-      _id
-      cards {
-        ${cardQuery}
-      }
-      name
-    }
-    name
-    published
-    rotations {
-      _id
-      cards {
-        ${cardQuery}
-      }
-      name
-      size
-    }
-    sideboard {
-      ${cardQuery}
-    }
-  `;
-  const { populateCachedScryfallData } = usePopulate();
-  const { loading, sendRequest } = useRequest();
+  const [loading, setLoading] = useState(false);
+  const { cubeData } = location.state || {};
 
   const filterCards = useCallback(
     (cards, text) =>
@@ -146,12 +123,9 @@ export default function ContextualizedCubePage() {
         const wordArray = text.split(' ');
         return wordArray.every(
           (word) =>
-            card.keywords
-              .join(' ')
-              .toLowerCase()
-              .includes(word.toLowerCase()) ||
-            card.name.toLowerCase().includes(word.toLowerCase()) ||
-            card.type_line.toLowerCase().includes(word.toLowerCase())
+            card.scryfall_card.keywords.join(' ').toLowerCase().includes(word.toLowerCase()) ||
+            card.scryfall_card.name.toLowerCase().includes(word.toLowerCase()) ||
+            card.scryfall_card.type_line.toLowerCase().includes(word.toLowerCase())
         );
       }),
     []
@@ -161,18 +135,13 @@ export default function ContextualizedCubePage() {
     const state = { _id: displayState.activeComponentID };
 
     if (state._id === 'sideboard') {
-      state.displayedCards = filterCards(
-        cubeState.sideboard,
-        displayState.filter
-      );
+      state.displayedCards = filterCards(cubeState.sideboard, displayState.filter);
       state.name = 'Sideboard';
     } else if (cubeState.modules.find((module) => module._id === state._id)) {
       const module = cubeState.modules.find((mdl) => mdl._id === state._id);
       state.displayedCards = filterCards(module.cards, displayState.filter);
       state.name = module.name;
-    } else if (
-      cubeState.rotations.find((rotation) => rotation._id === state._id)
-    ) {
+    } else if (cubeState.rotations.find((rotation) => rotation._id === state._id)) {
       const rotation = cubeState.rotations.find((rtn) => rtn._id === state._id);
       state.displayedCards = filterCards(rotation.cards, displayState.filter);
       state.maxSize = rotation.cards.length;
@@ -180,118 +149,12 @@ export default function ContextualizedCubePage() {
       state.size = rotation.size;
     } else {
       state._id = 'mainboard';
-      state.displayedCards = filterCards(
-        cubeState.mainboard,
-        displayState.filter
-      );
+      state.displayedCards = filterCards(cubeState.mainboard, displayState.filter);
       state.name = 'Mainboard';
     }
 
     setActiveComponentState(state);
   }, [cubeState, displayState, filterCards]);
-
-  const updateCubeState = useCallback(
-    async function (data) {
-      const cardSet = new Set();
-
-      if (data.image) cardSet.add(data.image);
-
-      for (const card of data.mainboard) {
-        cardSet.add(card.scryfall_id);
-      }
-
-      for (const card of data.sideboard) {
-        cardSet.add(card.scryfall_id);
-      }
-
-      for (const module of data.modules) {
-        for (const card of module.cards) {
-          cardSet.add(card.scryfall_id);
-        }
-      }
-
-      for (const rotation of data.rotations) {
-        for (const card of rotation.cards) {
-          cardSet.add(card.scryfall_id);
-        }
-      }
-
-      await addCardsToCache([...cardSet]);
-
-      if (data.image) {
-        data.image = {
-          alt: scryfallCardDataCache.current[data.image].name,
-          scryfall_id: data.image,
-          src: scryfallCardDataCache.current[data.image].art_crop
-        };
-      }
-
-      data.mainboard.forEach(populateCachedScryfallData);
-
-      data.sideboard.forEach(populateCachedScryfallData);
-
-      for (const module of data.modules) {
-        module.cards.forEach(populateCachedScryfallData);
-      }
-
-      for (const rotation of data.rotations) {
-        rotation.cards.forEach(populateCachedScryfallData);
-      }
-
-      setCubeState(data);
-    },
-    [addCardsToCache, populateCachedScryfallData]
-  );
-
-  // const addCardToCube = useCallback(
-  //   async function ({ name, scryfall_id }) {
-  //     await sendRequest({
-  //       headers: { CubeID: cubeState._id },
-  //       operation: 'addCardToCube',
-  //       get body() {
-  //         return {
-  //           query: `
-  //           mutation {
-  //             ${this.operation}(
-  //               componentID: "${activeComponentState._id}",
-  //               name: "${name}",
-  //               scryfall_id: "${scryfall_id}"
-  //             ) {
-  //               _id
-  //             }
-  //           }
-  //         `
-  //         };
-  //       }
-  //     });
-  //   },
-  //   [activeComponentState._id, cubeState._id, sendRequest]
-  // );
-
-  const cloneCube = useCallback(
-    async function () {
-      await sendRequest({
-        callback: (data) => {
-          navigate(`/cube/${data._id}`);
-        },
-        headers: { CubeID: cubeState._id },
-        load: true,
-        operation: 'cloneCube',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation} {
-                ${cubeQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [cubeQuery, cubeState._id, navigate, sendRequest]
-  );
 
   const createModule = useCallback(
     async function (name, toggleOpen) {
@@ -367,9 +230,7 @@ export default function ContextualizedCubePage() {
             mutation {
               ${this.operation}(
                 cardID: "${cardID}",
-                ${
-                  destinationID ? 'destinationID: "' + destinationID + '",' : ''
-                }
+                ${destinationID ? 'destinationID: "' + destinationID + '",' : ''}
                 originID: "${activeComponentState._id}"
               )
             }
@@ -431,80 +292,6 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const editCard = useCallback(
-    async function (changes) {
-      await sendRequest({
-        headers: { CubeID: cubeState._id },
-        operation: 'editCard',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                componentID: "${activeComponentState._id}",
-                ${changes}
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [activeComponentState._id, cubeState._id, sendRequest]
-  );
-
-  const editCube = useCallback(
-    async function (description, image, name, published) {
-      await sendRequest({
-        headers: { CubeID: cubeState._id },
-        operation: 'editCube',
-        get body() {
-          return {
-            query: `
-              mutation {
-                ${this.operation}(
-                  description: "${description}",
-                  ${image ? `image: "${image}",` : ''}
-                  name: "${name}",
-                  published: ${published}
-                ) {
-                  _id
-                }
-              }
-            `
-          };
-        }
-      });
-    },
-    [cubeState._id, sendRequest]
-  );
-
-  const editModule = useCallback(
-    async function (name) {
-      await sendRequest({
-        headers: { CubeID: cubeState._id },
-        operation: 'editModule',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                moduleID: "${activeComponentState._id}",
-                name: "${name}"
-              ) {
-                _id
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [activeComponentState._id, cubeState._id, sendRequest]
-  );
-
   const editRotation = useCallback(
     async function (name, size) {
       await sendRequest({
@@ -530,54 +317,50 @@ export default function ContextualizedCubePage() {
     [activeComponentState._id, cubeState._id, sendRequest]
   );
 
-  const fetchCubeByID = useCallback(
-    async function () {
-      await sendRequest({
-        callback: updateCubeState,
-        headers: { CubeID: cubeState._id },
-        load: true,
-        operation: 'fetchCubeByID',
-        get body() {
-          return {
-            query: `
-            query {
-              ${this.operation} {
-                ${cubeQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [cubeQuery, cubeState._id, sendRequest, updateCubeState]
-  );
-
   useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
+    },
     connectionInfo: { cubeID },
+    dependencies: [cubeID],
     queryString: cubeQuery,
-    setup: fetchCubeByID,
+    setup: async () => {
+      if (cubeData) {
+        setCubeState(cubeData);
+      } else {
+        try {
+          setLoading(true);
+          const response = await fetchCubeByID({
+            headers: { CubeID: cubeID },
+            queryString: cubeQuery,
+            signal: abortControllerRef.current.signal
+          });
+          setCubeState(response.data.fetchCubeByID);
+        } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    },
     subscriptionType: 'subscribeCube',
-    update: updateCubeState
+    update: setCubeState
   });
 
   return (
     <CubeContext.Provider
       value={{
+        abortControllerRef,
         activeComponentState,
         cubeState,
         displayState,
         setDisplayState,
-        // addCardToCube,
-        cloneCube,
         createModule,
         createRotation,
         deleteCard,
         deleteModule,
         deleteRotation,
-        editCard,
-        editCube,
-        editModule,
         editRotation
       }}
     >

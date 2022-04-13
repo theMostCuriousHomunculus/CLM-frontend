@@ -43,7 +43,16 @@ export default function Blog() {
                   _id
                   author {
                     _id
-                    avatar
+                    avatar {
+                      card_faces {
+                        image_uris {
+                          art_crop
+                        }
+                      }
+                      image_uris {
+                        art_crop
+                      }
+                    }
                     name
                   }
                   body
@@ -97,8 +106,8 @@ export default function Blog() {
         toggleOpen={() => setBlogPostToDelete({ _id: null, title: null })}
       >
         <MUITypography variant="body1">
-          This action cannot be undone. Your wise counsel and witty humor will
-          be lost to the ages...
+          This action cannot be undone. Your wise counsel and witty humor will be lost to the
+          ages...
         </MUITypography>
       </ConfirmationDialog>
 
@@ -113,9 +122,7 @@ export default function Blog() {
               }}
             >
               <MUICardHeader
-                title={
-                  <MUITypography variant="subtitle1">New Article</MUITypography>
-                }
+                title={<MUITypography variant="subtitle1">New Article</MUITypography>}
                 style={{ flexGrow: 1 }}
                 subheader={
                   <MUITypography color="textSecondary" variant="subtitle2">
@@ -136,16 +143,7 @@ export default function Blog() {
           </MUIGrid>
         )}
         {blogPosts.map((blogPost) => (
-          <MUIGrid
-            container
-            item
-            key={blogPost._id}
-            xs={12}
-            sm={6}
-            md={4}
-            lg={3}
-            xl={2}
-          >
+          <MUIGrid container item key={blogPost._id} xs={12} sm={6} md={4} lg={3} xl={2}>
             <MUICard
               style={{
                 display: 'flex',
@@ -154,32 +152,20 @@ export default function Blog() {
               }}
             >
               <MUICardHeader
-                avatar={
-                  <Avatar
-                    alt={blogPost.author.name}
-                    size="small"
-                    src={blogPost.author.avatar}
-                  />
-                }
+                avatar={<Avatar profile={blogPost.author} size="small" />}
                 subheader={
                   <MUITypography color="textSecondary" variant="subtitle2">
                     {blogPost.subtitle}
                   </MUITypography>
                 }
                 style={{ flexGrow: 1 }}
-                title={
-                  <MUITypography variant="subtitle1">
-                    {blogPost.title}
-                  </MUITypography>
-                }
+                title={<MUITypography variant="subtitle1">{blogPost.title}</MUITypography>}
               />
               <MUICardMedia image={blogPost.image} />
               <MUICardActions
                 style={{
                   justifyContent:
-                    blogPost.author._id === authentication.userID
-                      ? 'space-between'
-                      : 'flex-end'
+                    blogPost.author._id === authentication.userID ? 'space-between' : 'flex-end'
                 }}
               >
                 {blogPost.author._id === authentication.userID && (

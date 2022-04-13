@@ -1,11 +1,12 @@
 export default async function cacheScryfallData(scryfallCardData) {
-  let art_crop, back_image, image, mana_cost, meldResult, type_line;
+  let art_crop, back_image, image, mana_cost, meldResult, oracle_text, type_line;
   switch (scryfallCardData.layout) {
     case 'adventure':
       // this mechanic debuted in Throne of Eldrain.  all adventure cards are either (instants or sorceries) and creatures.  it seems to have been popular, so it may appear again
       art_crop = scryfallCardData.image_uris.art_crop;
       image = scryfallCardData.image_uris.large;
       mana_cost = `${scryfallCardData.card_faces[0].mana_cost}${scryfallCardData.card_faces[1].mana_cost}`;
+      oracle_text = `${scryfallCardData.card_faces[0].oracle_text} / ${scryfallCardData.card_faces[1].oracle_text}`;
       type_line = `${scryfallCardData.card_faces[0].type_line} / ${scryfallCardData.card_faces[1].type_line}`;
       break;
     case 'flip':
@@ -13,6 +14,7 @@ export default async function cacheScryfallData(scryfallCardData) {
       art_crop = scryfallCardData.image_uris.art_crop;
       image = scryfallCardData.image_uris.large;
       mana_cost = scryfallCardData.card_faces[0].mana_cost;
+      oracle_text = `${scryfallCardData.card_faces[0].oracle_text} / ${scryfallCardData.card_faces[1].oracle_text}`;
       type_line = `${scryfallCardData.card_faces[0].type_line} / ${scryfallCardData.card_faces[1].type_line}`;
       break;
     case 'leveler':
@@ -20,6 +22,7 @@ export default async function cacheScryfallData(scryfallCardData) {
       art_crop = scryfallCardData.image_uris.art_crop;
       image = scryfallCardData.image_uris.large;
       mana_cost = scryfallCardData.mana_cost;
+      oracle_text = scryfallCardData.oracle_text;
       type_line = scryfallCardData.type_line;
       break;
     case 'meld':
@@ -29,18 +32,18 @@ export default async function cacheScryfallData(scryfallCardData) {
       type_line = scryfallCardData.type_line;
 
       meldResult = await fetch(
-        scryfallCardData.all_parts.find(
-          (part) => part.component === 'meld_result'
-        ).uri
+        scryfallCardData.all_parts.find((part) => part.component === 'meld_result').uri
       ).json();
       back_image = meldResult.image_uris.large;
       image = scryfallCardData.image_uris.large;
+      oracle_text = `${scryfallCardData.oracle_text} / ${meldResult.oracle_text}`;
       break;
     case 'modal_dfc':
       art_crop = scryfallCardData.card_faces[0].image_uris.art_crop;
       back_image = scryfallCardData.card_faces[1].image_uris.large;
       image = scryfallCardData.card_faces[0].image_uris.large;
       mana_cost = `${scryfallCardData.card_faces[0].mana_cost}${scryfallCardData.card_faces[1].mana_cost}`;
+      oracle_text = `${scryfallCardData.card_faces[0].oracle_text} / ${scryfallCardData.card_faces[1].oracle_text}`;
       type_line = `${scryfallCardData.card_faces[0].type_line} / ${scryfallCardData.card_faces[1].type_line}`;
       break;
     case 'saga':
@@ -48,6 +51,7 @@ export default async function cacheScryfallData(scryfallCardData) {
       art_crop = scryfallCardData.image_uris.art_crop;
       image = scryfallCardData.image_uris.large;
       mana_cost = scryfallCardData.mana_cost;
+      oracle_text = scryfallCardData.oracle_text;
       type_line = scryfallCardData.type_line;
       break;
     case 'split':
@@ -55,6 +59,7 @@ export default async function cacheScryfallData(scryfallCardData) {
       art_crop = scryfallCardData.image_uris.art_crop;
       image = scryfallCardData.image_uris.large;
       mana_cost = `${scryfallCardData.card_faces[0].mana_cost}${scryfallCardData.card_faces[1].mana_cost}`;
+      oracle_text = `${scryfallCardData.card_faces[0].oracle_text} / ${scryfallCardData.card_faces[1].oracle_text}`;
       type_line = `${scryfallCardData.card_faces[0].type_line} / ${scryfallCardData.card_faces[1].type_line}`;
       break;
     case 'transform':
@@ -62,12 +67,14 @@ export default async function cacheScryfallData(scryfallCardData) {
       back_image = scryfallCardData.card_faces[1].image_uris.large;
       image = scryfallCardData.card_faces[0].image_uris.large;
       mana_cost = scryfallCardData.card_faces[0].mana_cost;
+      oracle_text = `${scryfallCardData.card_faces[0].oracle_text} / ${scryfallCardData.card_faces[1].oracle_text}`;
       type_line = `${scryfallCardData.card_faces[0].type_line} / ${scryfallCardData.card_faces[1].type_line}`;
       break;
     default:
       art_crop = scryfallCardData.image_uris.art_crop;
       image = scryfallCardData.image_uris.large;
       mana_cost = scryfallCardData.mana_cost;
+      oracle_text = scryfallCardData.oracle_text;
       type_line = scryfallCardData.type_line;
   }
 
@@ -79,10 +86,12 @@ export default async function cacheScryfallData(scryfallCardData) {
     color_identity: scryfallCardData.color_identity,
     image,
     keywords: scryfallCardData.keywords,
+    legalities: scryfallCardData.legalities,
     mana_cost,
     mtgo_id: scryfallCardData.mtgo_id,
     name: scryfallCardData.name,
     oracle_id: scryfallCardData.oracle_id,
+    oracle_text,
     scryfall_id: scryfallCardData.id,
     set: scryfallCardData.set,
     set_name: scryfallCardData.set_name,

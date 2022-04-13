@@ -42,11 +42,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function AutoScrollMessages({
-  messages,
-  submitFunction,
-  title
-}) {
+export default function AutoScrollMessages({ messages, submitFunction, title }) {
   const { isLoggedIn, userID } = useContext(AuthenticationContext);
   const newMessageRef = useRef();
   const [newMessageText, setNewMessageText] = useState('');
@@ -61,9 +57,7 @@ export default function AutoScrollMessages({
 
   return (
     <MUICard className={messageCard}>
-      <MUICardHeader
-        title={<MUITypography variant="h3">{title}</MUITypography>}
-      />
+      <MUICardHeader title={<MUITypography variant="h3">{title}</MUITypography>} />
       <MUICardContent className={messageCardContent}>
         <ul className={messagesUL}>
           {messages
@@ -73,21 +67,14 @@ export default function AutoScrollMessages({
                 className={messageLI}
                 key={message._id}
                 style={{
-                  flexDirection:
-                    message.author._id === userID ? 'row-reverse' : 'row'
+                  flexDirection: message.author._id === userID ? 'row-reverse' : 'row'
                 }}
               >
-                <Avatar
-                  alt={message.author.name}
-                  size="small"
-                  src={message.author.avatar}
-                />
+                <Avatar profile={message.author} size="small" />
                 <MUIPaper
                   style={{
                     backgroundColor:
-                      message.author._id === userID
-                        ? primaryColor['A100']
-                        : secondaryColor['A100'],
+                      message.author._id === userID ? primaryColor['A100'] : secondaryColor['A100'],
                     minWidth: '50%',
                     overflowWrap: 'break-word',
                     textAlign: message.author._id === userID ? 'right' : 'left'
@@ -119,11 +106,7 @@ export default function AutoScrollMessages({
               }
             }}
             onKeyDown={(event) => {
-              if (
-                !event.shiftKey &&
-                event.key === 'Enter' &&
-                newMessageText.length > 0
-              ) {
+              if (!event.shiftKey && event.key === 'Enter' && newMessageText.length > 0) {
                 submitFunction(newMessageText);
                 setNewMessageText('');
                 newMessageRef.current.focus();

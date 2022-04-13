@@ -1,25 +1,24 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { createContext, /* useCallback, */ useContext, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import accountQuery from '../constants/account-query';
 import fetchAccountByID from '../graphql/queries/account/fetch-account-by-ID';
-import useRequest from '../hooks/request-hook';
+// import useRequest from '../hooks/request-hook';
+import useSubscribe from '../hooks/subscribe-hook';
 import Account from '../pages/Account';
 import LoadingSpinner from '../components/miscellaneous/LoadingSpinner';
-import { AuthenticationContext } from './Authentication';
-import { CardCacheContext } from './CardCache';
 import { ErrorContext } from './Error';
 
 export const AccountContext = createContext({
-  loading: false,
+  abortControllerRef: { current: new AbortController() },
   accountState: {
     _id: '',
-    avatar: '',
+    avatar: {
+      card_faces: null,
+      image_uris: {
+        art_crop: '...'
+      }
+    },
     buds: [],
     cubes: [],
     decks: [],
@@ -35,23 +34,26 @@ export const AccountContext = createContext({
     sent_bud_requests: [],
     total_events: 0
   },
-  setAccountState: () => null,
-  createMatch: () => null,
+  setAccountState: () => null
+  // createMatch: () => null
   // deleteEvent: () => null,
-  // deleteMatch: () => null,
-  editAccount: () => null
+  // deleteMatch: () => null
 });
 
 export default function ContextualizedAccountPage() {
-  const { setUserInfo, userID } = useContext(AuthenticationContext);
-  const { addCardsToCache, scryfallCardDataCache } =
-    useContext(CardCacheContext);
   const { setErrorMessages } = useContext(ErrorContext);
-  const navigate = useNavigate();
+  const location = useLocation();
+  // const navigate = useNavigate();
   const { accountID } = useParams();
+  const abortControllerRef = useRef(new AbortController());
   const [accountState, setAccountState] = useState({
     _id: accountID,
-    avatar: '',
+    avatar: {
+      card_faces: null,
+      image_uris: {
+        art_crop: '...'
+      }
+    },
     buds: [],
     cubes: [],
     decks: [],
@@ -68,272 +70,77 @@ export default function ContextualizedAccountPage() {
     total_events: 0
   });
   const [loading, setLoading] = useState(false);
-  const accountQuery = `
-    _id
-    avatar
-    buds {
-      _id
-      avatar
-      buds {
-        _id
-        avatar
-        name
-      }
-      decks {
-        _id
-        format
-        name
-      }
-      name
-    }
-    cubes {
-      _id
-      description
-      image
-      mainboard {
-        _id
-      }
-      modules {
-        _id
-        cards {
-          _id
-        }
-        name
-      }
-      name
-      rotations {
-        _id
-        cards {
-          _id
-        }
-        name
-        size
-      }
-      sideboard {
-        _id
-      }
-    }
-    decks {
-      _id
-      description
-      format
-      image
-      name
-    }
-    email
-    events {
-      _id
-      createdAt
-      cube {
-        _id
-        image
-        name
-      }
-      host {
-        _id
-        avatar
-        name
-      }
-      name
-      players {
-        account {
-          _id
-          avatar
-          name
-        }
-      }
-    }
-    location {
-      coordinates
-    }
-    matches {
-      _id
-      createdAt
-      cube {
-        _id
-        name
-      }
-      decks {
-        _id
-        format
-        name
-      }
-      event {
-        _id
-        name
-      }
-      players {
-        account {
-          _id
-          avatar
-          name
-        }
-      }
-    }
-    name
-    nearby_users {
-      _id
-      avatar
-      name
-    }
-    received_bud_requests {
-      _id
-      avatar
-      name
-    }
-    sent_bud_requests {
-      _id
-      avatar
-      name
-    }
-    settings {
-      measurement_system
-      radius
-    }
-    total_events
-  `;
-  const { sendRequest } = useRequest();
+  const { accountData } = location.state || {};
+  // const { sendRequest } = useRequest();
 
-  const updateAccountState = useCallback(
-    async function (data) {
-      const cardSet = new Set();
+  // const createMatch = useCallback(
+  //   async function (event, deckIDs, eventID, playerIDs) {
+  //     event.preventDefault();
 
-      for (const cube of data.cubes) {
-        if (cube.image) cardSet.add(cube.image);
-      }
+  //     await sendRequest({
+  //       callback: (data) => {
+  //         navigate(`/match/${data._id}`);
+  //       },
+  //       load: true,
+  //       operation: 'createMatch',
+  //       get body() {
+  //         return {
+  //           query: `
+  //           mutation {
+  //             ${this.operation}(
+  //               deckIDs: [${deckIDs.map((dckID) => '"' + dckID + '"')}],
+  //               ${eventID ? 'eventID: "' + eventID + '",\n' : ''}
+  //               playerIDs: [${playerIDs.map((plrID) => '"' + plrID + '"')}]
+  //             ) {
+  //               _id
+  //             }
+  //           }
+  //         `
+  //         };
+  //       }
+  //     });
+  //   },
+  //   [navigate, sendRequest]
+  // );
 
-      for (const deck of data.decks) {
-        if (deck.image) cardSet.add(deck.image);
-      }
-
-      for (const event of data.events) {
-        if (event.cube.image) cardSet.add(event.cube.image);
-      }
-
-      await addCardsToCache([...cardSet]);
-
-      for (const cube of data.cubes) {
-        if (cube.image) {
-          cube.image = {
-            alt: scryfallCardDataCache.current[cube.image].name,
-            scryfall_id: cube.image,
-            src: scryfallCardDataCache.current[cube.image].art_crop
-          };
-        }
-      }
-
-      for (const deck of data.decks) {
-        if (deck.image) {
-          deck.image = {
-            alt: scryfallCardDataCache.current[deck.image].name,
-            scryfall_id: deck.image,
-            src: scryfallCardDataCache.current[deck.image].art_crop
-          };
-        }
-      }
-
-      for (const event of data.events) {
-        if (event.cube.image) {
-          event.cube.image = {
-            alt: scryfallCardDataCache.current[event.cube.image].name,
-            scryfall_id: event.cube.image,
-            src: scryfallCardDataCache.current[event.cube.image].art_crop
-          };
-        }
-      }
-
-      setAccountState(data);
+  useSubscribe({
+    cleanup: () => {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
     },
-    [addCardsToCache]
-  );
-
-  const createMatch = useCallback(
-    async function (event, deckIDs, eventID, playerIDs) {
-      event.preventDefault();
-
-      await sendRequest({
-        callback: (data) => {
-          navigate(`/match/${data._id}`);
-        },
-        load: true,
-        operation: 'createMatch',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                deckIDs: [${deckIDs.map((dckID) => '"' + dckID + '"')}],
-                ${eventID ? 'eventID: "' + eventID + '",\n' : ''}
-                playerIDs: [${playerIDs.map((plrID) => '"' + plrID + '"')}]
-              ) {
-                _id
-              }
-            }
-          `
-          };
+    connectionInfo: { accountID },
+    dependencies: [accountID],
+    queryString: accountQuery,
+    setup: async () => {
+      if (accountData) {
+        setAccountState(accountData);
+      } else {
+        try {
+          setLoading(true);
+          const response = await fetchAccountByID({
+            headers: { AccountID: accountID },
+            queryString: accountQuery,
+            signal: abortControllerRef.current.signal
+          });
+          setAccountState(response.data.fetchAccountByID);
+        } catch (error) {
+          setErrorMessages((prevState) => [...prevState, error.message]);
+        } finally {
+          setLoading(false);
         }
-      });
-    },
-    [navigate, sendRequest]
-  );
-
-  const editAccount = useCallback(
-    async function (changes) {
-      await sendRequest({
-        callback: (data) => {
-          setAccountState(data);
-          if (!changes.toString().includes('return_other')) {
-            setUserInfo((prevState) => ({
-              ...prevState,
-              avatar: data.avatar,
-              settings: data.settings,
-              userName: data.name
-            }));
-          }
-        },
-        operation: 'editAccount',
-        get body() {
-          return {
-            query: `
-            mutation {
-              ${this.operation}(
-                ${changes}
-              ) {
-                ${accountQuery}
-              }
-            }
-          `
-          };
-        }
-      });
-    },
-    [accountQuery, sendRequest]
-  );
-
-  useEffect(() => {
-    (async function () {
-      try {
-        setLoading(true);
-        const data = await fetchAccountByID({
-          headers: { AccountID: accountID },
-          queryString: `{\n${accountQuery}\n}`
-        });
-        await updateAccountState(data.data.fetchAccountByID);
-      } catch (error) {
-        setErrorMessages((prevState) => [...prevState, error.message]);
-      } finally {
-        setLoading(false);
       }
-    })();
-  }, [accountID, userID]);
+    },
+    subscriptionType: 'subscribeAccount',
+    update: setAccountState
+  });
 
   return (
     <AccountContext.Provider
       value={{
+        abortControllerRef,
         accountState,
-        setAccountState,
-        createMatch,
-        editAccount
+        setAccountState
+        // createMatch
       }}
     >
       {loading ? <LoadingSpinner /> : <Account />}

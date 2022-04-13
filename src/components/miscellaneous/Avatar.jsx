@@ -22,15 +22,18 @@ const useStyles = makeStyles({
   }
 });
 
-export default function LargeAvatar({ alt, size, ...rest }) {
+export default function LargeAvatar({ profile, size, ...rest }) {
   const classes = useStyles();
 
   return (
-    <MUITooltip title={alt}>
+    <MUITooltip title={profile.name}>
       <MUIAvatar
-        alt={alt}
+        alt={profile.name}
         className={size && classes[size]}
         imgProps={{ draggable: false }}
+        src={
+          profile.avatar.image_uris?.art_crop ?? profile.avatar.card_faces[0].image_uris.art_crop
+        }
         {...rest}
       />
     </MUITooltip>

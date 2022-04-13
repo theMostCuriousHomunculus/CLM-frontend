@@ -57,26 +57,21 @@ export default function MatchAccordion({ pageClasses }) {
               </MUITableHead>
               <MUITableBody>
                 {matches.map(function (match) {
-                  const opponent = match.players.find(
-                    (player) => player.account._id !== accountID
-                  );
+                  const opponent = match.players.find((player) => player.account._id !== accountID);
 
                   return (
                     <MUITableRow key={match._id}>
                       <MUITableCell>
                         <Link to={`/match/${match._id}`}>
                           <Avatar
-                            alt={opponent.account.name}
+                            profile={opponent.account}
                             size="small"
-                            src={opponent.account.avatar}
                             style={{ marginRight: 16 }}
                           />
                         </Link>
                       </MUITableCell>
                       <MUITableCell>
-                        <span
-                          style={{ display: 'flex', flexDirection: 'column' }}
-                        >
+                        <span style={{ display: 'flex', flexDirection: 'column' }}>
                           {match.decks &&
                             match.decks.map((deck) => (
                               <Link key={deck._id} to={`/deck/${deck._id}`}>
@@ -87,9 +82,7 @@ export default function MatchAccordion({ pageClasses }) {
                       </MUITableCell>
                       <MUITableCell>
                         {match.event && (
-                          <Link to={`/event/${match.event._id}`}>
-                            {match.event.name}
-                          </Link>
+                          <Link to={`/event/${match.event._id}`}>{match.event.name}</Link>
                         )}
                       </MUITableCell>
                       <MUITableCell>
@@ -105,9 +98,7 @@ export default function MatchAccordion({ pageClasses }) {
 
         {accountID === userID && (
           <MUIAccordionActions>
-            <MUIButton onClick={() => setShowMatchForm(true)}>
-              Create a Match
-            </MUIButton>
+            <MUIButton onClick={() => setShowMatchForm(true)}>Create a Match</MUIButton>
           </MUIAccordionActions>
         )}
       </MUIAccordion>

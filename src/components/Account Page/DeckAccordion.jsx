@@ -40,10 +40,7 @@ export default function DeckAccordion({ pageClasses }) {
         toggleOpen={() => setShowCreateDeckForm((prevState) => !prevState)}
       />
 
-      <DeleteDeckForm
-        deckToDelete={deckToDelete}
-        setDeckToDelete={setDeckToDelete}
-      />
+      <DeleteDeckForm deckToDelete={deckToDelete} setDeckToDelete={setDeckToDelete} />
 
       <MUIAccordion>
         <MUIAccordionSummary
@@ -76,9 +73,17 @@ export default function DeckAccordion({ pageClasses }) {
                       >
                         {deck.image && (
                           <img
-                            alt={deck.image.alt}
+                            alt={
+                              deck.image.image_uris
+                                ? deck.image.name
+                                : deck.image.card_faces[0].name
+                            }
                             height={50}
-                            src={deck.image.src}
+                            src={
+                              deck.image.image_uris
+                                ? deck.image.image_uris.art_crop
+                                : deck.image.card_faces[0].image_uris.art_crop
+                            }
                             style={{ borderRadius: 4 }}
                           />
                         )}
@@ -90,9 +95,7 @@ export default function DeckAccordion({ pageClasses }) {
                       <MUITableCell style={{ textAlign: 'right' }}>
                         <MUIIconButton
                           color="secondary"
-                          onClick={() =>
-                            setDeckToDelete({ _id: deck._id, name: deck.name })
-                          }
+                          onClick={() => setDeckToDelete({ _id: deck._id, name: deck.name })}
                           size="small"
                         >
                           <MUIDeleteForeverOutlinedIcon fontSize="large" />

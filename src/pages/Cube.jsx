@@ -24,11 +24,7 @@ export default function Cube() {
   return (
     <React.Fragment>
       {selectedCard && (
-        <EditCardModal
-          card={selectedCard}
-          clear={() => setSelectedCard()}
-          editable={editable}
-        />
+        <EditCardModal card={selectedCard} clear={() => setSelectedCard()} editable={editable} />
       )}
 
       <CubeDashboard />
@@ -48,7 +44,7 @@ export default function Cube() {
                 headers: { CubeID: cubeID },
                 variables: {
                   componentID: activeComponentState._id,
-                  scryfall_id: cardData.scryfall_id
+                  scryfall_id: cardData._id
                 }
               })
             }

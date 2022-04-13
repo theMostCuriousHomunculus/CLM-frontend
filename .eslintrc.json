@@ -23,8 +23,7 @@
     // "ecmaFeatures": {
     //   "jsx": true
     // },
-    "ecmaVersion": 2021,
-    // "presets": ["@babel/preset-react"],
+    "ecmaVersion": "latest",
     "requireConfigFile": false,
     "sourceType": "module"
   },
@@ -40,14 +39,17 @@
     "comma-dangle": "off",
     "indent": "off",
     "max-len": [
-      "error",
+      "warn",
       {
+        "code": 100,
         "ignoreComments": true,
         "ignoreUrls": true,
         "ignoreStrings": true,
-        "ignoreTemplateLiterals": true
+        "ignoreTemplateLiterals": true,
+        "tabWidth": 2
       }
     ],
+    "no-undef": "error",
     "radix": ["error", "as-needed"],
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
