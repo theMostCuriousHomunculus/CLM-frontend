@@ -11,7 +11,7 @@ export const AuthenticationContext = createContext({
   admin: false,
   avatar: {
     card_faces: [],
-    image_uris: null
+    image_uris: {}
   },
   buds: [],
   conversations: [],
@@ -45,7 +45,7 @@ export function AuthenticationProvider({ children }) {
     admin: false,
     avatar: {
       card_faces: [],
-      image_uris: null
+      image_uris: {}
     },
     buds: [],
     conversations: [],

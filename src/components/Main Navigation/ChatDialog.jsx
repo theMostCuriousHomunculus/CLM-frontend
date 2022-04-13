@@ -67,14 +67,10 @@ export default function ChatDialog({
   return (
     <MUIDialog className={messageDialog} fullWidth maxWidth="xl" onClose={close} open={open}>
       <MUIDialogTitle>
-        {/* _id ? (
-          participants.map((participant) => participant.name).join(', ')
-        ) : ( */}
         <ParticipantsInput
           participants={participants}
-          setNewConversationParticipants={setNewConversationParticipants}
+          setParticipants={setNewConversationParticipants}
         />
-        {/* }) */}
       </MUIDialogTitle>
       <MUIDialogContent className={messageDialogContent}>
         <ul>
@@ -139,8 +135,8 @@ export default function ChatDialog({
                   setNewMessageText('');
                   newMessageRef.current.focus();
                 } else {
+                  // setNewConversationParticipants([]);
                   setSelectedConversationID(response.data.createConversationMessage._id);
-                  setNewConversationParticipants([]);
                 }
               }
             } catch (error) {
@@ -170,8 +166,8 @@ export default function ChatDialog({
                   setNewMessageText('');
                   newMessageRef.current.focus();
                 } else {
+                  // setNewConversationParticipants([]);
                   setSelectedConversationID(response.data.createConversationMessage._id);
-                  setNewConversationParticipants([]);
                 }
               }
             } catch (error) {

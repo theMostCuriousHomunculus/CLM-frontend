@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import MUIAddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MUIAvatarGroup from '@mui/material/AvatarGroup';
 import MUICard from '@mui/material/Card';
 import MUICardContent from '@mui/material/CardContent';
@@ -9,33 +10,27 @@ import { makeStyles } from '@mui/styles';
 
 import Avatar from '../miscellaneous/Avatar';
 import ChatDialog from './ChatDialog';
+import ParticipantsInput from './ParticipantsInput';
 import { AuthenticationContext } from '../../contexts/Authentication';
 
 const useStyles = makeStyles({
-  chatDrawerSection: {
-    maxHeight: 'calc(50vh - 12px)',
-    maxWidth: 350,
-    overflowY: 'auto'
-  },
   columnFlex: {
     display: 'flex',
     flexDirection: 'column',
     rowGap: 8
   },
-  stickyHeading: {
-    backdropFilter: 'blur(2px)',
-    margin: '0 2px',
-    position: 'sticky',
-    textAlign: 'center',
-    top: 0,
-    // to be above avatar which has z-index of 1200
-    zIndex: 1300
+  conversationCard: {
+    backgroundColor: 'transparent',
+    border: '2px solid white',
+    cursor: 'pointer',
+    margin: 0
   }
 });
 
 function ConversationMapItem({ conversation, setSelectedConversationID }) {
   const { userID } = useContext(AuthenticationContext);
   const lastMessage = conversation.messages[conversation.messages.length - 1];
+  const { conversationCard } = useStyles();
 
   conversation.participants.sort((a, b) => {
     if (a._id === userID) return -1;
@@ -46,17 +41,12 @@ function ConversationMapItem({ conversation, setSelectedConversationID }) {
 
   return (
     <MUICard
+      className={conversationCard}
       onClick={() => setSelectedConversationID(conversation._id)}
-      style={{
-        backgroundColor: 'transparent',
-        border: '2px solid white',
-        cursor: 'pointer',
-        margin: 0
-      }}
     >
       <MUICardHeader
         avatar={
-          <MUIAvatarGroup max={4}>
+          <MUIAvatarGroup max={3}>
             {conversation.participants
               .filter((participant) => participant._id !== userID)
               .map((participant) => (
@@ -89,10 +79,17 @@ function ConversationMapItem({ conversation, setSelectedConversationID }) {
 }
 
 export default function ChatDrawer({ chatDrawerOpen, setChatDrawerOpen }) {
-  const { avatar, buds, conversations, userID, userName } = useContext(AuthenticationContext);
+  const { avatar, conversations, userID, userName } = useContext(AuthenticationContext);
+  const [existingConversationParticipants, setExistingConversationParticipants] = useState([]);
   const [newConversationParticipants, setNewConversationParticipants] = useState([]);
   const [selectedConversationID, setSelectedConversationID] = useState();
-  const { chatDrawerSection, columnFlex, stickyHeading } = useStyles();
+  const { columnFlex, conversationCard } = useStyles();
+
+  const filteredConversations = conversations.filter((conversation) =>
+    existingConversationParticipants.every((ecp) =>
+      conversation.participants.some((cp) => ecp._id === cp._id)
+    )
+  );
 
   useEffect(() => {
     const existingConversation = conversations.find(
@@ -139,73 +136,77 @@ export default function ChatDrawer({ chatDrawerOpen, setChatDrawerOpen }) {
         onClose={() => setChatDrawerOpen(false)}
         open={chatDrawerOpen}
       >
-        <div className={columnFlex}>
-          <div className={chatDrawerSection}>
-            <MUITypography className={stickyHeading} color="white" variant="h3">
-              Buds
-            </MUITypography>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 8
-              }}
-            >
-              {buds.map((bud) => (
-                <Avatar
-                  key={bud._id}
+        <div className={columnFlex} style={{ width: 300 }}>
+          <ParticipantsInput
+            faded
+            participants={existingConversationParticipants}
+            setParticipants={setExistingConversationParticipants}
+          />
+          <div style={{ flexGrow: 1, flexShrink: 1, overflowY: 'auto' }}>
+            <div className={columnFlex}>
+              {!filteredConversations.find(
+                (fc) => fc.participants.length - 1 === existingConversationParticipants.length
+              ) && (
+                <MUICard
+                  className={conversationCard}
                   onClick={() => {
-                    const existingConversation = conversations.find(
-                      (conversation) =>
-                        conversation.participants.length === 2 &&
-                        conversation.participants.some((participant) => participant._id === bud._id)
-                    );
-
-                    if (existingConversation) {
-                      setSelectedConversationID(existingConversation._id);
-                    } else {
-                      setNewConversationParticipants([
-                        { _id: userID, avatar, name: userName },
-                        { _id: bud._id, avatar: bud.avatar, name: bud.name }
-                      ]);
-                    }
+                    setExistingConversationParticipants([]);
+                    setNewConversationParticipants([
+                      ...existingConversationParticipants,
+                      { _id: userID, avatar, name: userName }
+                    ]);
                   }}
-                  profile={{ avatar: bud.avatar, name: bud.name }}
-                  size="medium"
-                  style={{ cursor: 'pointer' }}
-                />
-              ))}
-            </div>
-          </div>
-          <div className={chatDrawerSection}>
-            <MUITypography className={stickyHeading} color="white" variant="h3">
-              Conversations
-            </MUITypography>
-            {conversations.length > 0 ? (
-              <div className={columnFlex}>
-                {conversations
-                  .sort((a, b) => {
-                    if (
-                      parseInt(a.messages[a.messages.length - 1].createdAt) >
-                      parseInt(b.messages[b.messages.length - 1].createdAt)
-                    ) {
-                      return -1;
+                >
+                  <MUICardHeader
+                    avatar={
+                      <MUIAvatarGroup max={3}>
+                        {existingConversationParticipants.map((participant) => (
+                          <Avatar key={participant._id} profile={participant} />
+                        ))}
+                      </MUIAvatarGroup>
                     }
-                    return 1;
-                  })
-                  .map((conversation) => (
-                    <ConversationMapItem
-                      conversation={conversation}
-                      key={conversation._id}
-                      setSelectedConversationID={setSelectedConversationID}
-                    />
-                  ))}
-              </div>
-            ) : (
-              <MUITypography color="white" variant="body1">
-                No Conversations Yet...
-              </MUITypography>
-            )}
+                    style={{ backgroundColor: 'transparent' }}
+                    title={
+                      <MUITypography color="white" variant="subtitle1">
+                        {existingConversationParticipants
+                          .map((participant) => participant.name)
+                          .join(', ')}
+                      </MUITypography>
+                    }
+                  />
+                  <MUICardContent
+                    style={{
+                      alignItems: 'center',
+                      backgroundColor: 'transparent',
+                      columnGap: 8,
+                      display: 'flex'
+                    }}
+                  >
+                    <MUIAddCircleOutlineIcon style={{ color: 'white' }} />
+                    <MUITypography color="white" variant="body1">
+                      New Conversation
+                    </MUITypography>
+                  </MUICardContent>
+                </MUICard>
+              )}
+              {filteredConversations
+                .sort((a, b) => {
+                  if (
+                    parseInt(a.messages[a.messages.length - 1].createdAt) >
+                    parseInt(b.messages[b.messages.length - 1].createdAt)
+                  ) {
+                    return -1;
+                  }
+                  return 1;
+                })
+                .map((conversation) => (
+                  <ConversationMapItem
+                    conversation={conversation}
+                    key={conversation._id}
+                    setSelectedConversationID={setSelectedConversationID}
+                  />
+                ))}
+            </div>
           </div>
         </div>
       </MUIDrawer>
